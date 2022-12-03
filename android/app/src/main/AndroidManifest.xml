@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.reddit_tutorial">
+    package="com.example.dima_app">
    <application
-        android:label="reddit_tutorial"
+        android:label="dima_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -1,6 +1,6 @@
 {
-    "name": "reddit_tutorial",
-    "short_name": "reddit_tutorial",
+    "name": "dima_app",
+    "short_name": "dima_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
