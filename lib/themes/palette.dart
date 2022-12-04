@@ -31,14 +31,7 @@ class Palette {
       bodyMedium: TextStyle(color: Colors.white),
       bodyLarge: TextStyle(color: Colors.white70),
     ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      selectedIconTheme: IconThemeData(
-        color: Colors.orange,
-      ),
-      unselectedIconTheme: IconThemeData(
-        color: Colors.amber,
-      ),
-    ),
+    iconTheme: const IconThemeData(color: whiteColor),
   );
 
   static var lightModeAppTheme = ThemeData.light().copyWith(
@@ -60,13 +53,6 @@ class Palette {
       bodyMedium: TextStyle(color: Colors.black),
       bodyLarge: TextStyle(color: Colors.black87),
     ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      selectedIconTheme: IconThemeData(
-        color: Colors.orange,
-      ),
-      unselectedIconTheme: IconThemeData(
-        color: Colors.amber,
-      ),
-    ),
+    iconTheme: const IconThemeData(color: whiteColor),
   );
 }

@@ -1,8 +1,11 @@
 import 'package:dima_app/screens/event_detail.dart';
 import 'package:dima_app/screens/events.dart';
+import 'package:dima_app/screens/groups.dart';
 import 'package:dima_app/screens/home.dart';
+import 'package:dima_app/screens/profile.dart';
 import 'package:dima_app/themes/palette.dart';
-import 'package:dima_app/widgets/my_tab_bar.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -73,47 +76,101 @@ class ThemeSwitch extends ChangeNotifier {
   }
 }
 
-class MyApp extends StatelessWidget {
+int tabIndex = 0;
+
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // https://stackoverflow.com/questions/52298686/flutter-pop-to-root-when-bottom-navigation-tapped
+  int currentIndex = 0;
+
+  final GlobalKey<NavigatorState> firstTabNavKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> secondTabNavKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> thirdTabNavKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> fourthTabNavKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Reddit Tutorial',
-      initialRoute: '/',
-      routes: {
-        '/event_detail': (context) => const EventDetailScreen(),
-      },
+      title: 'Eventy',
       theme: Provider.of<ThemeSwitch>(context).themeData,
-      home: DefaultTabController(
-        length: 4,
-        child: Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
-            title: const Text("Home"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Provider.of<ThemeSwitch>(context, listen: false)
-                      .changeTheme();
-                },
-                child: const Text(
-                  "DARK/LIGHT MODE",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          body: const TabBarView(
-            children: [
-              HomeScreen(),
-              EventsScreen(),
-            ],
-          ),
-          bottomNavigationBar: const MyTabBar(),
+      home: CupertinoTabScaffold(
+        tabBar: CupertinoTabBar(
+          onTap: (index) {
+            // back home only if not switching tab
+            if (currentIndex == index) {
+              switch (index) {
+                case 0:
+                  firstTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                  break;
+                case 1:
+                  secondTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                  break;
+                case 2:
+                  thirdTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                  break;
+                case 3:
+                  fourthTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                  break;
+              }
+            }
+            currentIndex = index;
+          },
+          activeColor: Provider.of<ThemeSwitch>(context).themeData.primaryColor,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.event),
+              label: 'Events',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.groups),
+              label: 'Groups',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle),
+              label: 'Profile',
+            ),
+          ],
         ),
+        tabBuilder: (context, index) {
+          switch (index) {
+            case 0:
+              return CupertinoTabView(
+                navigatorKey: firstTabNavKey,
+                builder: (context) =>
+                    const CupertinoPageScaffold(child: HomeScreen()),
+              );
+            case 1:
+              return CupertinoTabView(
+                navigatorKey: secondTabNavKey,
+                builder: (context) =>
+                    const CupertinoPageScaffold(child: EventsScreen()),
+              );
+            case 2:
+              return CupertinoTabView(
+                navigatorKey: thirdTabNavKey,
+                builder: (context) =>
+                    const CupertinoPageScaffold(child: GroupsScreen()),
+              );
+            case 3:
+              return CupertinoTabView(
+                navigatorKey: fourthTabNavKey,
+                builder: (context) =>
+                    const CupertinoPageScaffold(child: ProfileScreen()),
+              );
+            default:
+              return const CupertinoTabView();
+          }
+        },
       ),
     );
   }
