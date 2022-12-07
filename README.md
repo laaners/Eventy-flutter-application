@@ -1,16 +1,42 @@
-# dima_app
+## Git workflow
+### 0) From main branch
+From main branch, if branch_myname does not exist:
+```bash
+git pull
+```
 
-A new Flutter project.
+### 1) Create new branch
+```bash
+git branch branch_myname
+```
+```bash
+git checkout branch_myname
+```
+### 2) Pull requests
+In branch_myname do your stuff, once finished:
+```bash
+git add .
+```
+```bash
+git commit -m "message"
+```
+```bash
+git push
+```
+Then on github open a pull request and merge if there are no conflicts
+### 3) Merge changes to local branch
+If branch_myname exists and someone else has made some changes, we switch to main
+```bash
+git checkout main
+```
+```bash
+git pull
+```
+```bash
+git checkout branch_myname
+```
+```bash
+git merge main
+```
+Then we repeat step 2) and 3)
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
