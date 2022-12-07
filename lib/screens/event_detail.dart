@@ -18,7 +18,7 @@ class EventDetailScreen extends StatelessWidget {
             ),
           );
         },
-        child: const Text("TO EVENT DETAIL (WITH TABBAR)"),
+        child: const Text("TO EVENT DETAIL"),
       ),
     );
   }
