@@ -1,12 +1,13 @@
-import 'package:dima_app/screens/event_detail.dart';
 import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/groups.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/profile.dart';
+import 'package:dima_app/server/postgres_methods.dart';
 import 'package:dima_app/themes/palette.dart';
-import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:postgres/postgres.dart';
 
 import 'package:provider/provider.dart';
 import 'package:dima_app/provider_samples.dart';
@@ -22,6 +23,18 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
  */
+
+  await dotenv.load(fileName: ".env");
+  var db = PostgreSQLConnection(
+    dotenv.env['PG_HOST_NAME']!,
+    5432,
+    dotenv.env['PG_DATABASE_NAME']!,
+    username: dotenv.env['PG_USER_NAME'],
+    password: dotenv.env['PG_PASSWORD'],
+  );
+  await db.open().then((value) {
+    debugPrint("Database Connected!");
+  });
 
   runApp(
     MultiProvider(
@@ -53,7 +66,10 @@ void main() async {
           },
         ),
 
-        // Below a theme changer example------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------
+        // DB
+        Provider<PostgresMethods>(create: (context) => PostgresMethods(db)),
+
         // DARK/LIGHT THEME
         ChangeNotifierProvider(create: (context) => ThemeSwitch())
       ],
@@ -75,8 +91,6 @@ class ThemeSwitch extends ChangeNotifier {
     notifyListeners();
   }
 }
-
-int tabIndex = 0;
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
