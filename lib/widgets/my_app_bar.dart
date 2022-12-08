@@ -1,4 +1,4 @@
-import 'package:dima_app/main.dart';
+import 'package:dima_app/providers/theme_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
