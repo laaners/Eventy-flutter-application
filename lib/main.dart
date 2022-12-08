@@ -1,3 +1,4 @@
+import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/groups.dart';
 import 'package:dima_app/screens/home.dart';
@@ -67,7 +68,7 @@ void main() async {
         ),
 
         // ------------------------------------------------------------------------------------------------
-        // DB
+        // DB, read-only provider
         Provider<PostgresMethods>(create: (context) => PostgresMethods(db)),
 
         // DARK/LIGHT THEME
@@ -76,20 +77,6 @@ void main() async {
       child: const MyApp(),
     ),
   );
-}
-
-class ThemeSwitch extends ChangeNotifier {
-  ThemeData _themeData = Palette.lightModeAppTheme;
-
-  // getter
-  ThemeData get themeData => _themeData;
-
-  void changeTheme() {
-    _themeData = _themeData == Palette.lightModeAppTheme
-        ? Palette.darkModeAppTheme
-        : Palette.lightModeAppTheme;
-    notifyListeners();
-  }
 }
 
 class MyApp extends StatefulWidget {
