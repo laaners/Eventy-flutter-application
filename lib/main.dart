@@ -2,6 +2,7 @@ import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/groups.dart';
 import 'package:dima_app/screens/home.dart';
+import 'package:dima_app/screens/login.dart';
 import 'package:dima_app/screens/profile.dart';
 import 'package:dima_app/server/postgres_methods.dart';
 import 'package:dima_app/themes/palette.dart';
@@ -26,16 +27,16 @@ void main() async {
  */
 
   await dotenv.load(fileName: ".env");
-  var db = PostgreSQLConnection(
-    dotenv.env['PG_HOST_NAME']!,
-    5432,
-    dotenv.env['PG_DATABASE_NAME']!,
-    username: dotenv.env['PG_USER_NAME'],
-    password: dotenv.env['PG_PASSWORD'],
-  );
-  await db.open().then((value) {
-    debugPrint("Database Connected!");
-  });
+  // var db = PostgreSQLConnection(
+  //   dotenv.env['PG_HOST_NAME']!,
+  //   5432,
+  //   dotenv.env['PG_DATABASE_NAME']!,
+  //   username: dotenv.env['PG_USER_NAME'],
+  //   password: dotenv.env['PG_PASSWORD'],
+  // );
+  // await db.open().then((value) {
+  //   debugPrint("Database Connected!");
+  // });
 
   runApp(
     MultiProvider(
@@ -69,7 +70,7 @@ void main() async {
 
         // ------------------------------------------------------------------------------------------------
         // DB, read-only provider
-        Provider<PostgresMethods>(create: (context) => PostgresMethods(db)),
+        // Provider<PostgresMethods>(create: (context) => PostgresMethods(db)),
 
         // DARK/LIGHT THEME
         ChangeNotifierProvider(create: (context) => ThemeSwitch())
@@ -79,14 +80,27 @@ void main() async {
   );
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Eventy',
+      theme: Provider.of<ThemeSwitch>(context).themeData,
+      home: const LoginScreen(),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
+class MyApp2 extends StatefulWidget {
+  const MyApp2({super.key});
+
+  @override
+  State<MyApp2> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp2> {
   // https://stackoverflow.com/questions/52298686/flutter-pop-to-root-when-bottom-navigation-tapped
   int currentIndex = 0;
 
