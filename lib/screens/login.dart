@@ -1,6 +1,9 @@
+import 'package:dima_app/providers/theme_switch.dart';
+import 'package:dima_app/themes/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,91 +18,87 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              // Colors.purple,
-              Colors.purple.shade600,
-              Colors.deepPurpleAccent,
-            ],
-          ),
-        ),
         child: Column(
           children: [
             Container(
-              margin: const EdgeInsets.only(top: 100),
-              child: Text(
-                "Eventy",
-                style: const TextStyle(
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 3,
-                ),
+              margin: const EdgeInsets.only(top: 60),
+              child: Column(
+                children: const [
+                  Image(
+                    image: AssetImage('images/logo.png'),
+                    height: 100,
+                  ),
+                  Text(
+                    "Eventy",
+                    style: TextStyle(
+                      fontSize: 35,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                ],
               ),
             ),
             Expanded(
-              child: Container(
+              child: SizedBox(
                 width: double.infinity,
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(50),
-                        topRight: Radius.circular(50))),
-                margin: const EdgeInsets.only(top: 60),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
                       const SizedBox(
-                        height: 50,
+                        height: 20,
                       ),
                       Container(
-                        // color: Colors.red,
                         alignment: Alignment.topLeft,
-                        margin: const EdgeInsets.only(left: 22, bottom: 20),
+                        margin: const EdgeInsets.only(left: 22, bottom: 10),
                         child: const Text(
-                          "Login",
+                          "Sign In",
                           style: TextStyle(
-                              fontSize: 35,
-                              color: Colors.black87,
-                              letterSpacing: 2,
-                              fontFamily: "Lobster"),
+                            fontSize: 28,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                       Container(
                         width: double.infinity,
-                        height: 70,
+                        height: 60,
                         margin: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 20),
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 5),
+                          horizontal: 15,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Colors.purpleAccent, width: 1),
-                            boxShadow: const [
-                              BoxShadow(
-                                  color: Colors.purpleAccent,
-                                  blurRadius: 10,
-                                  offset: Offset(1, 1)),
-                            ],
-                            color: Colors.white,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20))),
+                          border:
+                              Border.all(color: Palette.greyColor, width: 1),
+                          color: Palette.whiteColor,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(12),
+                          ),
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            const Icon(Icons.email_outlined),
+                            const Icon(
+                              Icons.person,
+                              color: Palette.greyColor,
+                            ),
                             Expanded(
                               child: Container(
                                 margin: const EdgeInsets.only(left: 10),
                                 child: TextFormField(
                                   maxLines: 1,
                                   decoration: const InputDecoration(
-                                    label: Text(" E-mail ..."),
+                                    label: Text(
+                                      "Username",
+                                      style: TextStyle(
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
                                     border: InputBorder.none,
                                   ),
                                 ),
@@ -110,34 +109,42 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       Container(
                         width: double.infinity,
-                        height: 70,
+                        height: 60,
                         margin: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 20),
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 5),
+                          horizontal: 15,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Colors.purpleAccent, width: 1),
-                            boxShadow: const [
-                              BoxShadow(
-                                  color: Colors.purpleAccent,
-                                  blurRadius: 10,
-                                  offset: Offset(1, 1)),
-                            ],
-                            color: Colors.white,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20))),
+                          border:
+                              Border.all(color: Palette.greyColor, width: 1),
+                          color: Palette.whiteColor,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(12),
+                          ),
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            const Icon(Icons.password_outlined),
+                            const Icon(
+                              Icons.lock,
+                              color: Palette.greyColor,
+                            ),
                             Expanded(
                               child: Container(
                                 margin: const EdgeInsets.only(left: 10),
                                 child: TextFormField(
                                   maxLines: 1,
                                   decoration: const InputDecoration(
-                                    label: Text(" Password ..."),
+                                    label: Text(
+                                      "Your Password",
+                                      style: TextStyle(
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
                                     border: InputBorder.none,
                                   ),
                                 ),
