@@ -1,5 +1,8 @@
+import 'package:dima_app/main.dart';
 import 'package:dima_app/providers/theme_switch.dart';
+import 'package:dima_app/screens/event_detail.dart';
 import 'package:dima_app/themes/palette.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -195,6 +198,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           "SIGN UP",
                           style: TextStyle(color: Colors.black54, fontSize: 15),
                         ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => {
+                          Navigator.of(context, rootNavigator: true).push(
+                            ScreenTransition(
+                              builder: (context) => const MyApp2(),
+                            ),
+                          ),
+                        },
+                        child: const Text("To Home"),
                       ),
                     ],
                   ),

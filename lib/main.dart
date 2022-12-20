@@ -4,12 +4,9 @@ import 'package:dima_app/screens/groups.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/login.dart';
 import 'package:dima_app/screens/profile.dart';
-import 'package:dima_app/server/postgres_methods.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:postgres/postgres.dart';
 
 import 'package:provider/provider.dart';
 import 'package:dima_app/provider_samples.dart';
