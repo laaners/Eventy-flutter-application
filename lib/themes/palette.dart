@@ -7,10 +7,12 @@ class Palette {
   static const whiteColor = Colors.white;
   static const greyColor = Color.fromRGBO(128, 128, 128, 1);
 
-  static const drawerColor = Color.fromRGBO(18, 18, 18, 1);
+  static const drawerColor = Color.fromRGBO(1, 1, 1, 1);
   static const lightBGColor = Color.fromRGBO(236, 220, 252, 1);
-  static const darkBGColor = Color.fromRGBO(1, 1, 1, 1);
+  static const darkBGColor = Color.fromRGBO(18, 18, 18, 1);
   //static const lightBGColor = Color(0x00ecdcfc);
+
+  static const blueColor = Colors.blueAccent;
 
   // Themes
   static var darkModeAppTheme = ThemeData.dark().copyWith(
@@ -35,7 +37,7 @@ class Palette {
   );
 
   static var lightModeAppTheme = ThemeData.light().copyWith(
-    scaffoldBackgroundColor: lightBGColor,
+    scaffoldBackgroundColor: whiteColor, // lightBGColor,
     cardColor: greyColor,
     appBarTheme: const AppBarTheme(
       backgroundColor: drawerColor,

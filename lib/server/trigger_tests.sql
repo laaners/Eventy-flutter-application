@@ -9,20 +9,20 @@ begin;
 	insert into Poll values(
 		'PollName',
 		'a',
-		array [timestamp'1999-01-08 04:05:06 -8:00', timestamp'1999-01-08 02:05:06 -8:00'],
-		'1999-01-09 04:05:06 -8:00',
+		array [timestamp'1999-01-08 04:05:06', timestamp'1999-01-08 02:05:06'],
+		'1999-01-09 04:05:06',
 		'PollDescription'
 	);
 	insert into Location values('LocationA','PollName','a','LocationADesc','urlA');
 	insert into Location values('LocationB','PollName','a','LocationBDesc','urlB');
 	insert into Location values('LocationC','PollName','a','LocationCDesc','urlC');
-	insert into PollVote values('PollName','a','a','LocationA','1999-01-08 04:05:06 -8:00');
-	insert into PollVote values('PollName','a','b','LocationA','1999-01-08 04:05:06 -8:00');
-	insert into PollVote values('PollName','a','c','LocationA','1999-01-08 04:05:06 -8:00');
-	insert into PollVote values('PollName','a','a','LocationB','1999-01-08 04:05:06 -8:00');
-	insert into PollVote values('PollName','a','b','LocationB','1999-01-08 04:05:06 -8:00');
-	insert into PollVote values('PollName','a','a','LocationC','1999-01-08 02:05:06 -8:00');
-	insert into PollVote values('PollName','a','b','LocationB','1999-01-08 02:05:06 -8:00');
+	insert into PollVote values('PollName','a','a','LocationA','1999-01-08 04:05:06');
+	insert into PollVote values('PollName','a','b','LocationA','1999-01-08 04:05:06');
+	insert into PollVote values('PollName','a','c','LocationA','1999-01-08 04:05:06');
+	insert into PollVote values('PollName','a','a','LocationB','1999-01-08 04:05:06');
+	insert into PollVote values('PollName','a','b','LocationB','1999-01-08 04:05:06');
+	insert into PollVote values('PollName','a','a','LocationC','1999-01-08 02:05:06');
+	insert into PollVote values('PollName','a','b','LocationB','1999-01-08 02:05:06');
 end;
 
 select * from Users;

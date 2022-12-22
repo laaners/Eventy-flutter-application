@@ -1,4 +1,6 @@
+import 'package:dima_app/screens/event_create.dart';
 import 'package:dima_app/screens/event_detail.dart';
+import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:flutter/material.dart';
 
@@ -24,7 +26,7 @@ class EventsScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 ScreenTransition(
-                  builder: (context) => const EventDetailScreen(),
+                  builder: (context) => const HomeScreen(),
                 ),
               );
             },
@@ -39,6 +41,17 @@ class EventsScreen extends StatelessWidget {
               );
             },
             child: const Text("TO EVENT DETAIL (NO TABBAR)"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                ScreenTransition(
+                  builder: (context) => const EventCreateScreen(),
+                ),
+              );
+            },
+            child: const Text("TO EVENT CREATE"),
           ),
         ],
       ),
