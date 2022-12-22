@@ -67,7 +67,7 @@ class HomeScreen extends StatelessWidget {
           ),
 
           // List DB fetch
-          // const UsersList(),
+          const UsersList(),
 
           // long shape
           Center(
@@ -77,6 +77,7 @@ class HomeScreen extends StatelessWidget {
               height: 1000,
             ),
           ),
+          const Text("ok"),
         ],
       ),
     );
