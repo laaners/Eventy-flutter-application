@@ -1,4 +1,5 @@
 import 'package:dima_app/providers/theme_switch.dart';
+import 'package:dima_app/widgets/gmaps.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -78,6 +79,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           const Text("ok"),
+          MapSample(),
         ],
       ),
     );

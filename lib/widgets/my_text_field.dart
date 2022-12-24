@@ -62,7 +62,7 @@ class _MyTextFieldState extends State<MyTextField> {
             color: Palette.greyColor,
           ),
         ),
-        autofocus: true,
+        autofocus: false,
         maxLength: widget.maxLength,
       ),
     );

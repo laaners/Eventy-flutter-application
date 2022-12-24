@@ -1,6 +1,7 @@
 import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/themes/palette.dart';
+import 'package:dima_app/widgets/gmaps.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_list_view.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
@@ -61,7 +62,9 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             title: Text(
               locations[i].name,
               style: TextStyle(
-                color: Provider.of<ThemeSwitch>(context).themeData.primaryColor,
+                color: Provider.of<ThemeSwitch>(context, listen: false)
+                    .themeData
+                    .primaryColor,
               ),
             ),
             leading: Container(
@@ -273,20 +276,20 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                   ),
                   onTap: () {
                     setState(() {
-                      locations.add(
+                      locations = [
                         Location(
                           'Location ${locations.length}',
                           'A description for location ${locations.length}',
                           'site for ${locations.length}',
                         ),
-                      );
+                      ];
                     });
                     showModalBottomSheet(
                       useRootNavigator: true,
                       isScrollControlled: true,
                       context: context,
                       builder: (context) => FractionallySizedBox(
-                        heightFactor: 0.9,
+                        heightFactor: 0.85,
                         child: Container(
                           margin: const EdgeInsets.all(20),
                           child: ListView(
@@ -294,22 +297,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                               Container(
                                 alignment: Alignment.topLeft,
                                 child: const Text(
-                                  "Address",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                height: 600,
-                                color: Colors.orange,
-                              ),
-                              Container(
-                                alignment: Alignment.topLeft,
-                                child: const Text(
-                                  "Title",
+                                  "Name",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20,
@@ -321,7 +309,77 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                                 child: MyTextField(
                                   maxLength: 40,
                                   maxLines: 1,
-                                  hintText: "What's the occasion?",
+                                  hintText: "Name of the location",
+                                  controller: eventTitle,
+                                ),
+                              ),
+                              Container(
+                                alignment: Alignment.topLeft,
+                                child: const Text(
+                                  "Address",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ),
+                              MapSample(),
+                              TextField(
+                                style: TextStyle(
+                                  color: Provider.of<ThemeSwitch>(context,
+                                          listen: false)
+                                      .themeData
+                                      .primaryColor,
+                                ),
+                                decoration: const InputDecoration(
+                                  icon: Icon(
+                                    Icons.calendar_today,
+                                    color: Palette.greyColor,
+                                  ),
+                                  border: InputBorder.none,
+                                ),
+                                readOnly: true,
+                                controller: deadlineController,
+                                onTap: () async {
+                                  showModalBottomSheet(
+                                    useRootNavigator: true,
+                                    isScrollControlled: true,
+                                    context: context,
+                                    builder: (context) => FractionallySizedBox(
+                                      heightFactor: 0.4,
+                                      child: Container(
+                                        color: Provider.of<ThemeSwitch>(context,
+                                                listen: false)
+                                            .themeData
+                                            .scaffoldBackgroundColor,
+                                        child: CupertinoDatePicker(
+                                          mode: CupertinoDatePickerMode
+                                              .dateAndTime,
+                                          minimumDate: DateTime.now(),
+                                          initialDateTime:
+                                              DateFormatter.string2DateTime(
+                                                  deadlineController.text),
+                                          minuteInterval: 5,
+                                          use24hFormat: true,
+                                          onDateTimeChanged: (pickedDate) {
+                                            setState(() {
+                                              deadlineController.text =
+                                                  DateFormatter.dateTime2String(
+                                                      pickedDate);
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              Container(
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                child: MyTextField(
+                                  maxLength: 40,
+                                  maxLines: 1,
+                                  hintText: "Name of the location",
                                   controller: eventTitle,
                                 ),
                               ),
@@ -339,7 +397,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                                 margin: const EdgeInsets.symmetric(vertical: 8),
                                 child: MyTextField(
                                   maxLength: 200,
-                                  maxLines: 7,
+                                  maxLines: 6,
                                   hintText: "Describe what this event is about",
                                   controller: eventDesc,
                                 ),
