@@ -1,4 +1,4 @@
-import 'package:dima_app/screens/event_create.dart';
+import 'package:dima_app/screens/event_create/index.dart';
 import 'package:dima_app/screens/event_detail.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/transitions/screen_transition.dart';

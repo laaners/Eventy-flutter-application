@@ -25,7 +25,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
  */
-
   await dotenv.load(fileName: ".env");
   var db = PostgreSQLConnection(
     dotenv.env['PG_HOST_NAME']!,
@@ -78,6 +77,8 @@ void main() async {
       child: const MyApp(),
     ),
   );
+
+  WidgetsFlutterBinding.ensureInitialized();
 }
 
 class MyApp extends StatelessWidget {

@@ -13,9 +13,9 @@ begin;
 		'1999-01-09 04:05:06',
 		'PollDescription'
 	);
-	insert into Location values('LocationA','PollName','a','LocationADesc','urlA');
-	insert into Location values('LocationB','PollName','a','LocationBDesc','urlB');
-	insert into Location values('LocationC','PollName','a','LocationCDesc','urlC');
+	insert into Location values('LocationA','PollName','a','LocationADesc','urlA',0,10);
+	insert into Location values('LocationB','PollName','a','LocationBDesc','urlB',0,20);
+	insert into Location values('LocationC','PollName','a','LocationCDesc','urlC',0,30);
 	insert into PollVote values('PollName','a','a','LocationA','1999-01-08 04:05:06');
 	insert into PollVote values('PollName','a','b','LocationA','1999-01-08 04:05:06');
 	insert into PollVote values('PollName','a','c','LocationA','1999-01-08 04:05:06');
