@@ -16,6 +16,7 @@ class HomeScreen extends StatelessWidget {
       appBar: const MyAppBar("Home"),
       body: ListView(
         children: [
+          TextFormField(),
           Text(Provider.of<Something>(context).stringa),
           // equivalente a quello sopra
           Text(context.watch<Something>().stringa),

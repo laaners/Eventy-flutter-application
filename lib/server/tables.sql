@@ -33,7 +33,9 @@ create table Location(
 	PollName varchar(40),
 	OrganizerUserName varchar(40),
 	LocationDescription varchar(200),
-	LocationSite text not null,
+	LocationSite text,
+	Lat numeric,
+	Lon numeric,
 	constraint Location_PK primary key (LocationName, PollName, OrganizerUserName),
 	constraint Location_FK foreign key (PollName, OrganizerUserName) references Poll(PollName, OrganizerUserName) on delete cascade
 );
@@ -65,7 +67,9 @@ create table Event(
 	EventDescription varchar(200),
 	LocationName varchar(40),
 	LocationDescription varchar(200),
-	LocationSite text not null,
+	LocationSite text,
+	Lat numeric,
+	Lon numeric,
 	Date timestamp,
 	constraint Event_PK primary key (EventName, OrganizerUserName),
 	constraint Event_FK foreign key (OrganizerUserName) references Users(UserName) on delete cascade

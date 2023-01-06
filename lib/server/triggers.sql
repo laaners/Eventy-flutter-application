@@ -24,12 +24,15 @@ begin
 		most_voted_location.LocationName,
 		most_voted_location.LocationDescription,
 		most_voted_location.LocationSite,
-		most_voted.Date		
+		most_voted_location.Lat,
+		most_voted_location.Lon,
+		most_voted.Date
 	);
 	return old;
 end;
 $$ language plpgsql;
 
+drop trigger if exists poll_to_event on Poll;
 create trigger poll_to_event before delete on Poll for each row execute procedure poll_to_event();
 
 /*MUTUAL FRIENDSHIP----------------------------------------------------------------------------------------------------*/
@@ -50,4 +53,5 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists mutual_friendship on Friend;
 create trigger mutual_friendship before insert on Friend for each row execute procedure mutual_friendship();

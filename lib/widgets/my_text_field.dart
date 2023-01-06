@@ -1,8 +1,7 @@
 import 'package:dima_app/providers/theme_switch.dart';
+import 'package:dima_app/themes/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../themes/palette.dart';
 
 class MyTextField extends StatefulWidget {
   final int maxLength;
@@ -22,17 +21,38 @@ class MyTextField extends StatefulWidget {
 }
 
 class _MyTextFieldState extends State<MyTextField> {
+  final FocusNode _focus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focus.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _focus.removeListener(_onFocusChange);
+    _focus.dispose();
+  }
+
+  void _onFocusChange() {
+    debugPrint("Focus: ${_focus.hasFocus.toString()}");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Palette.greyColor, width: 1),
-        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Palette.greyColor),
       ),
-      child: TextField(
+      child: TextFormField(
+        focusNode: _focus,
+        autofocus: false,
         controller: widget.controller,
         keyboardType: TextInputType.text,
-        maxLines: widget.maxLines,
+        minLines: widget.maxLines,
+        maxLines: null, // widget.maxLines,
         style: TextStyle(
           color: Provider.of<ThemeSwitch>(context).themeData.primaryColor,
         ),
@@ -44,11 +64,14 @@ class _MyTextFieldState extends State<MyTextField> {
         }) {
           return isFocused
               ? Container(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    "$currentLength/$maxLength",
-                    style: const TextStyle(
-                      color: Palette.greyColor,
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Container(
+                    alignment: Alignment.topRight,
+                    child: Text(
+                      "$currentLength/$maxLength",
+                      style: const TextStyle(
+                        color: Palette.greyColor,
+                      ),
                     ),
                   ),
                 )
@@ -61,8 +84,8 @@ class _MyTextFieldState extends State<MyTextField> {
           hintStyle: const TextStyle(
             color: Palette.greyColor,
           ),
+          hintMaxLines: 2,
         ),
-        autofocus: true,
         maxLength: widget.maxLength,
       ),
     );
