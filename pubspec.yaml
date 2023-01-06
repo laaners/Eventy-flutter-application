@@ -40,6 +40,7 @@ dependencies:
   postgres: ^2.5.2
   flutter_dotenv: ^5.0.2
   intl: ^0.18.0
+  crypt: ^4.2.1
 
 dev_dependencies:
   flutter_test:
