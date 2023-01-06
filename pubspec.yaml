@@ -40,6 +40,7 @@ dependencies:
   postgres: ^2.5.2
   flutter_dotenv: ^5.0.2
   intl: ^0.18.0
+  crypt: ^4.2.1
   google_maps_flutter: ^2.2.2
   google_maps_flutter_web: ^0.4.0+3
   flutter_google_places: ^0.3.0
