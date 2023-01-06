@@ -3,6 +3,7 @@ import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/groups.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/login.dart';
+import 'package:dima_app/screens/signup.dart';
 import 'package:dima_app/screens/profile.dart';
 import 'package:dima_app/server/postgres_methods.dart';
 import 'package:flutter/cupertino.dart';
@@ -87,7 +88,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Eventy',
       theme: Provider.of<ThemeSwitch>(context).themeData,
-      home: const LoginScreen(),
+      home: const LogInScreen(),
     );
   }
 }
