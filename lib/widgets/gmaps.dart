@@ -1,59 +1,126 @@
-import 'dart:async';
+import 'dart:convert';
+import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 
-class MapSample extends StatefulWidget {
-  const MapSample({Key? key}) : super(key: key);
+class GmapFromAddr extends StatefulWidget {
+  final String address;
+  const GmapFromAddr({super.key, required this.address});
 
   @override
-  State<MapSample> createState() => MapSampleState();
+  State<GmapFromAddr> createState() => GmapFromAddrState();
 }
 
-class MapSampleState extends State<MapSample> {
+class GmapFromAddrState extends State<GmapFromAddr> {
+  /*
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
+*/
+  double lat = 0;
+  double lon = 0;
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
+  void initPosition() async {
+    var test = await http.get(
+      Uri.parse(
+          'https://nominatim.openstreetmap.org/search/${widget.address}?format=json&addressdetails=1&limit=1'),
+    );
+    var res = jsonDecode(test.body);
+    if (res.length > 0) {
+      setState(() {
+        lat = double.parse(res[0]["lat"]);
+        lon = double.parse(res[0]["lon"]);
+        Marker marker = Marker(
+          markerId: const MarkerId('place_name'),
+          position: LatLng(lat, lon),
+          // icon: BitmapDescriptor.,
+          infoWindow: InfoWindow(
+            title: widget.address,
+            snippet: widget.address,
+          ),
+        );
+        markers[const MarkerId('place_name')] = marker;
+      });
+    } else {
+      setState(() {
+        lat = 0;
+        lon = 0;
+        Marker marker = Marker(
+          markerId: const MarkerId('place_name'),
+          position: LatLng(lat, lon),
+          // icon: BitmapDescriptor.,
+          infoWindow: InfoWindow(
+            title: widget.address,
+            snippet: widget.address,
+          ),
+        );
+        markers[const MarkerId('place_name')] = marker;
+      });
+    }
+  }
 
-  static const CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
+  @override
+  void initState() {
+    super.initState();
+    initPosition();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return lat == 0 && lon == 0
+        ? const LoadingSpinner()
+        : Container(
+            height: 300,
+            margin: const EdgeInsets.all(15),
+            child: GoogleMap(
+              mapType: MapType.normal,
+              myLocationEnabled: false,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(lat, lon),
+                zoom: 16.4746,
+              ),
+              markers: markers.values.toSet(),
+            ),
+          );
+  }
+}
+
+class GmapFromCoor extends StatelessWidget {
+  final String address;
+  final double lat;
+  final double lon;
+  const GmapFromCoor({
+    super.key,
+    required this.lat,
+    required this.lon,
+    required this.address,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
       height: 300,
+      margin: const EdgeInsets.all(15),
       child: GoogleMap(
-        mapType: MapType.hybrid,
-        initialCameraPosition: _kGooglePlex,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
+        mapType: MapType.normal,
+        myLocationEnabled: false,
+        initialCameraPosition: CameraPosition(
+          target: LatLng(lat, lon),
+          zoom: 16.4746,
+        ),
+        markers: {
+          Marker(
+            markerId: const MarkerId('place_name'),
+            position: LatLng(lat, lon),
+            // icon: BitmapDescriptor.,
+            infoWindow: InfoWindow(
+              title: address,
+              snippet: address,
+            ),
+          )
         },
       ),
     );
-    // return Scaffold(
-    //   body: GoogleMap(
-    //     mapType: MapType.hybrid,
-    //     initialCameraPosition: _kGooglePlex,
-    //     onMapCreated: (GoogleMapController controller) {
-    //       _controller.complete(controller);
-    //     },
-    //   ),
-    //   floatingActionButton: FloatingActionButton.extended(
-    //     onPressed: _goToTheLake,
-    //     label: const Text('To the lake!'),
-    //     icon: const Icon(Icons.directions_boat),
-    //   ),
-    // );
-  }
-
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
   }
 }
