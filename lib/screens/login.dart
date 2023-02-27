@@ -1,221 +1,225 @@
-import 'package:dima_app/main.dart';
-import 'package:dima_app/providers/theme_switch.dart';
-import 'package:dima_app/screens/event_detail.dart';
-import 'package:dima_app/themes/palette.dart';
-import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:dima_app/screens/signup.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+import '../providers/theme_switch.dart';
 
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+class LogInScreen extends StatelessWidget {
+  const LogInScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SizedBox(
-        width: double.infinity,
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 60),
-              child: Column(
-                children: const [
-                  Image(
-                    image: AssetImage('images/logo.png'),
-                    height: 100,
-                  ),
-                  Text(
-                    "Eventy",
-                    style: TextStyle(
-                      fontSize: 35,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                ],
+      // todo: remove appBar
+      appBar: AppBar(
+        actions: [
+          TextButton(
+            onPressed: () {
+              Provider.of<ThemeSwitch>(context, listen: false).changeTheme();
+            },
+            child: Icon(
+              Icons.dark_mode,
+              color:
+                  Provider.of<ThemeSwitch>(context).themeData.iconTheme.color,
+            ),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          const SizedBox(
+            height: 50,
+          ),
+          const Image(
+            image: AssetImage('images/logo.png'),
+            height: 80,
+          ),
+          const Text(
+            "Eventy",
+            style: TextStyle(
+              fontSize: 35,
+              fontWeight: FontWeight.normal,
+              letterSpacing: 4,
+            ),
+          ),
+          Container(
+            alignment: Alignment.topLeft,
+            margin: const EdgeInsets.fromLTRB(22, 0, 0, 0),
+            child: const Text(
+              "Log In",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            Expanded(
-              child: SizedBox(
-                width: double.infinity,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Container(
-                        alignment: Alignment.topLeft,
-                        margin: const EdgeInsets.only(left: 22, bottom: 10),
-                        child: const Text(
-                          "Sign In",
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        height: 60,
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          border:
-                              Border.all(color: Palette.greyColor, width: 1),
-                          color: Palette.whiteColor,
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(12),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const Icon(
-                              Icons.person,
-                              color: Palette.greyColor,
-                            ),
-                            Expanded(
-                              child: Container(
-                                margin: const EdgeInsets.only(left: 10),
-                                child: TextFormField(
-                                  maxLines: 1,
-                                  decoration: const InputDecoration(
-                                    label: Text(
-                                      "Username",
-                                      style: TextStyle(
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                    border: InputBorder.none,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        height: 60,
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          border:
-                              Border.all(color: Palette.greyColor, width: 1),
-                          color: Palette.whiteColor,
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(12),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const Icon(
-                              Icons.lock,
-                              color: Palette.greyColor,
-                            ),
-                            Expanded(
-                              child: Container(
-                                margin: const EdgeInsets.only(left: 10),
-                                child: TextFormField(
-                                  maxLines: 1,
-                                  decoration: const InputDecoration(
-                                    label: Text(
-                                      "Your Password",
-                                      style: TextStyle(
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                    border: InputBorder.none,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                            onPrimary: Colors.purpleAccent,
-                            shadowColor: Colors.purpleAccent,
-                            elevation: 18,
-                            padding: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20))),
-                        child: Ink(
-                          decoration: BoxDecoration(
-                              gradient: const LinearGradient(colors: [
-                                Colors.purpleAccent,
-                                Colors.deepPurpleAccent
-                              ]),
-                              borderRadius: BorderRadius.circular(20)),
-                          child: Container(
-                            width: 200,
-                            height: 50,
-                            alignment: Alignment.center,
-                            child: const Text(
-                              'Login',
-                              style: TextStyle(
-                                fontSize: 30,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        height: 70,
-                        alignment: Alignment.center,
-                        margin: const EdgeInsets.only(top: 10),
-                        child: const Text(
-                          "SIGN UP",
-                          style: TextStyle(color: Colors.black54, fontSize: 15),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () => {
-                          Navigator.of(context, rootNavigator: true).push(
-                            ScreenTransition(
-                              builder: (context) => const MyApp2(),
-                            ),
-                          ),
-                        },
-                        child: const Text("To Home"),
-                      ),
-                    ],
+          ),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              image: DecorationImage(image: AssetImage('images/logo.png')),
+            ),
+          ),
+          const Expanded(
+            child: LogInForm(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class LogInForm extends StatefulWidget {
+  const LogInForm({super.key});
+
+  @override
+  State<LogInForm> createState() => _LogInFormState();
+}
+
+class _LogInFormState extends State<LogInForm> {
+  final _formKey = GlobalKey<FormState>();
+  bool _passwordVisible = false;
+  bool _rememberUser = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.face, color: Colors.grey),
+                border: OutlineInputBorder(),
+                labelText: 'Username',
+                labelStyle: TextStyle(fontStyle: FontStyle.italic),
+              ),
+              validator: (value) {
+                // todo: check if username already exists
+                if (value == null || value.isEmpty) {
+                  return 'Enter your username';
+                }
+                return null;
+              },
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: TextFormField(
+              obscureText: _passwordVisible,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
+                hintText: 'Password',
+                border: const OutlineInputBorder(),
+                labelText: 'Password',
+                labelStyle: const TextStyle(fontStyle: FontStyle.italic),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _passwordVisible = !_passwordVisible;
+                    });
+                  },
+                  icon: Icon(
+                    _passwordVisible ? Icons.visibility_off : Icons.visibility,
                   ),
                 ),
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Enter your password';
+                }
+                return null;
+              },
             ),
-          ],
-        ),
+          ),
+          Container(
+            margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+            child: Row(children: [
+              Switch(
+                value: _rememberUser,
+                onChanged: (bool value) {
+                  // This is called when the user toggles the switch.
+                  setState(() {
+                    _rememberUser = value;
+                    // todo: save credentials in secure storage if _rememberUser is true AND user is authenticated
+                    // https://pub.dev/packages/flutter_secure_storage
+                  });
+                },
+              ),
+              const Text(
+                "Remember me",
+                style: TextStyle(fontStyle: FontStyle.italic),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () {
+                  // todo: add transition to forgot password process
+                },
+                child: const Text(
+                  "Forgot Password?",
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ]),
+          ),
+          const Spacer(),
+          Container(
+            padding: const EdgeInsets.all(20),
+            alignment: Alignment.center,
+            child: ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  // If the form is valid, display a snackbar. In the real world,
+                  // you'd often call a server or save the information in a database.
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Processing Data'),
+                    ),
+                  );
+                }
+              },
+              style: const ButtonStyle(
+                padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
+                    EdgeInsets.all(20)),
+              ),
+              child: const Text(
+                "LOG IN",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
+          const Spacer(),
+          Container(
+            margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Don't have an account?",
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SignUpScreen()),
+                    );
+                  },
+                  child: const Text(
+                    "Sign up",
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
