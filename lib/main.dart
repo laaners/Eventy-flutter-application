@@ -9,7 +9,6 @@ import 'package:dima_app/screens/login.dart';
 import 'package:dima_app/screens/signup.dart';
 import 'package:dima_app/screens/profile.dart';
 import 'package:dima_app/server/firebase_methods.dart';
-import 'package:dima_app/server/postgres_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
