@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dima_app/widgets/my_app_bar.dart';
-import 'package:dima_app/server/postgres_methods.dart';
 import 'package:dima_app/provider_samples.dart';
 
 class HomeScreen extends StatelessWidget {

@@ -1,49 +1,19 @@
+import 'package:dima_app/server/firebase_methods.dart';
+import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/theme_switch.dart';
-import '../server/postgres_methods.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       // todo: remove appBar
-      appBar: AppBar(
-        centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: () {
-              Provider.of<ThemeSwitch>(context, listen: false).changeTheme();
-            },
-            child: Icon(
-              Icons.dark_mode,
-              color:
-                  Provider.of<ThemeSwitch>(context).themeData.iconTheme.color,
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Container(
-            alignment: Alignment.topLeft,
-            margin: const EdgeInsets.fromLTRB(22, 20, 0, 0),
-            child: const Text(
-              "Sign up",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          const Expanded(
-            child: SignUpForm(),
-          ),
-        ],
-      ),
+      appBar: MyAppBar("Sign Up"),
+      body: SignUpForm(),
     );
   }
 }
@@ -77,8 +47,7 @@ class _SignUpFormState extends State<SignUpForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+      child: ListView(
         children: <Widget>[
           Container(
             margin: const EdgeInsets.fromLTRB(20, 20, 20, 20),
@@ -197,37 +166,37 @@ class _SignUpFormState extends State<SignUpForm> {
               },
             ),
           ),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              alignment: Alignment.center,
-              child: ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    // If the form is valid, display a snackbar and call a server or save the information in the database.
-                    await Provider.of<PostgresMethods>(context, listen: false)
-                        .insertUser(
-                            context,
-                            _usernameController.text,
-                            _nameController.text,
-                            _surnameController.text,
-                            _passwordController.text);
-                    // ignore: use_build_context_synchronously
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Processing Data'),
-                      ),
-                    );
-                  }
-                },
-                style: const ButtonStyle(
-                  padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
-                      EdgeInsets.all(20)),
-                ),
-                child: const Text(
-                  "SIGN UP",
-                  style: TextStyle(fontSize: 18),
-                ),
+          Container(
+            margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            alignment: Alignment.center,
+            child: ElevatedButton(
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  // If the form is valid, display a snackbar and call a server or save the information in the database.
+                  await Provider.of<FirebaseMethods>(context, listen: false)
+                      .signUpWithEmail(
+                          email: "0@ok.it", //,_emailController.text,
+                          password: _passwordController.text,
+                          username: _usernameController.text,
+                          name: _nameController.text,
+                          surname: _surnameController.text,
+                          profilePic: "0", //profilePic,
+                          context: context);
+                  // ignore: use_build_context_synchronously
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Processing Data'),
+                    ),
+                  );
+                }
+              },
+              style: const ButtonStyle(
+                padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
+                    EdgeInsets.all(20)),
+              ),
+              child: const Text(
+                "SIGN UP",
+                style: TextStyle(fontSize: 18),
               ),
             ),
           ),
