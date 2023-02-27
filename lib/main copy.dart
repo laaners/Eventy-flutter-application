@@ -1,16 +1,10 @@
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/groups.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/login.dart';
 import 'package:dima_app/screens/profile.dart';
-import 'package:dima_app/server/firebase_methods.dart';
 import 'package:dima_app/server/postgres_methods.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -19,13 +13,29 @@ import 'package:postgres/postgres.dart';
 import 'package:provider/provider.dart';
 import 'package:dima_app/provider_samples.dart';
 
-import 'firebase_options.dart';
-
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+/*   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: Platform.isLinux
+        ? DefaultFirebaseOptions.linux
+        : DefaultFirebaseOptions.currentPlatform,
+  );
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+ */
+  await dotenv.load(fileName: ".env");
+  var db = PostgreSQLConnection(
+    dotenv.env['PG_HOST_NAME']!,
+    5432,
+    dotenv.env['PG_DATABASE_NAME']!,
+    username: dotenv.env['PG_USER_NAME'],
+    password: dotenv.env['PG_PASSWORD'],
+  );
+  await db.open().then((value) {
+    debugPrint("Database Connected!");
+  });
+
   runApp(
     MultiProvider(
       providers: [
@@ -58,19 +68,7 @@ void main() async {
 
         // ------------------------------------------------------------------------------------------------
         // DB, read-only provider
-        Provider<FirebaseMethods>(
-          create: (context) => FirebaseMethods(
-            FirebaseAuth.instance,
-            FirebaseFirestore.instance,
-          ),
-        ),
-
-        // Firebase state management, type user
-        StreamProvider(
-          create: (context) =>
-              Provider.of<FirebaseMethods>(context, listen: false).authState,
-          initialData: null,
-        ),
+        Provider<PostgresMethods>(create: (context) => PostgresMethods(db)),
 
         // DARK/LIGHT THEME
         ChangeNotifierProvider(create: (context) => ThemeSwitch())

@@ -77,8 +77,10 @@ class _StepPlacesState extends State<StepPlaces> {
                               margin:
                                   const EdgeInsets.only(top: 15, bottom: 15),
                               child: SelectVirtual(
+                                defaultOptions: Location("", "", "", 1, 1),
                                 locations: widget.locations,
                                 addLocation: widget.addLocation,
+                                removeLocation: widget.removeLocation,
                                 setVirtualMeeting: (value) {
                                   setState(() {
                                     virtualMeeting = value;
@@ -132,7 +134,9 @@ class _StepPlacesState extends State<StepPlaces> {
                     margin: const EdgeInsets.only(top: 15, bottom: 15),
                     child: SelectLocation(
                       locations: widget.locations,
-                      setLocation: widget.addLocation,
+                      addLocation: widget.addLocation,
+                      removeLocation: widget.removeLocation,
+                      defaultLocation: Location("", "", "", 0, 0),
                     ),
                   ),
                 ),
@@ -140,7 +144,9 @@ class _StepPlacesState extends State<StepPlaces> {
             },
           ),
         ),
-        if (virtualMeeting)
+        if (widget.locations
+            .map((x) => x.name)
+            .contains("Virtual meeting")) //(virtualMeeting)
           Container(
             padding: const EdgeInsets.symmetric(vertical: 1.0),
             decoration: const BoxDecoration(
@@ -160,8 +166,13 @@ class _StepPlacesState extends State<StepPlaces> {
               ),
               subtitle: Text(
                 widget.locations
-                    .firstWhere((_) => _.name == "Virtual meeting")
-                    .site,
+                        .firstWhere((_) => _.name == "Virtual meeting")
+                        .site
+                        .isEmpty
+                    ? "No link given"
+                    : widget.locations
+                        .firstWhere((_) => _.name == "Virtual meeting")
+                        .site,
                 overflow: TextOverflow.ellipsis,
               ),
               leading: Container(
@@ -187,7 +198,29 @@ class _StepPlacesState extends State<StepPlaces> {
                 },
               ),
               onTap: () {
-                print("Should redirect");
+                showModalBottomSheet(
+                  useRootNavigator: true,
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (context) => FractionallySizedBox(
+                    heightFactor: 0.85,
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 15, bottom: 15),
+                      child: SelectVirtual(
+                        defaultOptions: widget.locations
+                            .firstWhere((_) => _.name == "Virtual meeting"),
+                        locations: widget.locations,
+                        addLocation: widget.addLocation,
+                        removeLocation: widget.removeLocation,
+                        setVirtualMeeting: (value) {
+                          setState(() {
+                            virtualMeeting = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
           ),
@@ -246,7 +279,25 @@ class _StepPlacesState extends State<StepPlaces> {
                 },
               ),
               onTap: () {
-                print("Should redirect");
+                showModalBottomSheet(
+                  useRootNavigator: true,
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (context) => FractionallySizedBox(
+                    heightFactor: 0.85,
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 15, bottom: 15),
+                      child: SelectLocation(
+                        locations: widget.locations,
+                        addLocation: widget.addLocation,
+                        removeLocation: widget.removeLocation,
+                        defaultLocation: widget.locations
+                            .where((_) => _.name != "Virtual meeting")
+                            .toList()[i],
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
           ),

@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/providers/theme_switch.dart';
+import 'package:dima_app/server/firebase_methods.dart';
+import 'package:dima_app/server/tables/user_table.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +19,7 @@ class HomeScreen extends StatelessWidget {
       appBar: const MyAppBar("Home"),
       body: ListView(
         children: [
+          const Text("ok"),
           TextFormField(),
           Text(Provider.of<Something>(context).stringa),
           // equivalente a quello sopra
@@ -57,6 +61,47 @@ class HomeScreen extends StatelessWidget {
           // DB test
           TextButton(
             onPressed: () async {
+              await Provider.of<FirebaseMethods>(context, listen: false)
+                  .signUpWithEmail(
+                email: "kirbyalessio@yahoo.it",
+                password: "password",
+                username: "Username",
+                name: "name",
+                surname: "surname",
+                profilePic: "profilePic",
+                context: context,
+              );
+            },
+            child: const Text("Firebase test"),
+          ),
+          TextButton(
+            onPressed: () async {
+              await Provider.of<FirebaseMethods>(context, listen: false)
+                  .loginWithEmail(
+                email: "kirbyalessio@yahoo.it", //"ok@ok.it",
+                password: "password",
+                context: context,
+              );
+            },
+            child: const Text("Firebase login"),
+          ),
+          TextButton(
+            onPressed: () async {
+              await Provider.of<FirebaseMethods>(context, listen: false)
+                  .signOut(context);
+            },
+            child: const Text("Firebase sign out"),
+          ),
+          TextButton(
+            onPressed: () async {
+              await Provider.of<FirebaseMethods>(context, listen: false)
+                  .deleteAccount(context);
+            },
+            child: const Text("Firebase delete"),
+          ),
+          /*
+          TextButton(
+            onPressed: () async {
               var rows =
                   await Provider.of<PostgresMethods>(context, listen: false)
                       .test(context);
@@ -66,6 +111,7 @@ class HomeScreen extends StatelessWidget {
             },
             child: const Text("Postgres test"),
           ),
+          */
 
           // List DB fetch
           const UsersList(),
@@ -90,16 +136,19 @@ class UsersList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    CollectionReference users =
+        Provider.of<FirebaseMethods>(context, listen: false).users;
     return FutureBuilder(
-      future: Provider.of<PostgresMethods>(context, listen: false).users(),
+      future: users.get(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           var users = snapshot.data!;
           return ListView.builder(
             shrinkWrap: true,
-            itemCount: users.length,
+            itemCount: users.docs.length,
             itemBuilder: (context, index) {
-              return UserTile(user: users[index]["users"]);
+              return Text(users.docs[index]["email"]);
+              // return UserTile(user: users.docs[index]["uid"]);
             },
           );
         } else if (snapshot.hasError) {

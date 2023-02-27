@@ -1,8 +1,11 @@
 import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/event_create/my_stepper.dart';
 import 'package:dima_app/screens/event_create/step_basics.dart';
+import 'package:dima_app/screens/event_create/step_dates.dart';
 import 'package:dima_app/screens/event_create/step_places.dart';
+import 'package:dima_app/screens/event_create/step_slots.dart';
 import 'package:dima_app/server/date_methods.dart';
+import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +28,10 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   TextEditingController deadlineController = TextEditingController();
 
   // stepPlaces
-  late List<Location> locations;
+  List<Location> locations = [];
+
+  // stepDates;
+  List<DateTime> dates = [];
 
   @override
   void dispose() {
@@ -42,7 +48,6 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
     deadlineController.text = DateFormat("yyyy-MM-dd HH:00:00").format(
       DateTime(now.year, now.month, now.day + 1),
     );
-    locations = [];
   }
 
   List<MyStep> stepList() => [
@@ -85,6 +90,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
               addLocation: (location) {
                 setState(() {
                   locations.add(location);
+                  locations.sort((a, b) => a.name.compareTo(b.name));
                 });
               },
               removeLocation: (locationName) {
@@ -96,16 +102,27 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
         MyStep(
           isActive: _activeStepIndex >= 2,
           title: const Text(""),
-          label: const Text("Dates"),
-          content: Column(
-            children: [
-              // LocationGmap(),
-              DatePickerDialog(
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2123),
-              ),
-            ],
+          label: Text(
+            "Dates",
+            style: TextStyle(
+              color: Provider.of<ThemeSwitch>(context, listen: false)
+                  .themeData
+                  .primaryColor,
+            ),
+          ),
+          content: StepDates(
+            dates: dates,
+            addDate: (value) {
+              setState(() {
+                dates.add(value);
+              });
+            },
+            removeDate: (value) {
+              setState(() {
+                dates.removeWhere((item) => item == value);
+              });
+            },
+            deadlineController: deadlineController,
           ),
         ),
         MyStep(
@@ -125,7 +142,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar("New Event"),
+      appBar: const MyAppBar(
+          "New Event, filter dates before deadline at the end!!!"),
       body: Theme(
         data: ThemeData(
           canvasColor: Provider.of<ThemeSwitch>(context)
@@ -133,7 +151,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
               .scaffoldBackgroundColor,
           shadowColor: Colors.transparent,
           colorScheme: Theme.of(context).colorScheme.copyWith(
-                primary: Colors.purpleAccent,
+                primary: Palette.blueColor,
               ),
         ),
         child: MyStepper(
