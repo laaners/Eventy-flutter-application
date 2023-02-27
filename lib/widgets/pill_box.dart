@@ -2,6 +2,7 @@ import 'package:dima_app/providers/theme_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+// A pill-shaped wrapper/box with shadow, child can be any widget
 class PillBox extends StatelessWidget {
   final Widget child;
   const PillBox({super.key, required this.child});

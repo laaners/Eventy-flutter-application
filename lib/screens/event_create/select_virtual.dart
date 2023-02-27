@@ -1,9 +1,7 @@
 import 'package:dima_app/providers/theme_switch.dart';
-import 'package:dima_app/screens/event_create/select_location_address.dart';
 import 'package:dima_app/screens/event_create/step_places.dart' as step_places;
 import 'package:dima_app/screens/event_create/step_places.dart';
 import 'package:dima_app/themes/palette.dart';
-import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,12 +11,17 @@ import 'package:provider/provider.dart';
 class SelectVirtual extends StatefulWidget {
   final List<Location> locations;
   final ValueChanged<step_places.Location> addLocation;
+  final ValueChanged<String> removeLocation;
   final ValueChanged<bool> setVirtualMeeting;
-  const SelectVirtual(
-      {super.key,
-      required this.addLocation,
-      required this.locations,
-      required this.setVirtualMeeting});
+  final step_places.Location defaultOptions;
+  const SelectVirtual({
+    super.key,
+    required this.addLocation,
+    required this.removeLocation,
+    required this.locations,
+    required this.setVirtualMeeting,
+    required this.defaultOptions,
+  });
 
   @override
   State<SelectVirtual> createState() => _SelectVirtualState();
@@ -30,9 +33,17 @@ class _SelectVirtualState extends State<SelectVirtual> {
   TextEditingController locationAddrController = TextEditingController();
   List<String> locationSuggestions = [];
   String location = "Search Location";
-  bool showMap = false;
+
+  @override
+  void initState() {
+    super.initState();
+    locationNameController.text = "Virtual meeting";
+    locationDescController.text = widget.defaultOptions.description;
+    locationAddrController.text = widget.defaultOptions.site;
+  }
 
   void checkFields() {
+    widget.removeLocation("Virtual meeting");
     if (locationAddrController.text.isEmpty) {
       showCupertinoModalPopup(
         context: context,
@@ -68,6 +79,7 @@ class _SelectVirtualState extends State<SelectVirtual> {
       );
       return;
     }
+    widget.setVirtualMeeting(true);
     Navigator.pop(context);
     widget.addLocation(step_places.Location(
       locationNameController.text,
@@ -76,13 +88,6 @@ class _SelectVirtualState extends State<SelectVirtual> {
       0,
       0,
     ));
-    widget.setVirtualMeeting(true);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    locationNameController.text = "Virtual meeting";
   }
 
   @override
@@ -203,7 +208,7 @@ class _SelectVirtualState extends State<SelectVirtual> {
                   child: MyTextField(
                     maxLength: 200,
                     maxLines: 6,
-                    hintText: "Virtual room with on the ... platform",
+                    hintText: "Virtual room on the ... platform",
                     controller: locationDescController,
                   ),
                 ),

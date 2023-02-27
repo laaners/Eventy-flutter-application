@@ -38,12 +38,18 @@ Testing:
   dart pub add --dev test
   flutter test test/unit_test.dart
 
+VScode autocompletion:
+  CTRL+SHIFT+P then paste:
+    Dart Data Class Generator
+
 Firebase:
     dart pub global activate flutterfire_cli
+  Add C:\Users\kirby\AppData\Local\Pub\Cache\bin to path
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
     npm install -g firebase-tools
     firebase login
   Nella directory del progetto:
-    flutterfire configure --project=reddit-clone-c5c25
+    flutterfire configure --project=dima-app-372615
   Aggiungere le seguenti dependecy, CTRL+shift+P, type dependecy and paste:
     firebase_core, firebase_storage, cloud_firestore, firebase_auth, google_sign_in, flutter_riverpod
   To test it, make main async and add:

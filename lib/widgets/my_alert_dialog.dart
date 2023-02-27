@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
+// OK only alert dialog, usually for errors or warning
 class MyAlertDialog extends StatelessWidget {
   final String title;
   final String content;

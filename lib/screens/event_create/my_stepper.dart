@@ -782,13 +782,14 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
           child: Row(
             children: <Widget>[
               SizedBox(
-                height: _isLabel() ? 104.0 : 72.0,
+                height: _isLabel() ? 104.0 - 32 : 72.0,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  // CUSTOM: align to start, and reduce top padding
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     if (widget.steps[i].label != null)
                       const SizedBox(
-                        height: 24.0,
+                        height: 8.0,
                       ),
                     Center(child: _buildIcon(i)),
                     if (widget.steps[i].label != null)
@@ -811,7 +812,9 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
         if (!_isLast(i))
           Expanded(
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 0),
+              // CUSTOM: align to previous
+              //margin: const EdgeInsets.symmetric(horizontal: 0),
+              margin: const EdgeInsets.only(bottom: 14),
               height: 1.0,
               color: Colors.grey.shade400,
             ),

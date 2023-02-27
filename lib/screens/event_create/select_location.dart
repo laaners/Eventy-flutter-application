@@ -9,9 +9,16 @@ import 'package:flutter/material.dart';
 
 class SelectLocation extends StatefulWidget {
   final List<Location> locations;
-  final ValueChanged<step_places.Location> setLocation;
-  const SelectLocation(
-      {super.key, required this.setLocation, required this.locations});
+  final ValueChanged<step_places.Location> addLocation;
+  final ValueChanged<String> removeLocation;
+  final step_places.Location defaultLocation;
+  const SelectLocation({
+    super.key,
+    required this.addLocation,
+    required this.removeLocation,
+    required this.locations,
+    required this.defaultLocation,
+  });
 
   @override
   State<SelectLocation> createState() => _SelectLocationState();
@@ -27,6 +34,22 @@ class _SelectLocationState extends State<SelectLocation> {
   double lat = 0;
   double lon = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    locationNameController.text = widget.defaultLocation.name;
+    locationDescController.text = widget.defaultLocation.description;
+    locationAddrController.text = widget.defaultLocation.site;
+    lat = widget.defaultLocation.lat;
+    lon = widget.defaultLocation.lon;
+  }
+
+  @override
+  void dispose() {
+    showMap = false;
+    super.dispose();
+  }
+
   void checkFields() {
     if (locationNameController.text.isEmpty) {
       showCupertinoModalPopup(
@@ -39,8 +62,9 @@ class _SelectLocationState extends State<SelectLocation> {
       return;
     }
     if (List<String>.from(widget.locations.map((obj) => obj.name))
-            .contains(locationNameController.text) ||
+            .contains(widget.defaultLocation.name) ||
         locationNameController.text == "Virtual meeting") {
+      /*
       showCupertinoModalPopup(
         context: context,
         builder: (BuildContext context) => const MyAlertDialog(
@@ -48,7 +72,8 @@ class _SelectLocationState extends State<SelectLocation> {
           content: "You must give a different name to the location",
         ),
       );
-      return;
+      */
+      widget.removeLocation(widget.defaultLocation.name);
     }
     if (locationAddrController.text.isEmpty) {
       showCupertinoModalPopup(
@@ -60,14 +85,15 @@ class _SelectLocationState extends State<SelectLocation> {
       );
       return;
     }
-    widget.setLocation(step_places.Location(
+    showMap = false;
+    Navigator.pop(context);
+    widget.addLocation(step_places.Location(
       locationNameController.text,
       locationDescController.text,
       locationAddrController.text,
       lat,
       lon,
     ));
-    Navigator.pop(context);
   }
 
   @override
@@ -170,6 +196,7 @@ class _SelectLocationState extends State<SelectLocation> {
                 ),
                 const Padding(padding: EdgeInsets.only(top: 8)),
                 SelectLocationAddress(
+                  defaultLocation: widget.defaultLocation,
                   controller: locationAddrController,
                   setAddress: (address) {
                     setState(() {

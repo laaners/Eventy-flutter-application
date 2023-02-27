@@ -1,4 +1,5 @@
 import 'package:dima_app/providers/theme_switch.dart';
+import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
 import 'package:flutter/cupertino.dart';
@@ -113,21 +114,32 @@ class StepBasics extends StatelessWidget {
                   color: Provider.of<ThemeSwitch>(context, listen: false)
                       .themeData
                       .scaffoldBackgroundColor,
-                  child: CupertinoDatePicker(
-                    mode: CupertinoDatePickerMode.dateAndTime,
-                    initialDateTime: DateTime(
-                      DateTime.now().year,
-                      DateTime.now().month,
-                      DateTime.now().day,
-                      DateTime.now().hour + 1,
-                      (DateTime.now().minute % 5 * 5).toInt(),
-                    ),
-                    minimumDate: DateTime.now().add(const Duration(minutes: 1)),
-                    minuteInterval: 5,
-                    use24hFormat: true,
-                    onDateTimeChanged: (pickedDate) {
-                      setDeadline(pickedDate);
-                    },
+                  child: Column(
+                    children: [
+                      Container(
+                        padding:
+                            const EdgeInsets.only(top: 15, right: 5, left: 5),
+                        child: const Text(
+                          'Select the deadline date for voting',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 20),
+                        ),
+                      ),
+                      Expanded(
+                        child: CupertinoDatePicker(
+                          mode: CupertinoDatePickerMode.dateAndTime,
+                          initialDateTime: DateFormatter.string2DateTime(
+                              deadlineController.text),
+                          minimumDate:
+                              DateTime.now().add(const Duration(minutes: 30)),
+                          minuteInterval: 5,
+                          use24hFormat: true,
+                          onDateTimeChanged: (pickedDate) {
+                            setDeadline(pickedDate);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

@@ -5,16 +5,19 @@ import 'package:dima_app/widgets/gmaps.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:dima_app/screens/event_create/step_places.dart' as step_places;
 
 class SelectLocationAddress extends StatefulWidget {
   final TextEditingController controller;
   final ValueChanged<String> setAddress;
   final ValueChanged<List<double>> setCoor;
+  final step_places.Location defaultLocation;
   const SelectLocationAddress({
     super.key,
     required this.controller,
     required this.setAddress,
     required this.setCoor,
+    required this.defaultLocation,
   });
 
   @override
@@ -34,8 +37,19 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.defaultLocation.lat != 0 && widget.defaultLocation.lon != 0) {
+      showMap = true;
+      lat = widget.defaultLocation.lat;
+      lon = widget.defaultLocation.lon;
+    }
+  }
+
+  @override
   void dispose() {
     _debounce?.cancel();
+    showMap = false;
     super.dispose();
   }
 
@@ -129,6 +143,7 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
                     showMap = false;
                     locationSuggestions = [];
                     loadingLocations = false;
+                    widget.setCoor([0, 0]);
                   });
                 }
               });
