@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/server/firebase_methods.dart';
-import 'package:dima_app/server/tables/user_table.dart';
+import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -61,16 +61,18 @@ class HomeScreen extends StatelessWidget {
           // DB test
           TextButton(
             onPressed: () async {
-              await Provider.of<FirebaseMethods>(context, listen: false)
-                  .signUpWithEmail(
-                email: "kirbyalessio@yahoo.it",
-                password: "password",
-                username: "Username",
-                name: "name",
-                surname: "surname",
-                profilePic: "profilePic",
-                context: context,
-              );
+              for (var i = 10; i < 30; i++) {
+                await Provider.of<FirebaseMethods>(context, listen: false)
+                    .signUpWithEmail(
+                  email: "test$i@test.it",
+                  password: "password",
+                  username: "Username$i",
+                  name: "name$i",
+                  surname: "surname$i",
+                  profilePic: "profilePic",
+                  context: context,
+                );
+              }
             },
             child: const Text("Firebase test"),
           ),
@@ -78,12 +80,36 @@ class HomeScreen extends StatelessWidget {
             onPressed: () async {
               await Provider.of<FirebaseMethods>(context, listen: false)
                   .loginWithEmail(
-                email: "kirbyalessio@yahoo.it", //"ok@ok.it",
+                email: "test13@test.it", //"ok@ok.it",
                 password: "password",
                 context: context,
               );
             },
             child: const Text("Firebase login"),
+          ),
+          TextButton(
+            onPressed: () async {
+              var document =
+                  await Provider.of<FirebaseMethods>(context, listen: false)
+                      .readDoc(
+                Provider.of<FirebaseMethods>(context, listen: false)
+                    .userCollection,
+                "IrI8s7a6WeVUgF3fAYd99YHdnqh2",
+              );
+              print(document?.data());
+              print(document?.exists);
+            },
+            child: const Text("Firebase get"),
+          ),
+          TextButton(
+            onPressed: () async {
+              await Provider.of<FirebaseMethods>(context, listen: false)
+                  .addFollower(
+                context,
+                "PQLfSCX2fuXXof7PliIN4d48wvv1",
+              );
+            },
+            child: const Text("Firebase add follower"),
           ),
           TextButton(
             onPressed: () async {
@@ -137,7 +163,8 @@ class UsersList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     CollectionReference users =
-        Provider.of<FirebaseMethods>(context, listen: false).users;
+        Provider.of<FirebaseMethods>(context, listen: false).userCollection;
+    var curUid = Provider.of<FirebaseMethods>(context, listen: false).user!.uid;
     return FutureBuilder(
       future: users.get(),
       builder: (context, snapshot) {
@@ -147,7 +174,15 @@ class UsersList extends StatelessWidget {
             shrinkWrap: true,
             itemCount: users.docs.length,
             itemBuilder: (context, index) {
-              return Text(users.docs[index]["email"]);
+              var uid = users.docs[index]["uid"];
+              if (uid == curUid) {
+                return Text(users.docs[index]["uid"] + "==" + curUid);
+              } else {
+                Provider.of<FirebaseMethods>(context, listen: false)
+                    .addFollower(context, uid);
+                print("added");
+                return Text(users.docs[index]["uid"]);
+              }
               // return UserTile(user: users.docs[index]["uid"]);
             },
           );
