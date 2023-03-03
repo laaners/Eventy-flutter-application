@@ -3,7 +3,6 @@ import 'package:dima_app/screens/event_create/my_stepper.dart';
 import 'package:dima_app/screens/event_create/step_basics.dart';
 import 'package:dima_app/screens/event_create/step_dates.dart';
 import 'package:dima_app/screens/event_create/step_places.dart';
-import 'package:dima_app/screens/event_create/step_slots.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
@@ -31,7 +30,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   List<Location> locations = [];
 
   // stepDates;
-  List<DateTime> dates = [];
+  Map<String, dynamic> dates = {};
 
   @override
   void dispose() {
@@ -114,27 +113,33 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             dates: dates,
             addDate: (value) {
               setState(() {
-                dates.add(value);
+                String day = value[0];
+                String slot = value[1];
+                // dates.add(value);
+                if (!dates.containsKey(day)) {
+                  dates[day] = {};
+                }
+                dates[day][slot] = 1;
               });
             },
             removeDate: (value) {
               setState(() {
-                dates.removeWhere((item) => item == value);
+                String day = value[0];
+                String slot = value[1];
+                // dates.add(value);
+                if (dates.containsKey(day)) {
+                  if (slot == "all") {
+                    dates.removeWhere((key, value) => key == day);
+                  } else {
+                    dates[day].removeWhere((key, value) => key == slot);
+                    if (dates[day].isEmpty) {
+                      dates.removeWhere((key, value) => key == day);
+                    }
+                  }
+                }
               });
             },
             deadlineController: deadlineController,
-          ),
-        ),
-        MyStep(
-          isActive: _activeStepIndex >= 3,
-          title: const Text(''),
-          label: const Text("Invite"),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: const [
-              Text('Password: *****'),
-            ],
           ),
         ),
       ];
@@ -163,7 +168,11 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 _activeStepIndex += 1;
               });
             } else {
-              print('Submited');
+              print(eventTitleController.text);
+              print(eventDescController.text);
+              print(deadlineController.text);
+              print(locations.toString());
+              print(dates);
             }
           },
           onStepCancel: () {
@@ -183,7 +192,12 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
           controlsBuilder: (context, controls) {
             final isLastStep = _activeStepIndex == stepList().length - 1;
             return Container(
-              margin: const EdgeInsets.only(bottom: 40, top: 10),
+              margin: const EdgeInsets.only(
+                bottom: 0,
+                top: 10,
+                left: 10,
+                right: 10,
+              ),
               child: Row(
                 children: [
                   if (_activeStepIndex > 0)

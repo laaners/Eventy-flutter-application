@@ -781,23 +781,27 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
           canRequestFocus: widget.steps[i].state != StepState.disabled,
           child: Row(
             children: <Widget>[
-              SizedBox(
-                height: _isLabel() ? 104.0 - 32 : 72.0,
-                child: Column(
-                  // CUSTOM: align to start, and reduce top padding
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    if (widget.steps[i].label != null)
-                      const SizedBox(
-                        height: 8.0,
-                      ),
-                    Center(child: _buildIcon(i)),
-                    if (widget.steps[i].label != null)
-                      SizedBox(
-                        height: 24.0,
-                        child: _buildLabelText(i),
-                      ),
-                  ],
+              Container(
+                // CUSTOM: some margin at the sides
+                margin: const EdgeInsets.symmetric(horizontal: 10),
+                child: SizedBox(
+                  height: _isLabel() ? 104.0 - 32 : 72.0,
+                  child: Column(
+                    // CUSTOM: align to start, and reduce top padding
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      if (widget.steps[i].label != null)
+                        const SizedBox(
+                          height: 8.0,
+                        ),
+                      Center(child: _buildIcon(i)),
+                      if (widget.steps[i].label != null)
+                        SizedBox(
+                          height: 24.0,
+                          child: _buildLabelText(i),
+                        ),
+                    ],
+                  ),
                 ),
               ),
               /* CUSTOM: No strange space
@@ -860,6 +864,8 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
               left: 0,
             ),
             children: <Widget>[
+              // CUSTOM: controls on top
+              _buildVerticalControls(widget.currentStep),
               AnimatedSize(
                 curve: Curves.fastOutSlowIn,
                 duration: kThemeAnimationDuration,
@@ -867,7 +873,6 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: stepPanels),
               ),
-              _buildVerticalControls(widget.currentStep),
             ],
           ),
         ),
