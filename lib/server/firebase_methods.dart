@@ -10,7 +10,7 @@ class FirebaseMethods {
   FirebaseMethods(this._auth, this._firestore);
 
   // getter
-  User get user => _auth.currentUser!;
+  User? get user => _auth.currentUser;
   CollectionReference get users => _firestore.collection(UserTable.tableName);
 
   // State persistence

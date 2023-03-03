@@ -1,3 +1,4 @@
+import 'package:dima_app/screens/event_create/select_day_slots.dart';
 import 'package:dima_app/screens/event_create/select_slot.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/themes/palette.dart';
@@ -7,9 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class StepDates extends StatefulWidget {
-  final List<DateTime> dates;
-  final ValueChanged<DateTime> addDate;
-  final ValueChanged<DateTime> removeDate;
+  final Map<String, dynamic> dates;
+  final ValueChanged<List<String>> addDate;
+  final ValueChanged<List<String>> removeDate;
   final TextEditingController deadlineController;
   const StepDates({
     super.key,
@@ -24,7 +25,6 @@ class StepDates extends StatefulWidget {
 }
 
 class _StepDatesState extends State<StepDates> {
-  DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
   bool _fixedTimeSlots = false;
   List<Map<String, String>> _timeSlots = [];
@@ -33,14 +33,22 @@ class _StepDatesState extends State<StepDates> {
     setState(() {
       var start = times[0].toString();
       var end = times[1].toString();
-      var slot = {"start": start, "end": end};
-      bool exists = _timeSlots
-          .map((obj) => obj["start"]! + obj["end"]!)
-          .contains(start + end);
-      if (!exists) {
-        _timeSlots.add(slot);
-        _timeSlots.sort((a, b) => a["end"]!.compareTo(b["end"]!));
-        _timeSlots.sort((a, b) => a["start"]!.compareTo(b["start"]!));
+      var dayString = times[2];
+      if (dayString == "all") {
+        var slot = {"start": start, "end": end};
+        bool exists = _timeSlots
+            .map((obj) => obj["start"]! + obj["end"]!)
+            .contains(start + end);
+        if (!exists) {
+          _timeSlots.add(slot);
+          _timeSlots.sort((a, b) => a["end"]!.compareTo(b["end"]!));
+          _timeSlots.sort((a, b) => a["start"]!.compareTo(b["start"]!));
+        }
+        widget.dates.forEach((k, v) {
+          widget.addDate([k, "$start-$end"]);
+        });
+      } else {
+        widget.addDate([dayString, "$start-$end"]);
       }
     });
   }
@@ -91,11 +99,19 @@ class _StepDatesState extends State<StepDates> {
                           builder: (context) => FractionallySizedBox(
                             heightFactor: 0.4,
                             child: SelectSlot(
+                              dayString: "all",
                               setSlot: setSlot,
                             ),
                           ),
                         );
                       } else {
+                        for (var slot in _timeSlots) {
+                          var start = slot["start"];
+                          var end = slot["end"];
+                          widget.dates.forEach((k, v) {
+                            widget.removeDate([k, "$start-$end"]);
+                          });
+                        }
                         setState(() {
                           _timeSlots = [];
                         });
@@ -170,6 +186,7 @@ class _StepDatesState extends State<StepDates> {
                   builder: (context) => FractionallySizedBox(
                     heightFactor: 0.4,
                     child: SelectSlot(
+                      dayString: "all",
                       setSlot: setSlot,
                     ),
                   ),
@@ -215,6 +232,9 @@ class _StepDatesState extends State<StepDates> {
                       Icons.cancel,
                     ),
                     onPressed: () {
+                      widget.dates.forEach((k, v) {
+                        widget.removeDate([k, "$start-$end"]);
+                      });
                       setState(() {
                         _timeSlots.removeWhere((item) =>
                             item["start"] == start && item["end"] == end);
@@ -364,27 +384,48 @@ class _StepDatesState extends State<StepDates> {
                 ? _focusedDay
                 : DateFormatter.string2DateTime(widget.deadlineController.text),
             selectedDayPredicate: (day) {
-              return widget.dates.contains(day);
+              return widget.dates[DateFormatter.dateTime2String(day)] != null;
             },
             availableCalendarFormats: const {CalendarFormat.month: 'month'},
             calendarFormat: CalendarFormat.month,
             onDayLongPressed: (selectedDay, focusedDay) {
-              if (widget.dates.contains(selectedDay)) {
-                print(selectedDay);
-              }
+              showModalBottomSheet(
+                useRootNavigator: true,
+                isScrollControlled: true,
+                context: context,
+                builder: (context) => FractionallySizedBox(
+                  heightFactor: 0.5,
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 15, bottom: 15),
+                    child: SelectDaySlots(
+                      day: selectedDay,
+                      dates: widget.dates,
+                      addDate: widget.addDate,
+                      removeDate: widget.removeDate,
+                      setSlot: setSlot,
+                    ),
+                  ),
+                ),
+              );
             },
-            eventLoader: (day) {
-              return widget.dates.where((_) {
-                return _.day == day.day &&
-                    _.year == day.year &&
-                    _.month == day.month;
-              }).toList();
+            eventLoader: (DateTime day) {
+              String dayString = DateFormatter.dateTime2String(day);
+              if (widget.dates.containsKey(dayString)) {
+                return widget.dates[dayString].entries.toList();
+              }
+              return [];
             },
             onDaySelected: (selectedDay, focusedDay) {
-              if (widget.dates.contains(selectedDay)) {
-                widget.removeDate(selectedDay);
+              String selectedDayString =
+                  DateFormatter.dateTime2String(selectedDay);
+              if (widget.dates.containsKey(selectedDayString)) {
+                widget.removeDate([selectedDayString, "all"]);
               } else {
-                widget.addDate(selectedDay);
+                for (var slot in _timeSlots) {
+                  var start = slot["start"];
+                  var end = slot["end"];
+                  widget.addDate([selectedDayString, "$start-$end"]);
+                }
               }
               _focusedDay = selectedDay;
             },

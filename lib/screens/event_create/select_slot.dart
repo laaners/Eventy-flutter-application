@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class SelectSlot extends StatefulWidget {
+  final String dayString;
   final ValueChanged<List<String>> setSlot;
-  const SelectSlot({super.key, required this.setSlot});
+  const SelectSlot({super.key, required this.setSlot, required this.dayString});
 
   @override
   State<SelectSlot> createState() => _SelectSlotState();
@@ -58,6 +59,7 @@ class _SelectSlotState extends State<SelectSlot> {
                   widget.setSlot([
                     f.format(_startDate),
                     f.format(_endDate),
+                    widget.dayString
                   ]);
                   Navigator.of(context).pop();
                 },

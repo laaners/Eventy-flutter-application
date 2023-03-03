@@ -1,20 +1,14 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/events.dart';
-import 'package:dima_app/screens/groups.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/login.dart';
-import 'package:dima_app/screens/signup.dart';
 import 'package:dima_app/screens/profile.dart';
 import 'package:dima_app/server/firebase_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:postgres/postgres.dart';
 
 import 'package:provider/provider.dart';
 import 'package:dima_app/provider_samples.dart';
@@ -75,7 +69,7 @@ void main() async {
         // DARK/LIGHT THEME
         ChangeNotifierProvider(create: (context) => ThemeSwitch())
       ],
-      child: const MyApp(),
+      child: const MyApp2(),
     ),
   );
 
@@ -149,10 +143,6 @@ class _MyAppState extends State<MyApp2> {
               label: 'Events',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.groups),
-              label: 'Groups',
-            ),
-            BottomNavigationBarItem(
               icon: Icon(Icons.account_circle),
               label: 'Profile',
             ),
@@ -173,12 +163,6 @@ class _MyAppState extends State<MyApp2> {
                     const CupertinoPageScaffold(child: EventsScreen()),
               );
             case 2:
-              return CupertinoTabView(
-                navigatorKey: thirdTabNavKey,
-                builder: (context) =>
-                    const CupertinoPageScaffold(child: GroupsScreen()),
-              );
-            case 3:
               return CupertinoTabView(
                 navigatorKey: fourthTabNavKey,
                 builder: (context) =>
