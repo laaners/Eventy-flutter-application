@@ -4,6 +4,7 @@ import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class StepBasics extends StatelessWidget {
@@ -101,7 +102,11 @@ class StepBasics extends StatelessWidget {
               ),
               border: InputBorder.none,
             ),
-            controller: deadlineController,
+            controller: TextEditingController(
+              text: DateFormat("EEEE MMMM dd yyyy 'at' hh:mm").format(
+                DateFormatter.string2DateTime(deadlineController.text),
+              ),
+            ), //deadlineController,
           ),
           onTap: () async {
             showModalBottomSheet(

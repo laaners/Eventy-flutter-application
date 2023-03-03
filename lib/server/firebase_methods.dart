@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dima_app/server/tables/user_table.dart';
+import 'package:dima_app/server/tables/follow_collection.dart';
+import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +11,11 @@ class FirebaseMethods {
   FirebaseMethods(this._auth, this._firestore);
 
   // getter
-  User get user => _auth.currentUser!;
-  CollectionReference get users => _firestore.collection(UserTable.tableName);
+  User? get user => _auth.currentUser;
+  CollectionReference get userCollection =>
+      _firestore.collection(UserCollection.collectionName);
+  CollectionReference get followCollection =>
+      _firestore.collection(FollowCollection.collectionName);
 
   // State persistence
   Stream<User?> get authState => _auth.authStateChanges();
@@ -49,7 +53,7 @@ class FirebaseMethods {
       );
       // ignore: use_build_context_synchronously
       await sendEmailVerification(context);
-      UserTable userEntity = UserTable(
+      UserCollection userEntity = UserCollection(
         uid: userCredential.user!.uid,
         email: email,
         username: username,
@@ -57,7 +61,9 @@ class FirebaseMethods {
         surname: surname,
         profilePic: profilePic,
       );
-      await users.doc(userCredential.user!.uid).set(userEntity.toMap());
+      await userCollection
+          .doc(userCredential.user!.uid)
+          .set(userEntity.toMap());
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -103,18 +109,73 @@ class FirebaseMethods {
     try {
       var uid = _auth.currentUser?.uid;
       await _auth.currentUser!.delete();
-      await deleteDoc(users, uid!);
+      await deleteDoc(userCollection, uid!);
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
   }
 
-  Future<void> deleteDoc(
-    CollectionReference table,
-    String uid,
+  Future<void> addFollower(BuildContext context, String followUid) async {
+    try {
+      var uid = _auth.currentUser?.uid;
+      var document = await readDoc(followCollection, uid!);
+      if (document!.exists) {
+        await followCollection.doc(uid).update({
+          "follower": FieldValue.arrayUnion([followUid])
+        });
+      } else {
+        followCollection.doc(uid).set({
+          "follower": [followUid],
+          "following": []
+        });
+      }
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message!);
+    }
+  }
+
+  // CRUD
+  Future<void> createDoc(
+    CollectionReference collection,
+    String id,
+  ) async {
+    return null;
+  }
+
+  Future<DocumentSnapshot<Object?>?> readDoc(
+    CollectionReference collection,
+    String id,
   ) async {
     try {
-      await table.doc(uid).delete();
+      var uid = id;
+      var document = await collection.doc(uid).get();
+      return document;
+    } on FirebaseAuthException catch (e) {
+      print(e.message!);
+    }
+    return null;
+  }
+
+  Future<void> updateDoc(
+    CollectionReference collection,
+    String id,
+    String field,
+  ) async {
+    try {
+      await collection.doc(id).update({
+        field: FieldValue.arrayUnion(['ok'])
+      });
+    } on FirebaseAuthException catch (e) {
+      print(e.message!);
+    }
+  }
+
+  Future<void> deleteDoc(
+    CollectionReference collection,
+    String id,
+  ) async {
+    try {
+      await collection.doc(id).delete();
     } on FirebaseAuthException catch (e) {
       print(e.message!);
     }

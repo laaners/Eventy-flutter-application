@@ -11,6 +11,11 @@ class Location {
   final double lat;
   final double lon;
   Location(this.name, this.description, this.site, this.lat, this.lon);
+
+  @override
+  String toString() {
+    return 'Location(name: $name, description: $description, site: $site, lat: $lat, lon: $lon)';
+  }
 }
 
 class StepPlaces extends StatefulWidget {
@@ -224,6 +229,11 @@ class _StepPlacesState extends State<StepPlaces> {
               },
             ),
           ),
+        ListView(
+          shrinkWrap: true,
+          physics: ClampingScrollPhysics(),
+          children: [const Text("ok")],
+        ),
         for (var i = 0;
             i <
                 widget.locations
