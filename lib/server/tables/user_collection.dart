@@ -1,4 +1,4 @@
-class UserTable {
+class UserCollection {
   final String uid;
   final String email;
   final String username;
@@ -6,9 +6,9 @@ class UserTable {
   final String surname;
   final String profilePic;
 
-  static const tableName = "users";
+  static const collectionName = "user";
 
-  UserTable({
+  UserCollection({
     required this.uid,
     required this.email,
     required this.username,
@@ -17,7 +17,7 @@ class UserTable {
     required this.profilePic,
   });
 
-  UserTable copyWith({
+  UserCollection copyWith({
     String? uid,
     String? email,
     String? username,
@@ -25,7 +25,7 @@ class UserTable {
     String? surname,
     String? profilePic,
   }) {
-    return UserTable(
+    return UserCollection(
       uid: uid ?? this.uid,
       email: email ?? this.email,
       username: username ?? this.username,
@@ -46,8 +46,8 @@ class UserTable {
     };
   }
 
-  factory UserTable.fromMap(Map<String, dynamic> map) {
-    return UserTable(
+  factory UserCollection.fromMap(Map<String, dynamic> map) {
+    return UserCollection(
       uid: map['uid'] as String,
       email: map['email'] as String,
       username: map['username'] as String,
@@ -59,11 +59,11 @@ class UserTable {
 
   @override
   String toString() {
-    return 'UserTable(uid: $uid, email: $email, username: $username, name: $name, surname: $surname, profilePic: $profilePic)';
+    return 'UserCollection(uid: $uid, email: $email, username: $username, name: $name, surname: $surname, profilePic: $profilePic)';
   }
 
   @override
-  bool operator ==(covariant UserTable other) {
+  bool operator ==(covariant UserCollection other) {
     if (identical(this, other)) return true;
 
     return other.uid == uid &&

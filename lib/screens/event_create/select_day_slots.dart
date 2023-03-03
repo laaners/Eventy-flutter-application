@@ -115,49 +115,49 @@ class _SelectDaySlotsState extends State<SelectDaySlots> {
             ),
           ],
         ),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 2.0),
+          child: ListTile(
+            title: const Text(
+              "Add another time slot",
+              style: TextStyle(
+                color: Palette.blueColor,
+              ),
+            ),
+            leading: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: Palette.lightBGColor,
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: const Icon(
+                Icons.add_circle_outline,
+                color: Palette.blueColor,
+              ),
+            ),
+            onTap: () async {
+              await showModalBottomSheet(
+                useRootNavigator: true,
+                isScrollControlled: true,
+                context: context,
+                builder: (context) => FractionallySizedBox(
+                  heightFactor: 0.4,
+                  child: SelectSlot(
+                    dayString: dayString,
+                    setSlot: widget.setSlot,
+                  ),
+                ),
+              );
+              refreshSlotsList();
+            },
+          ),
+        ),
         Expanded(
           child: Container(
             margin: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom),
             child: ListView(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 2.0),
-                  child: ListTile(
-                    title: const Text(
-                      "Add another time slot",
-                      style: TextStyle(
-                        color: Palette.blueColor,
-                      ),
-                    ),
-                    leading: Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Palette.lightBGColor,
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Icon(
-                        Icons.add_circle_outline,
-                        color: Palette.blueColor,
-                      ),
-                    ),
-                    onTap: () async {
-                      await showModalBottomSheet(
-                        useRootNavigator: true,
-                        isScrollControlled: true,
-                        context: context,
-                        builder: (context) => FractionallySizedBox(
-                          heightFactor: 0.4,
-                          child: SelectSlot(
-                            dayString: dayString,
-                            setSlot: widget.setSlot,
-                          ),
-                        ),
-                      );
-                      refreshSlotsList();
-                    },
-                  ),
-                ),
                 if (!widget.dates.containsKey(dayString))
                   const Center(
                     child: Text(

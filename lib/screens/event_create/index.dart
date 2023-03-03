@@ -47,6 +47,15 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
     deadlineController.text = DateFormat("yyyy-MM-dd HH:00:00").format(
       DateTime(now.year, now.month, now.day + 1),
     );
+    for (var i = 0; i < 10; i++) {
+      locations.add(Location(
+        "locationNameController.text",
+        "locationDescController.text",
+        "locationAddrController.text",
+        30,
+        20,
+      ));
+    }
   }
 
   List<MyStep> stepList() => [
