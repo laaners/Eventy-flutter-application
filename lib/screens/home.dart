@@ -19,7 +19,7 @@ class HomeScreen extends StatelessWidget {
       appBar: const MyAppBar("Home"),
       body: ListView(
         children: [
-          const Text("ok"),
+          const Text("dfsaok"),
           Text("${Provider.of<FirebaseMethods>(context, listen: false).user}"),
           TextFormField(),
           Text(Provider.of<Something>(context).stringa),
