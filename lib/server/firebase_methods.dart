@@ -12,6 +12,8 @@ class FirebaseMethods {
 
   // getter
   User? get user => _auth.currentUser;
+
+  // get collections/firestore entities
   CollectionReference get userCollection =>
       _firestore.collection(UserCollection.collectionName);
   CollectionReference get followCollection =>
@@ -46,13 +48,16 @@ class FirebaseMethods {
     required BuildContext context,
   }) async {
     try {
+      var usernameValidation =
+          await userCollection.where('username', isEqualTo: username).get();
+
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
       // ignore: use_build_context_synchronously
-      await sendEmailVerification(context);
+      // await sendEmailVerification(context);
       UserCollection userEntity = UserCollection(
         uid: userCredential.user!.uid,
         email: email,
@@ -88,10 +93,15 @@ class FirebaseMethods {
         email: email,
         password: password,
       );
+      var uid = _auth.currentUser?.uid;
+      var document = await readDoc(userCollection, uid!);
+      print(document);
+      /*
       if (!_auth.currentUser!.emailVerified) {
         // ignore: use_build_context_synchronously
         await sendEmailVerification(context);
       }
+      */
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
