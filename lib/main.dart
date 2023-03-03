@@ -75,7 +75,7 @@ void main() async {
         // DARK/LIGHT THEME
         ChangeNotifierProvider(create: (context) => ThemeSwitch())
       ],
-      child: const MyApp(),
+      child: const MyApp2(),
     ),
   );
 

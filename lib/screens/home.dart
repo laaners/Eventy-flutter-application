@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/providers/theme_switch.dart';
+import 'package:dima_app/screens/search.dart';
 import 'package:dima_app/server/firebase_methods.dart';
 import 'package:dima_app/server/tables/user_table.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
@@ -42,6 +43,15 @@ class HomeScreen extends StatelessWidget {
             child: const Icon(Icons.add),
           ),
 
+          ElevatedButton(
+              child: const Text('Open search'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SearchPage()),
+                );
+              }),
+
           //Stream provider
           Consumer<int>(
             builder: (context, providerObj, child) {
@@ -73,6 +83,17 @@ class HomeScreen extends StatelessWidget {
             },
             child: const Text("Firebase test"),
           ),
+
+          // Search user functionality
+          TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SearchPage()),
+                );
+              },
+              child: const Text("Search page")),
+
           TextButton(
             onPressed: () async {
               await Provider.of<FirebaseMethods>(context, listen: false)
