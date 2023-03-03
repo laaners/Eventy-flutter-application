@@ -134,6 +134,25 @@ class FirebaseMethods {
     }
   }
 
+  Future<void> addFollowing(BuildContext context, String followUid) async {
+    try {
+      var uid = _auth.currentUser?.uid;
+      var document = await readDoc(followCollection, uid!);
+      if (document!.exists) {
+        await followCollection.doc(uid).update({
+          "following": FieldValue.arrayUnion([followUid])
+        });
+      } else {
+        followCollection.doc(uid).set({
+          "follower": [],
+          "following": [followUid]
+        });
+      }
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message!);
+    }
+  }
+
   // CRUD
   Future<void> createDoc(
     CollectionReference collection,
