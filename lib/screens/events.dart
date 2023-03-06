@@ -2,7 +2,7 @@ import 'package:dima_app/screens/event_create/index.dart';
 import 'package:dima_app/screens/event_detail.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
-import 'package:dima_app/widgets/change_image.dart';
+import 'package:dima_app/screens/profile/change_image.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/my_app_bar.dart';
@@ -54,7 +54,6 @@ class EventsScreen extends StatelessWidget {
             },
             child: const Text("TO EVENT CREATE"),
           ),
-          const ChangeImage(),
         ],
       ),
     );

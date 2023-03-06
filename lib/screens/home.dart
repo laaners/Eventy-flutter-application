@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
       body: ListView(
         children: [
           const Text("dfsaok"),
-          Text("${Provider.of<FirebaseMethods>(context, listen: false).user}"),
+          Text(FirebaseMethods.userData.toString()),
           TextFormField(),
           Text(Provider.of<Something>(context).stringa),
           // equivalente a quello sopra
