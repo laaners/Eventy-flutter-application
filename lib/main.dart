@@ -4,7 +4,10 @@ import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/login.dart';
 import 'package:dima_app/screens/profile/index.dart';
+import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_methods.dart';
+import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,6 +23,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   runApp(
     MultiProvider(
       providers: [
@@ -61,23 +67,19 @@ void main() async {
         ),
         */
         ChangeNotifierProvider(
-          create: (context) => FirebaseMethods(
-            FirebaseAuth.instance,
-            FirebaseFirestore.instance,
-          ),
+          create: (context) => FirebaseUser(_auth, _firestore),
         ),
-
-        // Firebase state management, type user
-        StreamProvider(
-          create: (context) =>
-              Provider.of<FirebaseMethods>(context, listen: false).authState,
-          initialData: null,
+        ChangeNotifierProvider(
+          create: (context) => FirebaseFollow(_firestore),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => FirebasePoll(_firestore),
         ),
 
         // DARK/LIGHT THEME
         ChangeNotifierProvider(create: (context) => ThemeSwitch())
       ],
-      child: const MyApp2(),
+      child: const MyApp(),
     ),
   );
 
@@ -92,19 +94,23 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Eventy',
       theme: Provider.of<ThemeSwitch>(context).themeData,
-      home: const LogInScreen(),
+      home: Consumer<FirebaseUser>(
+        builder: (context, value, child) {
+          return value.user != null ? const MainScreen() : const LogInScreen();
+        },
+      ),
     );
   }
 }
 
-class MyApp2 extends StatefulWidget {
-  const MyApp2({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
   @override
-  State<MyApp2> createState() => _MyAppState();
+  State<MainScreen> createState() => _MainScreen();
 }
 
-class _MyAppState extends State<MyApp2> {
+class _MainScreen extends State<MainScreen> {
   // https://stackoverflow.com/questions/52298686/flutter-pop-to-root-when-bottom-navigation-tapped
   int currentIndex = 0;
 

@@ -4,13 +4,13 @@ import 'package:dima_app/screens/event_create/step_basics.dart';
 import 'package:dima_app/screens/event_create/step_dates.dart';
 import 'package:dima_app/screens/event_create/step_places.dart';
 import 'package:dima_app/server/date_methods.dart';
-import 'package:dima_app/server/firebase_methods.dart';
+import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_button.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -193,35 +193,24 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 _activeStepIndex += 1;
               });
             } else {
-              bool checkField(bool condition, String title, String content) {
-                if (condition) {
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (BuildContext context) => MyAlertDialog(
-                      title: title,
-                      content: content,
-                    ),
-                  );
-                  return true;
-                }
-                return false;
-              }
-
-              bool ret = checkField(
+              bool ret = MyAlertDialog.showAlertIfCondition(
+                context,
                 eventTitleController.text.isEmpty,
                 "MISSING EVENT NAME",
                 "You must give a name to the event",
               );
               if (ret) return;
 
-              ret = checkField(
+              ret = MyAlertDialog.showAlertIfCondition(
+                context,
                 locations.isEmpty,
                 "MISSING EVENT PLACES",
                 "You must choose where to hold the event",
               );
               if (ret) return;
 
-              ret = checkField(
+              ret = MyAlertDialog.showAlertIfCondition(
+                context,
                 dates.isEmpty,
                 "MISSING EVENT DATES",
                 "You must choose when to hold the event",
@@ -263,10 +252,9 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 };
               }).toList();
               LoadingOverlay.show(context);
-              var curUid = Provider.of<FirebaseMethods>(context, listen: false)
-                  .user!
-                  .uid;
-              await Provider.of<FirebaseMethods>(context, listen: false)
+              var curUid =
+                  Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+              await Provider.of<FirebasePoll>(context, listen: false)
                   .createPoll(
                 context: context,
                 pollName: eventTitleController.text,

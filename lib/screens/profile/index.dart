@@ -1,4 +1,4 @@
-import 'package:dima_app/server/firebase_methods.dart';
+import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -56,7 +56,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
           child: const ChangeImage(),
         ),
         Center(
-          child: Consumer<FirebaseMethods>(
+          child: Consumer<FirebaseUser>(
             builder: (context, value, child) {
               return Text(
                   "${value.userData!["name"]} ${value.userData!["surname"]}");
