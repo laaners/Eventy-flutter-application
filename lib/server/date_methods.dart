@@ -29,7 +29,7 @@ class DateFormatter {
 
   static String toLocalString(String utcDate) {
     DateFormat f = DateFormat("yyyy-MM-dd HH:mm:ss");
-    DateTime localDate = f.parse(utcDate).toLocal();
+    DateTime localDate = f.parse(utcDate, true).toLocal();
     return dateTime2String(localDate);
   }
 }

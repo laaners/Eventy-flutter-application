@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/server/tables/follow_collection.dart';
+import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class FirebaseMethods {
+class FirebaseMethods extends ChangeNotifier {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
 
@@ -20,6 +21,8 @@ class FirebaseMethods {
       _firestore.collection(UserCollection.collectionName);
   CollectionReference get followCollection =>
       _firestore.collection(FollowCollection.collectionName);
+  CollectionReference get pollCollection =>
+      _firestore.collection(PollCollection.collectionName);
 
   // getter for
   // State persistence
@@ -51,13 +54,16 @@ class FirebaseMethods {
     required BuildContext context,
   }) async {
     try {
+      var usernameValidation =
+          await userCollection.where('username', isEqualTo: username).get();
+
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
       // ignore: use_build_context_synchronously
-      await sendEmailVerification(context);
+      // await sendEmailVerification(context);
       UserCollection userEntity = UserCollection(
         uid: userCredential.user!.uid,
         email: email,
@@ -69,6 +75,7 @@ class FirebaseMethods {
       await userCollection
           .doc(userCredential.user!.uid)
           .set(userEntity.toMap());
+      notifyListeners();
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -93,6 +100,18 @@ class FirebaseMethods {
         email: email,
         password: password,
       );
+      var uid = _auth.currentUser?.uid;
+      var document = await readDoc(userCollection, uid!);
+      print(document);
+
+      notifyListeners();
+
+      /*
+      if (!_auth.currentUser!.emailVerified) {
+        // ignore: use_build_context_synchronously
+        await sendEmailVerification(context);
+      }
+      */
 
       var userDataDoc = await readDoc(userCollection, _auth.currentUser!.uid);
       userData = (userDataDoc?.data()) as Map<String, dynamic>?;
@@ -105,6 +124,7 @@ class FirebaseMethods {
   Future<void> signOut(BuildContext context) async {
     try {
       await _auth.signOut();
+      notifyListeners();
       userData = null;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
@@ -116,16 +136,20 @@ class FirebaseMethods {
       var uid = _auth.currentUser?.uid;
       await _auth.currentUser!.delete();
       await deleteDoc(userCollection, uid!);
+      notifyListeners();
       userData = null;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
   }
 
-  Future<void> addFollower(BuildContext context, String followUid) async {
+  Future<void> addFollower(
+    BuildContext context,
+    String uid,
+    String followUid,
+  ) async {
     try {
-      var uid = _auth.currentUser?.uid;
-      var document = await readDoc(followCollection, uid!);
+      var document = await readDoc(followCollection, uid);
       if (document!.exists) {
         await followCollection.doc(uid).update({
           "follower": FieldValue.arrayUnion([followUid])
@@ -141,10 +165,13 @@ class FirebaseMethods {
     }
   }
 
-  Future<void> addFollowing(BuildContext context, String followUid) async {
+  Future<void> addFollowing(
+    BuildContext context,
+    String uid,
+    String followUid,
+  ) async {
     try {
-      var uid = _auth.currentUser?.uid;
-      var document = await readDoc(followCollection, uid!);
+      var document = await readDoc(followCollection, uid);
       if (document!.exists) {
         await followCollection.doc(uid).update({
           "following": FieldValue.arrayUnion([followUid])
@@ -160,11 +187,48 @@ class FirebaseMethods {
     }
   }
 
+  Future<void> createPoll({
+    required BuildContext context,
+    required String pollName,
+    required String organizerUid,
+    required String pollDesc,
+    required String deadline,
+    required Map<String, dynamic> dates,
+    required List<Map<String, dynamic>> locations,
+  }) async {
+    try {
+      PollCollection poll = PollCollection(
+        pollName: pollName,
+        organizerUid: organizerUid,
+        pollDesc: pollDesc,
+        deadline: deadline,
+        dates: dates,
+        locations: locations,
+      );
+      String pollId = "${pollName}_$organizerUid";
+      var pollExistence = await readDoc(pollCollection, pollId);
+      if (pollExistence!.exists) {
+        // ignore: use_build_context_synchronously
+        showSnackBar(context, "A poll with this name already exists");
+      }
+      await pollCollection.doc(pollId).set(poll.toMap());
+    } on FirebaseAuthException catch (e) {
+      // showSnackBar(context, e.message!);
+      print(e.message!);
+    }
+  }
+
   // CRUD
-  Future<void> createDoc(
+  Future<Stream<DocumentSnapshot<Object?>>?> readSnapshot(
     CollectionReference collection,
     String id,
   ) async {
+    try {
+      var document = collection.doc(id).snapshots();
+      return document;
+    } on FirebaseAuthException catch (e) {
+      print(e.message!);
+    }
     return null;
   }
 
@@ -173,8 +237,7 @@ class FirebaseMethods {
     String id,
   ) async {
     try {
-      var uid = id;
-      var document = await collection.doc(uid).get();
+      var document = await collection.doc(id).get();
       return document;
     } on FirebaseAuthException catch (e) {
       print(e.message!);

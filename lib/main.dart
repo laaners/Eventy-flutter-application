@@ -52,7 +52,15 @@ void main() async {
 
         // ------------------------------------------------------------------------------------------------
         // DB, read-only provider
+        /*
         Provider<FirebaseMethods>(
+          create: (context) => FirebaseMethods(
+            FirebaseAuth.instance,
+            FirebaseFirestore.instance,
+          ),
+        ),
+        */
+        ChangeNotifierProvider(
           create: (context) => FirebaseMethods(
             FirebaseAuth.instance,
             FirebaseFirestore.instance,

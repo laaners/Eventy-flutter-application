@@ -229,11 +229,6 @@ class _StepPlacesState extends State<StepPlaces> {
               },
             ),
           ),
-        ListView(
-          shrinkWrap: true,
-          physics: ClampingScrollPhysics(),
-          children: [const Text("ok")],
-        ),
         for (var i = 0;
             i <
                 widget.locations

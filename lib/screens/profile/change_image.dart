@@ -56,7 +56,10 @@ class _ChangeImageState extends State<ChangeImage> {
         Provider.of<FirebaseMethods>(context as BuildContext, listen: false)
             .user
             ?.uid; // basename(_photo!.path);
+    print(userId);
     final destination = 'profile_pics/$userId';
+    print(destination);
+    return;
     try {
       final ref =
           firebase_storage.FirebaseStorage.instance.ref().child(destination);
@@ -64,9 +67,6 @@ class _ChangeImageState extends State<ChangeImage> {
     } catch (e) {
       print('error occured');
     }
-    /*
-
-     */
   }
 
   @override
