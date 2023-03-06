@@ -26,6 +26,12 @@ class HomeScreen extends StatelessWidget {
               return Text("${value.user}");
             },
           ),
+          Consumer<FirebaseMethods>(
+            builder: (context, value, child) {
+              return Text("${value.userData}");
+            },
+          ),
+
           TextFormField(),
           Text(Provider.of<Something>(context).stringa),
           // equivalente a quello sopra
