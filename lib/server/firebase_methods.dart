@@ -8,15 +8,20 @@ import 'package:flutter/material.dart';
 class FirebaseMethods {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
+
   FirebaseMethods(this._auth, this._firestore);
+
+  static Map<String, dynamic>? userData;
 
   // getter
   User? get user => _auth.currentUser;
+
   CollectionReference get userCollection =>
       _firestore.collection(UserCollection.collectionName);
   CollectionReference get followCollection =>
       _firestore.collection(FollowCollection.collectionName);
 
+  // getter for
   // State persistence
   Stream<User?> get authState => _auth.authStateChanges();
 
@@ -88,10 +93,10 @@ class FirebaseMethods {
         email: email,
         password: password,
       );
-      if (!_auth.currentUser!.emailVerified) {
-        // ignore: use_build_context_synchronously
-        await sendEmailVerification(context);
-      }
+
+      var userDataDoc = await readDoc(userCollection, _auth.currentUser!.uid);
+      userData = (userDataDoc?.data()) as Map<String, dynamic>?;
+      print(userData.toString());
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -100,6 +105,7 @@ class FirebaseMethods {
   Future<void> signOut(BuildContext context) async {
     try {
       await _auth.signOut();
+      userData = null;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -110,6 +116,7 @@ class FirebaseMethods {
       var uid = _auth.currentUser?.uid;
       await _auth.currentUser!.delete();
       await deleteDoc(userCollection, uid!);
+      userData = null;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -127,6 +134,25 @@ class FirebaseMethods {
         followCollection.doc(uid).set({
           "follower": [followUid],
           "following": []
+        });
+      }
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message!);
+    }
+  }
+
+  Future<void> addFollowing(BuildContext context, String followUid) async {
+    try {
+      var uid = _auth.currentUser?.uid;
+      var document = await readDoc(followCollection, uid!);
+      if (document!.exists) {
+        await followCollection.doc(uid).update({
+          "following": FieldValue.arrayUnion([followUid])
+        });
+      } else {
+        followCollection.doc(uid).set({
+          "follower": [],
+          "following": [followUid]
         });
       }
     } on FirebaseAuthException catch (e) {
