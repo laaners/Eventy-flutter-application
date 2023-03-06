@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/theme_switch.dart';
+import 'change_image.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -53,12 +54,8 @@ class _ProfileInfoState extends State<ProfileInfo> {
     return Column(
       children: [
         Container(
-          margin: EdgeInsets.all(10),
-          child: const CircleAvatar(
-            backgroundColor: Color.fromARGB(255, 255, 176, 57),
-            radius: 50,
-            child: Text('JF'),
-          ),
+          margin: const EdgeInsets.all(10),
+          child: const ChangeImage(),
         ),
         Center(
           child: Text(
