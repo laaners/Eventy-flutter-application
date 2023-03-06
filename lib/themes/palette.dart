@@ -56,5 +56,6 @@ class Palette {
       bodyLarge: TextStyle(color: Colors.black87),
     ),
     iconTheme: const IconThemeData(color: whiteColor),
+    listTileTheme: const ListTileThemeData(textColor: Colors.black),
   );
 }
