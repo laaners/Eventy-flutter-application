@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/server/tables/follow_collection.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
@@ -12,10 +14,11 @@ class FirebaseMethods extends ChangeNotifier {
 
   FirebaseMethods(this._auth, this._firestore);
 
-  static Map<String, dynamic>? userData;
+  Map<String, dynamic>? _userData;
 
-  // getter
+  // getters
   User? get user => _auth.currentUser;
+  Map<String, dynamic>? get userData => _userData;
 
   CollectionReference get userCollection =>
       _firestore.collection(UserCollection.collectionName);
@@ -100,12 +103,6 @@ class FirebaseMethods extends ChangeNotifier {
         email: email,
         password: password,
       );
-      var uid = _auth.currentUser?.uid;
-      var document = await readDoc(userCollection, uid!);
-      print(document);
-
-      notifyListeners();
-
       /*
       if (!_auth.currentUser!.emailVerified) {
         // ignore: use_build_context_synchronously
@@ -114,8 +111,10 @@ class FirebaseMethods extends ChangeNotifier {
       */
 
       var userDataDoc = await readDoc(userCollection, _auth.currentUser!.uid);
-      userData = (userDataDoc?.data()) as Map<String, dynamic>?;
-      print(userData.toString());
+      _userData = (userDataDoc?.data()) as Map<String, dynamic>?;
+      notifyListeners();
+
+      print(_userData.toString());
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -124,8 +123,8 @@ class FirebaseMethods extends ChangeNotifier {
   Future<void> signOut(BuildContext context) async {
     try {
       await _auth.signOut();
+      _userData = null;
       notifyListeners();
-      userData = null;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -137,7 +136,7 @@ class FirebaseMethods extends ChangeNotifier {
       await _auth.currentUser!.delete();
       await deleteDoc(userCollection, uid!);
       notifyListeners();
-      userData = null;
+      _userData = null;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -163,6 +162,21 @@ class FirebaseMethods extends ChangeNotifier {
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
+  }
+
+  Future<List<String>> getFollowers(
+      BuildContext context, String userUid) async {
+    try {
+      var document = await readDoc(followCollection, userUid);
+      if (document!.exists) {
+        final follow = (document.data()) as Map<String, dynamic>?;
+        List<String> followers = follow!["followers"];
+        return followers;
+      }
+    } on FirebaseAuthException catch (e) {
+      print(e.message!);
+    }
+    return [];
   }
 
   Future<void> addFollowing(
