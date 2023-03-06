@@ -11,6 +11,7 @@ class StepDates extends StatefulWidget {
   final Map<String, dynamic> dates;
   final ValueChanged<List<String>> addDate;
   final ValueChanged<List<String>> removeDate;
+  final Function removeEmpty;
   final TextEditingController deadlineController;
   const StepDates({
     super.key,
@@ -18,6 +19,7 @@ class StepDates extends StatefulWidget {
     required this.addDate,
     required this.removeDate,
     required this.deadlineController,
+    required this.removeEmpty,
   });
 
   @override
@@ -25,9 +27,15 @@ class StepDates extends StatefulWidget {
 }
 
 class _StepDatesState extends State<StepDates> {
-  DateTime _focusedDay = DateTime.now();
+  late DateTime _focusedDay;
   bool _fixedTimeSlots = false;
   List<Map<String, String>> _timeSlots = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _focusedDay = DateFormatter.string2DateTime(widget.deadlineController.text);
+  }
 
   void setSlot(times) {
     setState(() {
@@ -111,6 +119,7 @@ class _StepDatesState extends State<StepDates> {
                           widget.dates.forEach((k, v) {
                             widget.removeDate([k, "$start-$end"]);
                           });
+                          widget.removeEmpty();
                         }
                         setState(() {
                           _timeSlots = [];
@@ -235,6 +244,7 @@ class _StepDatesState extends State<StepDates> {
                       widget.dates.forEach((k, v) {
                         widget.removeDate([k, "$start-$end"]);
                       });
+                      widget.removeEmpty();
                       setState(() {
                         _timeSlots.removeWhere((item) =>
                             item["start"] == start && item["end"] == end);
@@ -250,18 +260,18 @@ class _StepDatesState extends State<StepDates> {
         Container(
           margin: const EdgeInsets.only(top: 10, left: 15, right: 15),
           alignment: Alignment.topLeft,
-          child: const Text.rich(
+          child: Text.rich(
             TextSpan(
               text: '',
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
               children: <TextSpan>[
                 TextSpan(
-                  text: 'Long tap',
-                  style: TextStyle(
+                  text: _fixedTimeSlots ? 'Long tap' : 'Tap',
+                  style: const TextStyle(
                     decoration: TextDecoration.underline,
                   ),
                 ),
-                TextSpan(
+                const TextSpan(
                   text: ' on a selected day to edit its time slots',
                 ),
               ],
@@ -270,6 +280,7 @@ class _StepDatesState extends State<StepDates> {
         ),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 10),
+          padding: EdgeInsets.only(bottom: _fixedTimeSlots ? 50 : 0),
           child: TableCalendar(
             headerStyle: const HeaderStyle(
               titleCentered: true,
@@ -279,6 +290,30 @@ class _StepDatesState extends State<StepDates> {
               ),
             ),
             calendarBuilders: CalendarBuilders(
+              prioritizedBuilder: (context, day, focusedDay) {
+                DateTime deadlineDate = DateFormatter.string2DateTime(
+                    widget.deadlineController.text);
+                bool isDeadline = deadlineDate.year == day.year &&
+                    deadlineDate.month == day.month &&
+                    deadlineDate.day == day.day;
+                if (isDeadline) {
+                  return Container(
+                    margin: const EdgeInsets.all(1),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Palette.greyColor,
+                    ),
+                    child: Center(
+                      child: Text(
+                        day.day.toString(),
+                        style: const TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              },
               defaultBuilder: (context, day, focusedDay) {
                 return Container(
                   margin: const EdgeInsets.all(1),
@@ -375,14 +410,17 @@ class _StepDatesState extends State<StepDates> {
               },
             ),
             startingDayOfWeek: StartingDayOfWeek.monday,
-            firstDay: DateTime.now(),
-            lastDay:
-                DateFormatter.string2DateTime(widget.deadlineController.text),
+            firstDay:
+                DateFormatter.string2DateTime(widget.deadlineController.text)
+                    .add(const Duration(days: 1)),
+            lastDay: DateTime(DateTime.now().year + 50),
             focusedDay: _focusedDay.compareTo(DateFormatter.string2DateTime(
-                        widget.deadlineController.text)) <=
+                            widget.deadlineController.text)
+                        .add(const Duration(days: 1))) <=
                     0
-                ? _focusedDay
-                : DateFormatter.string2DateTime(widget.deadlineController.text),
+                ? DateFormatter.string2DateTime(widget.deadlineController.text)
+                    .add(const Duration(days: 1))
+                : _focusedDay,
             selectedDayPredicate: (day) {
               return widget.dates[DateFormatter.dateTime2String(day)] != null;
             },
@@ -421,10 +459,31 @@ class _StepDatesState extends State<StepDates> {
               if (widget.dates.containsKey(selectedDayString)) {
                 widget.removeDate([selectedDayString, "all"]);
               } else {
-                for (var slot in _timeSlots) {
-                  var start = slot["start"];
-                  var end = slot["end"];
-                  widget.addDate([selectedDayString, "$start-$end"]);
+                if (_timeSlots.isNotEmpty) {
+                  for (var slot in _timeSlots) {
+                    var start = slot["start"];
+                    var end = slot["end"];
+                    widget.addDate([selectedDayString, "$start-$end"]);
+                  }
+                } else {
+                  showModalBottomSheet(
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    context: context,
+                    builder: (context) => FractionallySizedBox(
+                      heightFactor: 0.5,
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 15, bottom: 15),
+                        child: SelectDaySlots(
+                          day: selectedDay,
+                          dates: widget.dates,
+                          addDate: widget.addDate,
+                          removeDate: widget.removeDate,
+                          setSlot: setSlot,
+                        ),
+                      ),
+                    ),
+                  );
                 }
               }
               _focusedDay = selectedDay;

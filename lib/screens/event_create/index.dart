@@ -4,9 +4,13 @@ import 'package:dima_app/screens/event_create/step_basics.dart';
 import 'package:dima_app/screens/event_create/step_dates.dart';
 import 'package:dima_app/screens/event_create/step_places.dart';
 import 'package:dima_app/server/date_methods.dart';
+import 'package:dima_app/server/firebase_methods.dart';
 import 'package:dima_app/themes/palette.dart';
+import 'package:dima_app/widgets/loading_overlay.dart';
+import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_button.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -47,15 +51,6 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
     deadlineController.text = DateFormat("yyyy-MM-dd HH:00:00").format(
       DateTime(now.year, now.month, now.day + 1),
     );
-    for (var i = 0; i < 10; i++) {
-      locations.add(Location(
-        "locationNameController.text",
-        "locationDescController.text",
-        "locationAddrController.text",
-        30,
-        20,
-      ));
-    }
   }
 
   List<MyStep> stepList() => [
@@ -74,6 +69,17 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             eventTitleController: eventTitleController,
             eventDescController: eventDescController,
             deadlineController: deadlineController,
+            dates: dates,
+            removeDays: (List<String> toRemove) {
+              setState(() {
+                dates.forEach((day, slots) {
+                  if (slots.isEmpty) {
+                    toRemove.add(day);
+                  }
+                });
+                dates.removeWhere((key, value) => toRemove.contains(key));
+              });
+            },
             setDeadline: (DateTime pickedDate) {
               setState(() {
                 deadlineController.text =
@@ -140,12 +146,22 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                   if (slot == "all") {
                     dates.removeWhere((key, value) => key == day);
                   } else {
-                    dates[day].removeWhere((key, value) => key == slot);
-                    if (dates[day].isEmpty) {
-                      dates.removeWhere((key, value) => key == day);
+                    if (dates[day].containsKey(slot)) {
+                      dates[day].removeWhere((key, value) => key == slot);
                     }
                   }
                 }
+              });
+            },
+            removeEmpty: () {
+              setState(() {
+                List<String> toRemove = [];
+                dates.forEach((day, slots) {
+                  if (slots.isEmpty) {
+                    toRemove.add(day);
+                  }
+                });
+                dates.removeWhere((key, value) => toRemove.contains(key));
               });
             },
             deadlineController: deadlineController,
@@ -171,17 +187,96 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
         child: MyStepper(
           currentStep: _activeStepIndex,
           steps: stepList(),
-          onStepContinue: () {
+          onStepContinue: () async {
             if (_activeStepIndex < (stepList().length - 1)) {
               setState(() {
                 _activeStepIndex += 1;
               });
             } else {
-              print(eventTitleController.text);
-              print(eventDescController.text);
-              print(deadlineController.text);
-              print(locations.toString());
-              print(dates);
+              bool checkField(bool condition, String title, String content) {
+                if (condition) {
+                  showCupertinoModalPopup(
+                    context: context,
+                    builder: (BuildContext context) => MyAlertDialog(
+                      title: title,
+                      content: content,
+                    ),
+                  );
+                  return true;
+                }
+                return false;
+              }
+
+              bool ret = checkField(
+                eventTitleController.text.isEmpty,
+                "MISSING EVENT NAME",
+                "You must give a name to the event",
+              );
+              if (ret) return;
+
+              ret = checkField(
+                locations.isEmpty,
+                "MISSING EVENT PLACES",
+                "You must choose where to hold the event",
+              );
+              if (ret) return;
+
+              ret = checkField(
+                dates.isEmpty,
+                "MISSING EVENT DATES",
+                "You must choose when to hold the event",
+              );
+              if (ret) return;
+
+              var utcDeadline =
+                  DateFormatter.toUtcString(deadlineController.text);
+              Map<String, dynamic> utcDates = {};
+              dates.forEach((day, slots) {
+                slots.forEach((slot, _) {
+                  var startDateString =
+                      "${day.split(" ")[0]} ${slot.split("-")[0]}:00";
+                  var endDateString =
+                      "${day.split(" ")[0]} ${slot.split("-")[1]}:00";
+                  var startDateUtc = DateFormatter.string2DateTime(
+                      DateFormatter.toUtcString(startDateString));
+                  var endDateUtc = DateFormatter.string2DateTime(
+                      DateFormatter.toUtcString(endDateString));
+                  String utcDay = DateFormat("yyyy-MM-dd").format(startDateUtc);
+                  var startUtc = DateFormat("HH:mm").format(startDateUtc);
+                  var endUtc = DateFormat("HH:mm").format(endDateUtc);
+                  if (!utcDates.containsKey(utcDay)) {
+                    utcDates[utcDay] = [];
+                  }
+                  utcDates[utcDay].add({
+                    "start": startUtc,
+                    "end": endUtc,
+                  });
+                });
+              });
+              var locationsMap = locations.map((location) {
+                return {
+                  "name": location.name,
+                  "desc": location.description,
+                  "site": location.site,
+                  "lat": location.lat,
+                  "lon": location.lon,
+                };
+              }).toList();
+              LoadingOverlay.show(context);
+              var curUid = Provider.of<FirebaseMethods>(context, listen: false)
+                  .user!
+                  .uid;
+              await Provider.of<FirebaseMethods>(context, listen: false)
+                  .createPoll(
+                context: context,
+                pollName: eventTitleController.text,
+                organizerUid: curUid,
+                pollDesc: eventDescController.text,
+                deadline: utcDeadline,
+                dates: utcDates,
+                locations: locationsMap,
+              );
+              LoadingOverlay.hide(context);
             }
           },
           onStepCancel: () {

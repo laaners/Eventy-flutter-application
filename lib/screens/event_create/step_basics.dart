@@ -7,19 +7,36 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class StepBasics extends StatelessWidget {
+class StepBasics extends StatefulWidget {
   final TextEditingController eventTitleController;
   final TextEditingController eventDescController;
   final TextEditingController deadlineController;
-
+  final Map<String, dynamic> dates;
+  final ValueChanged<List<String>> removeDays;
   final ValueChanged<DateTime> setDeadline;
+
   const StepBasics({
     super.key,
     required this.eventTitleController,
     required this.eventDescController,
     required this.deadlineController,
     required this.setDeadline,
+    required this.dates,
+    required this.removeDays,
   });
+
+  @override
+  State<StepBasics> createState() => _StepBasicsState();
+}
+
+class _StepBasicsState extends State<StepBasics> {
+  late DateTime _pickedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _pickedDate = DateFormatter.string2DateTime(widget.deadlineController.text);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +70,7 @@ class StepBasics extends StatelessWidget {
             maxLength: 40,
             maxLines: 2,
             hintText: "What's the occasion?",
-            controller: eventTitleController,
+            controller: widget.eventTitleController,
           ),
         ),
         Container(
@@ -73,7 +90,7 @@ class StepBasics extends StatelessWidget {
             maxLength: 200,
             maxLines: 7,
             hintText: "Describe what this event is about",
-            controller: eventDescController,
+            controller: widget.eventDescController,
           ),
         ),
         ListTile(
@@ -103,8 +120,8 @@ class StepBasics extends StatelessWidget {
               border: InputBorder.none,
             ),
             controller: TextEditingController(
-              text: DateFormat("EEEE MMMM dd yyyy 'at' hh:mm").format(
-                DateFormatter.string2DateTime(deadlineController.text),
+              text: DateFormat("EEEE MMMM dd yyyy 'at' HH:mm").format(
+                DateFormatter.string2DateTime(widget.deadlineController.text),
               ),
             ), //deadlineController,
           ),
@@ -119,32 +136,91 @@ class StepBasics extends StatelessWidget {
                   color: Provider.of<ThemeSwitch>(context, listen: false)
                       .themeData
                       .scaffoldBackgroundColor,
-                  child: Column(
-                    children: [
-                      Container(
-                        padding:
-                            const EdgeInsets.only(top: 15, right: 5, left: 5),
-                        child: const Text(
-                          'Select the deadline date for voting',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 20),
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                              alignment: Alignment.topRight,
+                              margin: const EdgeInsets.only(left: 15, top: 0),
+                              child: InkWell(
+                                child: const Icon(
+                                  Icons.close,
+                                  size: 30,
+                                ),
+                                onTap: () {
+                                  Navigator.pop(
+                                    context,
+                                    "This string will be passed back to the parent",
+                                  );
+                                },
+                              ),
+                            ),
+                            Flexible(
+                              child: Container(
+                                margin:
+                                    const EdgeInsets.only(bottom: 8, top: 8),
+                                alignment: Alignment.center,
+                                child: const Text(
+                                  "Select a deadline",
+                                  softWrap: true,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 22,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              alignment: Alignment.topRight,
+                              margin: const EdgeInsets.only(right: 15, top: 0),
+                              child: InkWell(
+                                onTap: () {
+                                  widget.setDeadline(_pickedDate);
+                                  List<String> toRemove = [];
+                                  widget.dates.forEach((day, slots) {
+                                    slots.forEach((slot, _) {
+                                      var startDateString =
+                                          "${day.split(" ")[0]} ${slot.split("-")[0]}:00";
+                                      DateTime startDate =
+                                          DateFormatter.string2DateTime(
+                                              startDateString);
+                                      if (startDate.isBefore(_pickedDate)) {
+                                        toRemove.add(day);
+                                      }
+                                    });
+                                  });
+                                  widget.removeDays(toRemove);
+                                  Navigator.pop(context);
+                                },
+                                child: const Icon(
+                                  Icons.done,
+                                  size: 30,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      Expanded(
-                        child: CupertinoDatePicker(
-                          mode: CupertinoDatePickerMode.dateAndTime,
-                          initialDateTime: DateFormatter.string2DateTime(
-                              deadlineController.text),
-                          minimumDate:
-                              DateTime.now().add(const Duration(minutes: 30)),
-                          minuteInterval: 5,
-                          use24hFormat: true,
-                          onDateTimeChanged: (pickedDate) {
-                            setDeadline(pickedDate);
-                          },
+                        Expanded(
+                          child: CupertinoDatePicker(
+                            mode: CupertinoDatePickerMode.dateAndTime,
+                            initialDateTime: DateFormatter.string2DateTime(
+                                widget.deadlineController.text),
+                            minimumDate:
+                                DateTime.now().add(const Duration(minutes: 30)),
+                            minuteInterval: 5,
+                            use24hFormat: true,
+                            onDateTimeChanged: (pickedDate) {
+                              _pickedDate = pickedDate;
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
