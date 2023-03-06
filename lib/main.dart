@@ -3,7 +3,7 @@ import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/login.dart';
-import 'package:dima_app/screens/profile.dart';
+import 'package:dima_app/screens/profile/index.dart';
 import 'package:dima_app/server/firebase_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';

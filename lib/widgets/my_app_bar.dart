@@ -13,17 +13,17 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       centerTitle: true,
       title: Text(title),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Provider.of<ThemeSwitch>(context, listen: false).changeTheme();
-          },
-          child: Icon(
-            Icons.dark_mode,
-            color: Provider.of<ThemeSwitch>(context).themeData.iconTheme.color,
-          ),
-        ),
-      ],
+      // actions: [
+      //   TextButton(
+      //     onPressed: () {
+      //       Provider.of<ThemeSwitch>(context, listen: false).changeTheme();
+      //     },
+      //     child: Icon(
+      //       Icons.dark_mode,
+      //       color: Provider.of<ThemeSwitch>(context).themeData.iconTheme.color,
+      //     ),
+      //   ),
+      // ],
     );
   }
 }

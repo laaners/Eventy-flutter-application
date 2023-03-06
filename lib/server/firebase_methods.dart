@@ -9,14 +9,14 @@ import 'package:flutter/material.dart';
 class FirebaseMethods extends ChangeNotifier {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
+
   FirebaseMethods(this._auth, this._firestore);
 
-  // loader
+  static Map<String, dynamic>? userData;
 
   // getter
   User? get user => _auth.currentUser;
 
-  // get collections/firestore entities
   CollectionReference get userCollection =>
       _firestore.collection(UserCollection.collectionName);
   CollectionReference get followCollection =>
@@ -24,6 +24,7 @@ class FirebaseMethods extends ChangeNotifier {
   CollectionReference get pollCollection =>
       _firestore.collection(PollCollection.collectionName);
 
+  // getter for
   // State persistence
   Stream<User?> get authState => _auth.authStateChanges();
 
@@ -111,6 +112,10 @@ class FirebaseMethods extends ChangeNotifier {
         await sendEmailVerification(context);
       }
       */
+
+      var userDataDoc = await readDoc(userCollection, _auth.currentUser!.uid);
+      userData = (userDataDoc?.data()) as Map<String, dynamic>?;
+      print(userData.toString());
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -120,6 +125,7 @@ class FirebaseMethods extends ChangeNotifier {
     try {
       await _auth.signOut();
       notifyListeners();
+      userData = null;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -131,6 +137,7 @@ class FirebaseMethods extends ChangeNotifier {
       await _auth.currentUser!.delete();
       await deleteDoc(userCollection, uid!);
       notifyListeners();
+      userData = null;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
