@@ -1,3 +1,4 @@
+import 'package:dima_app/server/firebase_methods.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -46,9 +47,6 @@ class ProfileInfo extends StatefulWidget {
 }
 
 class _ProfileInfoState extends State<ProfileInfo> {
-  String _name = "Jeff Bridge";
-  int _friendsNumber = 46;
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -58,8 +56,11 @@ class _ProfileInfoState extends State<ProfileInfo> {
           child: const ChangeImage(),
         ),
         Center(
-          child: Text(
-            _name,
+          child: Consumer<FirebaseMethods>(
+            builder: (context, value, child) {
+              return Text(
+                  "${value.userData!["name"]} ${value.userData!["surname"]}");
+            },
           ),
         ),
         Container(
@@ -72,9 +73,9 @@ class _ProfileInfoState extends State<ProfileInfo> {
           ),
           child: TextButton(
             onPressed: () {
-              // add transition to list of friends
+              // add transition to list of followers
             },
-            child: Text('$_friendsNumber friends'),
+            child: Text('x followers'),
           ),
         )
       ],
@@ -142,7 +143,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
         ),
         ListTile(
           leading: const Icon(Icons.logout),
-          title: const Text("Sing out"),
+          title: const Text("Sign out"),
           trailing: const Icon(Icons.navigate_next),
           onTap: () {
             // add transition to initial screen (LogInScreen?)
@@ -152,6 +153,5 @@ class _ProfileSettingsState extends State<ProfileSettings> {
     );
   }
 }
-
 
 // todo: add ProfileViewScreen
