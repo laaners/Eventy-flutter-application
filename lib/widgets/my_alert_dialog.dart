@@ -10,6 +10,25 @@ class MyAlertDialog extends StatelessWidget {
     required this.content,
   });
 
+  static bool showAlertIfCondition(
+    BuildContext context,
+    bool condition,
+    String title,
+    String content,
+  ) {
+    if (condition) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) => MyAlertDialog(
+          title: title,
+          content: content,
+        ),
+      );
+      return true;
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return CupertinoAlertDialog(

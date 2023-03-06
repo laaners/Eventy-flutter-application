@@ -193,35 +193,24 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 _activeStepIndex += 1;
               });
             } else {
-              bool checkField(bool condition, String title, String content) {
-                if (condition) {
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (BuildContext context) => MyAlertDialog(
-                      title: title,
-                      content: content,
-                    ),
-                  );
-                  return true;
-                }
-                return false;
-              }
-
-              bool ret = checkField(
+              bool ret = MyAlertDialog.showAlertIfCondition(
+                context,
                 eventTitleController.text.isEmpty,
                 "MISSING EVENT NAME",
                 "You must give a name to the event",
               );
               if (ret) return;
 
-              ret = checkField(
+              ret = MyAlertDialog.showAlertIfCondition(
+                context,
                 locations.isEmpty,
                 "MISSING EVENT PLACES",
                 "You must choose where to hold the event",
               );
               if (ret) return;
 
-              ret = checkField(
+              ret = MyAlertDialog.showAlertIfCondition(
+                context,
                 dates.isEmpty,
                 "MISSING EVENT DATES",
                 "You must choose when to hold the event",

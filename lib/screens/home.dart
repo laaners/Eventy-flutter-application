@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/search.dart';
 import 'package:dima_app/server/firebase_methods.dart';
+import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -126,8 +127,11 @@ class HomeScreen extends StatelessWidget {
                 "IrI8s7a6WeVUgF3fAYd99YHdnqh2",
               );
               LoadingOverlay.hide(context);
-              print(document?.data());
+              UserCollection usertest = UserCollection.fromMap(
+                document?.data() as Map<String, dynamic>,
+              );
               print(document?.exists);
+              print(usertest.email);
               // overlay.hide();
 
               var snapshots =

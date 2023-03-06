@@ -252,7 +252,7 @@ class FirebaseMethods extends ChangeNotifier {
   ) async {
     try {
       await collection.doc(id).update({
-        field: FieldValue.arrayUnion(['ok'])
+        field: field, // FieldValue.arrayUnion(['ok'])
       });
     } on FirebaseAuthException catch (e) {
       print(e.message!);
