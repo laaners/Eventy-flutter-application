@@ -1,4 +1,6 @@
 import 'package:dima_app/screens/signup.dart';
+import 'package:dima_app/server/firebase_user.dart';
+import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +36,19 @@ class _LogInFormState extends State<LogInForm> {
   Widget build(BuildContext context) {
     return ListView(
       children: [
+        TextButton(
+          onPressed: () async {
+            LoadingOverlay.show(context);
+            await Provider.of<FirebaseUser>(context, listen: false)
+                .loginWithEmail(
+              email: "test13@test.it", //"ok@ok.it",
+              password: "password",
+              context: context,
+            );
+            LoadingOverlay.hide(context);
+          },
+          child: const Text("Firebase login"),
+        ),
         const SizedBox(
           height: 50,
         ),

@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/search.dart';
+import 'package:dima_app/server/firebase_crud.dart';
+import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_methods.dart';
+import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
@@ -21,12 +24,12 @@ class HomeScreen extends StatelessWidget {
       body: ListView(
         children: [
           const Text("ok"),
-          Consumer<FirebaseMethods>(
+          Consumer<FirebaseUser>(
             builder: (context, value, child) {
               return Text("${value.user}");
             },
           ),
-          Consumer<FirebaseMethods>(
+          Consumer<FirebaseUser>(
             builder: (context, value, child) {
               return Text("${value.userData}");
             },
@@ -83,7 +86,7 @@ class HomeScreen extends StatelessWidget {
           TextButton(
             onPressed: () async {
               for (var i = 10; i < 30; i++) {
-                await Provider.of<FirebaseMethods>(context, listen: false)
+                await Provider.of<FirebaseUser>(context, listen: false)
                     .signUpWithEmail(
                   email: "test$i@test.it",
                   password: "password",
@@ -111,7 +114,7 @@ class HomeScreen extends StatelessWidget {
           TextButton(
             onPressed: () async {
               LoadingOverlay.show(context);
-              await Provider.of<FirebaseMethods>(context, listen: false)
+              await Provider.of<FirebaseUser>(context, listen: false)
                   .loginWithEmail(
                 email: "test13@test.it", //"ok@ok.it",
                 password: "password",
@@ -125,10 +128,8 @@ class HomeScreen extends StatelessWidget {
             onPressed: () async {
               LoadingOverlay.show(context);
               // overlay.show();
-              var document =
-                  await Provider.of<FirebaseMethods>(context, listen: false)
-                      .readDoc(
-                Provider.of<FirebaseMethods>(context, listen: false)
+              var document = await FirebaseCrud.readDoc(
+                Provider.of<FirebaseUser>(context, listen: false)
                     .userCollection,
                 "IrI8s7a6WeVUgF3fAYd99YHdnqh2",
               );
@@ -140,10 +141,8 @@ class HomeScreen extends StatelessWidget {
               print(usertest.email);
               // overlay.hide();
 
-              var snapshots =
-                  await Provider.of<FirebaseMethods>(context, listen: false)
-                      .readSnapshot(
-                Provider.of<FirebaseMethods>(context, listen: false)
+              var snapshots = await FirebaseCrud.readSnapshot(
+                Provider.of<FirebaseUser>(context, listen: false)
                     .userCollection,
                 "IrI8s7a6WeVUgF3fAYd99YHdnqh2",
               );
@@ -156,10 +155,9 @@ class HomeScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
-              var curUid = Provider.of<FirebaseMethods>(context, listen: false)
-                  .user!
-                  .uid;
-              await Provider.of<FirebaseMethods>(context, listen: false)
+              var curUid =
+                  Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+              await Provider.of<FirebaseFollow>(context, listen: false)
                   .addFollower(
                 context,
                 curUid,
@@ -170,14 +168,14 @@ class HomeScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
-              await Provider.of<FirebaseMethods>(context, listen: false)
+              await Provider.of<FirebaseUser>(context, listen: false)
                   .signOut(context);
             },
             child: const Text("Firebase sign out"),
           ),
           TextButton(
             onPressed: () async {
-              await Provider.of<FirebaseMethods>(context, listen: false)
+              await Provider.of<FirebaseUser>(context, listen: false)
                   .deleteAccount(context);
             },
             child: const Text("Firebase delete"),
@@ -220,8 +218,8 @@ class UsersList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     CollectionReference users =
-        Provider.of<FirebaseMethods>(context, listen: false).userCollection;
-    var curUid = Provider.of<FirebaseMethods>(context, listen: false).user!.uid;
+        Provider.of<FirebaseUser>(context, listen: false).userCollection;
+    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     return FutureBuilder(
       future: users.get(),
       builder: (context, snapshot) {
@@ -236,7 +234,7 @@ class UsersList extends StatelessWidget {
                 return Text(users.docs[index]["uid"] + "==" + curUid);
               } else {
                 /*
-                Provider.of<FirebaseMethods>(context, listen: false)
+                Provider.of<FirebaseFollow>(context, listen: false)
                     .addFollower(context, curUid, uid);
                 print("added");
                 */
