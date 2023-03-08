@@ -1,5 +1,6 @@
-import 'package:dima_app/server/firebase_methods.dart';
+import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -173,7 +174,7 @@ class _SignUpFormState extends State<SignUpForm> {
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar and call a server or save the information in the database.
-                  await Provider.of<FirebaseMethods>(context, listen: false)
+                  await Provider.of<FirebaseUser>(context, listen: false)
                       .signUpWithEmail(
                           email: "0@ok.it", //,_emailController.text,
                           password: _passwordController.text,
