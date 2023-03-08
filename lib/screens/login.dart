@@ -41,7 +41,7 @@ class _LogInFormState extends State<LogInForm> {
             LoadingOverlay.show(context);
             await Provider.of<FirebaseUser>(context, listen: false)
                 .loginWithEmail(
-              email: "test13@test.it", //"ok@ok.it",
+              email: "test12@test.it", //"ok@ok.it",
               password: "password",
               context: context,
             );

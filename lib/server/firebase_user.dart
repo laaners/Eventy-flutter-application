@@ -1,8 +1,4 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dima_app/server/tables/follow_collection.dart';
-import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,6 +23,13 @@ class FirebaseUser extends ChangeNotifier {
   // getter for
   // State persistence
   Stream<User?> get authState => _auth.authStateChanges();
+
+  Future<void> initUserData() async {
+    var userDataDoc =
+        await FirebaseCrud.readDoc(userCollection, _auth.currentUser!.uid);
+    _userData = (userDataDoc?.data()) as Map<String, dynamic>?;
+    notifyListeners();
+  }
 
   Future<void> signUpWithEmailNoVerification({
     required String email,
@@ -57,6 +60,11 @@ class FirebaseUser extends ChangeNotifier {
       var usernameValidation =
           await userCollection.where('username', isEqualTo: username).get();
 
+      if (usernameValidation.docs.isNotEmpty) {
+        showSnackBar(context, "Choose another username!");
+        return;
+      }
+
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -75,6 +83,7 @@ class FirebaseUser extends ChangeNotifier {
       await userCollection
           .doc(userCredential.user!.uid)
           .set(userEntity.toMap());
+      _userData = userEntity.toMap();
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
@@ -111,8 +120,6 @@ class FirebaseUser extends ChangeNotifier {
           await FirebaseCrud.readDoc(userCollection, _auth.currentUser!.uid);
       _userData = (userDataDoc?.data()) as Map<String, dynamic>?;
       notifyListeners();
-
-      print(_userData.toString());
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }

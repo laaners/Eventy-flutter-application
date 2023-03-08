@@ -1,12 +1,17 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/event_create/my_stepper.dart';
 import 'package:dima_app/screens/event_create/step_basics.dart';
 import 'package:dima_app/screens/event_create/step_dates.dart';
 import 'package:dima_app/screens/event_create/step_places.dart';
+import 'package:dima_app/screens/event_detail.dart';
+import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/themes/palette.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
@@ -172,8 +177,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar(
-          "New Event, filter dates before deadline at the end!!!"),
+      appBar: const MyAppBar("New Event"),
       body: Theme(
         data: ThemeData(
           canvasColor: Provider.of<ThemeSwitch>(context)
@@ -193,6 +197,9 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 _activeStepIndex += 1;
               });
             } else {
+              var curUid =
+                  Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+
               bool ret = MyAlertDialog.showAlertIfCondition(
                 context,
                 eventTitleController.text.isEmpty,
@@ -252,8 +259,6 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 };
               }).toList();
               LoadingOverlay.show(context);
-              var curUid =
-                  Provider.of<FirebaseUser>(context, listen: false).user!.uid;
               await Provider.of<FirebasePoll>(context, listen: false)
                   .createPoll(
                 context: context,
@@ -265,6 +270,16 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 locations: locationsMap,
               );
               LoadingOverlay.hide(context);
+              Navigator.of(context).pop();
+              Navigator.push(
+                context,
+                ScreenTransition(
+                  builder: (context) => PollDetailScreen(
+                    organizerUid: curUid,
+                    pollName: eventTitleController.text,
+                  ),
+                ),
+              );
             }
           },
           onStepCancel: () {

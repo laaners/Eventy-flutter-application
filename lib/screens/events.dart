@@ -27,7 +27,7 @@ class EventsScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 ScreenTransition(
-                  builder: (context) => const HomeScreen(),
+                  builder: (context) => const EventDetailScreen(),
                 ),
               );
             },

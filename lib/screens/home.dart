@@ -1,21 +1,60 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dima_app/providers/dynamic_links_handler.dart';
 import 'package:dima_app/providers/theme_switch.dart';
+import 'package:dima_app/screens/event_detail.dart';
+import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/search.dart';
 import 'package:dima_app/server/firebase_crud.dart';
 import 'package:dima_app/server/firebase_follow.dart';
-import 'package:dima_app/server/firebase_methods.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/provider_samples.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    initLink();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void initLink() async {
+    final PendingDynamicLinkData? initialLink =
+        await FirebaseDynamicLinks.instance.getInitialLink();
+    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
+      print("ok2---------------------------");
+      print(dynamicLinkData);
+      /*
+      Navigator.of(context).push(
+        ScreenTransition(
+          builder: (context) => const EventDetailScreen(),
+        ),
+      );
+      */
+      // Navigator.pushNamed(context, dynamicLinkData.link.path);
+    }).onError((error) {
+      // Handle errors
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +63,16 @@ class HomeScreen extends StatelessWidget {
       body: ListView(
         children: [
           const Text("ok"),
+          Text(Provider.of<DynamicLinksHandler>(context, listen: false)
+                      .dynamicLink !=
+                  null
+              ? "non null"
+              : "null"),
+          Consumer<DynamicLinksHandler>(
+            builder: (context, value, child) {
+              return Text("${value.dynamicLink ?? 'null'}");
+            },
+          ),
           Consumer<FirebaseUser>(
             builder: (context, value, child) {
               return Text("${value.user}");
@@ -82,10 +131,60 @@ class HomeScreen extends StatelessWidget {
             },
           ),
 
+          // Dynamic link test
+          TextButton(
+            onPressed: () {
+              /*
+              Navigator.of(context, rootNavigator: true).push(
+                ScreenTransition(
+                  builder: (context) => const EventDetailScreen(),
+                ),
+              );
+              */
+              Navigator.of(context).push(
+                ScreenTransition(
+                  builder: (context) => const EventsScreen(),
+                ),
+              );
+            },
+            child: const Text("Push named"),
+          ),
+
+          // Dynamic link test
+          TextButton(
+            onPressed: () async {
+              const String url = "https://eventy?test=1";
+              final dynamicLinkParams = DynamicLinkParameters(
+                link: Uri.parse(url),
+                uriPrefix: "https://eventy.page.link",
+                androidParameters: const AndroidParameters(
+                  packageName: "com.example.dima_app",
+                ),
+                iosParameters: const IOSParameters(
+                  bundleId: "com.example.dima_app",
+                ),
+              );
+              final dynamicLongLink = await FirebaseDynamicLinks.instance
+                  .buildLink(dynamicLinkParams);
+              final ShortDynamicLink dynamicShortLink =
+                  await FirebaseDynamicLinks.instance
+                      .buildShortLink(dynamicLinkParams);
+              Uri finalUrl = dynamicShortLink.shortUrl;
+              print(finalUrl);
+              print(dynamicLongLink);
+
+              final instanceLink =
+                  await FirebaseDynamicLinks.instance.getInitialLink();
+
+              // init dynamic link
+            },
+            child: const Text("Dynamic link"),
+          ),
+
           // DB test
           TextButton(
             onPressed: () async {
-              for (var i = 10; i < 30; i++) {
+              for (var i = 13; i < 14; i++) {
                 await Provider.of<FirebaseUser>(context, listen: false)
                     .signUpWithEmail(
                   email: "test$i@test.it",
@@ -98,7 +197,7 @@ class HomeScreen extends StatelessWidget {
                 );
               }
             },
-            child: const Text("Firebase test"),
+            child: const Text("Firebase sign in"),
           ),
 
           // Search user functionality
