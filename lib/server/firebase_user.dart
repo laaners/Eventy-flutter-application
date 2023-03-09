@@ -139,4 +139,16 @@ class FirebaseUser extends ChangeNotifier {
       showSnackBar(context, e.message!);
     }
   }
+
+  Future<Map<String, dynamic>?> getUserData(
+      BuildContext context, String uid) async {
+    try {
+      var userDataDoc = await FirebaseCrud.readDoc(userCollection, uid);
+      var userDetails = (userDataDoc?.data()) as Map<String, dynamic>?;
+      return userDetails;
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message!);
+    }
+    return null;
+  }
 }
