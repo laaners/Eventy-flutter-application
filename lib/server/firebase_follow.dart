@@ -11,10 +11,12 @@ class FirebaseFollow extends ChangeNotifier {
 
   FirebaseFollow(this._firestore);
 
-  List<String>? _followersUid;
+  List<String> _followersUid = [];
+  List<String> _followingUid = [];
 
   // getters
-  List<String>? get followersUid => _followersUid;
+  List<String> get followersUid => _followersUid;
+  List<String> get followingUid => _followingUid;
 
   CollectionReference get followCollection =>
       _firestore.collection(FollowCollection.collectionName);
@@ -37,7 +39,7 @@ class FirebaseFollow extends ChangeNotifier {
         });
       }
       // ignore: use_build_context_synchronously
-      _followersUid = await getFollowers(context, uid);
+      _followersUid = (await getFollowers(context, uid))!;
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
@@ -50,10 +52,27 @@ class FirebaseFollow extends ChangeNotifier {
       var document = await FirebaseCrud.readDoc(followCollection, userUid);
       if (document!.exists) {
         final follow = (document.data()) as Map<String, dynamic>?;
-        _followersUid = follow!["followers"];
+        _followersUid = List<String>.from(follow!["follower"]);
+        notifyListeners();
         return _followersUid;
       }
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return [];
+  }
+
+  Future<List<String>?> getFollowing(
+      BuildContext context, String userUid) async {
+    try {
+      var document = await FirebaseCrud.readDoc(followCollection, userUid);
+      if (document!.exists) {
+        final follow = (document.data()) as Map<String, dynamic>?;
+        _followingUid = List<String>.from(follow!["following"]);
+        notifyListeners();
+        return _followingUid;
+      }
+    } on FirebaseException catch (e) {
       print(e.message!);
     }
     return [];
@@ -77,7 +96,7 @@ class FirebaseFollow extends ChangeNotifier {
         });
       }
       // ignore: use_build_context_synchronously
-      _followersUid = await getFollowers(context, uid);
+      _followersUid = (await getFollowers(context, uid))!;
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
