@@ -1,3 +1,5 @@
+import 'package:dima_app/screens/profile/profile_pic.dart';
+
 import 'change_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +18,9 @@ class ProfileInfo extends StatefulWidget {
 }
 
 class _ProfileInfoState extends State<ProfileInfo> {
+  List<String>? following = [];
+  List<String>? followers = [];
+
   @override
   void initState() {
     // TODO: implement initState
@@ -25,6 +30,14 @@ class _ProfileInfoState extends State<ProfileInfo> {
 
   void initFollow() async {
     String uid = widget.userData!["uid"];
+    if (uid != Provider.of<FirebaseUser>(context, listen: false).user!.uid) {
+      setState(() async {
+        followers = await Provider.of<FirebaseFollow>(context, listen: false)
+            .getFollowers(context, uid);
+        following = await Provider.of<FirebaseFollow>(context, listen: false)
+            .getFollowing(context, uid);
+      });
+    }
     await Provider.of<FirebaseFollow>(context, listen: false)
         .getFollowers(context, uid);
     // ignore: use_build_context_synchronously
@@ -33,24 +46,30 @@ class _ProfileInfoState extends State<ProfileInfo> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Column build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.all(10),
-          child: const ChangeImage(),
-        ),
         Center(
-          child: Consumer<FirebaseUser>(
-            builder: (context, value, child) {
-              return Column(
-                children: [
-                  Text("${value.userData!["username"]}"),
-                  Text(
-                      "${value.userData!["name"]} ${value.userData!["surname"]}"),
-                ],
-              );
-            },
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.all(10),
+                child: ProfilePic(
+                  userData: widget.userData,
+                  loading: false,
+                  radius: 90,
+                ),
+              ),
+              Text("${widget.userData!["username"]}"),
+              Text(
+                  "${widget.userData!["name"]} ${widget.userData!["surname"]}"),
+            ],
           ),
         ),
         Container(

@@ -3,23 +3,28 @@ import 'package:flutter/material.dart';
 class ProfilePic extends StatelessWidget {
   final Map<String, dynamic>? userData;
   final bool loading;
-  const ProfilePic({super.key, required this.userData, required this.loading});
+  final double radius;
+  const ProfilePic(
+      {super.key,
+      required this.userData,
+      required this.loading,
+      required this.radius});
 
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-      radius: 55,
+      radius: radius,
       backgroundColor: Colors.orange,
-      foregroundColor: Colors.orange,
+      //foregroundColor: Colors.orange,
       child: userData?["profilePic"] != "default"
           ? (loading
               ? const Center(child: CircularProgressIndicator())
               : ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(radius),
                   child: Image.network(
                     userData?["profilePic"],
-                    width: 100,
-                    height: 100,
+                    width: radius * 2,
+                    height: radius * 2,
                     fit: BoxFit.fill,
                     loadingBuilder: (BuildContext context, Widget child,
                         ImageChunkEvent? loadingProgress) {
@@ -45,9 +50,9 @@ class ProfilePic extends StatelessWidget {
                 child: Text(
                   "${userData?["name"][0]}${userData?["surname"][0]}",
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 30,
+                    fontSize: radius / 2,
                   ),
                 ),
               ),

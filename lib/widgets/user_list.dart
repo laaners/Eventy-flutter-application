@@ -2,6 +2,7 @@ import 'package:dima_app/screens/profile/view_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../screens/profile/profile_pic.dart';
 import '../server/firebase_user.dart';
 
 class UserList extends StatefulWidget {
@@ -85,10 +86,10 @@ class UserTile extends StatelessWidget {
     return SizedBox(
       height: 80,
       child: ListTile(
-        leading: CircleAvatar(
+        leading: ProfilePic(
+          loading: false,
+          userData: userData,
           radius: 30,
-          backgroundColor: Colors.brown.shade800,
-          child: Text("${userData['name'][0]}${userData['surname'][0]}"),
         ),
         title: Text("${userData['name']} ${userData['surname']}"),
         subtitle: Text("${userData['username']}"),
