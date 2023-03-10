@@ -32,10 +32,11 @@ class FirebaseCrud {
     CollectionReference collection,
     String id,
     String field,
+    dynamic newValue,
   ) async {
     try {
       await collection.doc(id).update({
-        field: field,
+        field: newValue,
       });
     } on FirebaseException catch (e) {
       print(e.message!);
