@@ -181,7 +181,7 @@ class _SignUpFormState extends State<SignUpForm> {
                           username: _usernameController.text,
                           name: _nameController.text,
                           surname: _surnameController.text,
-                          profilePic: "0", //profilePic,
+                          profilePic: "default", //profilePic,
                           context: context);
                   // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(

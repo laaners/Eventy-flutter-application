@@ -148,11 +148,26 @@ class FirebaseUser extends ChangeNotifier {
   }
 
   Future<Map<String, dynamic>?> getUserData(
-      BuildContext context, String uid) async {
+    BuildContext context,
+    String uid,
+  ) async {
     try {
       var userDataDoc = await FirebaseCrud.readDoc(userCollection, uid);
       var userDetails = (userDataDoc?.data()) as Map<String, dynamic>?;
       return userDetails;
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message!);
+    }
+    return null;
+  }
+
+  Future<void> updateProfilePic(BuildContext context, String profileUrl) async {
+    try {
+      var uid = _auth.currentUser!.uid;
+      await FirebaseCrud.updateDoc(
+          userCollection, uid, "profilePic", profileUrl);
+      _userData?["profilePic"] = profileUrl;
+      notifyListeners();
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }

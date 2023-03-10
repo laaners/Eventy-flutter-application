@@ -53,7 +53,9 @@ class _UserListState extends State<UserList> {
     for (int i = start; i < end; i++) {
       var userData = await Provider.of<FirebaseUser>(context, listen: false)
           .getUserData(context, widget.users[i]) as Map<String, dynamic>;
-      usersData.add(userData);
+      setState(() {
+        usersData.add(userData);
+      });
     }
   }
 
