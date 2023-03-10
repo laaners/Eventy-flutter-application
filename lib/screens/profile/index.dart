@@ -1,5 +1,8 @@
+import 'package:dima_app/screens/profile/follower_list.dart';
+import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
+import 'package:dima_app/widgets/user_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,12 +19,6 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         //mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Center(
-            child: Text(
-              "Profile",
-              style: TextStyle(fontSize: 28),
-            ),
-          ),
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(children: const [
@@ -48,7 +45,24 @@ class ProfileInfo extends StatefulWidget {
 
 class _ProfileInfoState extends State<ProfileInfo> {
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    // TODO: implement initState
+    initFollow();
+    super.initState();
+  }
+
+  void initFollow() async {
+    String uid =
+        Provider.of<FirebaseUser>(context, listen: false).userData!["uid"];
+    await Provider.of<FirebaseFollow>(context, listen: false)
+        .getFollowers(context, uid);
+    // ignore: use_build_context_synchronously
+    await Provider.of<FirebaseFollow>(context, listen: false)
+        .getFollowing(context, uid);
+  }
+
+  @override
+  Column build(BuildContext context) {
     return Column(
       children: [
         Container(
@@ -71,11 +85,59 @@ class _ProfileInfoState extends State<ProfileInfo> {
               Radius.circular(10),
             ),
           ),
-          child: TextButton(
-            onPressed: () {
-              // add transition to list of followers
-            },
-            child: Text('x followers'),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Consumer<FirebaseFollow>(
+                builder: (context, value, child) {
+                  print("before followers");
+                  print(value.followersUid);
+                  return TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => FollowerListScreen(
+                                    users: value.followersUid,
+                                  )),
+                        );
+                      },
+                      child: Text("${value.followersUid.length} followers"));
+                },
+              ),
+              // TextButton(
+              //   onPressed: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //           builder: (context) => const FollowerListScreen()),
+              //     );
+              //   },
+              //   // await Provider.of<PostgresMethods>(context, listen: false).method(params);
+              //   child: Consumer<FirebaseFollow>(
+              //     builder: (context, value, child) {
+              //       print("before followers");
+              //       print(value.followersUid);
+              //       return Text("${value.followersUid.length} followers");
+              //     },
+              //   ),
+              // ),
+              const VerticalDivider(
+                thickness: 2,
+                color: Colors.grey,
+              ),
+              TextButton(
+                onPressed: () {
+                  // add transition to list of following
+                },
+                // await Provider.of<PostgresMethods>(context, listen: false).method(params);
+                child: Consumer<FirebaseFollow>(
+                  builder: (context, value, child) {
+                    return Text("${value.followingUid.length} following");
+                  },
+                ),
+              ),
+            ],
           ),
         )
       ],
