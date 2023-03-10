@@ -1,8 +1,7 @@
-
 import 'dart:io';
 
 import 'package:dima_app/providers/theme_switch.dart';
-import 'package:dima_app/server/firebase_methods.dart';
+import 'package:dima_app/server/firebase_user.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -53,7 +52,7 @@ class _ChangeImageState extends State<ChangeImage> {
   Future uploadFile() async {
     if (_photo == null) return;
     final userId =
-        Provider.of<FirebaseMethods>(context as BuildContext, listen: false)
+        Provider.of<FirebaseUser>(context as BuildContext, listen: false)
             .user
             ?.uid; // basename(_photo!.path);
     print(userId);
