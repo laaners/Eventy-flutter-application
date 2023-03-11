@@ -3,8 +3,10 @@ import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'firebase_crud.dart';
+import 'firebase_follow.dart';
 
 class FirebaseUser extends ChangeNotifier {
   final FirebaseAuth _auth;
@@ -25,10 +27,14 @@ class FirebaseUser extends ChangeNotifier {
   Stream<User?> get authState => _auth.authStateChanges();
 
   Future<Map<String, dynamic>?> initUserData() async {
-    var userDataDoc =
-        await FirebaseCrud.readDoc(userCollection, _auth.currentUser!.uid);
-    _userData = (userDataDoc?.data()) as Map<String, dynamic>?;
-    notifyListeners();
+    try {
+      var userDataDoc =
+          await FirebaseCrud.readDoc(userCollection, _auth.currentUser!.uid);
+      _userData = (userDataDoc?.data()) as Map<String, dynamic>?;
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
     return _userData;
   }
 
@@ -116,10 +122,13 @@ class FirebaseUser extends ChangeNotifier {
         await sendEmailVerification(context);
       }
       */
-
       var userDataDoc =
           await FirebaseCrud.readDoc(userCollection, _auth.currentUser!.uid);
       _userData = (userDataDoc?.data()) as Map<String, dynamic>?;
+      var uid = _userData?["uid"];
+      // ignore: use_build_context_synchronously
+      await Provider.of<FirebaseFollow>(context, listen: false)
+          .getCurrentUserFollow(uid);
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
@@ -172,6 +181,5 @@ class FirebaseUser extends ChangeNotifier {
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
-    return null;
   }
 }

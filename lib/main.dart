@@ -143,7 +143,6 @@ class _MyAppState extends State<MyApp> {
   void initUser() async {
     var userData =
         await Provider.of<FirebaseUser>(context, listen: false).initUserData();
-
     if (userData != null) {
       var uid = userData["uid"];
       // ignore: use_build_context_synchronously
