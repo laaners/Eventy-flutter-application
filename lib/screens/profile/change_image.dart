@@ -91,7 +91,11 @@ class _ChangeImageState extends State<ChangeImage> {
           children: [
             Consumer<FirebaseUser>(
               builder: (context, value, child) {
-                return ProfilePic(userData: value.userData, loading: loading);
+                return ProfilePic(
+                  userData: value.userData,
+                  loading: loading,
+                  radius: 70,
+                );
               },
             ),
             Positioned(
