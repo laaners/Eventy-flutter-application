@@ -1,17 +1,14 @@
 import 'package:dima_app/screens/profile/profile_pic.dart';
-
-import 'change_image.dart';
+import 'package:dima_app/server/firebase_user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../server/firebase_follow.dart';
-import '../../server/firebase_user.dart';
 import 'follow_list.dart';
 
 class ProfileInfo extends StatefulWidget {
-  Map<String, dynamic>? userData;
+  final Map<String, dynamic>? userData;
 
-  ProfileInfo({super.key, required this.userData});
+  const ProfileInfo({super.key, required this.userData});
 
   @override
   State<ProfileInfo> createState() => _ProfileInfoState();
@@ -23,36 +20,20 @@ class _ProfileInfoState extends State<ProfileInfo> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    initFollow();
     super.initState();
-  }
-
-  void initFollow() async {
-    String uid = widget.userData!["uid"];
-    if (uid != Provider.of<FirebaseUser>(context, listen: false).user!.uid) {
-      setState(() async {
-        followers = await Provider.of<FirebaseFollow>(context, listen: false)
-            .getFollowers(context, uid);
-        following = await Provider.of<FirebaseFollow>(context, listen: false)
-            .getFollowing(context, uid);
-      });
-    }
-    await Provider.of<FirebaseFollow>(context, listen: false)
-        .getFollowers(context, uid);
-    // ignore: use_build_context_synchronously
-    await Provider.of<FirebaseFollow>(context, listen: false)
-        .getFollowing(context, uid);
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    followers = [];
+    following = [];
     super.dispose();
   }
 
   @override
-  Column build(BuildContext context) {
+  Widget build(BuildContext context) {
+    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+    bool isCurrentUser = curUid == widget.userData!["uid"];
     return Column(
       children: [
         Center(
@@ -83,45 +64,100 @@ class _ProfileInfoState extends State<ProfileInfo> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Consumer<FirebaseFollow>(
-                builder: (context, value, child) {
-                  return TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => FollowListScreen(
-                            users: value.followersUid,
-                            title: "Followers",
-                          ),
-                        ),
-                      );
-                    },
-                    child: Text("${value.followersUid.length} followers"),
-                  );
-                },
-              ),
+              isCurrentUser
+                  ? Consumer<FirebaseFollow>(
+                      builder: (context, value, child) {
+                        return TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FollowListScreen(
+                                  users: value.followersUid,
+                                  title: "Followers",
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text("${value.followersUid.length} followers"),
+                        );
+                      },
+                    )
+                  : FutureBuilder<List<String>?>(
+                      future:
+                          Provider.of<FirebaseFollow>(context, listen: false)
+                              .getFollowers(context, widget.userData?["uid"]),
+                      builder: (
+                        BuildContext context,
+                        AsyncSnapshot<List<String>?> snapshot,
+                      ) {
+                        return TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FollowListScreen(
+                                  users: snapshot.data!,
+                                  title:
+                                      "${widget.userData?["username"]} Followers",
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text(
+                              "${snapshot.data != null ? snapshot.data?.length : 0} followers"),
+                        );
+                      },
+                    ),
               const VerticalDivider(
                 thickness: 2,
                 color: Colors.grey,
               ),
-              Consumer<FirebaseFollow>(
-                builder: (context, value, child) {
-                  return TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FollowListScreen(
-                              users: value.followingUid,
-                              title: "Following",
-                            ),
-                          ),
+              isCurrentUser
+                  ? Consumer<FirebaseFollow>(
+                      builder: (context, value, child) {
+                        return TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FollowListScreen(
+                                  users: value.followingUid,
+                                  title: "Following",
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text("${value.followingUid.length} following"),
                         );
                       },
-                      child: Text("${value.followingUid.length} following"));
-                },
-              ),
+                    )
+                  : FutureBuilder<List<String>?>(
+                      future:
+                          Provider.of<FirebaseFollow>(context, listen: false)
+                              .getFollowing(context, widget.userData?["uid"]),
+                      builder: (
+                        BuildContext context,
+                        AsyncSnapshot<List<String>?> snapshot,
+                      ) {
+                        return TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FollowListScreen(
+                                  users: snapshot.data!,
+                                  title:
+                                      "${widget.userData?["username"]} Following",
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text(
+                              "${snapshot.data != null ? snapshot.data?.length : 0} following"),
+                        );
+                      },
+                    ),
             ],
           ),
         )

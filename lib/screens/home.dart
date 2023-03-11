@@ -85,6 +85,7 @@ class HomeScreen extends StatelessWidget {
           // DB test
           TextButton(
             onPressed: () async {
+              /*
               for (var i = 10; i < 30; i++) {
                 await Provider.of<FirebaseUser>(context, listen: false)
                     .signUpWithEmail(
@@ -97,6 +98,13 @@ class HomeScreen extends StatelessWidget {
                   context: context,
                 );
               }
+              */
+              var curUid =
+                  Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+              Provider.of<FirebaseFollow>(context, listen: false)
+                  .addFollower(context, curUid, "1", true);
+              Provider.of<FirebaseFollow>(context, listen: false)
+                  .removeFollower(context, curUid, "1", true);
             },
             child: const Text("Firebase test"),
           ),
@@ -152,19 +160,6 @@ class HomeScreen extends StatelessWidget {
               );
             },
             child: const Text("Firebase get"),
-          ),
-          TextButton(
-            onPressed: () async {
-              var curUid =
-                  Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-              await Provider.of<FirebaseFollow>(context, listen: false)
-                  .addFollower(
-                context,
-                curUid,
-                "TEST",
-              );
-            },
-            child: const Text("Firebase add follower"),
           ),
           TextButton(
             onPressed: () async {
@@ -243,7 +238,7 @@ class UsersList2 extends StatelessWidget {
               } else {
                 /*
                 Provider.of<FirebaseFollow>(context, listen: false)
-                    .addFollower(context, curUid, uid);
+                    .addFollower(context, curUid, uid, true);
                 print("added");
                 */
                 return Text(users.docs[index]["uid"]);
