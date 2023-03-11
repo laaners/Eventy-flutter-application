@@ -8,6 +8,7 @@ import 'package:dima_app/screens/login.dart';
 import 'package:dima_app/screens/profile/index.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -78,6 +79,8 @@ void main() async {
             create: (context) => FirebaseUser(auth, firestore)),
         ChangeNotifierProvider(create: (context) => FirebaseFollow(firestore)),
         ChangeNotifierProvider(create: (context) => FirebasePoll(firestore)),
+        ChangeNotifierProvider(
+            create: (context) => FirebasePollInvite(firestore)),
 
         // DARK/LIGHT THEME
         ChangeNotifierProvider(create: (context) => ThemeSwitch()),
