@@ -23,15 +23,53 @@ class FirebaseFollow extends ChangeNotifier {
   CollectionReference get followCollection =>
       _firestore.collection(FollowCollection.collectionName);
 
-  Future<void> initFollow(BuildContext context){
-    var uid = Provider.of<FirebaseUser>(context, listen: false).user?.uid;
-    _followersUid = async
+  Future<void> getCurrentUserFollow(String uid) async {
+    var document = await FirebaseCrud.readDoc(followCollection, uid);
+    if (document!.exists) {
+      final follow = (document.data()) as Map<String, dynamic>?;
+      _followersUid = List<String>.from(follow!["follower"]);
+      _followingUid = List<String>.from(follow["following"]);
+      notifyListeners();
+    }
+  }
+
+  Future<List<String>?> getFollowers(
+    BuildContext context,
+    String userUid,
+  ) async {
+    try {
+      var document = await FirebaseCrud.readDoc(followCollection, userUid);
+      if (document!.exists) {
+        final follow = (document.data()) as Map<String, dynamic>?;
+        return List<String>.from(follow!["follower"]);
+      }
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return [];
+  }
+
+  Future<List<String>?> getFollowing(
+    BuildContext context,
+    String userUid,
+  ) async {
+    try {
+      var document = await FirebaseCrud.readDoc(followCollection, userUid);
+      if (document!.exists) {
+        final follow = (document.data()) as Map<String, dynamic>?;
+        return List<String>.from(follow!["following"]);
+      }
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return [];
   }
 
   Future<void> addFollower(
     BuildContext context,
     String uid,
     String followUid,
+    bool addMutual,
   ) async {
     try {
       var document = await FirebaseCrud.readDoc(followCollection, uid);
@@ -45,6 +83,10 @@ class FirebaseFollow extends ChangeNotifier {
           "following": []
         });
       }
+      if (addMutual) {
+        // ignore: use_build_context_synchronously
+        addFollowing(context, followUid, uid, false);
+      }
       // ignore: use_build_context_synchronously
       _followersUid = (await getFollowers(context, uid))!;
       notifyListeners();
@@ -53,42 +95,11 @@ class FirebaseFollow extends ChangeNotifier {
     }
   }
 
-  Future<List<String>?> getFollowers(
-      BuildContext context, String userUid) async {
-    try {
-      var document = await FirebaseCrud.readDoc(followCollection, userUid);
-      if (document!.exists) {
-        final follow = (document.data()) as Map<String, dynamic>?;
-        _followersUid = List<String>.from(follow!["follower"]);
-        notifyListeners();
-        return _followersUid;
-      }
-    } on FirebaseException catch (e) {
-      print(e.message!);
-    }
-    return [];
-  }
-
-  Future<List<String>?> getFollowing(
-      BuildContext context, String userUid) async {
-    try {
-      var document = await FirebaseCrud.readDoc(followCollection, userUid);
-      if (document!.exists) {
-        final follow = (document.data()) as Map<String, dynamic>?;
-        _followingUid = List<String>.from(follow!["following"]);
-        notifyListeners();
-        return _followingUid;
-      }
-    } on FirebaseException catch (e) {
-      print(e.message!);
-    }
-    return [];
-  }
-
   Future<void> addFollowing(
     BuildContext context,
     String uid,
     String followUid,
+    bool addMutual,
   ) async {
     try {
       var document = await FirebaseCrud.readDoc(followCollection, uid);
@@ -101,6 +112,70 @@ class FirebaseFollow extends ChangeNotifier {
           "follower": [],
           "following": [followUid]
         });
+      }
+      if (addMutual) {
+        // ignore: use_build_context_synchronously
+        addFollower(context, followUid, uid, false);
+      }
+      // ignore: use_build_context_synchronously
+      _followersUid = (await getFollowers(context, uid))!;
+      notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message!);
+    }
+  }
+
+  Future<void> removeFollower(
+    BuildContext context,
+    String uid,
+    String followUid,
+    bool removeMutual,
+  ) async {
+    try {
+      var document = await FirebaseCrud.readDoc(followCollection, uid);
+      if (document!.exists) {
+        await followCollection.doc(uid).update({
+          "follower": FieldValue.arrayRemove([followUid])
+        });
+      } else {
+        followCollection.doc(uid).set({
+          "follower": [followUid],
+          "following": []
+        });
+      }
+      if (removeMutual) {
+        // ignore: use_build_context_synchronously
+        removeFollowing(context, followUid, uid, false);
+      }
+      // ignore: use_build_context_synchronously
+      _followersUid = (await getFollowers(context, uid))!;
+      notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message!);
+    }
+  }
+
+  Future<void> removeFollowing(
+    BuildContext context,
+    String uid,
+    String followUid,
+    bool removeMutual,
+  ) async {
+    try {
+      var document = await FirebaseCrud.readDoc(followCollection, uid);
+      if (document!.exists) {
+        await followCollection.doc(uid).update({
+          "following": FieldValue.arrayRemove([followUid])
+        });
+      } else {
+        followCollection.doc(uid).set({
+          "follower": [],
+          "following": [followUid]
+        });
+      }
+      if (removeMutual) {
+        // ignore: use_build_context_synchronously
+        removeFollower(context, followUid, uid, false);
       }
       // ignore: use_build_context_synchronously
       _followersUid = (await getFollowers(context, uid))!;

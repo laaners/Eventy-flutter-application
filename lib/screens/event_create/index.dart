@@ -9,6 +9,7 @@ import 'package:dima_app/screens/event_detail.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
@@ -268,6 +269,13 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 deadline: utcDeadline,
                 dates: utcDates,
                 locations: locationsMap,
+              );
+              String pollId = "${eventTitleController.text}_$curUid";
+              await Provider.of<FirebasePollInvite>(context, listen: false)
+                  .createPollInvite(
+                context: context,
+                pollId: pollId,
+                inviteeId: curUid,
               );
               LoadingOverlay.hide(context);
               Navigator.of(context).pop();

@@ -3,6 +3,7 @@ import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/search.dart';
 import 'package:dima_app/server/firebase_crud.dart';
 import 'package:dima_app/server/firebase_follow.dart';
+import 'package:dima_app/server/firebase_poll_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
@@ -84,6 +85,7 @@ class HomeScreen extends StatelessWidget {
           // DB test
           TextButton(
             onPressed: () async {
+              /*
               for (var i = 10; i < 30; i++) {
                 await Provider.of<FirebaseUser>(context, listen: false)
                     .signUpWithEmail(
@@ -96,6 +98,13 @@ class HomeScreen extends StatelessWidget {
                   context: context,
                 );
               }
+              */
+              var curUid =
+                  Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+              Provider.of<FirebaseFollow>(context, listen: false)
+                  .addFollower(context, curUid, "1", true);
+              Provider.of<FirebaseFollow>(context, listen: false)
+                  .removeFollower(context, curUid, "1", true);
             },
             child: const Text("Firebase test"),
           ),
@@ -154,19 +163,6 @@ class HomeScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
-              var curUid =
-                  Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-              await Provider.of<FirebaseFollow>(context, listen: false)
-                  .addFollower(
-                context,
-                curUid,
-                "TEST",
-              );
-            },
-            child: const Text("Firebase add follower"),
-          ),
-          TextButton(
-            onPressed: () async {
               await Provider.of<FirebaseUser>(context, listen: false)
                   .signOut(context);
             },
@@ -194,7 +190,7 @@ class HomeScreen extends StatelessWidget {
           */
 
           // List DB fetch
-          const UsersList(),
+          const UsersList2(),
 
           // long shape
           Center(
@@ -211,8 +207,8 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class UsersList extends StatelessWidget {
-  const UsersList({super.key});
+class UsersList2 extends StatelessWidget {
+  const UsersList2({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -229,12 +225,20 @@ class UsersList extends StatelessWidget {
             itemCount: users.docs.length,
             itemBuilder: (context, index) {
               var uid = users.docs[index]["uid"];
+              /*
+              Provider.of<FirebasePollInvite>(context, listen: false)
+                  .createPollInvite(
+                      context: context,
+                      pollId: "a_IrI8s7a6WeVUgF3fAYd99YHdnqh2",
+                      inviteeId: uid);
+              print("added");
+              */
               if (uid == curUid) {
                 return Text(users.docs[index]["uid"] + "==" + curUid);
               } else {
                 /*
                 Provider.of<FirebaseFollow>(context, listen: false)
-                    .addFollower(context, curUid, uid);
+                    .addFollower(context, curUid, uid, true);
                 print("added");
                 */
                 return Text(users.docs[index]["uid"]);

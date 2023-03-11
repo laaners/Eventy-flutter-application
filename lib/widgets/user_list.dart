@@ -12,7 +12,7 @@ class UserList extends StatefulWidget {
   const UserList({super.key, required this.users, required this.height});
 
   @override
-  _UserListState createState() => _UserListState();
+  State<UserList> createState() => _UserListState();
 }
 
 class _UserListState extends State<UserList> {
@@ -32,6 +32,7 @@ class _UserListState extends State<UserList> {
   @override
   void dispose() {
     controller.removeListener(_scrollListener);
+    usersData = [];
     super.dispose();
   }
 
@@ -65,7 +66,6 @@ class _UserListState extends State<UserList> {
   }
 
   void _scrollListener() {
-    print(controller.position.extentAfter);
     if (controller.position.extentAfter < 500) {
       if (usersData.length < widget.users.length - usersToLoad) {
         initUsersData(usersData.length, usersData.length + usersToLoad);

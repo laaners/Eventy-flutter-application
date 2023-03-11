@@ -8,6 +8,7 @@ import 'package:dima_app/screens/login.dart';
 import 'package:dima_app/screens/profile/index.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -78,6 +79,8 @@ void main() async {
             create: (context) => FirebaseUser(auth, firestore)),
         ChangeNotifierProvider(create: (context) => FirebaseFollow(firestore)),
         ChangeNotifierProvider(create: (context) => FirebasePoll(firestore)),
+        ChangeNotifierProvider(
+            create: (context) => FirebasePollInvite(firestore)),
 
         // DARK/LIGHT THEME
         ChangeNotifierProvider(create: (context) => ThemeSwitch()),
@@ -138,7 +141,15 @@ class _MyAppState extends State<MyApp> {
   }
 
   void initUser() async {
-    await Provider.of<FirebaseUser>(context, listen: false).initUserData();
+    var userData =
+        await Provider.of<FirebaseUser>(context, listen: false).initUserData();
+
+    if (userData != null) {
+      var uid = userData["uid"];
+      // ignore: use_build_context_synchronously
+      await Provider.of<FirebaseFollow>(context, listen: false)
+          .getCurrentUserFollow(uid);
+    }
   }
 
   @override

@@ -24,11 +24,12 @@ class FirebaseUser extends ChangeNotifier {
   // State persistence
   Stream<User?> get authState => _auth.authStateChanges();
 
-  Future<void> initUserData() async {
+  Future<Map<String, dynamic>?> initUserData() async {
     var userDataDoc =
         await FirebaseCrud.readDoc(userCollection, _auth.currentUser!.uid);
     _userData = (userDataDoc?.data()) as Map<String, dynamic>?;
     notifyListeners();
+    return _userData;
   }
 
   Future<void> signUpWithEmailNoVerification({
