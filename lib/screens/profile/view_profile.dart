@@ -1,7 +1,6 @@
 import 'package:dima_app/widgets/event_poll_switch.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/my_app_bar.dart';
-import '../../widgets/my_button.dart';
 import 'profile_info.dart';
 
 class ViewProfileScreen extends StatelessWidget {
