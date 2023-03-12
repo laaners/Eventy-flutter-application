@@ -1,5 +1,7 @@
+import 'package:dima_app/widgets/event_poll_switch.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/my_app_bar.dart';
+import '../../widgets/my_button.dart';
 import 'profile_info.dart';
 
 class ViewProfileScreen extends StatelessWidget {
@@ -11,9 +13,15 @@ class ViewProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar("${userData['username']}"),
-      body: ProfileInfo(
-        userData: userData,
-      ),
+      body: ListView(children: [
+        ProfileInfo(
+          userData: userData,
+        ),
+        const Divider(
+          height: 30,
+        ),
+        const EventPollSwitch(),
+      ]),
     );
   }
 }

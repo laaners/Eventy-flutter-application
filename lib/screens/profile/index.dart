@@ -19,10 +19,9 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: const MyAppBar("Profile"),
       body: ListView(
-        //mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20),
+            margin: const EdgeInsets.all(10),
             child: Column(children: [
               ProfileInfo(
                 userData:
