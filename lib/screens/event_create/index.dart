@@ -283,8 +283,10 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 context,
                 ScreenTransition(
                   builder: (context) => PollDetailScreen(
-                    organizerUid: curUid,
-                    pollName: eventTitleController.text,
+                    pollData: {
+                      "organizerUid": curUid,
+                      "pollName": eventTitleController.text,
+                    },
                   ),
                 ),
               );

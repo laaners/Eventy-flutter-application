@@ -29,8 +29,10 @@ class EventsScreen extends StatelessWidget {
                 context,
                 ScreenTransition(
                   builder: (context) => const PollDetailScreen(
-                    organizerUid: "IrI8s7a6WeVUgF3fAYd99YHdnqh2",
-                    pollName: "a",
+                    pollData: {
+                      "organizerUid": "IrI8s7a6WeVUgF3fAYd99YHdnqh2",
+                      "pollName": "a",
+                    },
                   ),
                 ),
               );
@@ -42,8 +44,10 @@ class EventsScreen extends StatelessWidget {
               Navigator.of(context, rootNavigator: true).push(
                 ScreenTransition(
                   builder: (context) => const PollDetailScreen(
-                    organizerUid: "IrI8s7a6WeVUgF3fAYd99YHdnqh2",
-                    pollName: "a",
+                    pollData: {
+                      "organizerUid": "IrI8s7a6WeVUgF3fAYd99YHdnqh2",
+                      "pollName": "a",
+                    },
                   ),
                 ),
               );

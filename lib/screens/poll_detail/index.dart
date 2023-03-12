@@ -2,12 +2,11 @@ import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class PollDetailScreen extends StatefulWidget {
-  final String organizerUid;
-  final String pollName;
+  final Map<String, dynamic> pollData;
+
   const PollDetailScreen({
     super.key,
-    required this.organizerUid,
-    required this.pollName,
+    required this.pollData,
   });
 
   @override
@@ -21,8 +20,8 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
       appBar: const MyAppBar("Poll Details"),
       body: ListView(
         children: [
-          Text(widget.organizerUid),
-          Text(widget.pollName),
+          Text(widget.pollData["organizerUid"]),
+          Text(widget.pollData["deadline"]),
         ],
       ),
     );
