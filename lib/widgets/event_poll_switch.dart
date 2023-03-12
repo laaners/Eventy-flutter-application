@@ -1,6 +1,4 @@
-import 'package:dima_app/widgets/my_button.dart';
 import 'package:flutter/material.dart';
-import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 
 class EventPollSwitch extends StatefulWidget {
   const EventPollSwitch({super.key});
@@ -20,80 +18,102 @@ class _EventPollSwitchState extends State<EventPollSwitch> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            AnimatedContainer(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+            Container(
+              height: 37,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
                 borderRadius: const BorderRadius.all(Radius.circular(30)),
-                //color: const Color.fromARGB(255, 208, 207, 207),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 3,
-                    blurRadius: 10,
-                    offset: _displayEvents
-                        ? const Offset(-10, 0)
-                        : const Offset(10, 0),
+                    color: Colors.grey.withOpacity(0.2),
+                    blurStyle: BlurStyle.inner,
                   ),
                 ],
               ),
-              duration: const Duration(milliseconds: 500),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(children: [
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      width: 100,
-                      child: ElevatedButton(
+              child: Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  AnimatedPositioned(
+                    left: _displayEvents ? 0 : 100,
+                    right: _displayEvents ? 100 : 0,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.fastOutSlowIn,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        color: Colors.blue,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            blurStyle: BlurStyle.inner,
+                          ),
+                        ],
+                      ),
+                      child: const SizedBox(
+                        height: 30,
+                        width: 100,
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      TextButton(
                         onPressed: () {
                           setState(() {
                             _displayEvents = true;
                           });
                         },
                         style: ButtonStyle(
+                          fixedSize: MaterialStateProperty.all(
+                              const Size.fromWidth(100)),
+                          alignment: Alignment.center,
                           shape: MaterialStateProperty.all(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18),
                             ),
                           ),
-                          backgroundColor: !_displayEvents
-                              ? const MaterialStatePropertyAll(Colors.grey)
-                              : const MaterialStatePropertyAll(Colors.blue),
                         ),
-                        child: const Text("Events"),
+                        child: Text(
+                          "Events",
+                          style: TextStyle(
+                              color:
+                                  _displayEvents ? Colors.white : Colors.grey),
+                        ),
                       ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      width: 100,
-                      child: ElevatedButton(
+                      TextButton(
                         onPressed: () {
-                          setState(() {
-                            _displayEvents = false;
-                          });
+                          setState(
+                            () {
+                              _displayEvents = false;
+                            },
+                          );
                         },
                         style: ButtonStyle(
+                          fixedSize: MaterialStateProperty.all(
+                              const Size.fromWidth(100)),
+                          alignment: Alignment.center,
                           shape: MaterialStateProperty.all(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18),
                             ),
                           ),
-                          backgroundColor: _displayEvents
-                              ? const MaterialStatePropertyAll(Colors.grey)
-                              : const MaterialStatePropertyAll(Colors.blue),
                         ),
-                        child: Container(
-                            width: 100,
-                            alignment: Alignment.center,
-                            child: const Text("Polls")),
+                        child: Text(
+                          "Polls",
+                          style: TextStyle(
+                              color:
+                                  !_displayEvents ? Colors.white : Colors.grey),
+                        ),
                       ),
-                    ),
-                  ]),
+                    ],
+                  ),
                 ],
               ),
             ),
           ],
         ),
+        // todo: add widgets event_list and poll_list
         Container(
           child: _displayEvents ? const Text("Events") : const Text("Pools"),
         )
