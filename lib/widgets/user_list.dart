@@ -1,4 +1,6 @@
+import 'package:dima_app/screens/profile/index.dart';
 import 'package:dima_app/screens/profile/view_profile.dart';
+import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +20,7 @@ class UserList extends StatefulWidget {
 class _UserListState extends State<UserList> {
   late ScrollController controller;
   late int usersToLoad;
-  List<Map<String, dynamic>> usersData = [];
+  List<UserCollection> usersData = [];
 
   @override
   void initState() {
@@ -58,9 +60,9 @@ class _UserListState extends State<UserList> {
   initUsersData(int start, int end) async {
     for (int i = start; i < end; i++) {
       var userData = await Provider.of<FirebaseUser>(context, listen: false)
-          .getUserData(context, widget.users[i]) as Map<String, dynamic>;
+          .getUserData(context, widget.users[i]);
       setState(() {
-        usersData.add(userData);
+        usersData.add(userData!);
       });
     }
   }
@@ -77,7 +79,7 @@ class _UserListState extends State<UserList> {
 }
 
 class UserTile extends StatelessWidget {
-  final Map<String, dynamic> userData;
+  final UserCollection userData;
 
   const UserTile({super.key, required this.userData});
 
@@ -91,14 +93,26 @@ class UserTile extends StatelessWidget {
           userData: userData,
           radius: 30,
         ),
-        title: Text("${userData['name']} ${userData['surname']}"),
-        subtitle: Text("${userData['username']}"),
+        title: Text("${userData.name} ${userData.surname}"),
+        subtitle: Text(userData.username),
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ViewProfileScreen(userData: userData)),
-          );
+          var curUid =
+              Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+          if (curUid == userData.uid) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProfileScreen(),
+              ),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ViewProfileScreen(userData: userData),
+              ),
+            );
+          }
         },
       ),
     );

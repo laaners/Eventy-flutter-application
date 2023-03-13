@@ -31,7 +31,7 @@ class HomeScreen extends StatelessWidget {
           ),
           Consumer<FirebaseUser>(
             builder: (context, value, child) {
-              return Text("${value.userData}");
+              return Text(value.userData.toString());
             },
           ),
 
@@ -257,7 +257,7 @@ class UsersList2 extends StatelessWidget {
 }
 
 class UserTile extends StatelessWidget {
-  final Map<String, dynamic> user;
+  final UserCollection user;
   const UserTile({super.key, required this.user});
 
   @override
@@ -275,11 +275,11 @@ class UserTile extends StatelessWidget {
       ),
       child: ListTile(
         title: Text(
-          "UserName: ${user["username"]}",
+          "UserName: ${user.username}",
           style:
               Provider.of<ThemeSwitch>(context).themeData.textTheme.bodyMedium,
         ),
-        subtitle: Text("Name: ${user["name"]}"),
+        subtitle: Text("Name: ${user.name}"),
         leading: Text("USER:"),
         trailing: Text("..."),
         onTap: () {

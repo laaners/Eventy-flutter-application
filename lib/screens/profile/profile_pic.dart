@@ -1,14 +1,16 @@
+import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePic extends StatelessWidget {
-  final Map<String, dynamic>? userData;
+  final UserCollection? userData;
   final bool loading;
   final double radius;
-  const ProfilePic(
-      {super.key,
-      required this.userData,
-      required this.loading,
-      required this.radius});
+  const ProfilePic({
+    super.key,
+    required this.userData,
+    required this.loading,
+    required this.radius,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,13 +18,13 @@ class ProfilePic extends StatelessWidget {
       radius: radius,
       backgroundColor: Colors.orange,
       //foregroundColor: Colors.orange,
-      child: userData?["profilePic"] != "default"
+      child: userData?.profilePic != "default"
           ? (loading
               ? const Center(child: CircularProgressIndicator())
               : ClipRRect(
                   borderRadius: BorderRadius.circular(radius),
                   child: Image.network(
-                    userData?["profilePic"],
+                    userData!.profilePic,
                     width: radius * 2,
                     height: radius * 2,
                     fit: BoxFit.fill,
@@ -48,7 +50,7 @@ class ProfilePic extends StatelessWidget {
               height: 100,
               child: Center(
                 child: Text(
-                  "${userData?["name"][0]}${userData?["surname"][0]}",
+                  "${userData?.name[0]}${userData?.surname[0]}",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
