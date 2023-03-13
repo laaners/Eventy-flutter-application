@@ -44,4 +44,41 @@ class FirebasePoll extends ChangeNotifier {
       print(e.message!);
     }
   }
+
+  Future<PollCollection?> getPollData(
+    BuildContext context,
+    String uid,
+  ) async {
+    try {
+      var pollDataDoc = await FirebaseCrud.readDoc(pollCollection, uid);
+      var pollDetails = PollCollection.fromMap(
+        pollDataDoc?.data() as Map<String, dynamic>,
+      );
+      return pollDetails;
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message!);
+    }
+    return null;
+  }
+
+  Future<List<PollCollection>> getUserPolls(
+    BuildContext context,
+    String userUid,
+  ) async {
+    try {
+      var documents =
+          await pollCollection.where("inviteeId", isEqualTo: userUid).get();
+      if (documents.docs.isNotEmpty) {
+        final List<PollCollection> polls = documents.docs.map((doc) {
+          return PollCollection.fromMap(doc as Map<String, dynamic>);
+        }).toList();
+
+        return polls;
+      }
+      return [];
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return [];
+  }
 }
