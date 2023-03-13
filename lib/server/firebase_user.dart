@@ -14,11 +14,11 @@ class FirebaseUser extends ChangeNotifier {
 
   FirebaseUser(this._auth, this._firestore);
 
-  Map<String, dynamic>? _userData;
+  UserCollection? _userData;
 
   // getters
   User? get user => _auth.currentUser;
-  Map<String, dynamic>? get userData => _userData;
+  UserCollection? get userData => _userData;
   CollectionReference get userCollection =>
       _firestore.collection(UserCollection.collectionName);
 
@@ -26,11 +26,13 @@ class FirebaseUser extends ChangeNotifier {
   // State persistence
   Stream<User?> get authState => _auth.authStateChanges();
 
-  Future<Map<String, dynamic>?> initUserData() async {
+  Future<UserCollection?> initUserData() async {
     try {
       var userDataDoc =
           await FirebaseCrud.readDoc(userCollection, _auth.currentUser!.uid);
-      _userData = (userDataDoc?.data()) as Map<String, dynamic>?;
+      _userData = UserCollection.fromMap(
+        (userDataDoc?.data()) as Map<String, dynamic>,
+      );
       notifyListeners();
     } catch (e) {
       print(e);
@@ -90,7 +92,7 @@ class FirebaseUser extends ChangeNotifier {
       await userCollection
           .doc(userCredential.user!.uid)
           .set(userEntity.toMap());
-      _userData = userEntity.toMap();
+      _userData = userEntity;
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
@@ -124,8 +126,10 @@ class FirebaseUser extends ChangeNotifier {
       */
       var userDataDoc =
           await FirebaseCrud.readDoc(userCollection, _auth.currentUser!.uid);
-      _userData = (userDataDoc?.data()) as Map<String, dynamic>?;
-      var uid = _userData?["uid"];
+      _userData = UserCollection.fromMap(
+        (userDataDoc?.data()) as Map<String, dynamic>,
+      );
+      var uid = _userData!.uid;
       // ignore: use_build_context_synchronously
       await Provider.of<FirebaseFollow>(context, listen: false)
           .getCurrentUserFollow(uid);
@@ -157,13 +161,15 @@ class FirebaseUser extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>?> getUserData(
+  Future<UserCollection?> getUserData(
     BuildContext context,
     String uid,
   ) async {
     try {
       var userDataDoc = await FirebaseCrud.readDoc(userCollection, uid);
-      var userDetails = (userDataDoc?.data()) as Map<String, dynamic>?;
+      var userDetails = UserCollection.fromMap(
+        userDataDoc?.data() as Map<String, dynamic>,
+      );
       return userDetails;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
@@ -176,10 +182,13 @@ class FirebaseUser extends ChangeNotifier {
       var uid = _auth.currentUser!.uid;
       await FirebaseCrud.updateDoc(
           userCollection, uid, "profilePic", profileUrl);
-      _userData?["profilePic"] = profileUrl;
+      var tmpMap = _userData!.toMap();
+      tmpMap["profilePic"] = profileUrl;
+      _userData = UserCollection.fromMap(tmpMap);
       notifyListeners();
-    } on FirebaseAuthException catch (e) {
-      showSnackBar(context, e.message!);
+    } on FirebaseException catch (e) {
+      print(e.message!);
+      // showSnackBar(context, e.message!);
     }
   }
 }

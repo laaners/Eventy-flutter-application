@@ -1,12 +1,13 @@
 import 'package:dima_app/screens/profile/profile_pic.dart';
 import 'package:dima_app/server/firebase_user.dart';
+import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../server/firebase_follow.dart';
 import 'follow_list.dart';
 
 class ProfileInfo extends StatefulWidget {
-  final Map<String, dynamic>? userData;
+  final UserCollection? userData;
 
   const ProfileInfo({super.key, required this.userData});
 
@@ -33,7 +34,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
   @override
   Widget build(BuildContext context) {
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    bool isCurrentUser = curUid == widget.userData!["uid"];
+    bool isCurrentUser = curUid == widget.userData?.uid;
     return Column(
       children: [
         Center(
@@ -47,9 +48,8 @@ class _ProfileInfoState extends State<ProfileInfo> {
                   radius: 90,
                 ),
               ),
-              Text("${widget.userData!["username"]}"),
-              Text(
-                  "${widget.userData!["name"]} ${widget.userData!["surname"]}"),
+              Text(widget.userData!.username),
+              Text("${widget.userData?.uid} ${widget.userData?.surname}"),
             ],
           ),
         ),
@@ -86,7 +86,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
                   : FutureBuilder<List<String>?>(
                       future:
                           Provider.of<FirebaseFollow>(context, listen: false)
-                              .getFollowers(context, widget.userData?["uid"]),
+                              .getFollowers(context, widget.userData!.uid),
                       builder: (
                         BuildContext context,
                         AsyncSnapshot<List<String>?> snapshot,
@@ -99,7 +99,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
                                 builder: (context) => FollowListScreen(
                                   users: snapshot.data!,
                                   title:
-                                      "${widget.userData?["username"]} Followers",
+                                      "${widget.userData?.username} Followers",
                                 ),
                               ),
                             );
@@ -135,7 +135,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
                   : FutureBuilder<List<String>?>(
                       future:
                           Provider.of<FirebaseFollow>(context, listen: false)
-                              .getFollowing(context, widget.userData?["uid"]),
+                              .getFollowing(context, widget.userData!.uid),
                       builder: (
                         BuildContext context,
                         AsyncSnapshot<List<String>?> snapshot,
@@ -148,7 +148,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
                                 builder: (context) => FollowListScreen(
                                   users: snapshot.data!,
                                   title:
-                                      "${widget.userData?["username"]} Following",
+                                      "${widget.userData?.username} Following",
                                 ),
                               ),
                             );
