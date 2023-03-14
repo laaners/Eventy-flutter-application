@@ -1,7 +1,11 @@
+import 'package:dima_app/server/tables/poll_collection.dart';
+import 'package:dima_app/widgets/poll_list.dart';
 import 'package:flutter/material.dart';
 
 class EventPollSwitch extends StatefulWidget {
-  const EventPollSwitch({super.key});
+  final String userUid;
+
+  const EventPollSwitch({super.key, required this.userUid});
 
   @override
   State<EventPollSwitch> createState() => _EventPollSwitchState();
@@ -115,7 +119,12 @@ class _EventPollSwitchState extends State<EventPollSwitch> {
         ),
         // todo: add widgets event_list and poll_list
         Container(
-          child: _displayEvents ? const Text("Events") : const Text("Pools"),
+          child: _displayEvents
+              ? const Text("Events")
+              : PollList(
+                  userUid: widget.userUid,
+                  height: 400,
+                ),
         )
       ],
     );

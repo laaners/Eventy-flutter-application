@@ -20,7 +20,7 @@ class ViewProfileScreen extends StatelessWidget {
         const Divider(
           height: 30,
         ),
-        const EventPollSwitch(),
+        EventPollSwitch(userUid: userData.uid),
       ]),
     );
   }
