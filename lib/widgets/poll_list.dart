@@ -1,71 +1,100 @@
+import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/tables/poll_collection.dart';
+import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:flutter/material.dart';
-import '../screens/poll_detail/index.dart';
+import 'package:provider/provider.dart';
 
 class PollList extends StatefulWidget {
-  final List<String> polls;
+  final String userUid;
   final double height;
 
-  const PollList({super.key, required this.polls, required this.height});
+  const PollList({super.key, required this.userUid, required this.height});
 
   @override
   State<PollList> createState() => _PollListState();
 }
 
 class _PollListState extends State<PollList> {
-  late ScrollController controller;
-  late int pollsToLoad;
-  List<Map<String, dynamic>> pollsData = [];
+  List<PollCollection> pollsData = [];
 
   @override
   void initState() {
-    pollsToLoad = widget.height ~/ 80.round();
-    initPollsData(0,
-        widget.polls.length < pollsToLoad ? widget.polls.length : pollsToLoad);
+    initPolls(widget.userUid);
+
     super.initState();
-    controller = ScrollController()..addListener(_scrollListener);
   }
 
   @override
   void dispose() {
-    controller.removeListener(_scrollListener);
     pollsData = [];
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
-      child: pollsData.isEmpty
-          ? const Center(
-              child: Text("empty"),
-            )
-          : ListView.builder(
-              controller: controller,
-              itemBuilder: (context, index) {
-                return PollTile(
-                  pollData: pollsData[index],
-                );
-              },
-              itemCount: pollsData.length,
-            ),
+    return FutureBuilder(
+      future: Provider.of<FirebasePoll>(context, listen: false)
+          .getUserPolls(context, widget.userUid),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          var pollsData = snapshot.data!;
+          return Column(
+            children: [
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+              ...pollsData.map((e) => PollTile(pollData: e)).toList(),
+            ],
+          );
+        } else if (snapshot.hasError) {
+          return Text('${snapshot.error}');
+        }
+        // By default, show a loading spinner.
+        return const LoadingSpinner();
+      },
     );
   }
 
-  initPollsData(int i, int j) {}
-
-  void _scrollListener() {
-    if (controller.position.extentAfter < 500) {
-      if (pollsData.length < widget.polls.length - pollsToLoad) {
-        initPollsData(pollsData.length, pollsData.length + pollsToLoad);
-      } else if (pollsData.length < widget.polls.length) {
-        initPollsData(pollsData.length, widget.polls.length);
-      }
-    }
+  initPolls(String userUid) async {
+    var pollsDoc = await Provider.of<FirebasePoll>(context, listen: false)
+        .getUserPolls(context, userUid);
+    setState(
+      () {
+        pollsData = pollsDoc;
+        print(pollsDoc.toString());
+      },
+    );
   }
 }
 
 class PollTile extends StatelessWidget {
-  final Map<String, dynamic> pollData;
+  final PollCollection pollData;
 
   const PollTile({super.key, required this.pollData});
 
@@ -74,19 +103,13 @@ class PollTile extends StatelessWidget {
     return SizedBox(
       height: 80,
       child: ListTile(
-        // todo: change Avatar to LocationPic
-        leading: CircleAvatar(
-          backgroundColor: Colors.purple,
+        leading: const CircleAvatar(
+          backgroundColor: Colors.blue,
+          child: Icon(Icons.place),
         ),
-        title: Text("${pollData['pollName']}"),
-        subtitle: Text("${pollData['deadline']}"),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => PollDetailScreen(pollData: pollData)),
-          );
-        },
+        title: Text(pollData.pollName),
+        subtitle: Text(pollData.organizerUid),
+        onTap: () {},
       ),
     );
   }
