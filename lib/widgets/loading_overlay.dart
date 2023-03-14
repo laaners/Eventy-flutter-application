@@ -6,7 +6,7 @@ class LoadingOverlay {
   static void show(BuildContext context) {
     if (overlay != null) return;
     overlay = OverlayEntry(builder: (BuildContext context) {
-      return _FullScreenLoader();
+      return const FullScreenLoader();
     });
     Overlay.of(context).insert(overlay!);
   }
@@ -25,7 +25,9 @@ class LoadingOverlay {
   static void remove(BuildContext context) {}
 }
 
-class _FullScreenLoader extends StatelessWidget {
+class FullScreenLoader extends StatelessWidget {
+  const FullScreenLoader({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(

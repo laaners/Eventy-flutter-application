@@ -832,7 +832,11 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
         Visibility(
           maintainState: true,
           visible: i == widget.currentStep,
-          child: widget.steps[i].content,
+          child: Container(
+            // CUSTOM: overflow problem
+            padding: const EdgeInsets.only(bottom: 50),
+            child: widget.steps[i].content,
+          ),
         ),
       );
     }

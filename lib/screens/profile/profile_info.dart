@@ -1,6 +1,10 @@
+import 'package:dima_app/screens/error.dart';
+import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/profile/profile_pic.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../server/firebase_follow.dart';
@@ -91,6 +95,20 @@ class _ProfileInfoState extends State<ProfileInfo> {
                         BuildContext context,
                         AsyncSnapshot<List<String>?> snapshot,
                       ) {
+                        if (snapshot.hasError) {
+                          Future.microtask(() {
+                            Navigator.of(context).pop();
+                            Navigator.push(
+                              context,
+                              ScreenTransition(
+                                builder: (context) => ErrorScreen(
+                                  errorMsg: snapshot.error.toString(),
+                                ),
+                              ),
+                            );
+                          });
+                          return Container();
+                        }
                         return TextButton(
                           onPressed: () {
                             Navigator.push(

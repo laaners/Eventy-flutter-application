@@ -14,7 +14,7 @@ class FirebasePoll extends ChangeNotifier {
   CollectionReference get pollCollection =>
       _firestore.collection(PollCollection.collectionName);
 
-  Future<void> createPoll({
+  Future<PollCollection> createPoll({
     required BuildContext context,
     required String pollName,
     required String organizerUid,
@@ -22,16 +22,18 @@ class FirebasePoll extends ChangeNotifier {
     required String deadline,
     required Map<String, dynamic> dates,
     required List<Map<String, dynamic>> locations,
+    required bool public,
   }) async {
+    PollCollection poll = PollCollection(
+      pollName: pollName,
+      organizerUid: organizerUid,
+      pollDesc: pollDesc,
+      deadline: deadline,
+      dates: dates,
+      locations: locations,
+      public: public,
+    );
     try {
-      PollCollection poll = PollCollection(
-        pollName: pollName,
-        organizerUid: organizerUid,
-        pollDesc: pollDesc,
-        deadline: deadline,
-        dates: dates,
-        locations: locations,
-      );
       String pollId = "${pollName}_$organizerUid";
       var pollExistence = await FirebaseCrud.readDoc(pollCollection, pollId);
       if (pollExistence!.exists) {
@@ -43,19 +45,22 @@ class FirebasePoll extends ChangeNotifier {
       // showSnackBar(context, e.message!);
       print(e.message!);
     }
+    return poll;
   }
 
   Future<PollCollection?> getPollData(
     BuildContext context,
-    String uid,
+    String id,
   ) async {
     try {
-      var pollDataDoc = await FirebaseCrud.readDoc(pollCollection, uid);
-      var pollDetails = PollCollection.fromMap(
-        pollDataDoc?.data() as Map<String, dynamic>,
-      );
+      var pollDataDoc = await FirebaseCrud.readDoc(pollCollection, id);
+      var tmp = pollDataDoc?.data() as Map<String, dynamic>;
+      tmp["locations"] = (tmp["locations"] as List)
+          .map((e) => e as Map<String, dynamic>)
+          .toList();
+      var pollDetails = PollCollection.fromMap(tmp);
       return pollDetails;
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseException catch (e) {
       showSnackBar(context, e.message!);
     }
     return null;

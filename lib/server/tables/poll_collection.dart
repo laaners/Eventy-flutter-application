@@ -5,6 +5,7 @@ class PollCollection {
   final String organizerUid;
   final String pollDesc;
   final String deadline;
+  final bool public;
   final Map<String, dynamic> dates;
   final List<Map<String, dynamic>> locations;
   PollCollection({
@@ -14,6 +15,7 @@ class PollCollection {
     required this.deadline,
     required this.dates,
     required this.locations,
+    required this.public,
   });
 
   // PK = pollName_organizerUid
@@ -26,6 +28,7 @@ class PollCollection {
     String? deadline,
     Map<String, dynamic>? dates,
     List<Map<String, dynamic>>? locations,
+    bool? public,
   }) {
     return PollCollection(
       pollName: pollName ?? this.pollName,
@@ -34,6 +37,7 @@ class PollCollection {
       deadline: deadline ?? this.deadline,
       dates: dates ?? this.dates,
       locations: locations ?? this.locations,
+      public: public ?? this.public,
     );
   }
 
@@ -45,6 +49,7 @@ class PollCollection {
       'deadline': deadline,
       'dates': dates,
       'locations': locations,
+      'public': public,
     };
   }
 
@@ -59,12 +64,13 @@ class PollCollection {
         (map['locations'] as List<Map<String, dynamic>>)
             .map<Map<String, dynamic>>((x) => x),
       ),
+      public: map['public'] as bool,
     );
   }
 
   @override
   String toString() {
-    return 'PollCollection(pollName: $pollName, organizerUid: $organizerUid, pollDesc: $pollDesc, deadline: $deadline, dates: $dates, locations: $locations)';
+    return 'PollCollection(pollName: $pollName, organizerUid: $organizerUid, pollDesc: $pollDesc, deadline: $deadline, dates: $dates, locations: $locations, public: $public)';
   }
 
   @override
@@ -76,7 +82,8 @@ class PollCollection {
         other.pollDesc == pollDesc &&
         other.deadline == deadline &&
         mapEquals(other.dates, dates) &&
-        listEquals(other.locations, locations);
+        listEquals(other.locations, locations) &&
+        other.public == public;
   }
 
   @override
@@ -86,6 +93,7 @@ class PollCollection {
         pollDesc.hashCode ^
         deadline.hashCode ^
         dates.hashCode ^
-        locations.hashCode;
+        locations.hashCode ^
+        public.hashCode;
   }
 }
