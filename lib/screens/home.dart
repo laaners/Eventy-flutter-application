@@ -14,6 +14,9 @@ import 'package:provider/provider.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/provider_samples.dart';
 
+import '../widgets/search_bar.dart';
+import '../widgets/search_bar.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -23,54 +26,29 @@ class HomeScreen extends StatelessWidget {
       appBar: const MyAppBar("Home"),
       body: ListView(
         children: [
-          const Text("ok"),
           Consumer<FirebaseUser>(
             builder: (context, value, child) {
-              return Text("${value.user}");
-            },
-          ),
-          Consumer<FirebaseUser>(
-            builder: (context, value, child) {
-              return Text(value.userData.toString());
+              return Column(children: [
+                Text(
+                  "USER:\n${value.user}",
+                )
+              ]);
             },
           ),
 
-          TextFormField(),
-          Text(Provider.of<Something>(context).stringa),
-          // equivalente a quello sopra
-          Text(context.watch<Something>().stringa),
-          Text(Provider.of<String>(context)),
-
-          // mutable provider
-          // Wrap ONLY the part I want to rebuild in a Consumer of provider type, watch rebuilds everything
-          Consumer<CounterProviderSample>(
-            builder: (context, providerObj, child) {
-              return Text("${providerObj.counter}");
+          Consumer<FirebaseUser>(
+            builder: (context, value, child) {
+              return Text("USERDATA:\n${value.userData.toString()}");
             },
           ),
+
           ElevatedButton(
+            child: const Text('Open search'),
             onPressed: () {
-              Provider.of<CounterProviderSample>(context, listen: false)
-                  .incrementCounter();
-              // Read inside build should be avoided
-              // context.read<CounterProviderSample>().incrementCounter();
-            },
-            child: const Icon(Icons.add),
-          ),
-
-          ElevatedButton(
-              child: const Text('Open search'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SearchPage()),
-                );
-              }),
-
-          //Stream provider
-          Consumer<int>(
-            builder: (context, providerObj, child) {
-              return Text("$providerObj");
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchPage()),
+              );
             },
           ),
 
@@ -85,20 +63,6 @@ class HomeScreen extends StatelessWidget {
           // DB test
           TextButton(
             onPressed: () async {
-              /*
-              for (var i = 10; i < 30; i++) {
-                await Provider.of<FirebaseUser>(context, listen: false)
-                    .signUpWithEmail(
-                  email: "test$i@test.it",
-                  password: "password",
-                  username: "Username$i",
-                  name: "name$i",
-                  surname: "surname$i",
-                  profilePic: "profilePic",
-                  context: context,
-                );
-              }
-              */
               var curUid =
                   Provider.of<FirebaseUser>(context, listen: false).user!.uid;
               Provider.of<FirebaseFollow>(context, listen: false)
@@ -111,13 +75,16 @@ class HomeScreen extends StatelessWidget {
 
           // Search user functionality
           TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SearchPage()),
-                );
-              },
-              child: const Text("Search page")),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchPage()),
+              );
+            },
+            child: const Text("Search page"),
+          ),
+
+          SearchBar(),
 
           TextButton(
             onPressed: () async {
@@ -280,8 +247,8 @@ class UserTile extends StatelessWidget {
               Provider.of<ThemeSwitch>(context).themeData.textTheme.bodyMedium,
         ),
         subtitle: Text("Name: ${user.name}"),
-        leading: Text("USER:"),
-        trailing: Text("..."),
+        leading: const Text("USER:"),
+        trailing: const Text("..."),
         onTap: () {
           showSnackBar(context, "In construction...");
         },
