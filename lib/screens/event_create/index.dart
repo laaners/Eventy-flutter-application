@@ -9,7 +9,7 @@ import 'package:dima_app/screens/event_detail.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/firebase_poll.dart';
-import 'package:dima_app/server/firebase_poll_invite.dart';
+import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/themes/palette.dart';
@@ -277,8 +277,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 public: true,
               );
               String pollId = "${eventTitleController.text}_$curUid";
-              await Provider.of<FirebasePollInvite>(context, listen: false)
-                  .createPollInvite(
+              await Provider.of<FirebasePollEventInvite>(context, listen: false)
+                  .createPollEventInvite(
                 context: context,
                 pollId: pollId,
                 inviteeId: curUid,
