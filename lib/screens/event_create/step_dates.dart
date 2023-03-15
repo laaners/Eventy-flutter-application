@@ -280,7 +280,7 @@ class _StepDatesState extends State<StepDates> {
         ),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 10),
-          padding: EdgeInsets.only(bottom: _fixedTimeSlots ? 50 : 0),
+          padding: EdgeInsets.only(bottom: _fixedTimeSlots ? 0 : 0),
           child: TableCalendar(
             headerStyle: const HeaderStyle(
               titleCentered: true,

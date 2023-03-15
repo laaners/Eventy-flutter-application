@@ -9,8 +9,9 @@ import 'package:dima_app/screens/event_detail.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/firebase_poll.dart';
-import 'package:dima_app/server/firebase_poll_invite.dart';
+import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
+import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
@@ -71,27 +72,31 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                   .primaryColor,
             ),
           ),
-          content: StepBasics(
-            eventTitleController: eventTitleController,
-            eventDescController: eventDescController,
-            deadlineController: deadlineController,
-            dates: dates,
-            removeDays: (List<String> toRemove) {
-              setState(() {
-                dates.forEach((day, slots) {
-                  if (slots.isEmpty) {
-                    toRemove.add(day);
-                  }
+          content: Container(
+            margin: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: StepBasics(
+              eventTitleController: eventTitleController,
+              eventDescController: eventDescController,
+              deadlineController: deadlineController,
+              dates: dates,
+              removeDays: (List<String> toRemove) {
+                setState(() {
+                  dates.forEach((day, slots) {
+                    if (slots.isEmpty) {
+                      toRemove.add(day);
+                    }
+                  });
+                  dates.removeWhere((key, value) => toRemove.contains(key));
                 });
-                dates.removeWhere((key, value) => toRemove.contains(key));
-              });
-            },
-            setDeadline: (DateTime pickedDate) {
-              setState(() {
-                deadlineController.text =
-                    DateFormatter.dateTime2String(pickedDate);
-              });
-            },
+              },
+              setDeadline: (DateTime pickedDate) {
+                setState(() {
+                  deadlineController.text =
+                      DateFormatter.dateTime2String(pickedDate);
+                });
+              },
+            ),
           ),
         ),
         MyStep(
@@ -269,10 +274,11 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 deadline: utcDeadline,
                 dates: utcDates,
                 locations: locationsMap,
+                public: true,
               );
               String pollId = "${eventTitleController.text}_$curUid";
-              await Provider.of<FirebasePollInvite>(context, listen: false)
-                  .createPollInvite(
+              await Provider.of<FirebasePollEventInvite>(context, listen: false)
+                  .createPollEventInvite(
                 context: context,
                 pollId: pollId,
                 inviteeId: curUid,
@@ -282,13 +288,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
               Navigator.push(
                 context,
                 ScreenTransition(
-                  builder: (context) => PollDetailScreen(
-                    pollData: {
-                      "organizerUid": curUid,
-                      "pollName": eventTitleController.text,
-                    },
-                  ),
-                ),
+                    builder: (context) => PollDetailScreen(pollId: pollId)),
               );
             }
           },

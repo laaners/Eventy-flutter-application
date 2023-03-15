@@ -1,6 +1,9 @@
+import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/profile/index.dart';
 import 'package:dima_app/screens/profile/view_profile.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,15 +23,15 @@ class UserList extends StatefulWidget {
 class _UserListState extends State<UserList> {
   late ScrollController controller;
   late int usersToLoad;
-  List<UserCollection> usersData = [];
+  List<String> usersData = [];
 
   @override
   void initState() {
     usersToLoad = widget.height ~/ 80.round();
+    controller = ScrollController()..addListener(_scrollListener);
     initUsersData(0,
         widget.users.length < usersToLoad ? widget.users.length : usersToLoad);
     super.initState();
-    controller = ScrollController()..addListener(_scrollListener);
   }
 
   @override
@@ -38,33 +41,12 @@ class _UserListState extends State<UserList> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scrollbar(
-      child: usersData.isEmpty
-          ? const Center(
-              child: Text("empty"),
-            )
-          : ListView.builder(
-              controller: controller,
-              itemBuilder: (context, index) {
-                return UserTile(
-                  userData: usersData[index],
-                );
-              },
-              itemCount: usersData.length,
-            ),
-    );
-  }
-
-  initUsersData(int start, int end) async {
-    for (int i = start; i < end; i++) {
-      var userData = await Provider.of<FirebaseUser>(context, listen: false)
-          .getUserData(context, widget.users[i]);
-      setState(() {
-        usersData.add(userData!);
-      });
-    }
+  void initUsersData(int start, int end) {
+    setState(() {
+      for (int i = start; i < end; i++) {
+        usersData.add(widget.users[i]);
+      }
+    });
   }
 
   void _scrollListener() {
@@ -76,45 +58,93 @@ class _UserListState extends State<UserList> {
       }
     }
   }
-}
-
-class UserTile extends StatelessWidget {
-  final UserCollection userData;
-
-  const UserTile({super.key, required this.userData});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80,
-      child: ListTile(
-        leading: ProfilePic(
-          loading: false,
-          userData: userData,
-          radius: 30,
-        ),
-        title: Text("${userData.name} ${userData.surname}"),
-        subtitle: Text(userData.username),
-        onTap: () {
-          var curUid =
-              Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-          if (curUid == userData.uid) {
+    return widget.users.isNotEmpty
+        ? Scrollbar(
+            child: ListView.builder(
+              controller: controller,
+              itemBuilder: (context, index) {
+                return UserTile(
+                  userUid: widget.users[index],
+                );
+              },
+              itemCount: widget.users.length,
+            ),
+          )
+        : const Center(
+            child: Text("empty"),
+          );
+  }
+}
+
+class UserTile extends StatelessWidget {
+  final String userUid;
+  const UserTile({super.key, required this.userUid});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<UserCollection?>(
+      future: Provider.of<FirebaseUser>(context, listen: false)
+          .getUserData(context, userUid),
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<UserCollection?> snapshot,
+      ) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const LoadingSpinner();
+        }
+        if (snapshot.hasError) {
+          Future.microtask(() {
+            Navigator.of(context).pop();
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => const ProfileScreen(),
+              ScreenTransition(
+                builder: (context) => ErrorScreen(
+                  errorMsg: snapshot.error.toString(),
+                ),
               ),
             );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ViewProfileScreen(userData: userData),
-              ),
-            );
-          }
-        },
-      ),
+          });
+          return Container();
+        }
+        if (!snapshot.hasData) {
+          return Container();
+        }
+        UserCollection userData = snapshot.data!;
+        return SizedBox(
+          height: 80,
+          child: ListTile(
+            leading: ProfilePic(
+              loading: false,
+              userData: userData,
+              radius: 30,
+            ),
+            title: Text("${userData.name} ${userData.surname}"),
+            subtitle: Text(userData.username),
+            onTap: () {
+              var curUid =
+                  Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+              if (curUid == userData.uid) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ViewProfileScreen(userData: userData),
+                  ),
+                );
+              }
+            },
+          ),
+        );
+      },
     );
   }
 }

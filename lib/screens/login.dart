@@ -5,8 +5,6 @@ import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/theme_switch.dart';
-
 class LogInScreen extends StatelessWidget {
   const LogInScreen({super.key});
 
