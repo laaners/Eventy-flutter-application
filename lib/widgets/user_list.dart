@@ -12,66 +12,27 @@ import '../server/firebase_user.dart';
 
 class UserList extends StatefulWidget {
   final List<String> users;
-  final double height;
 
-  const UserList({super.key, required this.users, required this.height});
+  const UserList({
+    super.key,
+    required this.users,
+  });
 
   @override
   State<UserList> createState() => _UserListState();
 }
 
 class _UserListState extends State<UserList> {
-  late ScrollController controller;
-  late int usersToLoad;
-  List<String> usersData = [];
-
-  @override
-  void initState() {
-    usersToLoad = widget.height ~/ 80.round();
-    controller = ScrollController()..addListener(_scrollListener);
-    initUsersData(0,
-        widget.users.length < usersToLoad ? widget.users.length : usersToLoad);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    controller.removeListener(_scrollListener);
-    usersData = [];
-    super.dispose();
-  }
-
-  void initUsersData(int start, int end) {
-    setState(() {
-      for (int i = start; i < end; i++) {
-        usersData.add(widget.users[i]);
-      }
-    });
-  }
-
-  void _scrollListener() {
-    if (controller.position.extentAfter < 500) {
-      if (usersData.length < widget.users.length - usersToLoad) {
-        initUsersData(usersData.length, usersData.length + usersToLoad);
-      } else if (usersData.length < widget.users.length) {
-        initUsersData(usersData.length, widget.users.length);
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return widget.users.isNotEmpty
-        ? Scrollbar(
-            child: ListView.builder(
-              controller: controller,
-              itemBuilder: (context, index) {
-                return UserTile(
-                  userUid: widget.users[index],
-                );
-              },
-              itemCount: widget.users.length,
-            ),
+        ? ListView.builder(
+            itemBuilder: (context, index) {
+              return UserTile(
+                userUid: widget.users[index],
+              );
+            },
+            itemCount: widget.users.length,
           )
         : const Center(
             child: Text("empty"),
@@ -85,12 +46,12 @@ class UserTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<UserCollection?>(
+    return FutureBuilder(
       future: Provider.of<FirebaseUser>(context, listen: false)
           .getUserData(context, userUid),
       builder: (
-        BuildContext context,
-        AsyncSnapshot<UserCollection?> snapshot,
+        context,
+        snapshot,
       ) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const LoadingSpinner();
@@ -126,7 +87,7 @@ class UserTile extends StatelessWidget {
             onTap: () {
               var curUid =
                   Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-              if (curUid == userData.uid) {
+              if (curUid == userData.uid + "1") {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
