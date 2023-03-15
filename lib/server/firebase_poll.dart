@@ -72,10 +72,16 @@ class FirebasePoll extends ChangeNotifier {
   ) async {
     try {
       var documents =
-          await pollCollection.where("inviteeId", isEqualTo: userUid).get();
+          await pollCollection.where("organizerUid", isEqualTo: userUid).get();
+      print(documents.docs.toString());
       if (documents.docs.isNotEmpty) {
         final List<PollCollection> polls = documents.docs.map((doc) {
-          return PollCollection.fromMap(doc as Map<String, dynamic>);
+          var tmp = doc.data() as Map<String, dynamic>;
+          tmp["locations"] = (tmp["locations"] as List)
+              .map((e) => e as Map<String, dynamic>)
+              .toList();
+          var pollDetails = PollCollection.fromMap(tmp);
+          return pollDetails;
         }).toList();
 
         return polls;
