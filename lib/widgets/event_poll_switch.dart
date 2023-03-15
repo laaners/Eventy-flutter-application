@@ -123,7 +123,6 @@ class _EventPollSwitchState extends State<EventPollSwitch> {
               ? const Text("Events")
               : PollList(
                   userUid: widget.userUid,
-                  height: 400,
                 ),
         )
       ],
