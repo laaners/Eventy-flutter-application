@@ -8,9 +8,11 @@ import 'package:provider/provider.dart';
 
 class PollList extends StatefulWidget {
   final String userUid;
-  final double height;
 
-  const PollList({super.key, required this.userUid, required this.height});
+  const PollList({
+    super.key,
+    required this.userUid,
+  });
 
   @override
   State<PollList> createState() => _PollListState();
@@ -18,21 +20,14 @@ class PollList extends StatefulWidget {
 
 class _PollListState extends State<PollList> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: Provider.of<FirebasePoll>(context, listen: false)
           .getUserPolls(context, widget.userUid),
-      builder: (context, snapshot) {
+      builder: (
+        context,
+        snapshot,
+      ) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const LoadingSpinner();
         }
