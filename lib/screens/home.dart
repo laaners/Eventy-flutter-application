@@ -84,8 +84,6 @@ class HomeScreen extends StatelessWidget {
             child: const Text("Search page"),
           ),
 
-          SearchBar(),
-
           TextButton(
             onPressed: () async {
               LoadingOverlay.show(context);
