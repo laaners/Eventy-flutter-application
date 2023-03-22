@@ -4,8 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/theme_switch.dart';
-
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
 
@@ -31,7 +29,9 @@ class _SignUpFormState extends State<SignUpForm> {
   final _usernameController = TextEditingController();
   final _nameController = TextEditingController();
   final _surnameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
   bool _passwordInvisible = true;
 
   @override
@@ -40,6 +40,7 @@ class _SignUpFormState extends State<SignUpForm> {
     _usernameController.dispose();
     _nameController.dispose();
     _surnameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -99,6 +100,28 @@ class _SignUpFormState extends State<SignUpForm> {
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Surname cannot be empty';
+                }
+                return null;
+              },
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+            child: TextFormField(
+              controller: _emailController,
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.mail, color: Colors.grey),
+                border: OutlineInputBorder(),
+                labelText: 'E-mail',
+                labelStyle: TextStyle(fontStyle: FontStyle.italic),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter an e-mail address';
+                }
+                final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                if (!emailRegex.hasMatch(value)) {
+                  return 'Please enter a valid e-mail address';
                 }
                 return null;
               },
@@ -174,17 +197,21 @@ class _SignUpFormState extends State<SignUpForm> {
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar and call a server or save the information in the database.
+                  // TODO: if the user is created (perform a login and then move the home page).
                   await Provider.of<FirebaseUser>(context, listen: false)
                       .signUpWithEmail(
-                          email: "0@ok.it", //,_emailController.text,
+                          email: _emailController.text,
                           password: _passwordController.text,
                           username: _usernameController.text,
                           name: _nameController.text,
                           surname: _surnameController.text,
-                          profilePic: "default", //profilePic,
+                          profilePic: "default",
                           context: context);
                   // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
+                    // TODO: personalize message:
+                    //   - if the user is created show message, e.g. "Welcome, $username!"
+                    //   - else do not show snackBar
                     const SnackBar(
                       content: Text('Processing Data'),
                     ),
