@@ -94,7 +94,7 @@ class _ChangeImageState extends State<ChangeImage> {
                 return ProfilePic(
                   userData: value.userData,
                   loading: loading,
-                  radius: 70,
+                  radius: 90,
                 );
               },
             ),
