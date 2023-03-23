@@ -1,15 +1,19 @@
 import 'package:dima_app/screens/error.dart';
+import 'package:dima_app/screens/poll_detail/dates_list.dart';
+import 'package:dima_app/screens/poll_detail/invitees_pill.dart';
+import 'package:dima_app/screens/poll_detail/locations_list.dart';
 import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
+import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
-import 'package:dima_app/widgets/pill_box.dart';
 import 'package:dima_app/widgets/user_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PollDetailScreen extends StatefulWidget {
+class PollDetailScreen extends StatelessWidget {
   final String pollId;
 
   const PollDetailScreen({
@@ -17,28 +21,29 @@ class PollDetailScreen extends StatefulWidget {
     required this.pollId,
   });
 
-  @override
-  State<PollDetailScreen> createState() => _PollDetailScreenState();
-}
-
-class _PollDetailScreenState extends State<PollDetailScreen> {
-  PollCollection? pollData;
-
-  @override
-  void initState() {
-    super.initState();
+  Future<Map<String, dynamic>?> getPollDataAndInvites(
+      BuildContext context) async {
+    PollCollection? pollData =
+        await Provider.of<FirebasePoll>(context, listen: false)
+            .getPollData(context, pollId);
+    if (pollData == null) return null;
+    List<PollEventInviteCollection> pollInvites =
+        // ignore: use_build_context_synchronously
+        await Provider.of<FirebasePollEventInvite>(context, listen: false)
+            .getInvitesFromPollEventId(context, pollId);
+    if (pollInvites.isEmpty) return null;
+    return {"data": pollData, "invites": pollInvites};
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar("Poll Detail"),
-      body: FutureBuilder<PollCollection?>(
-        future: Provider.of<FirebasePoll>(context, listen: false)
-            .getPollData(context, widget.pollId),
+      appBar: const MyAppBar("Poll Detail"),
+      body: FutureBuilder<Map<String, dynamic>?>(
+        future: getPollDataAndInvites(context),
         builder: (
           BuildContext context,
-          AsyncSnapshot<PollCollection?> snapshot,
+          AsyncSnapshot<Map<String, dynamic>?> snapshot,
         ) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const LoadingSpinner();
@@ -57,8 +62,9 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
             });
             return Container();
           }
-          PollCollection pollData = snapshot.data!;
-          print(pollData.toString());
+          PollCollection pollData = snapshot.data!["data"];
+          List<PollEventInviteCollection> pollInvites =
+              snapshot.data!["invites"];
           return Container(
             margin: const EdgeInsets.all(10),
             child: ListView(
@@ -95,20 +101,40 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
                 Text(pollData.pollDesc.isEmpty
                     ? "The organized did not provide any description"
                     : pollData.pollDesc),
-                Container(
-                  width: 40,
-                  margin: EdgeInsets.symmetric(horizontal: 50),
-                  child: SizedBox(
-                    child: PillBox(
-                      child: const Text(
-                        "Virtual meeting",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
+                Container(padding: const EdgeInsets.symmetric(vertical: 5)),
+                InviteesPill(
+                  pollEventId: pollId,
+                  invites: pollInvites,
+                ),
+                Container(padding: const EdgeInsets.symmetric(vertical: 5)),
+                const Text(
+                  "Where this event could be held",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
                   ),
+                ),
+                Container(padding: const EdgeInsets.symmetric(vertical: 5)),
+                LocationsList(
+                  organizerUid: pollData.organizerUid,
+                  pollId: pollId,
+                  locations: pollData.locations,
+                  invites: pollInvites,
+                ),
+                Container(padding: const EdgeInsets.symmetric(vertical: 5)),
+                const Text(
+                  "When this event could be held",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                Container(padding: const EdgeInsets.symmetric(vertical: 5)),
+                DatesList(
+                  organizerUid: pollData.organizerUid,
+                  pollId: pollId,
+                  dates: pollData.dates,
+                  invites: pollInvites,
                 ),
                 Text(pollData.deadline),
                 Text(pollData.public.toString()),

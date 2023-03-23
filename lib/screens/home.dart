@@ -14,8 +14,17 @@ import 'package:provider/provider.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/provider_samples.dart';
 
-class HomeScreen extends StatelessWidget {
+import '../widgets/search_bar.dart';
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scroll = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +35,23 @@ class HomeScreen extends StatelessWidget {
           const Text("ok"),
           Expanded(
             child: ListView(
+              controller: _scroll,
               children: [
+                StreamBuilder(
+                  stream: FirebaseCrud.readSnapshot(
+                      Provider.of<FirebaseUser>(context, listen: false)
+                          .userCollection,
+                      "4AxIUlqdkVXYf2fCVGH4DpUb0Dj1"),
+                  builder: (
+                    BuildContext context,
+                    AsyncSnapshot<DocumentSnapshot<Object?>> snapshot,
+                  ) {
+                    UserCollection userData = UserCollection.fromMap(
+                      (snapshot.data!.data()) as Map<String, dynamic>,
+                    );
+                    return Text(userData.name);
+                  },
+                ),
                 const Text("ok"),
                 Consumer<FirebaseUser>(
                   builder: (context, value, child) {
@@ -78,6 +103,32 @@ class HomeScreen extends StatelessWidget {
                     return Text("$providerObj");
                   },
                 ),
+                Consumer<FirebaseUser>(
+                  builder: (context, value, child) {
+                    return Column(children: [
+                      Text(
+                        "USER:\n${value.user}",
+                      )
+                    ]);
+                  },
+                ),
+
+                Consumer<FirebaseUser>(
+                  builder: (context, value, child) {
+                    return Text("USERDATA:\n${value.userData.toString()}");
+                  },
+                ),
+
+                ElevatedButton(
+                  child: const Text('Open search'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SearchPage()),
+                    );
+                  },
+                ),
 
                 //Future provider
                 Consumer<String>(
@@ -126,6 +177,34 @@ class HomeScreen extends StatelessWidget {
                       );
                     },
                     child: const Text("Search page")),
+                // DB test
+                TextButton(
+                  onPressed: () async {
+                    var curUid =
+                        Provider.of<FirebaseUser>(context, listen: false)
+                            .user!
+                            .uid;
+                    Provider.of<FirebaseFollow>(context, listen: false)
+                        .addFollower(context, curUid, "1", true);
+                    Provider.of<FirebaseFollow>(context, listen: false)
+                        .removeFollower(context, curUid, "1", true);
+                  },
+                  child: const Text("Firebase test"),
+                ),
+
+                // Search user functionality
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SearchPage()),
+                    );
+                  },
+                  child: const Text("Search page"),
+                ),
+
+                SearchBar(),
 
                 TextButton(
                   onPressed: () async {
@@ -237,10 +316,10 @@ class UsersList2 extends StatelessWidget {
             itemBuilder: (context, index) {
               var uid = users.docs[index]["uid"];
               /*
-              Provider.of<FirebasePollInvite>(context, listen: false)
-                  .createPollInvite(
+              Provider.of<FirebasePollEventInvite>(context, listen: false)
+                  .createPollEventInvite(
                       context: context,
-                      pollId: "a_IrI8s7a6WeVUgF3fAYd99YHdnqh2",
+                      pollEventId: "gg_HB6d3gyBuwbG5RY1qK5bvqwdIkb2",
                       inviteeId: uid);
               print("added");
               */
@@ -291,8 +370,8 @@ class UserTile2 extends StatelessWidget {
               Provider.of<ThemeSwitch>(context).themeData.textTheme.bodyMedium,
         ),
         subtitle: Text("Name: ${user.name}"),
-        leading: Text("USER:"),
-        trailing: Text("..."),
+        leading: const Text("USER:"),
+        trailing: const Text("..."),
         onTap: () {
           showSnackBar(context, "In construction...");
         },

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_crud.dart';
@@ -14,7 +13,7 @@ class FirebasePoll extends ChangeNotifier {
   CollectionReference get pollCollection =>
       _firestore.collection(PollCollection.collectionName);
 
-  Future<PollCollection> createPoll({
+  Future<PollCollection?> createPoll({
     required BuildContext context,
     required String pollName,
     required String organizerUid,
@@ -38,10 +37,12 @@ class FirebasePoll extends ChangeNotifier {
       var pollExistence = await FirebaseCrud.readDoc(pollCollection, pollId);
       if (pollExistence!.exists) {
         // ignore: use_build_context_synchronously
-        showSnackBar(context, "A poll with this name already exists");
+        /// showSnackBar(context, "A poll with this name already exists");
+        // ignore: use_build_context_synchronously
+        return null;
       }
       await pollCollection.doc(pollId).set(poll.toMap());
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseException catch (e) {
       // showSnackBar(context, e.message!);
       print(e.message!);
     }
@@ -54,7 +55,10 @@ class FirebasePoll extends ChangeNotifier {
   ) async {
     try {
       var pollDataDoc = await FirebaseCrud.readDoc(pollCollection, id);
-      var tmp = pollDataDoc?.data() as Map<String, dynamic>;
+      if (!pollDataDoc!.exists) {
+        return null;
+      }
+      var tmp = pollDataDoc.data() as Map<String, dynamic>;
       tmp["locations"] = (tmp["locations"] as List)
           .map((e) => e as Map<String, dynamic>)
           .toList();
@@ -83,7 +87,6 @@ class FirebasePoll extends ChangeNotifier {
           var pollDetails = PollCollection.fromMap(tmp);
           return pollDetails;
         }).toList();
-
         return polls;
       }
       return [];

@@ -1,23 +1,25 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/gmaps.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:dima_app/screens/event_create/step_places.dart' as step_places;
 
 class SelectLocationAddress extends StatefulWidget {
   final TextEditingController controller;
   final ValueChanged<String> setAddress;
   final ValueChanged<List<double>> setCoor;
-  final step_places.Location defaultLocation;
+  final Location defaultLocation;
+  final FocusNode focusNode;
   const SelectLocationAddress({
     super.key,
     required this.controller,
     required this.setAddress,
     required this.setCoor,
     required this.defaultLocation,
+    required this.focusNode,
   });
 
   @override
@@ -79,8 +81,9 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
             icon: Icon(
                 widget.controller.text.isEmpty ? Icons.search : Icons.cancel),
           ),
-          subtitle: TextField(
+          subtitle: TextFormField(
             autofocus: false,
+            focusNode: widget.focusNode,
             controller: widget.controller,
             decoration: const InputDecoration(hintText: "Search here"),
             onChanged: (text) async {
