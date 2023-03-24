@@ -173,6 +173,35 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   },
                 ),
+          TextButton(
+            onPressed: () async {
+              LoadingOverlay.show(context);
+              await Provider.of<FirebaseUser>(context, listen: false)
+                  .loginWithEmail(
+                email: "test13@test.it", //"ok@ok.it",
+                password: "password",
+                context: context,
+              );
+              LoadingOverlay.hide(context);
+            },
+            child: const Text("Firebase login"),
+          ),
+          TextButton(
+            onPressed: () async {
+              LoadingOverlay.show(context);
+              // overlay.show();
+              var document = await FirebaseCrud.readDoc(
+                Provider.of<FirebaseUser>(context, listen: false)
+                    .userCollection,
+                "IrI8s7a6WeVUgF3fAYd99YHdnqh2",
+              );
+              LoadingOverlay.hide(context);
+              UserCollection usertest = UserCollection.fromMap(
+                document?.data() as Map<String, dynamic>,
+              );
+              print(document?.exists);
+              print(usertest.email);
+              // overlay.hide();
 
                 //Future provider
                 Consumer<String>(

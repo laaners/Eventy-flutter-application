@@ -177,6 +177,32 @@ class FirebaseUser extends ChangeNotifier {
     return null;
   }
 
+  // Return the data of user whose username matches a
+  Future<List<UserCollection>> getUsersData(
+    BuildContext context,
+    String pattern,
+  ) async {
+    try {
+      var users = await userCollection
+          .orderBy('username')
+          .where('username', isGreaterThanOrEqualTo: pattern)
+          .where('username', isLessThan: '${pattern}z')
+          .limit(10)
+          .get();
+      if (users.docs.isNotEmpty) {
+        List<UserCollection> usersData = users.docs
+            .map(
+                (e) => UserCollection.fromMap(e.data() as Map<String, dynamic>))
+            .toList();
+        return usersData;
+      }
+    } on FirebaseException catch (e) {
+      //showSnackBar(context, e.message!);
+      print(e.message);
+    }
+    return [];
+  }
+
   Future<void> updateProfilePic(BuildContext context, String profileUrl) async {
     try {
       var uid = _auth.currentUser!.uid;
