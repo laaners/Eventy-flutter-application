@@ -99,10 +99,10 @@ class _ChangeImageState extends State<ChangeImage> {
               },
             ),
             Positioned(
-              right: 0.0,
+              right: 10.0,
               bottom: 0.0,
               child: Container(
-                padding: const EdgeInsets.all(5),
+                padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   color: Palette.lightBGColor,
                   borderRadius: BorderRadius.circular(50),
@@ -115,8 +115,8 @@ class _ChangeImageState extends State<ChangeImage> {
                     _showPicker(context);
                   },
                   icon: const Icon(
-                    Icons.add_a_photo,
-                    color: Colors.grey,
+                    Icons.photo_camera,
+                    color: Colors.white,
                   ),
                 ),
               ),
