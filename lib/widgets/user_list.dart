@@ -10,29 +10,21 @@ import 'package:provider/provider.dart';
 import '../screens/profile/profile_pic.dart';
 import '../server/firebase_user.dart';
 
-class UserList extends StatefulWidget {
+class UserList extends StatelessWidget {
   final List<String> users;
 
-  const UserList({
-    super.key,
-    required this.users,
-  });
+  const UserList({super.key, required this.users});
 
-  @override
-  State<UserList> createState() => _UserListState();
-}
-
-class _UserListState extends State<UserList> {
   @override
   Widget build(BuildContext context) {
-    return widget.users.isNotEmpty
+    return users.isNotEmpty
         ? ListView.builder(
             itemBuilder: (context, index) {
               return UserTile(
-                userUid: widget.users[index],
+                userUid: users[index],
               );
             },
-            itemCount: widget.users.length,
+            itemCount: users.length,
           )
         : const Center(
             child: Text("empty"),
@@ -87,7 +79,7 @@ class UserTile extends StatelessWidget {
             onTap: () {
               var curUid =
                   Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-              if (curUid == userData.uid + "1") {
+              if (curUid == userData.uid) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(

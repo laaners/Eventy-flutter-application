@@ -5,22 +5,22 @@ import 'package:dima_app/screens/event_detail.dart';
 import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/login.dart';
+import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/screens/profile/index.dart';
 import 'package:dima_app/server/firebase_event.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
+import 'package:dima_app/server/firebase_vote.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
 import 'package:dima_app/provider_samples.dart';
-
 import 'firebase_options.dart';
 
 void main() async {
@@ -83,6 +83,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => FirebaseEvent(firestore)),
         ChangeNotifierProvider(
             create: (context) => FirebasePollEventInvite(firestore)),
+        ChangeNotifierProvider(create: (context) => FirebaseVote(firestore)),
 
         // DARK/LIGHT THEME
         ChangeNotifierProvider(create: (context) => ThemeSwitch()),
@@ -126,7 +127,7 @@ class _MyAppState extends State<MyApp> {
       */
       Navigator.of(context).push(
         ScreenTransition(
-          builder: (context) => const EventDetailScreen(),
+          builder: (context) => PollDetailScreen(pollId: pollId),
         ),
       );
       // Navigator.pushNamed(context, dynamicLinkData.link.path);
@@ -246,13 +247,16 @@ class _MainScreen extends State<MainScreen> {
             Provider.of<DynamicLinksHandler>(context, listen: true).dynamicLink;
         bool pushed =
             Provider.of<DynamicLinksHandler>(context, listen: false).pushed;
+
         if (dynamicLink != null && !pushed) {
+          Map<String, dynamic> queryParams = dynamicLink.link.queryParameters;
+          String pollId = queryParams["pollId"];
           switch (currentIndex) {
             case 0:
               Future.delayed(Duration.zero, () {
                 firstTabNavKey.currentState?.push(
                   ScreenTransition(
-                    builder: (context) => const EventDetailScreen(),
+                    builder: (context) => PollDetailScreen(pollId: pollId),
                   ),
                 );
               });
@@ -261,7 +265,7 @@ class _MainScreen extends State<MainScreen> {
               Future.delayed(Duration.zero, () {
                 secondTabNavKey.currentState?.push(
                   ScreenTransition(
-                    builder: (context) => const EventDetailScreen(),
+                    builder: (context) => PollDetailScreen(pollId: pollId),
                   ),
                 );
               });
@@ -270,7 +274,7 @@ class _MainScreen extends State<MainScreen> {
               Future.delayed(Duration.zero, () {
                 thirdTabNavKey.currentState?.push(
                   ScreenTransition(
-                    builder: (context) => const EventDetailScreen(),
+                    builder: (context) => PollDetailScreen(pollId: pollId),
                   ),
                 );
               });
@@ -279,7 +283,7 @@ class _MainScreen extends State<MainScreen> {
               Future.delayed(Duration.zero, () {
                 fourthTabNavKey.currentState?.push(
                   ScreenTransition(
-                    builder: (context) => const EventDetailScreen(),
+                    builder: (context) => PollDetailScreen(pollId: pollId),
                   ),
                 );
               });

@@ -1,6 +1,5 @@
 import 'package:dima_app/screens/event_create/select_location_address.dart';
-import 'package:dima_app/screens/event_create/step_places.dart' as step_places;
-import 'package:dima_app/screens/event_create/step_places.dart';
+import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
@@ -9,9 +8,9 @@ import 'package:flutter/material.dart';
 
 class SelectLocation extends StatefulWidget {
   final List<Location> locations;
-  final ValueChanged<step_places.Location> addLocation;
+  final ValueChanged<Location> addLocation;
   final ValueChanged<String> removeLocation;
-  final step_places.Location defaultLocation;
+  final Location defaultLocation;
   const SelectLocation({
     super.key,
     required this.addLocation,
@@ -33,6 +32,7 @@ class _SelectLocationState extends State<SelectLocation> {
   bool showMap = false;
   double lat = 0;
   double lon = 0;
+  FocusNode focusNode = FocusNode();
 
   @override
   void initState() {
@@ -42,12 +42,18 @@ class _SelectLocationState extends State<SelectLocation> {
     locationAddrController.text = widget.defaultLocation.site;
     lat = widget.defaultLocation.lat;
     lon = widget.defaultLocation.lon;
+    focusNode.addListener(_onFocusChange);
   }
 
   @override
   void dispose() {
     showMap = false;
+    focusNode.removeListener(_onFocusChange);
     super.dispose();
+  }
+
+  void _onFocusChange() {
+    debugPrint("\t\t\tFocus: ${focusNode.hasFocus.toString()}");
   }
 
   void checkFields() {
@@ -87,7 +93,7 @@ class _SelectLocationState extends State<SelectLocation> {
     }
     showMap = false;
     Navigator.pop(context);
-    widget.addLocation(step_places.Location(
+    widget.addLocation(Location(
       locationNameController.text,
       locationDescController.text,
       locationAddrController.text,
@@ -153,46 +159,60 @@ class _SelectLocationState extends State<SelectLocation> {
                 bottom: MediaQuery.of(context).viewInsets.bottom),
             child: ListView(
               children: [
-                Container(
-                  margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
-                  alignment: Alignment.topLeft,
-                  child: const Text(
-                    "Name",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 15),
-                  child: MyTextField(
-                    maxLength: 40,
-                    maxLines: 1,
-                    hintText: "Name of the Location",
-                    controller: locationNameController,
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
-                  alignment: Alignment.topLeft,
-                  child: const Text(
-                    "Description (optional)",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 15),
-                  child: MyTextField(
-                    maxLength: 200,
-                    maxLines: 6,
-                    hintText:
-                        "Add details and indications to reach this location",
-                    controller: locationDescController,
-                  ),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 1000),
+                  reverseDuration: const Duration(milliseconds: 1000),
+                  child: focusNode.hasFocus
+                      ? Container()
+                      : Column(
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  bottom: 8, top: 8, left: 15),
+                              alignment: Alignment.topLeft,
+                              child: const Text(
+                                "Name",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              child: MyTextField(
+                                maxLength: 40,
+                                maxLines: 1,
+                                hintText: "Name of the Location",
+                                controller: locationNameController,
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  bottom: 8, top: 8, left: 15),
+                              alignment: Alignment.topLeft,
+                              child: const Text(
+                                "Description (optional)",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              child: MyTextField(
+                                maxLength: 200,
+                                maxLines: 6,
+                                hintText:
+                                    "Add details and indications to reach this location",
+                                controller: locationDescController,
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
                 const Padding(padding: EdgeInsets.only(top: 8)),
                 SelectLocationAddress(
@@ -209,6 +229,7 @@ class _SelectLocationState extends State<SelectLocation> {
                       lon = coor[1];
                     });
                   },
+                  focusNode: focusNode,
                 ),
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 15),

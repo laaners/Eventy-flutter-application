@@ -14,15 +14,15 @@ class FirebasePollEventInvite extends ChangeNotifier {
 
   Future<void> createPollEventInvite({
     required BuildContext context,
-    required String pollId,
+    required String pollEventId,
     required String inviteeId,
   }) async {
     try {
       PollEventInviteCollection pollEventInvite = PollEventInviteCollection(
-        pollEventId: pollId,
+        pollEventId: pollEventId,
         inviteeId: inviteeId,
       );
-      String pollEventInviteId = "${pollId}_$inviteeId";
+      String pollEventInviteId = "${pollEventId}_$inviteeId";
       var pollEventInviteExistence = await FirebaseCrud.readDoc(
           pollEventInviteCollection, pollEventInviteId);
       if (pollEventInviteExistence!.exists) {
@@ -36,5 +36,53 @@ class FirebasePollEventInvite extends ChangeNotifier {
       // showSnackBar(context, e.message!);
       print(e.message!);
     }
+  }
+
+  Future<List<PollEventInviteCollection>> getInvitesFromPollEventId(
+    BuildContext context,
+    String pollEventId,
+  ) async {
+    try {
+      var documents = await pollEventInviteCollection
+          .where("pollEventId", isEqualTo: pollEventId)
+          .get();
+      if (documents.docs.isNotEmpty) {
+        final List<PollEventInviteCollection> pollEventInvites =
+            documents.docs.map((doc) {
+          var tmp = doc.data() as Map<String, dynamic>;
+          var pollEventInvite = PollEventInviteCollection.fromMap(tmp);
+          return pollEventInvite;
+        }).toList();
+        return pollEventInvites;
+      }
+      return [];
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return [];
+  }
+
+  Future<List<PollEventInviteCollection>> getInvitesFromUserId(
+    BuildContext context,
+    String userId,
+  ) async {
+    try {
+      var documents = await pollEventInviteCollection
+          .where("inviteeId", isEqualTo: userId)
+          .get();
+      if (documents.docs.isNotEmpty) {
+        final List<PollEventInviteCollection> pollEventInvites =
+            documents.docs.map((doc) {
+          var tmp = doc.data() as Map<String, dynamic>;
+          var pollEventInvite = PollEventInviteCollection.fromMap(tmp);
+          return pollEventInvite;
+        }).toList();
+        return pollEventInvites;
+      }
+      return [];
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return [];
   }
 }

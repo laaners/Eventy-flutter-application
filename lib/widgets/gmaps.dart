@@ -86,7 +86,7 @@ class GmapFromAddrState extends State<GmapFromAddr> {
   }
 }
 
-class GmapFromCoor extends StatelessWidget {
+class GmapFromCoor extends StatefulWidget {
   final String address;
   final double lat;
   final double lon;
@@ -98,25 +98,43 @@ class GmapFromCoor extends StatelessWidget {
   });
 
   @override
+  State<GmapFromCoor> createState() => _GmapFromCoorState();
+}
+
+class _GmapFromCoorState extends State<GmapFromCoor> {
+  late GoogleMapController mapController;
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       margin: const EdgeInsets.all(15),
       child: GoogleMap(
+        onMapCreated: _onMapCreated,
         mapType: MapType.normal,
         myLocationEnabled: false,
         initialCameraPosition: CameraPosition(
-          target: LatLng(lat, lon),
+          target: LatLng(widget.lat, widget.lon),
           zoom: 16.4746,
         ),
         markers: {
           Marker(
             markerId: const MarkerId('place_name'),
-            position: LatLng(lat, lon),
+            position: LatLng(widget.lat, widget.lon),
             // icon: BitmapDescriptor.,
             infoWindow: InfoWindow(
-              title: address,
-              snippet: address,
+              title: widget.address,
+              snippet: widget.address,
             ),
           )
         },

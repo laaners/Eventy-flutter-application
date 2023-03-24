@@ -1,6 +1,5 @@
 import 'package:dima_app/providers/theme_switch.dart';
-import 'package:dima_app/screens/event_create/step_places.dart' as step_places;
-import 'package:dima_app/screens/event_create/step_places.dart';
+import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
@@ -10,10 +9,10 @@ import 'package:provider/provider.dart';
 
 class SelectVirtual extends StatefulWidget {
   final List<Location> locations;
-  final ValueChanged<step_places.Location> addLocation;
+  final ValueChanged<Location> addLocation;
   final ValueChanged<String> removeLocation;
   final ValueChanged<bool> setVirtualMeeting;
-  final step_places.Location defaultOptions;
+  final Location defaultOptions;
   const SelectVirtual({
     super.key,
     required this.addLocation,
@@ -61,7 +60,7 @@ class _SelectVirtualState extends State<SelectVirtual> {
             CupertinoDialogAction(
               isDefaultAction: true,
               onPressed: () {
-                widget.addLocation(step_places.Location(
+                widget.addLocation(Location(
                   locationNameController.text,
                   locationDescController.text,
                   locationAddrController.text,
@@ -81,7 +80,7 @@ class _SelectVirtualState extends State<SelectVirtual> {
     }
     widget.setVirtualMeeting(true);
     Navigator.pop(context);
-    widget.addLocation(step_places.Location(
+    widget.addLocation(Location(
       locationNameController.text,
       locationDescController.text,
       locationAddrController.text,
