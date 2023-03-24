@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseCrud {
   // CRUD
-  static Future<Stream<DocumentSnapshot<Object?>>?> readSnapshot(
+  static Stream<DocumentSnapshot<Object?>>? readSnapshot(
     CollectionReference collection,
     String id,
-  ) async {
+  ) {
     try {
       var document = collection.doc(id).snapshots();
       return document;

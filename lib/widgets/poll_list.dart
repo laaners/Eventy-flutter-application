@@ -45,8 +45,10 @@ class _PollListState extends State<PollList> {
           });
           return Container();
         }
-        if (!snapshot.hasData) {
-          return Container();
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Container(
+            child: const Text("empty"),
+          );
         }
         var pollsData = snapshot.data!;
         return Column(

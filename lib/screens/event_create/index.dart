@@ -10,6 +10,8 @@ import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
+import 'package:dima_app/server/tables/location.dart';
+import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
@@ -263,8 +265,9 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 };
               }).toList();
               LoadingOverlay.show(context);
-              await Provider.of<FirebasePoll>(context, listen: false)
-                  .createPoll(
+              var dbPoll =
+                  await Provider.of<FirebasePoll>(context, listen: false)
+                      .createPoll(
                 context: context,
                 pollName: eventTitleController.text,
                 organizerUid: curUid,
@@ -274,11 +277,22 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 locations: locationsMap,
                 public: true,
               );
+              ret = MyAlertDialog.showAlertIfCondition(
+                context,
+                dbPoll == null,
+                "DUPLICATE POLL",
+                "A poll with this name already exists",
+              );
+              if (ret) {
+                LoadingOverlay.hide(context);
+                return;
+              }
+
               String pollId = "${eventTitleController.text}_$curUid";
               await Provider.of<FirebasePollEventInvite>(context, listen: false)
                   .createPollEventInvite(
                 context: context,
-                pollId: pollId,
+                pollEventId: pollId,
                 inviteeId: curUid,
               );
               LoadingOverlay.hide(context);

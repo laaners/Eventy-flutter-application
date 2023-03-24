@@ -37,7 +37,7 @@ class _MyTextFieldState extends State<MyTextField> {
   }
 
   void _onFocusChange() {
-    debugPrint("Focus: ${_focus.hasFocus.toString()}");
+    debugPrint("\t\t\tFocus: ${_focus.hasFocus.toString()}");
   }
 
   @override

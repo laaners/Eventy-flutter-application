@@ -1,22 +1,11 @@
 import 'package:dima_app/screens/event_create/select_location.dart';
 import 'package:dima_app/screens/event_create/select_virtual.dart';
+import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/themes/palette.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';
-
-class Location {
-  final String name;
-  final String description;
-  final String site;
-  final double lat;
-  final double lon;
-  Location(this.name, this.description, this.site, this.lat, this.lon);
-
-  @override
-  String toString() {
-    return 'Location(name: $name, description: $description, site: $site, lat: $lat, lon: $lon)';
-  }
-}
 
 class StepPlaces extends StatefulWidget {
   final List<Location> locations;

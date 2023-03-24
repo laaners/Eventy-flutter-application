@@ -3,6 +3,7 @@ import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:dima_app/widgets/gmaps.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -47,6 +48,28 @@ class EventsScreen extends StatelessWidget {
               );
             },
             child: const Text("TO EVENT CREATE"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await showModalBottomSheet(
+                useRootNavigator: true,
+                isScrollControlled: true,
+                context: context,
+                builder: (context) => FractionallySizedBox(
+                  heightFactor: 0.85,
+                  child: Scaffold(
+                    body: Container(
+                        // margin: const EdgeInsets.only(top: 15, bottom: 15),
+                        child: GmapFromCoor(
+                      address: "ok",
+                      lat: 50,
+                      lon: 50,
+                    )),
+                  ),
+                ),
+              );
+            },
+            child: const Text("map test"),
           ),
         ],
       ),
