@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +42,12 @@ class FirebasePoll extends ChangeNotifier {
         // ignore: use_build_context_synchronously
         return null;
       }
-      await pollCollection.doc(pollId).set(poll.toMap());
+
+      // await pollCollection.doc(pollId).set(poll.toMap());
+      var test = poll.toMap();
+      // deadline in utc
+      test["deadline"] = DateFormatter.string2DateTime(deadline);
+      await pollCollection.doc(pollId).set(test);
     } on FirebaseException catch (e) {
       // showSnackBar(context, e.message!);
       print(e.message!);
@@ -62,6 +68,9 @@ class FirebasePoll extends ChangeNotifier {
       tmp["locations"] = (tmp["locations"] as List)
           .map((e) => e as Map<String, dynamic>)
           .toList();
+      // utc string
+      tmp["deadline"] = DateFormatter.dateTime2String(tmp["deadline"].toDate());
+      tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
       var pollDetails = PollCollection.fromMap(tmp);
       return pollDetails;
     } on FirebaseException catch (e) {

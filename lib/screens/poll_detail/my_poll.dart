@@ -1,5 +1,7 @@
 library flutter_polls;
 
+import 'package:dima_app/server/tables/availability.dart';
+import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -8,8 +10,13 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 // This widget is used to display a poll.
 // It can be used in any way and also in a [ListView] or [Column].
 class MyPolls extends HookWidget {
+  // CUSTOM: organizer and curUid
+  final String organizedUid;
+  final String curUid;
   const MyPolls({
     super.key,
+    required this.organizedUid,
+    required this.curUid,
     required this.pollId,
     this.hasVoted = false,
     this.userVotedOptionId,
@@ -247,6 +254,14 @@ class MyPolls extends HookWidget {
                       ? InkWell(
                           // CUSTOM: change vote
                           onTap: () async {
+                            if (MyAlertDialog.showAlertIfCondition(
+                                context,
+                                curUid == organizedUid &&
+                                    pollOption.id != Availability.yes,
+                                "YOU CANNOT VOTE",
+                                "You are the organizer, you must be present at the event!")) {
+                              return;
+                            }
                             MyPollOption? prevOption = votedOption.value;
                             if (isLoading.value) return;
                             votedOption.value = pollOption;

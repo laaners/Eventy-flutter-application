@@ -1,30 +1,26 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dima_app/screens/error.dart';
-import 'package:dima_app/server/date_methods.dart';
-import 'package:dima_app/server/firebase_vote.dart';
+import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/availability.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:dima_app/themes/palette.dart';
-import 'package:dima_app/transitions/screen_transition.dart';
-import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:collection/collection.dart';
 
 class DatesList extends StatefulWidget {
   final String organizerUid;
   final String pollId;
   final Map<String, dynamic> dates;
   final List<PollEventInviteCollection> invites;
+  final List<VoteDateCollection> votesDates;
+
   const DatesList({
     super.key,
     required this.dates,
     required this.pollId,
     required this.organizerUid,
     required this.invites,
+    required this.votesDates,
   });
 
   @override
@@ -33,14 +29,17 @@ class DatesList extends StatefulWidget {
 
 class _DatesListState extends State<DatesList> {
   bool sortedByVotes = true;
+  late List<VoteDateCollection> votesDates;
 
   @override
   void initState() {
     super.initState();
+    votesDates = widget.votesDates;
   }
 
   @override
   Widget build(BuildContext context) {
+    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     return Column(
       children: [
         MyButton(
@@ -48,114 +47,37 @@ class _DatesListState extends State<DatesList> {
           onPressed: () {
             setState(() {
               sortedByVotes = !sortedByVotes;
-            });
-          },
-        ),
-        StreamBuilder(
-          stream: Provider.of<FirebaseVote>(context, listen: false)
-              .getVotesDatesSnapshots(widget.pollId),
-          builder: (
-            BuildContext context,
-            AsyncSnapshot<QuerySnapshot<Object?>?> snapshot,
-          ) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const LoadingSpinner();
-            }
-            if (snapshot.hasError || snapshot.data == null) {
-              Future.microtask(() {
-                Navigator.of(context).pop();
-                Navigator.push(
-                  context,
-                  ScreenTransition(
-                    builder: (context) => ErrorScreen(
-                      errorMsg: snapshot.error.toString(),
-                    ),
-                  ),
-                );
-              });
-              return Container();
-            }
-            List<VoteDateCollection> datesVotesCollection = [];
-            if (snapshot.data!.docs.isNotEmpty) {
-              datesVotesCollection =
-                  snapshot.data!.docs.map<VoteDateCollection>((e) {
-                return VoteDateCollection.fromMap(
-                  e.data() as Map<String, dynamic>,
-                );
-              }).toList();
-            }
-            widget.dates.forEach((key, dates) {
-              for (var date in dates) {
-                VoteDateCollection? voteDateCollection =
-                    datesVotesCollection.firstWhereOrNull(
-                  (element) =>
-                      element.date == key &&
-                      element.start == date["start"] &&
-                      element.end == date["end"],
-                );
-                if (voteDateCollection == null) {
-                  datesVotesCollection.add(
-                    VoteDateCollection(
-                      pollId: widget.pollId,
-                      date: key,
-                      start: date["start"],
-                      end: date["end"],
-                      votes: {
-                        widget.organizerUid: Availability.yes,
-                      },
-                    ),
-                  );
-                } else {
-                  voteDateCollection.votes[widget.organizerUid] =
-                      Availability.yes;
-                }
+              if (sortedByVotes) {
+                votesDates.sort((a, b) =>
+                    b.getPositiveVotes().length - a.getPositiveVotes().length);
+              } else {
+                votesDates.sort((a, b) => a.votes.length - b.votes.length);
+                votesDates.sort((a, b) => a.end.compareTo(b.end));
+                votesDates.sort((a, b) => a.start.compareTo(b.start));
+                votesDates.sort((a, b) => a.date.compareTo(b.date));
               }
             });
-            // UTC to local
-            List<VoteDateCollection> localDates = [];
-            for (var dateVoteCollection in datesVotesCollection) {
-              var startDateString =
-                  "${dateVoteCollection.date} ${dateVoteCollection.start}:00";
-              var endDateString =
-                  "${dateVoteCollection.date} ${dateVoteCollection.end}:00";
-              var startDateLocal = DateFormatter.string2DateTime(
-                  DateFormatter.toLocalString(startDateString));
-              var endDateLocal = DateFormatter.string2DateTime(
-                  DateFormatter.toLocalString(endDateString));
-              String localDay = DateFormat("yyyy-MM-dd").format(startDateLocal);
-              var startLocal = DateFormat("HH:mm").format(startDateLocal);
-              var endLocal = DateFormat("HH:mm").format(endDateLocal);
-              localDates.add(VoteDateCollection(
-                pollId: widget.pollId,
-                date: localDay,
-                start: startLocal,
-                end: endLocal,
-                votes: dateVoteCollection.votes,
-              ));
-            }
-            datesVotesCollection = localDates;
-            if (sortedByVotes) {
-              datesVotesCollection.sort((a, b) =>
-                  b.getPositiveVotes().length - a.getPositiveVotes().length);
-            } else {
-              datesVotesCollection
-                  .sort((a, b) => a.votes.length - b.votes.length);
-              datesVotesCollection.sort((a, b) => a.end.compareTo(b.end));
-              datesVotesCollection.sort((a, b) => a.start.compareTo(b.start));
-              datesVotesCollection.sort((a, b) => a.date.compareTo(b.date));
-            }
-            return Column(
-              children: datesVotesCollection.map((voteDateCollection) {
-                return DateTile(
-                  pollId: widget.pollId,
-                  organizerUid: widget.organizerUid,
-                  invites: widget.invites,
-                  voteDateCollection: voteDateCollection,
-                );
-              }).toList(),
-            );
           },
         ),
+        Column(
+          children: votesDates.map((voteDate) {
+            return DateTile(
+              pollId: widget.pollId,
+              organizerUid: widget.organizerUid,
+              invites: widget.invites,
+              voteDate: voteDate,
+              modifyVote: (int newAvailability) {
+                setState(() {
+                  votesDates[votesDates.indexWhere((e) =>
+                          e.date == voteDate.date &&
+                          e.start == voteDate.start &&
+                          e.end == voteDate.end)]
+                      .votes[curUid] = newAvailability;
+                });
+              },
+            );
+          }).toList(),
+        )
       ],
     );
   }
@@ -165,13 +87,15 @@ class DateTile extends StatelessWidget {
   final String pollId;
   final String organizerUid;
   final List<PollEventInviteCollection> invites;
-  final VoteDateCollection voteDateCollection;
+  final VoteDateCollection voteDate;
+  final ValueChanged<int> modifyVote;
   const DateTile({
     super.key,
     required this.pollId,
     required this.organizerUid,
     required this.invites,
-    required this.voteDateCollection,
+    required this.voteDate,
+    required this.modifyVote,
   });
 
   @override
@@ -188,11 +112,11 @@ class DateTile extends StatelessWidget {
       ),
       child: ListTile(
         title: Text(
-          voteDateCollection.date,
+          voteDate.date,
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(
-          voteDateCollection.start + "_" + voteDateCollection.end,
+          voteDate.start + "_" + voteDate.end,
           overflow: TextOverflow.ellipsis,
         ),
         leading: Container(
@@ -209,7 +133,7 @@ class DateTile extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text((voteDateCollection.getPositiveVotes().length).toString()),
+            Text((voteDate.getPositiveVotes().length).toString()),
             IconButton(
               icon: const Icon(
                 Icons.check,
@@ -239,6 +163,7 @@ class DateTile extends StatelessWidget {
             ),
           );
           */
+          modifyVote(Availability.not);
         },
       ),
     );

@@ -4,9 +4,13 @@ import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/themes/palette.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/pill_box.dart';
+import 'package:dima_app/widgets/user_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class InviteesPill extends StatelessWidget {
   final String pollEventId;
@@ -59,7 +63,10 @@ class InviteesPill extends StatelessWidget {
       child: SizedBox(
         child: PillBox(
           child: InkWell(
-            onTap: () {
+            onTap: () async {
+              await Share.share(
+                'https://www.youtube.com,Nice Service',
+              );
               /*
               Navigator.push(
                 context,
@@ -75,7 +82,7 @@ class InviteesPill extends StatelessWidget {
                 ),
               );
               */
-              insert();
+              // insert();
             },
             child: Row(
               children: [

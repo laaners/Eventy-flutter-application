@@ -3,11 +3,15 @@ import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/search.dart';
 import 'package:dima_app/server/firebase_crud.dart';
 import 'package:dima_app/server/firebase_follow.dart';
+import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
+import 'package:dima_app/widgets/lists_switcher.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
+import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -37,6 +41,39 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ListView(
               controller: _scroll,
               children: [
+                TextButton(
+                  onPressed: () async {
+                    const String url =
+                        "https://eventy.page.link?pollId=gg_HB6d3gyBuwbG5RY1qK5bvqwdIkb2";
+                    final dynamicLinkParams = DynamicLinkParameters(
+                      link: Uri.parse(url),
+                      uriPrefix: "https://eventy.page.link",
+                      androidParameters: const AndroidParameters(
+                        packageName: "com.example.dima_app",
+                      ),
+                      iosParameters: const IOSParameters(
+                        bundleId: "com.example.dima_app",
+                      ),
+                    );
+                    final dynamicLongLink = await FirebaseDynamicLinks.instance
+                        .buildLink(dynamicLinkParams);
+                    final ShortDynamicLink dynamicShortLink =
+                        await FirebaseDynamicLinks.instance
+                            .buildShortLink(dynamicLinkParams);
+                    Uri finalUrl = dynamicShortLink.shortUrl;
+                    print(finalUrl);
+                    print(dynamicLongLink);
+
+                    final instanceLink =
+                        await FirebaseDynamicLinks.instance.getInitialLink();
+                    // init dynamic link
+                  },
+                  child: const Text("dynamic link"),
+                ),
+                ListsSwitcher(
+                  labels: ["ciao", "come", "stai"],
+                  lists: [Text("data1"), Text("data2"), Text("data3")],
+                ),
                 StreamBuilder(
                   stream: FirebaseCrud.readSnapshot(
                       Provider.of<FirebaseUser>(context, listen: false)
@@ -46,6 +83,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     BuildContext context,
                     AsyncSnapshot<DocumentSnapshot<Object?>> snapshot,
                   ) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const LoadingSpinner();
+                    }
+                    if (snapshot.hasError || snapshot.data == null) {
+                      return const Text(
+                          "user retrieval failed or non-existent");
+                    }
                     UserCollection userData = UserCollection.fromMap(
                       (snapshot.data!.data()) as Map<String, dynamic>,
                     );

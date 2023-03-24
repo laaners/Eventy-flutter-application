@@ -44,7 +44,7 @@ class FirebaseVote extends ChangeNotifier {
     return null;
   }
 
-  Future<VoteLocationCollection?> getVoteLocation(
+  Future<VoteLocationCollection?> getVotesLocation(
     BuildContext context,
     String pollId,
     String locationName,
@@ -125,7 +125,7 @@ class FirebaseVote extends ChangeNotifier {
     return null;
   }
 
-  Future<List<VoteDateCollection>> getVotesDate(
+  Future<VoteDateCollection?> getVotesDate(
     BuildContext context,
     String pollId,
     String date,
@@ -133,6 +133,18 @@ class FirebaseVote extends ChangeNotifier {
     String end,
   ) async {
     try {
+      var voteId = "${pollId}_${date}_${start}_$end";
+      var document = await FirebaseCrud.readDoc(
+        voteDateCollection,
+        voteId,
+      );
+      if (!document!.exists) {
+        return null;
+      }
+      var tmp = document.data() as Map<String, dynamic>;
+      var voteDate = VoteDateCollection.fromMap(tmp);
+      return voteDate;
+      /*
       var documents = await voteDateCollection
           .where("pollId", isEqualTo: pollId)
           .where('date', isEqualTo: date)
@@ -151,10 +163,11 @@ class FirebaseVote extends ChangeNotifier {
         return votesDate;
       }
       return [];
+       */
     } on FirebaseException catch (e) {
       print(e.message!);
     }
-    return [];
+    return null;
   }
 
   Future<void> userVoteDate(
