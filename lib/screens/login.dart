@@ -1,9 +1,13 @@
+import 'package:dima_app/screens/password_reset.dart';
+import 'package:dima_app/screens/profile/change_password.dart';
 import 'package:dima_app/screens/signup.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../widgets/title.dart';
 
 class LogInScreen extends StatelessWidget {
   const LogInScreen({super.key});
@@ -12,7 +16,6 @@ class LogInScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       // todo: remove appBar
-      appBar: MyAppBar("Log In"),
       body: LogInForm(),
     );
   }
@@ -27,8 +30,20 @@ class LogInForm extends StatefulWidget {
 
 class _LogInFormState extends State<LogInForm> {
   final _formKey = GlobalKey<FormState>();
+
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+
   bool _passwordVisible = false;
   bool _rememberUser = false;
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,16 +79,9 @@ class _LogInFormState extends State<LogInForm> {
             ),
           ),
         ),
-        Container(
+        MyTitle(
+          text: "Log In",
           alignment: Alignment.topLeft,
-          margin: const EdgeInsets.fromLTRB(22, 0, 0, 0),
-          child: const Text(
-            "Log In",
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
         ),
         Form(
           key: _formKey,
@@ -87,6 +95,7 @@ class _LogInFormState extends State<LogInForm> {
               Container(
                 margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
                 child: TextFormField(
+                  controller: _usernameController,
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.face, color: Colors.grey),
                     border: OutlineInputBorder(),
@@ -105,6 +114,7 @@ class _LogInFormState extends State<LogInForm> {
               Container(
                 margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                 child: TextFormField(
+                  controller: _passwordController,
                   obscureText: _passwordVisible,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
@@ -134,50 +144,34 @@ class _LogInFormState extends State<LogInForm> {
                 ),
               ),
               Container(
-                margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                child: Row(children: [
-                  Switch(
-                    value: _rememberUser,
-                    onChanged: (bool value) {
-                      // This is called when the user toggles the switch.
-                      setState(() {
-                        _rememberUser = value;
-                        // todo: save credentials in secure storage if _rememberUser is true AND user is authenticated
-                        // https://pub.dev/packages/flutter_secure_storage
-                      });
-                    },
-                  ),
-                  const Text(
-                    "Remember me",
-                    style: TextStyle(fontStyle: FontStyle.italic),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      // todo: add transition to forgot password process
-                    },
-                    child: const Text(
-                      "Forgot Password?",
-                      style: TextStyle(
-                        fontStyle: FontStyle.italic,
+                margin: const EdgeInsets.symmetric(horizontal: 10),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const PasswordResetScreen(),
                       ),
+                    );
+                  },
+                  child: const Text(
+                    "Forgot Password?",
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
-                ]),
+                ),
               ),
               Container(
                 padding: const EdgeInsets.all(20),
                 alignment: Alignment.center,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       // If the form is valid, display a snackbar. In the real world,
                       // you'd often call a server or save the information in a database.
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Processing Data'),
-                        ),
-                      );
+                      await Provider.of<FirebaseUser>(context, listen: false)
+                          .logInWithUsername(context, _usernameController.text,
+                              _passwordController.text);
                     }
                   },
                   style: const ButtonStyle(
