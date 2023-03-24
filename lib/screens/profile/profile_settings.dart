@@ -1,7 +1,10 @@
+import 'package:dima_app/screens/profile/edit_profile.dart';
+import 'package:dima_app/widgets/delete_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/theme_switch.dart';
+import 'change_password.dart';
 
 class ProfileSettings extends StatefulWidget {
   const ProfileSettings({super.key});
@@ -50,7 +53,11 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           title: const Text("Edit profile"),
           trailing: const Icon(Icons.navigate_next),
           onTap: () {
-            // add transition to EditProfileScreen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const EditProfileScreen()),
+            );
           },
         ),
         ListTile(
@@ -58,7 +65,12 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           title: const Text("Change password"),
           trailing: const Icon(Icons.navigate_next),
           onTap: () {
-            // add change password transition
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ChangePasswordScreen(),
+              ),
+            );
           },
         ),
         ListTile(
@@ -66,7 +78,18 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           title: const Text("Sign out"),
           trailing: const Icon(Icons.navigate_next),
           onTap: () {
-            // add transition to initial screen (LogInScreen?)
+            // TODO: add transition to initial screen (LogInScreen?)
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.delete_forever),
+          title: const Text("Delete Account"),
+          trailing: const Icon(Icons.navigate_next),
+          onTap: () {
+            // TODO: add transition to initial screen (LogInScreen?)
+            showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => DeleteDialog());
           },
         ),
       ],

@@ -3,6 +3,7 @@ import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_crud.dart';
@@ -139,6 +140,26 @@ class FirebaseUser extends ChangeNotifier {
     }
   }
 
+  Future<void> logInWithUsername(
+      BuildContext context, String username, String password) async {
+    try {
+      var usernameValidation =
+          await userCollection.where('username', isEqualTo: username).get();
+
+      if (usernameValidation.docs.isNotEmpty) {
+        String email = (usernameValidation.docs[0].data()
+            as Map<String, dynamic>)['email'];
+
+        await loginWithEmail(
+            email: email, password: password, context: context);
+      } else {
+        showSnackBar(context, "Username does not exists");
+      }
+    } on FirebaseException catch (e) {
+      print(e.message);
+    }
+  }
+
   Future<void> signOut(BuildContext context) async {
     try {
       await _auth.signOut();
@@ -147,6 +168,18 @@ class FirebaseUser extends ChangeNotifier {
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
+  }
+
+  Future<bool> reauthenticationCurrentUser(
+      BuildContext context, String password) async {
+    try {
+      loginWithEmail(
+          email: userData!.email, password: password, context: context);
+      return true;
+    } on FirebaseException catch (e) {
+      showSnackBar(context, e.message!);
+    }
+    return false;
   }
 
   Future<void> deleteAccount(BuildContext context) async {
@@ -203,6 +236,30 @@ class FirebaseUser extends ChangeNotifier {
     return [];
   }
 
+  Future<void> updateUserData(BuildContext context, String username,
+      String name, String surname, String email) async {
+    try {
+      var uid = _auth.currentUser!.uid;
+
+      UserCollection userEntity = UserCollection(
+        uid: uid,
+        email: email,
+        username: username,
+        name: name,
+        surname: surname,
+        profilePic: userData!.profilePic,
+      );
+
+      await userCollection.doc(uid).set(userEntity.toMap());
+      _userData = userEntity;
+
+      notifyListeners();
+    } on FirebaseException catch (e) {
+      print(e.message!);
+      showSnackBar(context, e.message!);
+    }
+  }
+
   Future<void> updateProfilePic(BuildContext context, String profileUrl) async {
     try {
       var uid = _auth.currentUser!.uid;
@@ -215,6 +272,44 @@ class FirebaseUser extends ChangeNotifier {
     } on FirebaseException catch (e) {
       print(e.message!);
       // showSnackBar(context, e.message!);
+    }
+  }
+
+  Future<bool> usernameAlreadyExists(String username) async {
+    try {
+      var usernameValidation = await userCollection
+          .where('username', isEqualTo: username)
+          .where('username', isNotEqualTo: userData!.username)
+          .get();
+
+      if (usernameValidation.docs.isNotEmpty) {
+        return true;
+      } else {
+        return false;
+      }
+    } on FirebaseException catch (e) {
+      print(e.message);
+      return true;
+    }
+  }
+
+  Future<void> updateCurrentUserPassword(
+      BuildContext context, String newPassword) async {
+    try {
+      await user?.updatePassword(newPassword);
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+      //showSnackBar(context, text)
+    }
+  }
+
+  Future<void> sendPasswordResetEmail(
+      BuildContext context, String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      // if (e = )
+      print(e.message);
     }
   }
 }

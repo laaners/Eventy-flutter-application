@@ -93,7 +93,7 @@ class CustomDelegate extends SearchDelegate<String> {
                 itemCount: usersData.length,
                 itemBuilder: (_, i) {
                   var user = usersData[i];
-                  return UserTile(
+                  return UserTileSearch(
                     userData: user,
                   );
                 },
@@ -103,9 +103,9 @@ class CustomDelegate extends SearchDelegate<String> {
   }
 }
 
-class UserTile extends StatelessWidget {
+class UserTileSearch extends StatelessWidget {
   final UserCollection userData;
-  const UserTile({super.key, required this.userData});
+  const UserTileSearch({super.key, required this.userData});
 
   @override
   Widget build(BuildContext context) {
