@@ -242,7 +242,7 @@ class FirebaseUser extends ChangeNotifier {
     return [];
   }
 
-  Future<void> updateUserData(BuildContext context, String username,
+  Future<bool> updateUserData(BuildContext context, String username,
       String name, String surname, String email) async {
     try {
       var uid = _auth.currentUser!.uid;
@@ -260,10 +260,11 @@ class FirebaseUser extends ChangeNotifier {
       _userData = userEntity;
 
       notifyListeners();
+      return true;
     } on FirebaseException catch (e) {
-      print(e.message!);
       showSnackBar(context, e.message!);
     }
+    return false;
   }
 
   Future<void> updateProfilePic(BuildContext context, String profileUrl) async {

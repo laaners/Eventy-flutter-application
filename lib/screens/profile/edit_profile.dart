@@ -1,5 +1,6 @@
 import 'package:dima_app/screens/profile/change_image.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
+import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -159,17 +160,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: ElevatedButton(
                 onPressed: () async {
                   if (_formkey.currentState!.validate()) {
-                    // TODO: add updateUserData() here or in onWillPopAttribute,
-                    // in the second case the info is update pressing back: if the
-                    // operation is successful pop the window else display error message.
                     // ignore: use_build_context_synchronously
-                    //await Provider.of<FirebaseUser>(context, listen: false).updateUserData(context, username, name, surname, email))
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      // TODO: personalize message.
-                      const SnackBar(
-                        content: Text('Processing Data'),
-                      ),
-                    );
+                    if (await Provider.of<FirebaseUser>(context, listen: false)
+                            .updateUserData(
+                                context,
+                                _usernameController.text,
+                                _nameController.text,
+                                _surnameController.text,
+                                _emailController.text) ==
+                        true) {
+                      // ignore: use_build_context_synchronously
+                      showSnackBar(
+                          context, "Your information has been updated!");
+                    }
                   }
                 },
                 style: const ButtonStyle(
