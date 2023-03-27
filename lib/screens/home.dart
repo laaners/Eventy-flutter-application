@@ -33,7 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar("Home"),
+      appBar: MyAppBar(
+        title: "Home",
+        upRightActions: [MyAppBar.SearchAction(context)],
+      ),
       body: Column(
         children: [
           const Text("ok"),
@@ -41,22 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ListView(
               controller: _scroll,
               children: [
-                StepInvite(
-                  inviteeIds: inviteeIds,
-                  addInvitee: (String uid) {
-                    setState(() {
-                      if (!inviteeIds.contains(uid)) {
-                        inviteeIds.add(uid);
-                      }
-                    });
-                  },
-                  removeInvitee: (String uid) {
-                    setState(() {
-                      inviteeIds.removeWhere((item) => item == uid);
-                    });
-                  },
-                ),
-
                 MyButton(
                   onPressed: () {
                     FirebaseCrudsTesting.createFollowingFollowers(context);

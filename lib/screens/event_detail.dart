@@ -8,7 +8,10 @@ class EventDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar("Event Detail"),
+      appBar: MyAppBar(
+        title: "Event Detail",
+        upRightActions: [MyAppBar.SearchAction(context)],
+      ),
       body: ElevatedButton(
         onPressed: () {
           Navigator.push(

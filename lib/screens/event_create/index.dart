@@ -47,7 +47,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   Map<String, dynamic> dates = {};
 
   // stepInvite
-  List<String> inviteeIds = [];
+  List<UserCollection> invitees = [];
 
   @override
   void dispose() {
@@ -197,18 +197,18 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             ),
           ),
           content: StepInvite(
-            inviteeIds: inviteeIds,
-            addInvitee: (String uid) {
+            invitees: invitees,
+            addInvitee: (UserCollection user) {
               setState(() {
-                if (!inviteeIds.contains(uid)) {
+                if (!invitees.map((_) => _.uid).toList().contains(user.uid)) {
                   // inviteeIds.add(uid);
-                  inviteeIds.insert(0, uid);
+                  invitees.insert(0, user);
                 }
               });
             },
-            removeInvitee: (String uid) {
+            removeInvitee: (UserCollection user) {
               setState(() {
-                inviteeIds.removeWhere((item) => item == uid);
+                invitees.removeWhere((item) => item.uid == user.uid);
               });
             },
           ),
@@ -218,7 +218,10 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar("New Event"),
+      appBar: MyAppBar(
+        title: "New Event",
+        upRightActions: [MyAppBar.SearchAction(context)],
+      ),
       body: Theme(
         data: ThemeData(
           canvasColor: Provider.of<ThemeSwitch>(context)
@@ -330,13 +333,14 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 pollEventId: pollId,
                 inviteeId: curUid,
               );
-              await Future.wait(inviteeIds
-                  .map((uid) => Provider.of<FirebasePollEventInvite>(context,
+              await Future.wait(invitees
+                  .map((invitee) => Provider.of<FirebasePollEventInvite>(
+                              context,
                               listen: false)
                           .createPollEventInvite(
                         context: context,
                         pollEventId: pollId,
-                        inviteeId: uid,
+                        inviteeId: invitee.uid,
                       ))
                   .toList());
               LoadingOverlay.hide(context);

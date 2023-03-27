@@ -50,7 +50,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar("Edit profile"),
+      appBar: MyAppBar(
+        title: "Edit Profile",
+        upRightActions: [MyAppBar.SearchAction(context)],
+      ),
       body: Form(
         key: _formkey,
         // TODO: (?) remove update button and make the update on back button using

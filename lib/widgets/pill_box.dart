@@ -15,7 +15,7 @@ class PillBox extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           decoration: BoxDecoration(
-            color: Provider.of<ThemeSwitch>(context, listen: false)
+            color: Provider.of<ThemeSwitch>(context, listen: true)
                 .themeData
                 .scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(35),

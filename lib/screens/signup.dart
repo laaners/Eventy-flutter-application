@@ -11,7 +11,6 @@ class SignUpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       // todo: remove appBar
-      appBar: MyAppBar("Sign Up"),
       body: SignUpForm(),
     );
   }

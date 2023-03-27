@@ -15,7 +15,23 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(50);
   final String title;
-  const MyAppBar(this.title, {super.key});
+  final List<Widget> upRightActions;
+
+  const MyAppBar(
+      {super.key, required this.title, required this.upRightActions});
+
+  static Widget SearchAction(context) => TextButton(
+        onPressed: () async {
+          await showSearch<String>(
+            context: context,
+            delegate: CustomDelegate(),
+          );
+        },
+        child: Icon(
+          Icons.search,
+          color: Provider.of<ThemeSwitch>(context).themeData.primaryColor,
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -25,20 +41,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Colors.transparent,
       iconTheme:
           Provider.of<ThemeSwitch>(context).themeData.appBarTheme.iconTheme,
-      actions: [
-        TextButton(
-          onPressed: () async {
-            await showSearch<String>(
-              context: context,
-              delegate: CustomDelegate(),
-            );
-          },
-          child: Icon(
-            Icons.search,
-            color: Provider.of<ThemeSwitch>(context).themeData.primaryColor,
-          ),
-        ),
-      ],
+      actions: upRightActions,
     );
   }
 }

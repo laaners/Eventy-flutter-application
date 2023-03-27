@@ -84,7 +84,7 @@ class _UserTileState extends State<UserTile> {
             leading: ProfilePic(
               loading: false,
               userData: userData,
-              radius: 30,
+              radius: 25,
             ),
             title: Text("${userData.name} ${userData.surname}"),
             subtitle: Text(userData.username),

@@ -15,7 +15,10 @@ class ViewProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar(userData.username),
+      appBar: MyAppBar(
+        title: userData.name,
+        upRightActions: [MyAppBar.SearchAction(context)],
+      ),
       body: ListView(children: [
         ProfileInfo(
           userData: userData,

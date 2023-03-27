@@ -1,3 +1,4 @@
+import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/poll_detail/location_detail.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/location.dart';
@@ -6,6 +7,7 @@ import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/my_button.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -43,19 +45,40 @@ class _LocationsListState extends State<LocationsList> {
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     return Column(
       children: [
-        MyButton(
-          text: "sort test",
-          onPressed: () {
-            setState(() {
-              sortedByVotes = !sortedByVotes;
-              if (sortedByVotes) {
-                votesLocations.sort((a, b) =>
-                    b.getPositiveVotes().length - a.getPositiveVotes().length);
-              } else {
-                votesLocations.sort((a, b) => a.votes.length - b.votes.length);
-              }
-            });
-          },
+        Container(
+          alignment: Alignment.topRight,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    votesLocations.sort(
+                        (a, b) => a.locationName.compareTo(b.locationName));
+                  });
+                },
+                icon: Icon(
+                  Icons.sort_by_alpha,
+                  color:
+                      Provider.of<ThemeSwitch>(context).themeData.primaryColor,
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    votesLocations.sort((a, b) =>
+                        b.getPositiveVotes().length -
+                        a.getPositiveVotes().length);
+                  });
+                },
+                icon: Icon(
+                  Icons.sort,
+                  color:
+                      Provider.of<ThemeSwitch>(context).themeData.primaryColor,
+                ),
+              ),
+            ],
+          ),
         ),
         Column(
           children: votesLocations.map((voteLocation) {
@@ -152,6 +175,7 @@ class LocationTile extends StatelessWidget {
           ],
         ),
         onTap: () async {
+          /*
           await showModalBottomSheet(
             useRootNavigator: true,
             isScrollControlled: true,
@@ -166,6 +190,21 @@ class LocationTile extends StatelessWidget {
                 modifyVote: modifyVote,
               ),
             ),
+          );
+          */
+          MyModal.show(
+            context: context,
+            child: LocationDetail(
+              pollId: pollId,
+              organizerUid: organizerUid,
+              invites: invites,
+              location: location,
+              modifyVote: modifyVote,
+            ),
+            heightFactor: 0.85,
+            doneCancelMode: false,
+            onDone: () {},
+            title: "",
           );
           /*
           Navigator.push(

@@ -16,7 +16,10 @@ class EventsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar("Events"),
+      appBar: MyAppBar(
+        title: "Events",
+        upRightActions: [MyAppBar.SearchAction(context)],
+      ),
       body: ListView(
         children: [
           const Center(

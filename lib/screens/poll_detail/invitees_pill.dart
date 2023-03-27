@@ -1,16 +1,14 @@
-import 'dart:math';
-
+import 'package:dima_app/screens/profile/profile_pic.dart';
 import 'package:dima_app/server/firebase_user.dart';
-import 'package:dima_app/server/firebase_vote.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/pill_box.dart';
-import 'package:dima_app/widgets/user_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+
+import '../../widgets/user_list.dart';
 
 class InviteesPill extends StatelessWidget {
   final String pollEventId;
@@ -23,82 +21,78 @@ class InviteesPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void insert() async {
-      var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-      for (var e in invites) {
-        var uid = e.inviteeId;
-        if (uid == curUid) continue;
-        final random = Random();
-        int next(int min, int max) => min + random.nextInt(max - min);
-        /*
-        await Provider.of<FirebaseVote>(context, listen: false)
-            .userVoteLocation(
-          context,
-          pollEventId,
-          "Virtual meeting",
-          uid,
-          next(-1, 3),
-        );
-        print("added");
-        */
-
-        await Provider.of<FirebaseVote>(context, listen: false).userVoteDate(
-          context,
-          pollEventId,
-          "2023-03-25",
-          "20:10",
-          "18:10",
-          uid,
-          next(-1, 3),
-        );
-        print("added");
-        /*
-        */
-      }
-    }
-
     return Container(
-      width: 40,
-      margin: const EdgeInsets.symmetric(horizontal: 50),
+      margin: const EdgeInsets.symmetric(horizontal: 100),
       child: SizedBox(
         child: PillBox(
           child: InkWell(
-            onTap: () async {
-              await Share.share(
-                'https://www.youtube.com,Nice Service',
-                subject: "ok",
-              );
-              /*
+            onTap: () {
               Navigator.push(
                 context,
                 ScreenTransition(
                   builder: (context) => Scaffold(
-                    appBar: const MyAppBar("Poll Partecipants"),
+                    appBar: MyAppBar(
+                      title: "Partecipants",
+                      upRightActions: [MyAppBar.SearchAction(context)],
+                    ),
                     body: UserList(
-                      users: invites.map((e) {
-                        return e.inviteeId;
-                      }).toList(),
+                      users: invites.map((e) => e.inviteeId).toList(),
                     ),
                   ),
                 ),
               );
-              */
-              // insert();
             },
-            child: Row(
-              children: [
-                Text(
-                  "${invites.length.toString()} partecipants",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: 80,
+                    width: 210,
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          left: 0,
+                          child: ProfilePic(
+                            userData: Provider.of<FirebaseUser>(context,
+                                    listen: false)
+                                .userData,
+                            loading: false,
+                            radius: 40,
+                          ),
+                        ),
+                        Positioned(
+                          left: 60,
+                          child: ProfilePic(
+                            userData: Provider.of<FirebaseUser>(context,
+                                    listen: false)
+                                .userData,
+                            loading: false,
+                            radius: 40,
+                          ),
+                        ),
+                        Positioned(
+                          left: 120,
+                          child: ProfilePic(
+                            userData: Provider.of<FirebaseUser>(context,
+                                    listen: false)
+                                .userData,
+                            loading: false,
+                            radius: 40,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const Icon(
-                  Icons.arrow_forward_ios_sharp,
-                  color: Palette.greyColor,
-                ),
-              ],
+                  Text(
+                    "${invites.length.toString()} partecipants",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
