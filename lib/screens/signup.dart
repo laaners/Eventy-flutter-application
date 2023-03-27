@@ -33,6 +33,7 @@ class _SignUpFormState extends State<SignUpForm> {
   final _passwordController = TextEditingController();
 
   bool _passwordInvisible = true;
+  bool _usernameAlreadyExist = false;
 
   @override
   void dispose() {
@@ -54,6 +55,7 @@ class _SignUpFormState extends State<SignUpForm> {
           Container(
             margin: const EdgeInsets.fromLTRB(20, 20, 20, 20),
             child: TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _usernameController,
               decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.face, color: Colors.grey),
@@ -61,9 +63,21 @@ class _SignUpFormState extends State<SignUpForm> {
                 labelText: 'Username',
                 labelStyle: TextStyle(fontStyle: FontStyle.italic),
               ),
+              onChanged: (username) async {
+                // TODO: add delay to the call
+                bool tmp =
+                    await Provider.of<FirebaseUser>(context, listen: false)
+                        .usernameAlreadyExists(username);
+                setState(() {
+                  _usernameAlreadyExist = tmp;
+                  print(_usernameAlreadyExist);
+                });
+              },
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Username cannot be empty';
+                } else if (_usernameAlreadyExist) {
+                  return 'Username already exists';
                 }
                 return null;
               },
@@ -197,8 +211,8 @@ class _SignUpFormState extends State<SignUpForm> {
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar and call a server or save the information in the database.
-                  // TODO: if the user is created (perform a login and then move the home page).
-                  await Provider.of<FirebaseUser>(context, listen: false)
+                  // TODO: if the operation is successful move the home page.
+                  if (await Provider.of<FirebaseUser>(context, listen: false)
                       .signUpWithEmail(
                           email: _emailController.text,
                           password: _passwordController.text,
@@ -206,7 +220,10 @@ class _SignUpFormState extends State<SignUpForm> {
                           name: _nameController.text,
                           surname: _surnameController.text,
                           profilePic: "default",
-                          context: context);
+                          context: context)) {
+                    Navigator.pop(context);
+                  }
+
                   // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
                     // TODO: personalize message:
