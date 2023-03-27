@@ -11,7 +11,6 @@ class SignUpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       // todo: remove appBar
-      appBar: MyAppBar("Sign Up"),
       body: SignUpForm(),
     );
   }
@@ -212,15 +211,18 @@ class _SignUpFormState extends State<SignUpForm> {
                 if (_formKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar and call a server or save the information in the database.
                   // TODO: if the operation is successful move the home page.
+                  // ignore: use_build_context_synchronously
                   if (await Provider.of<FirebaseUser>(context, listen: false)
                       .signUpWithEmail(
-                          email: _emailController.text,
-                          password: _passwordController.text,
-                          username: _usernameController.text,
-                          name: _nameController.text,
-                          surname: _surnameController.text,
-                          profilePic: "default",
-                          context: context)) {
+                    email: _emailController.text,
+                    password: _passwordController.text,
+                    username: _usernameController.text,
+                    name: _nameController.text,
+                    surname: _surnameController.text,
+                    profilePic: "default",
+                    context: context,
+                  )) {
+                    // ignore: use_build_context_synchronously
                     Navigator.pop(context);
                   }
 

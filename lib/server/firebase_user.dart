@@ -41,22 +41,6 @@ class FirebaseUser extends ChangeNotifier {
     return _userData;
   }
 
-  Future<void> signUpWithEmailNoVerification({
-    required String email,
-    required String password,
-    required BuildContext context,
-  }) async {
-    try {
-      await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-    } on FirebaseAuthException catch (e) {
-      debugPrint(e.message);
-      showSnackBar(context, e.message!);
-    }
-  }
-
   Future<bool> signUpWithEmail({
     required String email,
     required String password,
@@ -71,6 +55,7 @@ class FirebaseUser extends ChangeNotifier {
           await userCollection.where('username', isEqualTo: username).get();
 
       if (usernameValidation.docs.isNotEmpty) {
+        // ignore: use_build_context_synchronously
         showSnackBar(context, "Choose another username!");
         return false;
       }
@@ -90,9 +75,9 @@ class FirebaseUser extends ChangeNotifier {
         surname: surname,
         profilePic: profilePic,
       );
-      await userCollection
-          .doc(userCredential.user!.uid)
-          .set(userEntity.toMap());
+      Map<String, dynamic> userMap = userEntity.toMap();
+      userMap["username_lower"] = username.toLowerCase();
+      await userCollection.doc(userCredential.user!.uid).set(userMap);
       _userData = userEntity;
       notifyListeners();
       return true;
@@ -142,8 +127,11 @@ class FirebaseUser extends ChangeNotifier {
     }
   }
 
-  Future<void> logInWithUsername(
-      BuildContext context, String username, String password) async {
+  Future<void> logInWithUsername({
+    required BuildContext context,
+    required String username,
+    required String password,
+  }) async {
     try {
       var usernameValidation =
           await userCollection.where('username', isEqualTo: username).get();
@@ -152,9 +140,11 @@ class FirebaseUser extends ChangeNotifier {
         String email = (usernameValidation.docs[0].data()
             as Map<String, dynamic>)['email'];
 
+        // ignore: use_build_context_synchronously
         await loginWithEmail(
             email: email, password: password, context: context);
       } else {
+        // ignore: use_build_context_synchronously
         showSnackBar(context, "Username does not exists");
       }
     } on FirebaseException catch (e) {
@@ -175,15 +165,11 @@ class FirebaseUser extends ChangeNotifier {
   Future<bool> reauthenticationCurrentUser(
       BuildContext context, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(
-        email: userData!.email,
-        password: password,
-      );
+      loginWithEmail(
+          email: userData!.email, password: password, context: context);
       return true;
     } on FirebaseException catch (e) {
       showSnackBar(context, e.message!);
-    } catch (e) {
-      print(e);
     }
     return false;
   }
@@ -223,9 +209,10 @@ class FirebaseUser extends ChangeNotifier {
   ) async {
     try {
       var users = await userCollection
-          .orderBy('username')
-          .where('username', isGreaterThanOrEqualTo: pattern)
-          .where('username', isLessThan: '${pattern}z')
+          .orderBy('username_lower')
+          .where('username_lower',
+              isGreaterThanOrEqualTo: pattern.toLowerCase())
+          .where('username_lower', isLessThan: '${pattern.toLowerCase()}z')
           .limit(10)
           .get();
       if (users.docs.isNotEmpty) {

@@ -32,6 +32,8 @@ class Palette {
       bodySmall: TextStyle(color: Colors.white30),
       bodyMedium: TextStyle(color: Colors.white),
       bodyLarge: TextStyle(color: Colors.white70),
+      titleMedium: TextStyle(color: Colors.white),
+      titleLarge: TextStyle(color: Colors.white),
     ),
     iconTheme: const IconThemeData(color: whiteColor),
   );
@@ -43,7 +45,8 @@ class Palette {
       backgroundColor: drawerColor,
       elevation: 0,
       iconTheme: IconThemeData(
-        color: whiteColor,
+        // color: whiteColor,
+        color: blackColor,
       ),
     ),
     drawerTheme: const DrawerThemeData(
@@ -54,6 +57,8 @@ class Palette {
       bodySmall: TextStyle(color: Colors.black38),
       bodyMedium: TextStyle(color: Colors.black),
       bodyLarge: TextStyle(color: Colors.black87),
+      titleMedium: TextStyle(color: Colors.black),
+      titleLarge: TextStyle(color: Colors.black),
     ),
     iconTheme: const IconThemeData(color: whiteColor),
     listTileTheme: const ListTileThemeData(textColor: Colors.black),

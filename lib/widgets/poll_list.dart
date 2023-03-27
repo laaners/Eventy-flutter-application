@@ -1,4 +1,5 @@
 import 'package:dima_app/screens/error.dart';
+import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
@@ -19,11 +20,19 @@ class PollList extends StatefulWidget {
 }
 
 class _PollListState extends State<PollList> {
+  Future<List<PollCollection>>? _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = Provider.of<FirebasePoll>(context, listen: false)
+        .getUserPolls(context, widget.userUid);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Provider.of<FirebasePoll>(context, listen: false)
-          .getUserPolls(context, widget.userUid),
+      future: _future,
       builder: (
         context,
         snapshot,
@@ -66,6 +75,7 @@ class PollTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String pollId = "${pollData.pollName}_${pollData.organizerUid}";
     return SizedBox(
       height: 80,
       child: ListTile(
@@ -75,7 +85,16 @@ class PollTile extends StatelessWidget {
         ),
         title: Text(pollData.pollName),
         subtitle: Text(pollData.organizerUid),
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            ScreenTransition(
+              builder: (context) => PollDetailScreen(
+                pollId: pollId,
+              ),
+            ),
+          );
+        },
       ),
     );
   }

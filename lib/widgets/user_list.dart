@@ -12,7 +12,6 @@ import '../server/firebase_user.dart';
 
 class UserList extends StatelessWidget {
   final List<String> users;
-
   const UserList({super.key, required this.users});
 
   @override
@@ -32,15 +31,28 @@ class UserList extends StatelessWidget {
   }
 }
 
-class UserTile extends StatelessWidget {
+class UserTile extends StatefulWidget {
   final String userUid;
   const UserTile({super.key, required this.userUid});
 
   @override
+  State<UserTile> createState() => _UserTileState();
+}
+
+class _UserTileState extends State<UserTile> {
+  Future<UserCollection?>? _future;
+
+  @override
+  initState() {
+    super.initState();
+    _future = Provider.of<FirebaseUser>(context, listen: false)
+        .getUserData(context, widget.userUid);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Provider.of<FirebaseUser>(context, listen: false)
-          .getUserData(context, userUid),
+      future: _future,
       builder: (
         context,
         snapshot,
@@ -72,7 +84,7 @@ class UserTile extends StatelessWidget {
             leading: ProfilePic(
               loading: false,
               userData: userData,
-              radius: 30,
+              radius: 25,
             ),
             title: Text("${userData.name} ${userData.surname}"),
             subtitle: Text(userData.username),

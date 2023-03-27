@@ -26,18 +26,12 @@ class _MyTextFieldState extends State<MyTextField> {
   @override
   void initState() {
     super.initState();
-    _focus.addListener(_onFocusChange);
   }
 
   @override
   void dispose() {
     super.dispose();
-    _focus.removeListener(_onFocusChange);
     _focus.dispose();
-  }
-
-  void _onFocusChange() {
-    debugPrint("\t\t\tFocus: ${_focus.hasFocus.toString()}");
   }
 
   @override

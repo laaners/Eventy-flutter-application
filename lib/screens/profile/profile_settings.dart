@@ -62,8 +62,8 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.password),
-          title: const Text("Change password"),
+          leading: const Icon(Icons.logout),
+          title: const Text("Sign out"),
           trailing: const Icon(Icons.navigate_next),
           onTap: () {
             Navigator.push(
@@ -75,8 +75,8 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.logout),
-          title: const Text("Sign out"),
+          leading: const Icon(Icons.delete_forever),
+          title: const Text("Delete Account"),
           trailing: const Icon(Icons.navigate_next),
           onTap: () async {
             await Provider.of<FirebaseUser>(context, listen: false)

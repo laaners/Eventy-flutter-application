@@ -32,7 +32,10 @@ class _ChangeProfileScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar("Change password"),
+      appBar: MyAppBar(
+        title: "Change password",
+        upRightActions: [MyAppBar.SearchAction(context)],
+      ),
       body: Form(
         key: _formkey,
         child: ListView(

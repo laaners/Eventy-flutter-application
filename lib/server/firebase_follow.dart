@@ -28,6 +28,9 @@ class FirebaseFollow extends ChangeNotifier {
       _followersUid = List<String>.from(follow!["follower"]);
       _followingUid = List<String>.from(follow["following"]);
       notifyListeners();
+    } else {
+      _followersUid = [];
+      _followingUid = [];
     }
   }
 

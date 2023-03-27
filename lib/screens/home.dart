@@ -1,15 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dima_app/firebase_cruds_testing.dart';
 import 'package:dima_app/providers/theme_switch.dart';
+import 'package:dima_app/screens/event_create/step_invite.dart';
 import 'package:dima_app/screens/search.dart';
 import 'package:dima_app/server/firebase_crud.dart';
 import 'package:dima_app/server/firebase_follow.dart';
-import 'package:dima_app/server/firebase_poll.dart';
-import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/lists_switcher.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
+import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +18,6 @@ import 'package:provider/provider.dart';
 
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/provider_samples.dart';
-
-import '../widgets/search_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,11 +28,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scroll = ScrollController();
+  List<String> inviteeIds = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar("Home"),
+      appBar: MyAppBar(
+        title: "Home",
+        upRightActions: [MyAppBar.SearchAction(context)],
+      ),
       body: Column(
         children: [
           const Text("ok"),
@@ -41,6 +44,18 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ListView(
               controller: _scroll,
               children: [
+                MyButton(
+                  onPressed: () {
+                    FirebaseCrudsTesting.createFollowingFollowers(context);
+                  },
+                  text: "create followers/following",
+                ),
+                MyButton(
+                  onPressed: () {
+                    FirebaseCrudsTesting.createPolls(context);
+                  },
+                  text: "create polls",
+                ),
                 TextButton(
                   onPressed: () async {
                     const String url =

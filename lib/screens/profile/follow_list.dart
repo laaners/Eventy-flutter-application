@@ -15,7 +15,10 @@ class FollowListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar(title),
+      appBar: MyAppBar(
+        title: title,
+        upRightActions: [MyAppBar.SearchAction(context)],
+      ),
       body: UserList(
         users: users,
       ),

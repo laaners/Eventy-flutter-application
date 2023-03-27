@@ -10,7 +10,6 @@ class MyTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: alignment,
-      margin: const EdgeInsets.fromLTRB(22, 0, 0, 0),
       child: Text(
         text,
         style: const TextStyle(

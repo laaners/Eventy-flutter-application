@@ -11,7 +11,10 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar("Profile"),
+      appBar: MyAppBar(
+        title: "Profile",
+        upRightActions: [MyAppBar.SearchAction(context)],
+      ),
       body: ListView(
         children: [
           Container(

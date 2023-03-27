@@ -1,3 +1,5 @@
+import 'package:dima_app/screens/error.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:flutter/material.dart';
 
 class LoadingOverlay {
@@ -9,6 +11,23 @@ class LoadingOverlay {
       return const FullScreenLoader();
     });
     Overlay.of(context).insert(overlay!);
+    Future.delayed(const Duration(seconds: 5)).then((value) {
+      // if(overlay == null) // operation successful
+      if (overlay != null) {
+        // operation still waiting, push to error
+        hide(context);
+        Future.microtask(() {
+          Navigator.push(
+            context,
+            ScreenTransition(
+              builder: (context) => const ErrorScreen(
+                errorMsg: "snapshot.error.toString()",
+              ),
+            ),
+          );
+        });
+      }
+    });
   }
 
   static void hide(BuildContext context) {

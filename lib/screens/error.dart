@@ -9,7 +9,10 @@ class ErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar(""),
+      appBar: const MyAppBar(
+        title: "Error",
+        upRightActions: [],
+      ),
       body: Center(
         child: ListView(
           shrinkWrap: true,

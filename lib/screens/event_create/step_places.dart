@@ -1,9 +1,8 @@
 import 'package:dima_app/screens/event_create/select_location.dart';
 import 'package:dima_app/screens/event_create/select_virtual.dart';
 import 'package:dima_app/server/tables/location.dart';
+import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/themes/palette.dart';
-import 'package:dima_app/transitions/screen_transition.dart';
-import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';
 
@@ -71,7 +70,8 @@ class _StepPlacesState extends State<StepPlaces> {
                               margin:
                                   const EdgeInsets.only(top: 15, bottom: 15),
                               child: SelectVirtual(
-                                defaultOptions: Location("", "", "", 1, 1),
+                                defaultOptions:
+                                    Location("", "", 1, 1, "videocam"),
                                 locations: widget.locations,
                                 addLocation: widget.addLocation,
                                 removeLocation: widget.removeLocation,
@@ -130,7 +130,8 @@ class _StepPlacesState extends State<StepPlaces> {
                       locations: widget.locations,
                       addLocation: widget.addLocation,
                       removeLocation: widget.removeLocation,
-                      defaultLocation: Location("", "", "", 0, 0),
+                      defaultLocation:
+                          Location("", "", 0, 0, "location_on_outlined"),
                     ),
                   ),
                 ),
@@ -218,14 +219,11 @@ class _StepPlacesState extends State<StepPlaces> {
               },
             ),
           ),
-        for (var i = 0;
-            i <
-                widget.locations
-                    .where((_) => _.name != "Virtual meeting")
-                    .toList()
-                    .length;
-            i++)
-          Container(
+        ...widget.locations
+            .where((_) => _.name != "Virtual meeting")
+            .toList()
+            .map((location) {
+          return Container(
             padding: const EdgeInsets.symmetric(vertical: 1.0),
             decoration: const BoxDecoration(
               border: Border(
@@ -237,17 +235,11 @@ class _StepPlacesState extends State<StepPlaces> {
             ),
             child: ListTile(
               title: Text(
-                widget.locations
-                    .where((_) => _.name != "Virtual meeting")
-                    .toList()[i]
-                    .name,
+                location.name,
                 overflow: TextOverflow.ellipsis,
               ),
               subtitle: Text(
-                widget.locations
-                    .where((_) => _.name != "Virtual meeting")
-                    .toList()[i]
-                    .site,
+                location.site,
                 overflow: TextOverflow.ellipsis,
               ),
               leading: Container(
@@ -256,8 +248,8 @@ class _StepPlacesState extends State<StepPlaces> {
                   color: Palette.lightBGColor,
                   borderRadius: BorderRadius.circular(50),
                 ),
-                child: const Icon(
-                  Icons.location_on_outlined,
+                child: Icon(
+                  LocationIcons.icons[location.icon],
                   color: Palette.greyColor,
                 ),
               ),
@@ -266,10 +258,7 @@ class _StepPlacesState extends State<StepPlaces> {
                   Icons.cancel,
                 ),
                 onPressed: () {
-                  widget.removeLocation(widget.locations
-                      .where((_) => _.name != "Virtual meeting")
-                      .toList()[i]
-                      .name);
+                  widget.removeLocation(location.name);
                 },
               ),
               onTap: () {
@@ -285,16 +274,15 @@ class _StepPlacesState extends State<StepPlaces> {
                         locations: widget.locations,
                         addLocation: widget.addLocation,
                         removeLocation: widget.removeLocation,
-                        defaultLocation: widget.locations
-                            .where((_) => _.name != "Virtual meeting")
-                            .toList()[i],
+                        defaultLocation: location,
                       ),
                     ),
                   ),
                 );
               },
             ),
-          ),
+          );
+        }).toList(),
       ],
     );
   }

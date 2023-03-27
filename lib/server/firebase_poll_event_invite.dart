@@ -85,4 +85,22 @@ class FirebasePollEventInvite extends ChangeNotifier {
     }
     return [];
   }
+
+  Stream<DocumentSnapshot<Object?>>? getPollEventInviteSnapshot(
+    BuildContext context,
+    String pollId,
+    String uid,
+  ) {
+    try {
+      String pollEventInviteId = "${pollId}_$uid";
+      var document = FirebaseCrud.readSnapshot(
+        pollEventInviteCollection,
+        pollEventInviteId,
+      );
+      return document;
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return null;
+  }
 }
