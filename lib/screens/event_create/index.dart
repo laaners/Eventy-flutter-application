@@ -6,7 +6,6 @@ import 'package:dima_app/screens/event_create/step_basics.dart';
 import 'package:dima_app/screens/event_create/step_dates.dart';
 import 'package:dima_app/screens/event_create/step_invite.dart';
 import 'package:dima_app/screens/event_create/step_places.dart';
-import 'package:dima_app/screens/event_detail.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/firebase_poll.dart';

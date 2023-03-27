@@ -41,7 +41,7 @@ class FirebaseUser extends ChangeNotifier {
     return _userData;
   }
 
-  Future<void> signUpWithEmail({
+  Future<bool> signUpWithEmail({
     required String email,
     required String password,
     required String username,
@@ -57,7 +57,7 @@ class FirebaseUser extends ChangeNotifier {
       if (usernameValidation.docs.isNotEmpty) {
         // ignore: use_build_context_synchronously
         showSnackBar(context, "Choose another username!");
-        return;
+        return false;
       }
 
       UserCredential userCredential =
@@ -80,9 +80,11 @@ class FirebaseUser extends ChangeNotifier {
       await userCollection.doc(userCredential.user!.uid).set(userMap);
       _userData = userEntity;
       notifyListeners();
+      return true;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
+    return false;
   }
 
   Future<void> sendEmailVerification(BuildContext context) async {
@@ -227,13 +229,8 @@ class FirebaseUser extends ChangeNotifier {
     return [];
   }
 
-  Future<void> updateUserData(
-    BuildContext context,
-    String username,
-    String name,
-    String surname,
-    String email,
-  ) async {
+  Future<bool> updateUserData(BuildContext context, String username,
+      String name, String surname, String email) async {
     try {
       var uid = _auth.currentUser!.uid;
 
@@ -245,16 +242,16 @@ class FirebaseUser extends ChangeNotifier {
         surname: surname,
         profilePic: userData!.profilePic,
       );
-      Map<String, dynamic> userMap = userEntity.toMap();
-      userMap["username_lower"] = username.toLowerCase();
-      await userCollection.doc(uid).set(userMap);
+
+      await userCollection.doc(uid).set(userEntity.toMap());
       _userData = userEntity;
 
       notifyListeners();
+      return true;
     } on FirebaseException catch (e) {
-      print(e.message!);
       showSnackBar(context, e.message!);
     }
+    return false;
   }
 
   Future<void> updateProfilePic(BuildContext context, String profileUrl) async {
@@ -274,10 +271,8 @@ class FirebaseUser extends ChangeNotifier {
 
   Future<bool> usernameAlreadyExists(String username) async {
     try {
-      var usernameValidation = await userCollection
-          .where('username', isEqualTo: username)
-          .where('username', isNotEqualTo: userData!.username)
-          .get();
+      var usernameValidation =
+          await userCollection.where('username', isEqualTo: username).get();
 
       if (usernameValidation.docs.isNotEmpty) {
         return true;
@@ -290,14 +285,15 @@ class FirebaseUser extends ChangeNotifier {
     }
   }
 
-  Future<void> updateCurrentUserPassword(
+  Future<bool> updateCurrentUserPassword(
       BuildContext context, String newPassword) async {
     try {
       await user?.updatePassword(newPassword);
-    } on FirebaseAuthException catch (e) {
-      print(e.message);
-      //showSnackBar(context, text)
+      return true;
+    } on FirebaseException catch (e) {
+      showSnackBar(context, e.message);
     }
+    return false;
   }
 
   Future<void> sendPasswordResetEmail(
