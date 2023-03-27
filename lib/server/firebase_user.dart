@@ -57,7 +57,7 @@ class FirebaseUser extends ChangeNotifier {
     }
   }
 
-  Future<void> signUpWithEmail({
+  Future<bool> signUpWithEmail({
     required String email,
     required String password,
     required String username,
@@ -72,7 +72,7 @@ class FirebaseUser extends ChangeNotifier {
 
       if (usernameValidation.docs.isNotEmpty) {
         showSnackBar(context, "Choose another username!");
-        return;
+        return false;
       }
 
       UserCredential userCredential =
@@ -95,9 +95,11 @@ class FirebaseUser extends ChangeNotifier {
           .set(userEntity.toMap());
       _userData = userEntity;
       notifyListeners();
+      return true;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
+    return false;
   }
 
   Future<void> sendEmailVerification(BuildContext context) async {
@@ -173,11 +175,15 @@ class FirebaseUser extends ChangeNotifier {
   Future<bool> reauthenticationCurrentUser(
       BuildContext context, String password) async {
     try {
-      loginWithEmail(
-          email: userData!.email, password: password, context: context);
+      await _auth.signInWithEmailAndPassword(
+        email: userData!.email,
+        password: password,
+      );
       return true;
     } on FirebaseException catch (e) {
       showSnackBar(context, e.message!);
+    } catch (e) {
+      print(e);
     }
     return false;
   }
@@ -277,10 +283,8 @@ class FirebaseUser extends ChangeNotifier {
 
   Future<bool> usernameAlreadyExists(String username) async {
     try {
-      var usernameValidation = await userCollection
-          .where('username', isEqualTo: username)
-          .where('username', isNotEqualTo: userData!.username)
-          .get();
+      var usernameValidation =
+          await userCollection.where('username', isEqualTo: username).get();
 
       if (usernameValidation.docs.isNotEmpty) {
         return true;
@@ -293,14 +297,15 @@ class FirebaseUser extends ChangeNotifier {
     }
   }
 
-  Future<void> updateCurrentUserPassword(
+  Future<bool> updateCurrentUserPassword(
       BuildContext context, String newPassword) async {
     try {
       await user?.updatePassword(newPassword);
-    } on FirebaseAuthException catch (e) {
-      print(e.message);
-      //showSnackBar(context, text)
+      return true;
+    } on FirebaseException catch (e) {
+      showSnackBar(context, e.message);
     }
+    return false;
   }
 
   Future<void> sendPasswordResetEmail(

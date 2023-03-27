@@ -1,9 +1,10 @@
 import 'package:dima_app/screens/profile/edit_profile.dart';
-import 'package:dima_app/widgets/delete_dialog.dart';
+import 'package:dima_app/screens/profile/delete_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/theme_switch.dart';
+import '../../server/firebase_user.dart';
 import 'change_password.dart';
 
 class ProfileSettings extends StatefulWidget {
@@ -77,8 +78,9 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           leading: const Icon(Icons.logout),
           title: const Text("Sign out"),
           trailing: const Icon(Icons.navigate_next),
-          onTap: () {
-            // TODO: add transition to initial screen (LogInScreen?)
+          onTap: () async {
+            await Provider.of<FirebaseUser>(context, listen: false)
+                .signOut(context);
           },
         ),
         ListTile(
