@@ -86,7 +86,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Username cannot be empty';
-                  } else if (_usernameAlreadyExist) {
+                  } else if (_usernameAlreadyExist &&
+                      userData!.username != value) {
                     return 'Username already exists';
                   }
                   return null;
@@ -176,7 +177,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       EdgeInsets.all(20)),
                 ),
                 child: const Text(
-                  "UPDATE",
+                  "SAVE",
                   style: TextStyle(fontSize: 18),
                 ),
               ),
