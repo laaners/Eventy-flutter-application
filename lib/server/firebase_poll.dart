@@ -65,9 +65,11 @@ class FirebasePoll extends ChangeNotifier {
         return null;
       }
       var tmp = pollDataDoc.data() as Map<String, dynamic>;
-      tmp["locations"] = (tmp["locations"] as List)
-          .map((e) => e as Map<String, dynamic>)
-          .toList();
+      tmp["locations"] = (tmp["locations"] as List).map((e) {
+        e["lat"] = e["lat"].toDouble();
+        e["lon"] = e["lon"].toDouble();
+        return e as Map<String, dynamic>;
+      }).toList();
       // utc string
       tmp["deadline"] = DateFormatter.dateTime2String(tmp["deadline"].toDate());
       tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
@@ -86,13 +88,17 @@ class FirebasePoll extends ChangeNotifier {
     try {
       var documents =
           await pollCollection.where("organizerUid", isEqualTo: userUid).get();
-      print(documents.docs.toString());
       if (documents.docs.isNotEmpty) {
         final List<PollCollection> polls = documents.docs.map((doc) {
           var tmp = doc.data() as Map<String, dynamic>;
-          tmp["locations"] = (tmp["locations"] as List)
-              .map((e) => e as Map<String, dynamic>)
-              .toList();
+          tmp["locations"] = (tmp["locations"] as List).map((e) {
+            e["lat"] = e["lat"].toDouble();
+            e["lon"] = e["lon"].toDouble();
+            return e as Map<String, dynamic>;
+          }).toList();
+          tmp["deadline"] =
+              DateFormatter.dateTime2String(tmp["deadline"].toDate());
+          tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
           var pollDetails = PollCollection.fromMap(tmp);
           return pollDetails;
         }).toList();

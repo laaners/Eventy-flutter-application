@@ -20,7 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class PollDetailScreen extends StatelessWidget {
+class PollDetailScreen extends StatefulWidget {
   final String pollId;
 
   const PollDetailScreen({
@@ -28,22 +28,29 @@ class PollDetailScreen extends StatelessWidget {
     required this.pollId,
   });
 
+  @override
+  State<PollDetailScreen> createState() => _PollDetailScreenState();
+}
+
+class _PollDetailScreenState extends State<PollDetailScreen> {
+  Future<Map<String, dynamic>?>? _future;
+
   Future<Map<String, dynamic>?> getPollDataAndInvites(
       BuildContext context) async {
     PollCollection? pollData =
         await Provider.of<FirebasePoll>(context, listen: false)
-            .getPollData(context, pollId);
+            .getPollData(context, widget.pollId);
     if (pollData == null) return null;
     List<PollEventInviteCollection> pollInvites =
         // ignore: use_build_context_synchronously
         await Provider.of<FirebasePollEventInvite>(context, listen: false)
-            .getInvitesFromPollEventId(context, pollId);
+            .getInvitesFromPollEventId(context, widget.pollId);
     if (pollInvites.isEmpty) return null;
 
     List<VoteLocationCollection> votesLocations =
         await Future.wait(pollData.locations.map((location) {
       return Provider.of<FirebaseVote>(context, listen: false)
-          .getVotesLocation(context, pollId, location["name"])
+          .getVotesLocation(context, widget.pollId, location["name"])
           .then((value) {
         if (value != null) {
           value.votes[pollData.organizerUid] = Availability.yes;
@@ -51,7 +58,7 @@ class PollDetailScreen extends StatelessWidget {
         } else {
           return VoteLocationCollection(
             locationName: location["name"],
-            pollId: pollId,
+            pollId: widget.pollId,
             votes: {
               pollData.organizerUid: Availability.yes,
             },
@@ -64,14 +71,15 @@ class PollDetailScreen extends StatelessWidget {
         .map((date) {
           return pollData.dates[date].map((slot) {
             return Provider.of<FirebaseVote>(context, listen: false)
-                .getVotesDate(context, pollId, date, slot["start"], slot["end"])
+                .getVotesDate(
+                    context, widget.pollId, date, slot["start"], slot["end"])
                 .then((value) {
               if (value != null) {
                 value.votes[pollData.organizerUid] = Availability.yes;
                 return value;
               } else {
                 return VoteDateCollection(
-                  pollId: pollId,
+                  pollId: widget.pollId,
                   date: date,
                   start: slot["start"],
                   end: slot["end"],
@@ -89,7 +97,6 @@ class PollDetailScreen extends StatelessWidget {
         .cast();
 
     List<VoteDateCollection> votesDates = await Future.wait(promises);
-    print(votesDates[5]);
     List<VoteDateCollection> localDates = [];
     for (var voteDate in votesDates) {
       var startDateString = "${voteDate.date} ${voteDate.start}:00";
@@ -102,7 +109,7 @@ class PollDetailScreen extends StatelessWidget {
       var startLocal = DateFormat("HH:mm").format(startDateLocal);
       var endLocal = DateFormat("HH:mm").format(endDateLocal);
       localDates.add(VoteDateCollection(
-        pollId: pollId,
+        pollId: widget.pollId,
         date: localDay,
         start: startLocal,
         end: endLocal,
@@ -120,11 +127,17 @@ class PollDetailScreen extends StatelessWidget {
   }
 
   @override
+  initState() {
+    super.initState();
+    _future = getPollDataAndInvites(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MyAppBar("Poll Detail"),
       body: FutureBuilder<Map<String, dynamic>?>(
-        future: getPollDataAndInvites(context),
+        future: _future,
         builder: (
           BuildContext context,
           AsyncSnapshot<Map<String, dynamic>?> snapshot,
@@ -194,7 +207,7 @@ class PollDetailScreen extends StatelessWidget {
                     : pollData.pollDesc),
                 Container(padding: const EdgeInsets.symmetric(vertical: 5)),
                 InviteesPill(
-                  pollEventId: pollId,
+                  pollEventId: widget.pollId,
                   invites: pollInvites,
                 ),
                 Container(padding: const EdgeInsets.symmetric(vertical: 5)),
@@ -211,14 +224,14 @@ class PollDetailScreen extends StatelessWidget {
                   lists: [
                     LocationsList(
                       organizerUid: pollData.organizerUid,
-                      pollId: pollId,
+                      pollId: widget.pollId,
                       locations: pollData.locations,
                       invites: pollInvites,
                       votesLocations: votesLocations,
                     ),
                     DatesList(
                       organizerUid: pollData.organizerUid,
-                      pollId: pollId,
+                      pollId: widget.pollId,
                       dates: pollData.dates,
                       invites: pollInvites,
                       votesDates: votesDates,

@@ -13,10 +13,15 @@ class HorizontalScroller extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: children,
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: mainAxisAlignment,
+          crossAxisAlignment: crossAxisAlignment,
+          children: children,
+        ),
       ),
     );
   }

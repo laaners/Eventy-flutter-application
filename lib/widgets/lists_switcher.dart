@@ -1,9 +1,5 @@
-import 'package:dima_app/server/tables/poll_collection.dart';
-import 'package:dima_app/widgets/poll_list.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
-
-import 'event_list.dart';
 
 class ListsSwitcher extends StatefulWidget {
   final List<String> labels;
@@ -21,6 +17,7 @@ class ListsSwitcher extends StatefulWidget {
 
 class _ListsSwitcherState extends State<ListsSwitcher> {
   int _listIndex = 0;
+  int _showIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -102,9 +99,16 @@ class _ListsSwitcherState extends State<ListsSwitcher> {
           ],
         ),
         // todo: add widgets event_list and poll_list
-        Container(
-          child: widget.lists[_listIndex],
-        )
+        ...widget.lists.mapIndexed((index, child) {
+          return Visibility(
+            maintainState:
+                true, // in this way the child is not rebuilt every time we switch
+            visible: _listIndex == index,
+            child: Container(
+              child: child,
+            ),
+          );
+        }).toList(),
       ],
     );
   }

@@ -262,6 +262,7 @@ class MyPolls extends HookWidget {
                                 "You are the organizer, you must be present at the event!")) {
                               return;
                             }
+                            if (curUid == organizedUid) return;
                             MyPollOption? prevOption = votedOption.value;
                             if (isLoading.value) return;
                             votedOption.value = pollOption;
@@ -273,7 +274,8 @@ class MyPolls extends HookWidget {
                             );
                             isLoading.value = false;
                             if (success) {
-                              prevOption?.votes--;
+                              if (prevOption!.id == pollOption.id) return;
+                              prevOption.votes--;
                               pollOption.votes++;
                             }
                           },

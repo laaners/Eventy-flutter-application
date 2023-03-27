@@ -16,7 +16,6 @@ class _DeleteDialogState extends State<DeleteDialog> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _passwordController.dispose();
   }

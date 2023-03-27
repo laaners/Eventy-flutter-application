@@ -1,4 +1,5 @@
 import 'package:dima_app/screens/event_create/index.dart';
+import 'package:dima_app/screens/event_create/step_invite.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
@@ -31,7 +32,8 @@ class EventsScreen extends StatelessWidget {
                 context,
                 ScreenTransition(
                   builder: (context) => const PollDetailScreen(
-                    pollId: "gg_HB6d3gyBuwbG5RY1qK5bvqwdIkb2",
+                    pollId:
+                        "Event 0 of UsernameId0_u8oRJn2HdAQP459lnSVmFxgtsW93",
                   ),
                 ),
               );

@@ -6,6 +6,7 @@ import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
 import 'package:dima_app/server/tables/availability.dart';
 import 'package:dima_app/server/tables/location.dart';
+import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
 import 'package:dima_app/themes/palette.dart';
@@ -128,25 +129,23 @@ class LocationDetail extends StatelessWidget {
                     ),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
-                  alignment: Alignment.topLeft,
-                  child: const Text(
-                    "Description (optional)",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Palette.lightBGColor,
+                      borderRadius: BorderRadius.circular(50 + 5),
                     ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 15),
-                  child: MyTextField(
-                    maxLength: 200,
-                    maxLines: 6,
-                    hintText:
-                        "Add details and indications to reach this location",
-                    controller: TextEditingController(),
+                    child: IconButton(
+                      iconSize: 100.0,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {},
+                      icon: Icon(
+                        LocationIcons.icons[location.icon],
+                        color: Palette.greyColor,
+                      ),
+                    ),
                   ),
                 ),
                 Container(
@@ -200,7 +199,7 @@ class LocationDetail extends StatelessWidget {
                     }
                     userVotedOptionId = organizerUid == curUid
                         ? Availability.yes
-                        : Availability.empty;
+                        : userVotedOptionId;
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 15),
                       child: MyPolls(

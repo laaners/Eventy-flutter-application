@@ -1,5 +1,6 @@
 import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/server/tables/location.dart';
+import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
@@ -28,7 +29,6 @@ class SelectVirtual extends StatefulWidget {
 
 class _SelectVirtualState extends State<SelectVirtual> {
   TextEditingController locationNameController = TextEditingController();
-  TextEditingController locationDescController = TextEditingController();
   TextEditingController locationAddrController = TextEditingController();
   List<String> locationSuggestions = [];
   String location = "Search Location";
@@ -37,7 +37,6 @@ class _SelectVirtualState extends State<SelectVirtual> {
   void initState() {
     super.initState();
     locationNameController.text = "Virtual meeting";
-    locationDescController.text = widget.defaultOptions.description;
     locationAddrController.text = widget.defaultOptions.site;
   }
 
@@ -62,10 +61,10 @@ class _SelectVirtualState extends State<SelectVirtual> {
               onPressed: () {
                 widget.addLocation(Location(
                   locationNameController.text,
-                  locationDescController.text,
                   locationAddrController.text,
                   0,
                   0,
+                  "videocam",
                 ));
                 widget.setVirtualMeeting(true);
                 Navigator.pop(context);
@@ -82,10 +81,10 @@ class _SelectVirtualState extends State<SelectVirtual> {
     Navigator.pop(context);
     widget.addLocation(Location(
       locationNameController.text,
-      locationDescController.text,
       locationAddrController.text,
       0,
       0,
+      "videocam",
     ));
   }
 
@@ -146,72 +145,25 @@ class _SelectVirtualState extends State<SelectVirtual> {
                 bottom: MediaQuery.of(context).viewInsets.bottom),
             child: ListView(
               children: [
-                Container(
-                  margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
-                  alignment: Alignment.topLeft,
-                  child: const Text(
-                    "Name",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 15),
+                Center(
                   child: Container(
+                    padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Palette.greyColor),
+                      color: Palette.lightBGColor,
+                      borderRadius: BorderRadius.circular(50 + 5),
                     ),
-                    child: TextFormField(
-                      enabled: false,
-                      autofocus: false,
-                      controller: locationNameController,
-                      keyboardType: TextInputType.text,
-                      minLines: 1,
-                      maxLines: null, // widget.maxLines,
-                      style: TextStyle(
-                        color: Provider.of<ThemeSwitch>(context)
-                            .themeData
-                            .primaryColor,
+                    child: IconButton(
+                      iconSize: 100.0,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {},
+                      icon: Icon(
+                        LocationIcons.videocam,
+                        color: Palette.greyColor,
                       ),
-                      buildCounter: (
-                        context, {
-                        required currentLength,
-                        required isFocused,
-                        maxLength,
-                      }) {
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(15),
-                      ),
-                      maxLength: 40,
                     ),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
-                  alignment: Alignment.topLeft,
-                  child: const Text(
-                    "Description (optional)",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 15),
-                  child: MyTextField(
-                    maxLength: 200,
-                    maxLines: 6,
-                    hintText: "Virtual room on the ... platform",
-                    controller: locationDescController,
-                  ),
-                ),
-                const Padding(padding: EdgeInsets.only(top: 8)),
                 ListTile(
                   title: const Text(
                     "Virtual room link (optional)",

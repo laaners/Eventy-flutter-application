@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/providers/dynamic_links_handler.dart';
 import 'package:dima_app/providers/theme_switch.dart';
-import 'package:dima_app/screens/event_detail.dart';
 import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/login.dart';
@@ -23,7 +22,7 @@ import 'package:provider/provider.dart';
 import 'package:dima_app/provider_samples.dart';
 import 'firebase_options.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

@@ -200,13 +200,14 @@ class _SignUpFormState extends State<SignUpForm> {
                   // TODO: if the user is created (perform a login and then move the home page).
                   await Provider.of<FirebaseUser>(context, listen: false)
                       .signUpWithEmail(
-                          email: _emailController.text,
-                          password: _passwordController.text,
-                          username: _usernameController.text,
-                          name: _nameController.text,
-                          surname: _surnameController.text,
-                          profilePic: "default",
-                          context: context);
+                    email: _emailController.text,
+                    password: _passwordController.text,
+                    username: _usernameController.text,
+                    name: _nameController.text,
+                    surname: _surnameController.text,
+                    profilePic: "default",
+                    context: context,
+                  );
                   // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
                     // TODO: personalize message:

@@ -4,6 +4,7 @@ import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/event_create/my_stepper.dart';
 import 'package:dima_app/screens/event_create/step_basics.dart';
 import 'package:dima_app/screens/event_create/step_dates.dart';
+import 'package:dima_app/screens/event_create/step_invite.dart';
 import 'package:dima_app/screens/event_create/step_places.dart';
 import 'package:dima_app/screens/event_detail.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
@@ -13,6 +14,7 @@ import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
+import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
@@ -43,6 +45,9 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
 
   // stepDates;
   Map<String, dynamic> dates = {};
+
+  // stepInvite
+  List<String> inviteeIds = [];
 
   @override
   void dispose() {
@@ -112,18 +117,19 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             ),
           ),
           content: StepPlaces(
-              locations: locations,
-              addLocation: (location) {
-                setState(() {
-                  locations.add(location);
-                  locations.sort((a, b) => a.name.compareTo(b.name));
-                });
-              },
-              removeLocation: (locationName) {
-                setState(() {
-                  locations.removeWhere((item) => item.name == locationName);
-                });
-              }),
+            locations: locations,
+            addLocation: (location) {
+              setState(() {
+                locations.add(location);
+                locations.sort((a, b) => a.name.compareTo(b.name));
+              });
+            },
+            removeLocation: (locationName) {
+              setState(() {
+                locations.removeWhere((item) => item.name == locationName);
+              });
+            },
+          ),
         ),
         MyStep(
           isActive: _activeStepIndex >= 2,
@@ -177,6 +183,34 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
               });
             },
             deadlineController: deadlineController,
+          ),
+        ),
+        MyStep(
+          isActive: _activeStepIndex >= 3,
+          title: const Text(""),
+          label: Text(
+            "Invite",
+            style: TextStyle(
+              color: Provider.of<ThemeSwitch>(context, listen: false)
+                  .themeData
+                  .primaryColor,
+            ),
+          ),
+          content: StepInvite(
+            inviteeIds: inviteeIds,
+            addInvitee: (String uid) {
+              setState(() {
+                if (!inviteeIds.contains(uid)) {
+                  // inviteeIds.add(uid);
+                  inviteeIds.insert(0, uid);
+                }
+              });
+            },
+            removeInvitee: (String uid) {
+              setState(() {
+                inviteeIds.removeWhere((item) => item == uid);
+              });
+            },
           ),
         ),
       ];
@@ -259,10 +293,10 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
               var locationsMap = locations.map((location) {
                 return {
                   "name": location.name,
-                  "desc": location.description,
                   "site": location.site,
                   "lat": location.lat,
                   "lon": location.lon,
+                  "icon": location.icon,
                 };
               }).toList();
               LoadingOverlay.show(context);
@@ -296,6 +330,15 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 pollEventId: pollId,
                 inviteeId: curUid,
               );
+              await Future.wait(inviteeIds
+                  .map((uid) => Provider.of<FirebasePollEventInvite>(context,
+                              listen: false)
+                          .createPollEventInvite(
+                        context: context,
+                        pollEventId: pollId,
+                        inviteeId: uid,
+                      ))
+                  .toList());
               LoadingOverlay.hide(context);
               Navigator.of(context).pop();
               Navigator.push(

@@ -1,9 +1,8 @@
+import 'package:dima_app/firebase_cruds_testing.dart';
 import 'package:dima_app/screens/password_reset.dart';
-import 'package:dima_app/screens/profile/change_password.dart';
 import 'package:dima_app/screens/signup.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
-import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -33,13 +32,10 @@ class _LogInFormState extends State<LogInForm> {
 
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-
   bool _passwordVisible = false;
-  bool _rememberUser = false;
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -50,13 +46,23 @@ class _LogInFormState extends State<LogInForm> {
     return ListView(
       children: [
         TextButton(
+          key: GlobalKey(debugLabel: 'test1'),
+          onPressed: () async {
+            LoadingOverlay.show(context);
+            FirebaseCrudsTesting.signUpNewUsers(context);
+            LoadingOverlay.hide(context);
+          },
+          child: const Text("Create some users"),
+        ),
+        TextButton(
+          key: GlobalKey(debugLabel: 'test1'),
           onPressed: () async {
             LoadingOverlay.show(context);
             await Provider.of<FirebaseUser>(context, listen: false)
-                .loginWithEmail(
-              email: "test12@test.it", //"ok@ok.it",
-              password: "password",
+                .logInWithUsername(
               context: context,
+              username: "UsernameId0",
+              password: "password",
             );
             LoadingOverlay.hide(context);
           },
@@ -170,8 +176,11 @@ class _LogInFormState extends State<LogInForm> {
                       // If the form is valid, display a snackbar. In the real world,
                       // you'd often call a server or save the information in a database.
                       await Provider.of<FirebaseUser>(context, listen: false)
-                          .logInWithUsername(context, _usernameController.text,
-                              _passwordController.text);
+                          .logInWithUsername(
+                        context: context,
+                        username: _usernameController.text,
+                        password: _passwordController.text,
+                      );
                     }
                   },
                   style: const ButtonStyle(
@@ -194,6 +203,7 @@ class _LogInFormState extends State<LogInForm> {
                       style: TextStyle(fontStyle: FontStyle.italic),
                     ),
                     TextButton(
+                      key: const Key("log-in-to-sign-up-screen"),
                       onPressed: () {
                         Navigator.push(
                           context,

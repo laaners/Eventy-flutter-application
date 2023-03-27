@@ -66,6 +66,7 @@ class InviteesPill extends StatelessWidget {
             onTap: () async {
               await Share.share(
                 'https://www.youtube.com,Nice Service',
+                subject: "ok",
               );
               /*
               Navigator.push(

@@ -21,11 +21,19 @@ class EventList extends StatefulWidget {
 }
 
 class _EventListState extends State<EventList> {
+  Future<List<EventCollection>>? _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = Provider.of<FirebaseEvent>(context, listen: false)
+        .getUserEvents(context, widget.userUid);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Provider.of<FirebaseEvent>(context, listen: false)
-          .getUserEvents(context, widget.userUid),
+      future: _future,
       builder: (
         context,
         snapshot,

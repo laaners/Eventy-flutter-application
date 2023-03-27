@@ -870,6 +870,8 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
             children: <Widget>[
               // CUSTOM: controls on top
               _buildVerticalControls(widget.currentStep),
+              // CUSTOM: remove strange scroll behavior
+              /*
               AnimatedSize(
                 curve: Curves.fastOutSlowIn,
                 duration: kThemeAnimationDuration,
@@ -877,6 +879,10 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: stepPanels),
               ),
+              */
+              Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: stepPanels),
             ],
           ),
         ),

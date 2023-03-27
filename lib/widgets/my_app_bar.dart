@@ -23,6 +23,8 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       title: Text(title),
       backgroundColor: Colors.transparent,
+      iconTheme:
+          Provider.of<ThemeSwitch>(context).themeData.appBarTheme.iconTheme,
       actions: [
         TextButton(
           onPressed: () async {
@@ -33,7 +35,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
           },
           child: Icon(
             Icons.search,
-            color: Provider.of<ThemeSwitch>(context).themeData.iconTheme.color,
+            color: Provider.of<ThemeSwitch>(context).themeData.primaryColor,
           ),
         ),
       ],
@@ -115,7 +117,7 @@ class UserTileSearch extends StatelessWidget {
         leading: ProfilePic(
           loading: false,
           userData: userData,
-          radius: 30,
+          radius: 25,
         ),
         title: Text("${userData.name} ${userData.surname}"),
         subtitle: Text(userData.username),

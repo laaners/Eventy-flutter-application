@@ -1,10 +1,9 @@
 import 'package:dima_app/screens/profile/edit_profile.dart';
-import 'package:dima_app/widgets/delete_dialog.dart';
+import 'package:dima_app/widgets/dialog_delete.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/theme_switch.dart';
-import 'change_password.dart';
 
 class ProfileSettings extends StatefulWidget {
   const ProfileSettings({super.key});
@@ -57,19 +56,6 @@ class _ProfileSettingsState extends State<ProfileSettings> {
               context,
               MaterialPageRoute(
                   builder: (context) => const EditProfileScreen()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.password),
-          title: const Text("Change password"),
-          trailing: const Icon(Icons.navigate_next),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ChangePasswordScreen(),
-              ),
             );
           },
         ),
