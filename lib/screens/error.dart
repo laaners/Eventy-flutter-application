@@ -1,6 +1,8 @@
+import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ErrorScreen extends StatelessWidget {
   final String errorMsg;
@@ -9,9 +11,14 @@ class ErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar(
-        title: "Error",
-        upRightActions: [],
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        title: const Text("Error"),
+        backgroundColor: Colors.transparent,
+        iconTheme:
+            Provider.of<ThemeSwitch>(context).themeData.appBarTheme.iconTheme,
+        actions: const [],
       ),
       body: Center(
         child: ListView(
@@ -40,7 +47,8 @@ class ErrorScreen extends StatelessWidget {
               child: MyButton(
                 text: "GO BACK!",
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  // Navigator.of(context).pop();
                 },
               ),
             ),

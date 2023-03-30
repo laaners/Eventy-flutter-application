@@ -105,7 +105,9 @@ class _GmapFromCoorState extends State<GmapFromCoor> {
   late GoogleMapController mapController;
 
   void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
+    setState(() {
+      mapController = controller;
+    });
   }
 
   @override

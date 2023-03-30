@@ -6,6 +6,7 @@ class PollCollection {
   final String pollDesc;
   final String deadline;
   final bool public;
+  final bool canInvite;
   final Map<String, dynamic> dates;
   final List<Map<String, dynamic>> locations;
   PollCollection({
@@ -16,6 +17,7 @@ class PollCollection {
     required this.dates,
     required this.locations,
     required this.public,
+    required this.canInvite,
   });
 
   // PK = pollName_organizerUid
@@ -29,6 +31,7 @@ class PollCollection {
     Map<String, dynamic>? dates,
     List<Map<String, dynamic>>? locations,
     bool? public,
+    bool? canInvite,
   }) {
     return PollCollection(
       pollName: pollName ?? this.pollName,
@@ -38,6 +41,7 @@ class PollCollection {
       dates: dates ?? this.dates,
       locations: locations ?? this.locations,
       public: public ?? this.public,
+      canInvite: canInvite ?? this.canInvite,
     );
   }
 
@@ -50,6 +54,7 @@ class PollCollection {
       'dates': dates,
       'locations': locations,
       'public': public,
+      'canInvite': canInvite,
     };
   }
 
@@ -65,12 +70,13 @@ class PollCollection {
             .map<Map<String, dynamic>>((x) => x),
       ),
       public: map['public'] as bool,
+      canInvite: map['canInvite'] as bool,
     );
   }
 
   @override
   String toString() {
-    return 'PollCollection(pollName: $pollName, organizerUid: $organizerUid, pollDesc: $pollDesc, deadline: $deadline, dates: $dates, locations: $locations, public: $public)';
+    return 'PollCollection(pollName: $pollName, organizerUid: $organizerUid, pollDesc: $pollDesc, deadline: $deadline, dates: $dates, locations: $locations, public: $public, canInvite: $canInvite)';
   }
 
   @override
@@ -83,7 +89,8 @@ class PollCollection {
         other.deadline == deadline &&
         mapEquals(other.dates, dates) &&
         listEquals(other.locations, locations) &&
-        other.public == public;
+        other.public == public &&
+        other.canInvite == canInvite;
   }
 
   @override
@@ -94,6 +101,7 @@ class PollCollection {
         deadline.hashCode ^
         dates.hashCode ^
         locations.hashCode ^
-        public.hashCode;
+        public.hashCode ^
+        canInvite.hashCode;
   }
 }

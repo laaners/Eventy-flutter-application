@@ -144,15 +144,22 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
     _future = getPollDataAndInvites(context);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void refreshPollDetail() {
+    setState(() {
+      _future = null;
+      _future = getPollDataAndInvites(context);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    return StreamBuilder(
+    return RefreshIndicator(
+      onRefresh: () async {
+        refreshPollDetail();
+        return;
+      },
+      child: StreamBuilder(
         stream: Provider.of<FirebasePollEventInvite>(context, listen: false)
             .getPollEventInviteSnapshot(context, widget.pollId, curUid),
         builder: (
@@ -223,45 +230,50 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
               List<VoteDateCollection> votesDates = snapshot.data!["dates"];
               votesDates.sort((a, b) =>
                   b.getPositiveVotes().length - a.getPositiveVotes().length);
+              var curUid =
+                  Provider.of<FirebaseUser>(context, listen: false).user!.uid;
               return Scaffold(
                 appBar: MyAppBar(
                   title: "Poll Detail",
-                  upRightActions: [
-                    TextButton(
-                      onPressed: () async {
-                        LoadingOverlay.show(context);
-                        String url =
-                            "https://eventy.page.link?pollId=${pollData.pollName}_${pollData.organizerUid}";
-                        final dynamicLinkParams = DynamicLinkParameters(
-                          link: Uri.parse(url),
-                          uriPrefix: "https://eventy.page.link",
-                          androidParameters: const AndroidParameters(
-                            packageName: "com.example.dima_app",
-                          ),
-                          iosParameters: const IOSParameters(
-                            bundleId: "com.example.dima_app",
-                          ),
-                        );
-                        final dynamicLongLink = await FirebaseDynamicLinks
-                            .instance
-                            .buildLink(dynamicLinkParams);
-                        final ShortDynamicLink dynamicShortLink =
-                            await FirebaseDynamicLinks.instance
-                                .buildShortLink(dynamicLinkParams);
-                        Uri finalUrl = dynamicShortLink.shortUrl;
-                        print(finalUrl);
-                        print(dynamicLongLink);
-                        await Share.share(finalUrl.toString());
-                        LoadingOverlay.hide(context);
-                      },
-                      child: Icon(
-                        Icons.share_outlined,
-                        color: Provider.of<ThemeSwitch>(context)
-                            .themeData
-                            .primaryColor,
-                      ),
-                    )
-                  ],
+                  upRightActions: pollData.organizerUid != curUid &&
+                          !pollData.public
+                      ? []
+                      : [
+                          TextButton(
+                            onPressed: () async {
+                              LoadingOverlay.show(context);
+                              String url =
+                                  "https://eventy.page.link?pollId=${pollData.pollName}_${pollData.organizerUid}";
+                              final dynamicLinkParams = DynamicLinkParameters(
+                                link: Uri.parse(url),
+                                uriPrefix: "https://eventy.page.link",
+                                androidParameters: const AndroidParameters(
+                                  packageName: "com.example.dima_app",
+                                ),
+                                iosParameters: const IOSParameters(
+                                  bundleId: "com.example.dima_app",
+                                ),
+                              );
+                              final dynamicLongLink = await FirebaseDynamicLinks
+                                  .instance
+                                  .buildLink(dynamicLinkParams);
+                              final ShortDynamicLink dynamicShortLink =
+                                  await FirebaseDynamicLinks.instance
+                                      .buildShortLink(dynamicLinkParams);
+                              Uri finalUrl = dynamicShortLink.shortUrl;
+                              print(finalUrl);
+                              print(dynamicLongLink);
+                              await Share.share(finalUrl.toString());
+                              LoadingOverlay.hide(context);
+                            },
+                            child: Icon(
+                              Icons.share_outlined,
+                              color: Provider.of<ThemeSwitch>(context)
+                                  .themeData
+                                  .primaryColor,
+                            ),
+                          )
+                        ],
                 ),
                 body: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -272,8 +284,10 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
                         alignment: Alignment.topLeft,
                       ),
                       InviteesPill(
+                        pollData: pollData,
                         pollEventId: widget.pollId,
                         invites: pollInvites,
+                        refreshPollDetail: refreshPollDetail,
                       ),
                       const Text(
                         "Organized by",
@@ -331,6 +345,8 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
               );
             },
           );
-        });
+        },
+      ),
+    );
   }
 }

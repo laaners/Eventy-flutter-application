@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dima_app/providers/theme_switch.dart';
-import 'package:dima_app/screens/profile/profile_pic.dart';
+import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:flutter/material.dart';

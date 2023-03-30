@@ -23,6 +23,7 @@ class FirebasePoll extends ChangeNotifier {
     required Map<String, dynamic> dates,
     required List<Map<String, dynamic>> locations,
     required bool public,
+    required bool canInvite,
   }) async {
     PollCollection poll = PollCollection(
       pollName: pollName,
@@ -32,6 +33,7 @@ class FirebasePoll extends ChangeNotifier {
       dates: dates,
       locations: locations,
       public: public,
+      canInvite: canInvite,
     );
     try {
       String pollId = "${pollName}_$organizerUid";

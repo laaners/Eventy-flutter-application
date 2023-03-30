@@ -38,6 +38,21 @@ class FirebasePollEventInvite extends ChangeNotifier {
     }
   }
 
+  Future<void> deletePollEventInvite({
+    required BuildContext context,
+    required String pollEventId,
+    required String inviteeId,
+  }) async {
+    try {
+      String pollEventInviteId = "${pollEventId}_$inviteeId";
+      await FirebaseCrud.deleteDoc(
+          pollEventInviteCollection, pollEventInviteId);
+    } on FirebaseException catch (e) {
+      // showSnackBar(context, e.message!);
+      print(e.message!);
+    }
+  }
+
   Future<List<PollEventInviteCollection>> getInvitesFromPollEventId(
     BuildContext context,
     String pollEventId,

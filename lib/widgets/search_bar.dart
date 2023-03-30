@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/profile/index.dart';
-import '../screens/profile/profile_pic.dart';
+import 'profile_pic.dart';
 import '../screens/profile/view_profile.dart';
 import '../server/tables/user_collection.dart';
 

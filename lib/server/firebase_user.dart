@@ -229,6 +229,21 @@ class FirebaseUser extends ChangeNotifier {
     return [];
   }
 
+  Future<List<UserCollection>> getUsersDataFromList(
+      BuildContext context, List<String> uids) async {
+    List<UserCollection> usersData = [];
+    await Future.wait(uids.map((uid) {
+      return Provider.of<FirebaseUser>(context, listen: false)
+          .getUserData(context, uid)
+          .then((value) {
+        if (value != null) {
+          return usersData.add(value);
+        }
+      });
+    }));
+    return usersData;
+  }
+
   Future<bool> updateUserData(BuildContext context, String username,
       String name, String surname, String email) async {
     try {

@@ -1,5 +1,5 @@
 import 'package:dima_app/screens/error.dart';
-import 'package:dima_app/screens/profile/profile_pic.dart';
+import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
