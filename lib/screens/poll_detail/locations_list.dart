@@ -53,8 +53,9 @@ class _LocationsListState extends State<LocationsList> {
               IconButton(
                 onPressed: () {
                   setState(() {
-                    votesLocations.sort(
-                        (a, b) => a.locationName.compareTo(b.locationName));
+                    votesLocations.sort((a, b) => a.locationName
+                        .toLowerCase()
+                        .compareTo(b.locationName.toLowerCase()));
                   });
                 },
                 icon: Icon(

@@ -7,7 +7,7 @@ import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../screens/profile/profile_pic.dart';
+import 'profile_pic.dart';
 import '../server/firebase_user.dart';
 
 class UserList extends StatelessWidget {

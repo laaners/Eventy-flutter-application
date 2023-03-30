@@ -12,7 +12,6 @@ import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/location.dart';
-import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
@@ -38,6 +37,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   TextEditingController eventTitleController = TextEditingController();
   TextEditingController eventDescController = TextEditingController();
   TextEditingController deadlineController = TextEditingController();
+  bool visibility = false;
+  bool canInvite = false;
 
   // stepPlaces
   List<Location> locations = [];
@@ -99,6 +100,18 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 setState(() {
                   deadlineController.text =
                       DateFormatter.dateTime2String(pickedDate);
+                });
+              },
+              visibility: visibility,
+              changeVisibility: () {
+                setState(() {
+                  visibility = !visibility;
+                });
+              },
+              canInvite: canInvite,
+              changeCanInvite: () {
+                setState(() {
+                  canInvite = !canInvite;
                 });
               },
             ),
@@ -196,6 +209,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             ),
           ),
           content: StepInvite(
+            organizerUid:
+                Provider.of<FirebaseUser>(context, listen: false).user!.uid,
             invitees: invitees,
             addInvitee: (UserCollection user) {
               setState(() {
@@ -242,7 +257,6 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             } else {
               var curUid =
                   Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-
               bool ret = MyAlertDialog.showAlertIfCondition(
                 context,
                 eventTitleController.text.isEmpty,
@@ -312,7 +326,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 deadline: utcDeadline,
                 dates: utcDates,
                 locations: locationsMap,
-                public: true,
+                public: visibility,
+                canInvite: canInvite,
               );
               ret = MyAlertDialog.showAlertIfCondition(
                 context,

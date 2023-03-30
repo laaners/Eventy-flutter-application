@@ -1,13 +1,11 @@
 import 'dart:async';
 
-import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/profile/index.dart';
-import 'package:dima_app/screens/profile/profile_pic.dart';
+import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/screens/profile/view_profile.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
-import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';
@@ -17,11 +15,13 @@ class StepInvite extends StatefulWidget {
   final List<UserCollection> invitees;
   final ValueChanged<UserCollection> addInvitee;
   final ValueChanged<UserCollection> removeInvitee;
+  final String organizerUid;
   const StepInvite({
     super.key,
     required this.invitees,
     required this.addInvitee,
     required this.removeInvitee,
+    required this.organizerUid,
   });
 
   @override
@@ -29,28 +29,32 @@ class StepInvite extends StatefulWidget {
 }
 
 class _StepInviteState extends State<StepInvite> {
-  Future addFollowers() async {
-    List<String> followersIds =
-        Provider.of<FirebaseFollow>(context, listen: false).followersUid;
+  late List<String> followersIds = [];
 
-    await Future.wait(followersIds
-        .map(
-          (uid) => Provider.of<FirebaseUser>(context, listen: false)
-              .getUserData(context, uid)
-              .then(
-            (value) {
-              if (value != null) widget.addInvitee(value);
-            },
-          ),
-        )
-        .toList());
+  @override
+  void initState() {
+    super.initState();
+    // filter out organizer from followers
+    followersIds = Provider.of<FirebaseFollow>(context, listen: false)
+        .followersUid
+        .where((uid) => uid != widget.organizerUid)
+        .toList();
+  }
+
+  Future addFollowers() async {
+    await Future.wait(followersIds.map(
+      (uid) => Provider.of<FirebaseUser>(context, listen: false)
+          .getUserData(context, uid)
+          .then(
+        (value) {
+          if (value != null) widget.addInvitee(value);
+        },
+      ),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
-    List<String> followersIds =
-        Provider.of<FirebaseFollow>(context, listen: false).followersUid;
-
     return Container(
       margin: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom, top: 8, left: 15),
@@ -59,7 +63,7 @@ class _StepInviteState extends State<StepInvite> {
           Container(
             alignment: Alignment.topLeft,
             child: const Text(
-              "Invite people to the event",
+              "Invite people to vote",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
@@ -243,6 +247,7 @@ class _SearchUsersState extends State<SearchUsers> {
   List<UserCollection> usersMatching = [];
   // true after next query, false when input text is empty
   bool loadingUsers = false;
+  final FocusNode _focus = FocusNode();
   final TextEditingController _controller = TextEditingController();
 
   @override
@@ -265,6 +270,7 @@ class _SearchUsersState extends State<SearchUsers> {
               controller: _controller,
               autofocus: false,
               decoration: const InputDecoration(hintText: "Search here"),
+              focusNode: _focus,
               onChanged: (text) async {
                 if (text.isEmpty) {
                   setState(() {
@@ -284,8 +290,11 @@ class _SearchUsersState extends State<SearchUsers> {
               },
             ),
           ),
-          Container(
-            height: 150,
+          SizedBox(
+            height: (!_focus.hasFocus && usersMatching.isEmpty) ||
+                    _controller.text.isEmpty
+                ? 0
+                : 110,
             child: usersMatching.isNotEmpty
                 ? HorizontalScroller(
                     mainAxisAlignment: MainAxisAlignment.center,

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../screens/error.dart';
 import '../screens/profile/index.dart';
-import '../screens/profile/profile_pic.dart';
+import 'profile_pic.dart';
 import '../screens/profile/view_profile.dart';
 import '../server/firebase_user.dart';
 import '../server/tables/user_collection.dart';

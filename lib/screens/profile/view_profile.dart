@@ -7,34 +7,48 @@ import 'package:flutter/material.dart';
 import '../../widgets/my_app_bar.dart';
 import 'profile_info.dart';
 
-class ViewProfileScreen extends StatelessWidget {
+class ViewProfileScreen extends StatefulWidget {
   final UserCollection userData;
-
   const ViewProfileScreen({super.key, required this.userData});
 
   @override
+  State<ViewProfileScreen> createState() => _ViewProfileScreenState();
+}
+
+class _ViewProfileScreenState extends State<ViewProfileScreen> {
+  int _refresh = 1;
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MyAppBar(
-        title: userData.name,
-        upRightActions: [MyAppBar.SearchAction(context)],
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {
+          _refresh = 0;
+        });
+        return;
+      },
+      child: Scaffold(
+        appBar: MyAppBar(
+          title: widget.userData.name,
+          upRightActions: [MyAppBar.SearchAction(context)],
+        ),
+        body: ListView(children: [
+          ProfileInfo(
+            userData: widget.userData,
+          ),
+          const Divider(
+            height: 30,
+          ),
+          ListsSwitcher(
+            labels: const ["Events", "Polls"],
+            lists: [
+              EventList(userUid: widget.userData.uid),
+              PollList(userUid: widget.userData.uid)
+            ],
+          ),
+          // EventPollSwitch(userUid: userData.uid),
+        ]),
       ),
-      body: ListView(children: [
-        ProfileInfo(
-          userData: userData,
-        ),
-        const Divider(
-          height: 30,
-        ),
-        ListsSwitcher(
-          labels: const ["Events", "Polls"],
-          lists: [
-            EventList(userUid: userData.uid),
-            PollList(userUid: userData.uid)
-          ],
-        ),
-        // EventPollSwitch(userUid: userData.uid),
-      ]),
     );
   }
 }
