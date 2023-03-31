@@ -1,8 +1,8 @@
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/event_list.dart';
-import 'package:dima_app/widgets/event_poll_switch.dart';
-import 'package:dima_app/widgets/lists_switcher.dart';
+// import 'package:dima_app/widgets/lists_switcher.dart';
 import 'package:dima_app/widgets/poll_list.dart';
+import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/my_app_bar.dart';
 import 'profile_info.dart';
@@ -16,18 +16,32 @@ class ViewProfileScreen extends StatefulWidget {
 }
 
 class _ViewProfileScreenState extends State<ViewProfileScreen> {
-  int _refresh = 1;
+  bool _refresh = true;
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
         setState(() {
-          _refresh = 0;
+          _refresh = !_refresh;
         });
         return;
       },
-      child: Scaffold(
+      child: TabbarSwitcher(
+        appBarTitle: widget.userData.name,
+        labels: const ["Events", "Polls"],
+        tabbars: [
+          EventList(userUid: widget.userData.uid),
+          PollList(userUid: widget.userData.uid)
+        ],
+        listSticky: ProfileInfo(
+          userData: widget.userData,
+        ),
+        stickyHeight: 320,
+        upRightActions: [MyAppBar.SearchAction(context)],
+      ),
+      /*
+      Scaffold(
         appBar: MyAppBar(
           title: widget.userData.name,
           upRightActions: [MyAppBar.SearchAction(context)],
@@ -49,6 +63,7 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
           // EventPollSwitch(userUid: userData.uid),
         ]),
       ),
+      */
     );
   }
 }

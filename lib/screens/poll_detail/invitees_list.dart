@@ -12,9 +12,12 @@ import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
+import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'package:dima_app/widgets/tabbar_switcher.dart' as tabbar_switcher;
 
 class InviteesList extends StatefulWidget {
   final String pollEventId;
@@ -41,8 +44,17 @@ class _InviteesListState extends State<InviteesList> {
   initState() {
     super.initState();
     users = widget.invites.map((e) => e.inviteeId).toList();
+
+    // this list will be passed to step_invite, must filter out from the list
+    // the organizer and the current user itself
+    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     _future = Provider.of<FirebaseUser>(context, listen: false)
-        .getUsersDataFromList(context, users);
+        .getUsersDataFromList(
+            context,
+            users
+                .where((uid) =>
+                    uid != curUid && uid != widget.pollData.organizerUid)
+                .toList());
   }
 
   Future updateInvitees(List<String> newInvitees) async {
@@ -61,9 +73,14 @@ class _InviteesListState extends State<InviteesList> {
       );
     }));
 
-    // delete removed invites
-    List<String> toRemove =
-        oldInvitees.where((newId) => !newInvitees.contains(newId)).toList();
+    // delete removed invites, filter out organizer (impossible case but whatever) and curuid
+    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+    List<String> toRemove = oldInvitees
+        .where((oldId) =>
+            !newInvitees.contains(oldId) &&
+            oldId != widget.pollData.organizerUid &&
+            oldId != curUid)
+        .toList();
     await Future.wait(toRemove.map((uid) {
       return Provider.of<FirebasePollEventInvite>(context, listen: false)
           .deletePollEventInvite(
@@ -93,7 +110,6 @@ class _InviteesListState extends State<InviteesList> {
               }
               if (snapshot.hasError) {
                 Future.microtask(() {
-                  Navigator.of(context).pop();
                   Navigator.of(context).pop();
                   Navigator.push(
                     context,
@@ -160,59 +176,88 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
     usersData = widget.usersDataInitial;
   }
 
+  void addInvitee(UserCollection user) {
+    setState(() {
+      if (!usersData.map((e) => e.uid).contains(user.uid)) {
+        usersData.insert(0, user);
+      }
+    });
+  }
+
+  void removeInvitee(UserCollection user) {
+    setState(() {
+      usersData.removeWhere((item) => item.uid == user.uid);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    return Scaffold(
-      appBar: MyAppBar(
-        title: "Partecipants",
-        upRightActions: [
-          TextButton(
-            onPressed: () {
-              widget.updateInvitees(usersData.map((e) => e.uid).toList());
-            },
-            child: Icon(
-              Icons.done,
-              color: Provider.of<ThemeSwitch>(context).themeData.primaryColor,
-            ),
+    return widget.pollData.organizerUid == curUid || widget.pollData.canInvite
+        ? tabbar_switcher.TabbarSwitcher(
+            appBarTitle: widget.pollData.pollName,
+            upRightActions: widget.pollData.organizerUid == curUid ||
+                    widget.pollData.canInvite
+                ? [
+                    TextButton(
+                      onPressed: () {
+                        widget.updateInvitees(
+                            usersData.map((e) => e.uid).toList());
+                      },
+                      child: Icon(
+                        Icons.done,
+                        color: Provider.of<ThemeSwitch>(context)
+                            .themeData
+                            .primaryColor,
+                      ),
+                    )
+                  ]
+                : [],
+            stickyHeight: 0,
+            listSticky: null,
+            labels: const ["Partecipants", "Invite"],
+            tabbars: [
+              ListView(
+                children: usersData
+                    .map((user) => InviteeTile(
+                          userData: user,
+                        ))
+                    .toList(),
+              ),
+              ListView(
+                children: [
+                  StepInvite(
+                    organizerUid: widget.pollData.organizerUid,
+                    invitees: usersData,
+                    addInvitee: addInvitee,
+                    removeInvitee: removeInvitee,
+                  ),
+                  MyButton(
+                    text: "INVITE",
+                    onPressed: () {
+                      widget
+                          .updateInvitees(usersData.map((e) => e.uid).toList());
+                    },
+                  )
+                ],
+              )
+            ],
           )
-        ],
-      ),
-      body: Column(
-        children: [
-          if (widget.pollData.organizerUid == curUid || widget.pollData.public)
-            StepInvite(
-              organizerUid: widget.pollData.organizerUid,
-              invitees: usersData,
-              addInvitee: (UserCollection user) {
-                setState(() {
-                  if (!usersData.map((e) => e.uid).contains(user.uid)) {
-                    usersData.insert(0, user);
-                  }
-                });
-              },
-              removeInvitee: (UserCollection user) {
-                setState(() {
-                  usersData.removeWhere((item) => item.uid == user.uid);
-                });
-              },
+        : Scaffold(
+            appBar: MyAppBar(
+              title: widget.pollData.pollName,
+              upRightActions: [],
             ),
-          Expanded(
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: const ClampingScrollPhysics(),
-              itemCount: usersData.length,
-              itemBuilder: (_, i) {
-                var user = usersData[i];
-                return InviteeTile(
-                  userData: user,
-                );
-              },
+            body: ListView(
+              children: usersData
+                  .map(
+                    (user) => InviteeTile(
+                      userData: user,
+                    ),
+                  )
+                  .toList(),
             ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 }
 

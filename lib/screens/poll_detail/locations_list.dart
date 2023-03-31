@@ -6,7 +6,8 @@ import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
 import 'package:dima_app/themes/palette.dart';
-import 'package:dima_app/widgets/my_button.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,8 @@ class LocationsList extends StatefulWidget {
   State<LocationsList> createState() => _LocationsListState();
 }
 
-class _LocationsListState extends State<LocationsList> {
+class _LocationsListState extends State<LocationsList>
+    with AutomaticKeepAliveClientMixin {
   bool sortedByVotes = true;
   late List<VoteLocationCollection> votesLocations;
 
@@ -41,9 +43,13 @@ class _LocationsListState extends State<LocationsList> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    return Column(
+    return ListView(
       children: [
         Container(
           alignment: Alignment.topRight,
@@ -193,6 +199,8 @@ class LocationTile extends StatelessWidget {
             ),
           );
           */
+          /*
+          */
           MyModal.show(
             context: context,
             child: LocationDetail(
@@ -208,25 +216,26 @@ class LocationTile extends StatelessWidget {
             title: "",
           );
           /*
+          */
+          return;
           Navigator.push(
             context,
             ScreenTransition(
               builder: (context) => Scaffold(
-                appBar: MyAppBar(location.name),
-                body: Container(
-                  // margin: const EdgeInsets.only(top: 15, bottom: 15),
-                  child: LocationDetail(
-                    pollId: pollId,
-                    organizerUid: organizerUid,
-                    invites: invites,
-                    location: location,
-                    modifyVote: modifyVote,
-                  ),
+                appBar: MyAppBar(
+                  title: "location detail",
+                  upRightActions: [],
+                ),
+                body: LocationDetail(
+                  pollId: pollId,
+                  organizerUid: organizerUid,
+                  invites: invites,
+                  location: location,
+                  modifyVote: modifyVote,
                 ),
               ),
             ),
           );
-          */
           // modifyVote(Availability.not);
         },
       ),

@@ -59,7 +59,7 @@ class InviteesPill extends StatelessWidget {
                     );
                   },
                   child: Text(
-                    "${(invites.length - 1).toString()} other voting",
+                    "${(invites.length - 1).toString()} others voting",
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 35,
