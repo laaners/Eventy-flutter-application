@@ -7,7 +7,6 @@ import 'package:dima_app/server/firebase_crud.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
-import 'package:dima_app/widgets/lists_switcher.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/my_button.dart';
@@ -84,10 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     // init dynamic link
                   },
                   child: const Text("dynamic link"),
-                ),
-                ListsSwitcher(
-                  labels: ["ciao", "come", "stai"],
-                  lists: [Text("data1"), Text("data2"), Text("data3")],
                 ),
                 StreamBuilder(
                   stream: FirebaseCrud.readSnapshot(

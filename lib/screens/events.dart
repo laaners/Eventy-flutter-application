@@ -31,14 +31,14 @@ class EventsScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               // ignore: use_build_context_synchronously
+              String pollId =
+                  "Event 0 of UsernameId0_u8oRJn2HdAQP459lnSVmFxgtsW93";
+              Widget test = PollDetailScreen(
+                pollId: pollId,
+              );
               Navigator.push(
                 context,
-                ScreenTransition(
-                  builder: (context) => const PollDetailScreen(
-                    pollId:
-                        "Event 0 of UsernameId0_u8oRJn2HdAQP459lnSVmFxgtsW93",
-                  ),
-                ),
+                ScreenTransition(builder: (context) => test),
               );
             },
             child: const Text("TO POLL DETAIL (WITH TABBAR)"),

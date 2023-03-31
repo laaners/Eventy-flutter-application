@@ -17,8 +17,11 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final List<Widget> upRightActions;
 
-  const MyAppBar(
-      {super.key, required this.title, required this.upRightActions});
+  const MyAppBar({
+    super.key,
+    required this.title,
+    required this.upRightActions,
+  });
 
   static Widget SearchAction(context) => TextButton(
         onPressed: () async {

@@ -1,6 +1,8 @@
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_event_invite.dart';
+import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
@@ -20,19 +22,13 @@ class PollList extends StatefulWidget {
 }
 
 class _PollListState extends State<PollList> {
-  Future<List<PollCollection>>? _future;
-
-  @override
-  void initState() {
-    super.initState();
-    _future = Provider.of<FirebasePoll>(context, listen: false)
-        .getUserPolls(context, widget.userUid);
-  }
+  int _refresh = 1;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _future,
+      future: Provider.of<FirebasePoll>(context, listen: false)
+          .getOtherUserPublicOrInvitedPolls(context, widget.userUid),
       builder: (
         context,
         snapshot,
@@ -61,7 +57,19 @@ class _PollListState extends State<PollList> {
         }
         var pollsData = snapshot.data!;
         return Column(
-          children: pollsData.map((e) => PollTile(pollData: e)).toList(),
+          children: pollsData
+              .map(
+                (e) => PollTile(
+                  pollData: e["pollDetails"] as PollCollection,
+                  invited: e["invited"] as bool,
+                  refreshParent: () {
+                    setState(() {
+                      _refresh += 1;
+                    });
+                  },
+                ),
+              )
+              .toList(),
         );
       },
     );
@@ -70,8 +78,14 @@ class _PollListState extends State<PollList> {
 
 class PollTile extends StatelessWidget {
   final PollCollection pollData;
-
-  const PollTile({super.key, required this.pollData});
+  final bool invited;
+  final VoidCallback refreshParent;
+  const PollTile({
+    super.key,
+    required this.pollData,
+    required this.invited,
+    required this.refreshParent,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -79,21 +93,33 @@ class PollTile extends StatelessWidget {
     return SizedBox(
       height: 80,
       child: ListTile(
+        /*
+        trailing: Text(
+            "public: ${pollData.public.toString()}, canInvite: ${pollData.canInvite.toString()}, invited: ${invited.toString()}"),
+        */
         leading: const CircleAvatar(
           backgroundColor: Colors.blue,
           child: Icon(Icons.place),
         ),
         title: Text(pollData.pollName),
         subtitle: Text(pollData.organizerUid),
-        onTap: () {
+        onTap: () async {
+          // if not invited and is a public event, add invite
+          if (!invited && pollData.public) {
+            var curUid =
+                Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+            await Provider.of<FirebasePollEventInvite>(context, listen: false)
+                .createPollEventInvite(
+              context: context,
+              pollEventId: pollId,
+              inviteeId: curUid,
+            );
+            refreshParent();
+          }
+          Widget newScreen = PollDetailScreen(pollId: pollId);
+          // ignore: use_build_context_synchronously
           Navigator.push(
-            context,
-            ScreenTransition(
-              builder: (context) => PollDetailScreen(
-                pollId: pollId,
-              ),
-            ),
-          );
+              context, ScreenTransition(builder: (context) => newScreen));
         },
       ),
     );
