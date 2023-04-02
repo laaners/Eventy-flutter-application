@@ -3,10 +3,9 @@ import 'package:dima_app/screens/password_reset.dart';
 import 'package:dima_app/screens/signup.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
+import 'package:dima_app/widgets/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../widgets/title.dart';
 
 class LogInScreen extends StatelessWidget {
   const LogInScreen({super.key});
@@ -44,6 +43,7 @@ class _LogInFormState extends State<LogInForm> {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      padding: const EdgeInsets.all(20),
       children: [
         TextButton(
           key: GlobalKey(debugLabel: 'test1'),
@@ -71,83 +71,76 @@ class _LogInFormState extends State<LogInForm> {
         const SizedBox(
           height: 50,
         ),
-        const Image(
-          image: AssetImage('images/logo.png'),
-          height: 80,
+        SizedBox(
+          height: 170,
+          child: Image.asset('images/logo.png'),
         ),
-        const Center(
-          child: Text(
-            "Eventy",
-            style: TextStyle(
-              fontSize: 35,
-              fontWeight: FontWeight.normal,
-              letterSpacing: 4,
-            ),
-          ),
+        Text(
+          "Eventy",
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.displayLarge,
         ),
-        MyTitle(
-          text: "Log In",
-          alignment: Alignment.topLeft,
+        const SizedBox(
+          height: 50,
+        ),
+        Text(
+          "Log In",
+          style: Theme.of(context).textTheme.headlineLarge,
         ),
         Form(
           key: _formKey,
           child: Column(
             children: <Widget>[
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  image: DecorationImage(image: AssetImage('images/logo.png')),
-                ),
+              const SizedBox(
+                height: 25,
               ),
-              Container(
-                margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
-                child: TextFormField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.face, color: Colors.grey),
-                    border: OutlineInputBorder(),
-                    labelText: 'Username',
-                    labelStyle: TextStyle(fontStyle: FontStyle.italic),
-                  ),
-                  validator: (value) {
-                    // todo: check if username already exists
-                    if (value == null || value.isEmpty) {
-                      return 'Enter your username';
-                    }
-                    return null;
-                  },
+              TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.face, color: Colors.grey),
+                  border: OutlineInputBorder(),
+                  labelText: 'Username',
+                  labelStyle: TextStyle(fontStyle: FontStyle.italic),
                 ),
+                validator: (value) {
+                  // todo: check if username already exists
+                  if (value == null || value.isEmpty) {
+                    return 'Enter your username';
+                  }
+                  return null;
+                },
               ),
-              Container(
-                margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                child: TextFormField(
-                  controller: _passwordController,
-                  obscureText: _passwordVisible,
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
-                    hintText: 'Password',
-                    border: const OutlineInputBorder(),
-                    labelText: 'Password',
-                    labelStyle: const TextStyle(fontStyle: FontStyle.italic),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _passwordVisible = !_passwordVisible;
-                        });
-                      },
-                      icon: Icon(
-                        _passwordVisible
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
+              const SizedBox(
+                height: 25,
+              ),
+              TextFormField(
+                controller: _passwordController,
+                obscureText: _passwordVisible,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
+                  hintText: 'Password',
+                  border: const OutlineInputBorder(),
+                  labelText: 'Password',
+                  labelStyle: const TextStyle(fontStyle: FontStyle.italic),
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _passwordVisible = !_passwordVisible;
+                      });
+                    },
+                    icon: Icon(
+                      _passwordVisible
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                     ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Enter your password';
-                    }
-                    return null;
-                  },
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Enter your password';
+                  }
+                  return null;
+                },
               ),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -167,31 +160,20 @@ class _LogInFormState extends State<LogInForm> {
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(20),
-                alignment: Alignment.center,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      // If the form is valid, display a snackbar. In the real world,
-                      // you'd often call a server or save the information in a database.
-                      await Provider.of<FirebaseUser>(context, listen: false)
-                          .logInWithUsername(
-                        context: context,
-                        username: _usernameController.text,
-                        password: _passwordController.text,
-                      );
-                    }
-                  },
-                  style: const ButtonStyle(
-                    padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
-                        EdgeInsets.all(20)),
-                  ),
-                  child: const Text(
-                    "LOG IN",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
+              MyButton(
+                text: "LOG IN",
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    // If the form is valid, display a snackbar. In the real world,
+                    // you'd often call a server or save the information in a database.
+                    await Provider.of<FirebaseUser>(context, listen: false)
+                        .logInWithUsername(
+                      context: context,
+                      username: _usernameController.text,
+                      password: _passwordController.text,
+                    );
+                  }
+                },
               ),
               Container(
                 margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
@@ -200,7 +182,9 @@ class _LogInFormState extends State<LogInForm> {
                   children: [
                     const Text(
                       "Don't have an account?",
-                      style: TextStyle(fontStyle: FontStyle.italic),
+                      style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
                     TextButton(
                       key: const Key("log-in-to-sign-up-screen"),

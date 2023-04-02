@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/firebase_cruds_testing.dart';
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/event_create/step_invite.dart';
 import 'package:dima_app/screens/search.dart';
 import 'package:dima_app/server/firebase_crud.dart';
@@ -412,40 +411,6 @@ class UsersList2 extends StatelessWidget {
         // By default, show a loading spinner.
         return const CircularProgressIndicator();
       },
-    );
-  }
-}
-
-class UserTile2 extends StatelessWidget {
-  final UserCollection user;
-  const UserTile2({super.key, required this.user});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(0),
-      padding: const EdgeInsets.all(1.0),
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            width: 1,
-            color: Provider.of<ThemeSwitch>(context).themeData.primaryColor,
-          ),
-        ),
-      ),
-      child: ListTile(
-        title: Text(
-          "UserName: ${user.username}",
-          style:
-              Provider.of<ThemeSwitch>(context).themeData.textTheme.bodyMedium,
-        ),
-        subtitle: Text("Name: ${user.name}"),
-        leading: const Text("USER:"),
-        trailing: const Text("..."),
-        onTap: () {
-          showSnackBar(context, "In construction...");
-        },
-      ),
     );
   }
 }

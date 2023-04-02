@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/providers/dynamic_links_handler.dart';
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/login.dart';
@@ -12,6 +11,8 @@ import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
+import 'package:dima_app/themes/theme_constants.dart';
+import 'package:dima_app/themes/theme_manager.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -85,7 +86,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (context) => FirebaseVote(firestore)),
 
         // DARK/LIGHT THEME
-        ChangeNotifierProvider(create: (context) => ThemeSwitch()),
+        ChangeNotifierProvider(create: (context) => ThemeManager()),
 
         // DYNAMIC LINK
         ChangeNotifierProvider(create: (context) => DynamicLinksHandler()),
@@ -157,7 +158,9 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Eventy',
-      theme: Provider.of<ThemeSwitch>(context).themeData,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: Provider.of<ThemeManager>(context).themeMode,
       home: Consumer<FirebaseUser>(
         builder: (context, value, child) {
           return value.user != null ? const MainScreen() : const LogInScreen();
@@ -225,7 +228,6 @@ class _MainScreen extends State<MainScreen> {
           }
           currentIndex = index;
         },
-        activeColor: Provider.of<ThemeSwitch>(context).themeData.primaryColor,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
