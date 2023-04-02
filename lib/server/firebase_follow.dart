@@ -69,7 +69,7 @@ class FirebaseFollow extends ChangeNotifier {
   Future<void> addFollower(
     BuildContext context,
     String uid,
-    String followUid,
+    String followUid, // of the followed
     bool addMutual,
   ) async {
     try {
