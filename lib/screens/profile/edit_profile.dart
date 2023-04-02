@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../server/firebase_user.dart';
 import '../../server/tables/user_collection.dart';
+import '../../widgets/my_button.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -157,36 +158,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 },
               ),
             ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              alignment: Alignment.center,
-              child: ElevatedButton(
-                onPressed: () async {
-                  if (_formkey.currentState!.validate()) {
+            MyButton(
+              text: "SAVE",
+              onPressed: () async {
+                if (_formkey.currentState!.validate()) {
+                  // ignore: use_build_context_synchronously
+                  if (await Provider.of<FirebaseUser>(context, listen: false)
+                          .updateUserData(
+                              context,
+                              _usernameController.text,
+                              _nameController.text,
+                              _surnameController.text,
+                              _emailController.text) ==
+                      true) {
                     // ignore: use_build_context_synchronously
-                    if (await Provider.of<FirebaseUser>(context, listen: false)
-                            .updateUserData(
-                                context,
-                                _usernameController.text,
-                                _nameController.text,
-                                _surnameController.text,
-                                _emailController.text) ==
-                        true) {
-                      // ignore: use_build_context_synchronously
-                      showSnackBar(
-                          context, "Your information has been updated!");
-                    }
+                    showSnackBar(context, "Your information has been updated!");
                   }
-                },
-                style: const ButtonStyle(
-                  padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
-                      EdgeInsets.all(20)),
-                ),
-                child: const Text(
-                  "SAVE",
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
+                }
+              },
             ),
           ],
         ),

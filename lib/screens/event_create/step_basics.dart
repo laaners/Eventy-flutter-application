@@ -1,6 +1,4 @@
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/server/date_methods.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -47,10 +45,6 @@ class _StepBasicsState extends State<StepBasics> {
           alignment: Alignment.topLeft,
           child: const Text(
             "Set the basic details",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
           ),
         ),
         Container(
@@ -98,24 +92,14 @@ class _StepBasicsState extends State<StepBasics> {
             padding: const EdgeInsets.only(top: 8, bottom: 8),
             child: const Text(
               "Deadline for voting",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
             ),
           ),
           subtitle: TextField(
             enabled: false,
-            style: TextStyle(
-              color: Provider.of<ThemeSwitch>(context, listen: false)
-                  .themeData
-                  .primaryColor,
-            ),
             decoration: const InputDecoration(
               isDense: true,
               icon: Icon(
                 Icons.calendar_today,
-                color: Palette.greyColor,
               ),
               border: InputBorder.none,
             ),
@@ -133,9 +117,6 @@ class _StepBasicsState extends State<StepBasics> {
               builder: (context) => FractionallySizedBox(
                 heightFactor: 0.4,
                 child: Container(
-                  color: Provider.of<ThemeSwitch>(context, listen: false)
-                      .themeData
-                      .scaffoldBackgroundColor,
                   child: Container(
                     margin: const EdgeInsets.only(top: 10),
                     child: Column(

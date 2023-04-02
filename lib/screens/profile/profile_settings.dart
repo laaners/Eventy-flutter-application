@@ -1,9 +1,10 @@
 import 'package:dima_app/screens/profile/edit_profile.dart';
 import 'package:dima_app/screens/profile/delete_dialog.dart';
+import 'package:dima_app/themes/palette.dart';
+import 'package:dima_app/themes/theme_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../providers/theme_switch.dart';
 import '../../server/firebase_user.dart';
 import 'change_password.dart';
 
@@ -28,7 +29,6 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           ),
           value: _pushNotificationEnabled,
           onChanged: (bool value) {
-            // This is called when the user toggles the switch.
             setState(() {
               _pushNotificationEnabled = value;
             });
@@ -40,11 +40,11 @@ class _ProfileSettingsState extends State<ProfileSettings> {
             "Dark mode",
           ),
           value: _darkModeEnabled,
-          onChanged: (bool value) {
-            // This is called when the user toggles the switch.
+          onChanged: (newValue) {
             setState(() {
-              _darkModeEnabled = value;
-              Provider.of<ThemeSwitch>(context, listen: false).changeTheme();
+              _darkModeEnabled = newValue;
+              Provider.of<ThemeManager>(context, listen: false)
+                  .toggleTheme(newValue);
             });
           },
           secondary: const Icon(Icons.dark_mode),
@@ -62,8 +62,8 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.logout),
-          title: const Text("Sign out"),
+          leading: const Icon(Icons.password),
+          title: const Text("Change password"),
           trailing: const Icon(Icons.navigate_next),
           onTap: () {
             Navigator.push(
@@ -75,8 +75,8 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.delete_forever),
-          title: const Text("Delete Account"),
+          leading: const Icon(Icons.logout),
+          title: const Text("Sing Out"),
           trailing: const Icon(Icons.navigate_next),
           onTap: () async {
             await Provider.of<FirebaseUser>(context, listen: false)
@@ -88,7 +88,6 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           title: const Text("Delete Account"),
           trailing: const Icon(Icons.navigate_next),
           onTap: () {
-            // TODO: add transition to initial screen (LogInScreen?)
             showDialog<String>(
                 context: context,
                 builder: (BuildContext context) => DeleteDialog());

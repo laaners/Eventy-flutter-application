@@ -172,19 +172,14 @@ class _StepDatesState extends State<StepDates> {
             child: ListTile(
               title: const Text(
                 "Add another time slot",
-                style: TextStyle(
-                  color: Palette.blueColor,
-                ),
               ),
               leading: Container(
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: Palette.lightBGColor,
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: const Icon(
                   Icons.add_circle_outline,
-                  color: Palette.blueColor,
                 ),
               ),
               onTap: () async {
@@ -212,7 +207,6 @@ class _StepDatesState extends State<StepDates> {
             return Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                color: Palette.blueColor,
               ),
               margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
               padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
@@ -301,7 +295,6 @@ class _StepDatesState extends State<StepDates> {
                     margin: const EdgeInsets.all(1),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      color: Palette.greyColor,
                     ),
                     child: Center(
                       child: Text(
@@ -335,7 +328,6 @@ class _StepDatesState extends State<StepDates> {
                       day.day.toString(),
                       style: const TextStyle(
                         fontSize: 18,
-                        color: Palette.greyColor,
                       ),
                     ),
                   ),
@@ -357,7 +349,6 @@ class _StepDatesState extends State<StepDates> {
                       width: 5,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50),
-                        color: Palette.greyColor,
                       ),
                     ),
                   ],
@@ -368,7 +359,6 @@ class _StepDatesState extends State<StepDates> {
                   margin: const EdgeInsets.all(1),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: Palette.blueColor,
                   ),
                   child: Center(
                     child: Text(
@@ -390,7 +380,6 @@ class _StepDatesState extends State<StepDates> {
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(3),
-                                color: Palette.greyColor,
                               ),
                               padding: const EdgeInsets.symmetric(
                                 vertical: 1.5,

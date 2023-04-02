@@ -1,11 +1,9 @@
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/poll_detail/location_detail.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
@@ -59,8 +57,6 @@ class _LocationsListState extends State<LocationsList> {
                 },
                 icon: Icon(
                   Icons.sort_by_alpha,
-                  color:
-                      Provider.of<ThemeSwitch>(context).themeData.primaryColor,
                 ),
               ),
               IconButton(
@@ -73,8 +69,6 @@ class _LocationsListState extends State<LocationsList> {
                 },
                 icon: Icon(
                   Icons.sort,
-                  color:
-                      Provider.of<ThemeSwitch>(context).themeData.primaryColor,
                 ),
               ),
             ],
@@ -137,7 +131,6 @@ class LocationTile extends StatelessWidget {
         border: Border(
           top: BorderSide(
             width: 1,
-            color: Palette.greyColor,
           ),
         ),
       ),
@@ -153,12 +146,10 @@ class LocationTile extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
-            color: Palette.lightBGColor,
             borderRadius: BorderRadius.circular(50),
           ),
           child: Icon(
             LocationIcons.icons[location.icon],
-            color: Palette.greyColor,
           ),
         ),
         trailing: Row(

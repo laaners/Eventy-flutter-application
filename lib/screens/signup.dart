@@ -1,5 +1,6 @@
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
+import 'package:dima_app/widgets/my_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,7 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      // todo: remove appBar
+      appBar: MyAppBar(title: "", upRightActions: []),
       body: SignUpForm(),
     );
   }
@@ -203,49 +204,33 @@ class _SignUpFormState extends State<SignUpForm> {
               },
             ),
           ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-            alignment: Alignment.center,
-            child: ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  // If the form is valid, display a snackbar and call a server or save the information in the database.
-                  // TODO: if the operation is successful move the home page.
+          MyButton(
+            text: "SIGN UP",
+            onPressed: () async {
+              if (_formKey.currentState!.validate()) {
+                // ignore: use_build_context_synchronously
+                if (await Provider.of<FirebaseUser>(context, listen: false)
+                    .signUpWithEmail(
+                  email: _emailController.text,
+                  password: _passwordController.text,
+                  username: _usernameController.text,
+                  name: _nameController.text,
+                  surname: _surnameController.text,
+                  profilePic: "default",
+                  context: context,
+                )) {
                   // ignore: use_build_context_synchronously
-                  if (await Provider.of<FirebaseUser>(context, listen: false)
-                      .signUpWithEmail(
-                    email: _emailController.text,
-                    password: _passwordController.text,
-                    username: _usernameController.text,
-                    name: _nameController.text,
-                    surname: _surnameController.text,
-                    profilePic: "default",
-                    context: context,
-                  )) {
-                    // ignore: use_build_context_synchronously
-                    Navigator.pop(context);
-                  }
-
-                  // ignore: use_build_context_synchronously
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    // TODO: personalize message:
-                    //   - if the user is created show message, e.g. "Welcome, $username!"
-                    //   - else do not show snackBar
-                    const SnackBar(
-                      content: Text('Processing Data'),
-                    ),
-                  );
+                  Navigator.pop(context);
                 }
-              },
-              style: const ButtonStyle(
-                padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
-                    EdgeInsets.all(20)),
-              ),
-              child: const Text(
-                "SIGN UP",
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
+
+                // ignore: use_build_context_synchronously
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Welcome, ${_usernameController.text}!"),
+                  ),
+                );
+              }
+            },
           ),
           Container(
             margin: const EdgeInsets.all(20),

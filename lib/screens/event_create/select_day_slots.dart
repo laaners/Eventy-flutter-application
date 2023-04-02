@@ -47,7 +47,6 @@ class _SelectDaySlotsState extends State<SelectDaySlots> {
                 border: Border(
                   top: BorderSide(
                     width: 1,
-                    color: Palette.greyColor,
                   ),
                 ),
               ),
@@ -63,12 +62,10 @@ class _SelectDaySlotsState extends State<SelectDaySlots> {
                 leading: Container(
                   padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
-                    color: Palette.lightBGColor,
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: const Icon(
                     Icons.access_time_outlined,
-                    color: Palette.greyColor,
                   ),
                 ),
                 trailing: IconButton(
@@ -120,19 +117,14 @@ class _SelectDaySlotsState extends State<SelectDaySlots> {
           child: ListTile(
             title: const Text(
               "Add another time slot",
-              style: TextStyle(
-                color: Palette.blueColor,
-              ),
             ),
             leading: Container(
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                color: Palette.lightBGColor,
                 borderRadius: BorderRadius.circular(50),
               ),
               child: const Icon(
                 Icons.add_circle_outline,
-                color: Palette.blueColor,
               ),
             ),
             onTap: () async {

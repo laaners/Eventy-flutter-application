@@ -1,7 +1,6 @@
 import 'package:dima_app/screens/event_create/select_location_address.dart';
 import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/location_icons.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_button.dart';
@@ -189,10 +188,6 @@ class _SelectLocationState extends State<SelectLocation> {
                                   margin: const EdgeInsets.all(5),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(50 + 5),
-                                    color: LocationIcons.icons[locationIcon] ==
-                                            entry.value
-                                        ? Palette.lightBGColor
-                                        : Colors.transparent,
                                   ),
                                   child: IconButton(
                                     iconSize: 50.0,
@@ -205,7 +200,6 @@ class _SelectLocationState extends State<SelectLocation> {
                                     },
                                     icon: Icon(
                                       entry.value,
-                                      color: Palette.greyColor,
                                     ),
                                   ),
                                 );

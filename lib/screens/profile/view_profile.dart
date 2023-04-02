@@ -2,6 +2,7 @@ import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/event_list.dart';
 import 'package:dima_app/widgets/event_poll_switch.dart';
 import 'package:dima_app/widgets/lists_switcher.dart';
+import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/poll_list.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/my_app_bar.dart';

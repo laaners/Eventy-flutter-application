@@ -106,7 +106,6 @@ class DateTile extends StatelessWidget {
         border: Border(
           top: BorderSide(
             width: 1,
-            color: Palette.greyColor,
           ),
         ),
       ),
@@ -122,12 +121,10 @@ class DateTile extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
-            color: Palette.lightBGColor,
             borderRadius: BorderRadius.circular(50),
           ),
           child: const Icon(
             Icons.location_on_outlined,
-            color: Palette.greyColor,
           ),
         ),
         trailing: Row(

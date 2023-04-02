@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:dima_app/server/tables/location.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/gmaps.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:http/http.dart' as http;
@@ -165,7 +164,6 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
                         decoration: const BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
-                              color: Palette.greyColor,
                               width: 1.0,
                             ),
                           ),

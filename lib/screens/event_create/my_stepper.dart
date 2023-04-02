@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:dima_app/themes/palette.dart';
 import 'package:flutter/material.dart';
 
 // TODO(dragostis): Missing functionality:
@@ -854,7 +853,7 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
                   children: children,
                 ),
               ),
-              const Divider(color: Palette.greyColor, height: 1, thickness: 1),
+              const Divider(height: 1, thickness: 1),
             ],
           ),
         ),

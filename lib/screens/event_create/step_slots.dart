@@ -1,4 +1,3 @@
-import 'package:dima_app/themes/palette.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -59,7 +58,6 @@ class _StepSlotsState extends State<StepSlots> {
             border: Border(
               top: BorderSide(
                 width: 1,
-                color: Palette.greyColor,
               ),
             ),
           ),
@@ -75,12 +73,10 @@ class _StepSlotsState extends State<StepSlots> {
             leading: Container(
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                color: Palette.lightBGColor,
                 borderRadius: BorderRadius.circular(50),
               ),
               child: const Icon(
                 Icons.videocam,
-                color: Palette.greyColor,
               ),
             ),
             trailing: IconButton(

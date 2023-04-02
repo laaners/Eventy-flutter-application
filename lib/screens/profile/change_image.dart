@@ -1,9 +1,7 @@
 import 'dart:io';
 
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/profile/profile_pic.dart';
 import 'package:dima_app/server/firebase_user.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -88,6 +86,7 @@ class _ChangeImageState extends State<ChangeImage> {
           _showPicker(context);
         },
         child: Stack(
+          alignment: Alignment.center,
           children: [
             Consumer<FirebaseUser>(
               builder: (context, value, child) {
@@ -104,7 +103,6 @@ class _ChangeImageState extends State<ChangeImage> {
               child: Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: Palette.lightBGColor,
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: IconButton(
@@ -136,13 +134,8 @@ class _ChangeImageState extends State<ChangeImage> {
             children: [
               ListTile(
                   leading: const Icon(Icons.photo_library),
-                  title: Text(
+                  title: const Text(
                     'Gallery',
-                    style: TextStyle(
-                      color: Provider.of<ThemeSwitch>(context)
-                          .themeData
-                          .primaryColor,
-                    ),
                   ),
                   onTap: () {
                     imgFromGallery(context);
@@ -150,13 +143,8 @@ class _ChangeImageState extends State<ChangeImage> {
                   }),
               ListTile(
                 leading: const Icon(Icons.photo_camera),
-                title: Text(
+                title: const Text(
                   'Camera',
-                  style: TextStyle(
-                    color: Provider.of<ThemeSwitch>(context)
-                        .themeData
-                        .primaryColor,
-                  ),
                 ),
                 onTap: () {
                   imgFromCamera(context);

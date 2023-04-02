@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/poll_detail/dates_list.dart';
 import 'package:dima_app/screens/poll_detail/invitees_pill.dart';
@@ -25,7 +24,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../widgets/title.dart';
 
 class PollDetailScreen extends StatefulWidget {
   final String pollId;
@@ -256,9 +254,6 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
                       },
                       child: Icon(
                         Icons.share_outlined,
-                        color: Provider.of<ThemeSwitch>(context)
-                            .themeData
-                            .primaryColor,
                       ),
                     )
                   ],
@@ -267,10 +262,7 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 10),
                   child: ListView(
                     children: [
-                      MyTitle(
-                        text: pollData.pollName,
-                        alignment: Alignment.topLeft,
-                      ),
+                      Text(pollData.pollName),
                       InviteesPill(
                         pollEventId: widget.pollId,
                         invites: pollInvites,

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/poll_detail/my_poll.dart';
 import 'package:dima_app/server/firebase_user.dart';
@@ -9,7 +8,6 @@ import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/gmaps.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
@@ -110,7 +108,6 @@ class LocationDetail extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-              color: Palette.lightBGColor,
               borderRadius: BorderRadius.circular(50 + 5),
             ),
             child: IconButton(
@@ -120,7 +117,6 @@ class LocationDetail extends StatelessWidget {
               onPressed: () {},
               icon: Icon(
                 LocationIcons.icons[location.icon],
-                color: Palette.greyColor,
               ),
             ),
           ),
@@ -308,10 +304,10 @@ class LocationDetail extends StatelessWidget {
                       ? "The organizer did not provide any link"
                       : location.site,
                   style: TextStyle(
-                    color: Provider.of<ThemeSwitch>(context)
-                        .themeData
-                        .primaryColor,
-                  ),
+                      // color: Provider.of<ThemeSwitch>(context)
+                      //     .themeData
+                      //     .primaryColor,
+                      ),
                   enabled: false,
                   autofocus: false,
                 ),
@@ -339,11 +335,6 @@ class LocationDetail extends StatelessWidget {
                     ),
                     subtitle: TextFormField(
                       initialValue: location.site,
-                      style: TextStyle(
-                        color: Provider.of<ThemeSwitch>(context)
-                            .themeData
-                            .primaryColor,
-                      ),
                       autofocus: false,
                       enabled: false,
                     ),
@@ -369,7 +360,6 @@ class LocationDetail extends StatelessWidget {
                 width: 80,
                 height: 3,
                 decoration: BoxDecoration(
-                  color: Palette.greyColor.withOpacity(0.5),
                   borderRadius: const BorderRadius.all(Radius.circular(20)),
                 ),
               ),
@@ -397,7 +387,6 @@ class LocationDetail extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                      color: Palette.lightBGColor,
                       borderRadius: BorderRadius.circular(50 + 5),
                     ),
                     child: IconButton(
@@ -407,7 +396,6 @@ class LocationDetail extends StatelessWidget {
                       onPressed: () {},
                       icon: Icon(
                         LocationIcons.icons[location.icon],
-                        color: Palette.greyColor,
                       ),
                     ),
                   ),
@@ -599,11 +587,6 @@ class LocationDetail extends StatelessWidget {
                           initialValue: location.site.isEmpty
                               ? "The organizer did not provide any link"
                               : location.site,
-                          style: TextStyle(
-                            color: Provider.of<ThemeSwitch>(context)
-                                .themeData
-                                .primaryColor,
-                          ),
                           enabled: false,
                           autofocus: false,
                         ),
@@ -631,11 +614,6 @@ class LocationDetail extends StatelessWidget {
                             ),
                             subtitle: TextFormField(
                               initialValue: location.site,
-                              style: TextStyle(
-                                color: Provider.of<ThemeSwitch>(context)
-                                    .themeData
-                                    .primaryColor,
-                              ),
                               autofocus: false,
                               enabled: false,
                             ),

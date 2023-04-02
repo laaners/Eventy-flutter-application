@@ -2,7 +2,6 @@ import 'package:dima_app/screens/event_create/select_location.dart';
 import 'package:dima_app/screens/event_create/select_virtual.dart';
 import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/location_icons.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';
 
@@ -102,19 +101,14 @@ class _StepPlacesState extends State<StepPlaces> {
           child: ListTile(
             title: const Text(
               "Add a location",
-              style: TextStyle(
-                color: Palette.blueColor,
-              ),
             ),
             leading: Container(
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                color: Palette.lightBGColor,
                 borderRadius: BorderRadius.circular(50),
               ),
               child: const Icon(
                 Icons.add_location_alt,
-                color: Palette.blueColor,
               ),
             ),
             onTap: () {
@@ -148,7 +142,6 @@ class _StepPlacesState extends State<StepPlaces> {
               border: Border(
                 top: BorderSide(
                   width: 1,
-                  color: Palette.greyColor,
                 ),
               ),
             ),
@@ -173,12 +166,10 @@ class _StepPlacesState extends State<StepPlaces> {
               leading: Container(
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: Palette.lightBGColor,
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: const Icon(
                   Icons.videocam,
-                  color: Palette.greyColor,
                 ),
               ),
               trailing: IconButton(
@@ -229,7 +220,6 @@ class _StepPlacesState extends State<StepPlaces> {
               border: Border(
                 top: BorderSide(
                   width: 1,
-                  color: Palette.greyColor,
                 ),
               ),
             ),
@@ -245,12 +235,10 @@ class _StepPlacesState extends State<StepPlaces> {
               leading: Container(
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: Palette.lightBGColor,
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Icon(
                   LocationIcons.icons[location.icon],
-                  color: Palette.greyColor,
                 ),
               ),
               trailing: IconButton(

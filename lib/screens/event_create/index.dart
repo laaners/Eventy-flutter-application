@@ -1,6 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/event_create/my_stepper.dart';
 import 'package:dima_app/screens/event_create/step_basics.dart';
 import 'package:dima_app/screens/event_create/step_dates.dart';
@@ -14,7 +11,6 @@ import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
@@ -69,13 +65,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
         MyStep(
           isActive: _activeStepIndex >= 0,
           title: const Text(""),
-          label: Text(
+          label: const Text(
             "Basics",
-            style: TextStyle(
-              color: Provider.of<ThemeSwitch>(context, listen: false)
-                  .themeData
-                  .primaryColor,
-            ),
           ),
           content: Container(
             margin: EdgeInsets.only(
@@ -107,13 +98,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
         MyStep(
           isActive: _activeStepIndex >= 1,
           title: const Text(""),
-          label: Text(
+          label: const Text(
             "Places",
-            style: TextStyle(
-              color: Provider.of<ThemeSwitch>(context, listen: false)
-                  .themeData
-                  .primaryColor,
-            ),
           ),
           content: StepPlaces(
             locations: locations,
@@ -133,13 +119,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
         MyStep(
           isActive: _activeStepIndex >= 2,
           title: const Text(""),
-          label: Text(
+          label: const Text(
             "Dates",
-            style: TextStyle(
-              color: Provider.of<ThemeSwitch>(context, listen: false)
-                  .themeData
-                  .primaryColor,
-            ),
           ),
           content: StepDates(
             dates: dates,
@@ -187,13 +168,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
         MyStep(
           isActive: _activeStepIndex >= 3,
           title: const Text(""),
-          label: Text(
+          label: const Text(
             "Invite",
-            style: TextStyle(
-              color: Provider.of<ThemeSwitch>(context, listen: false)
-                  .themeData
-                  .primaryColor,
-            ),
           ),
           content: StepInvite(
             invitees: invitees,
@@ -221,182 +197,169 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
         title: "New Event",
         upRightActions: [MyAppBar.SearchAction(context)],
       ),
-      body: Theme(
-        data: ThemeData(
-          canvasColor: Provider.of<ThemeSwitch>(context)
-              .themeData
-              .scaffoldBackgroundColor,
-          shadowColor: Colors.transparent,
-          colorScheme: Theme.of(context).colorScheme.copyWith(
-                primary: Palette.blueColor,
-              ),
-        ),
-        child: MyStepper(
-          currentStep: _activeStepIndex,
-          steps: stepList(),
-          onStepContinue: () async {
-            if (_activeStepIndex < (stepList().length - 1)) {
-              setState(() {
-                _activeStepIndex += 1;
-              });
-            } else {
-              var curUid =
-                  Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+      body: MyStepper(
+        currentStep: _activeStepIndex,
+        steps: stepList(),
+        onStepContinue: () async {
+          if (_activeStepIndex < (stepList().length - 1)) {
+            setState(() {
+              _activeStepIndex += 1;
+            });
+          } else {
+            var curUid =
+                Provider.of<FirebaseUser>(context, listen: false).user!.uid;
 
-              bool ret = MyAlertDialog.showAlertIfCondition(
-                context,
-                eventTitleController.text.isEmpty,
-                "MISSING EVENT NAME",
-                "You must give a name to the event",
-              );
-              if (ret) return;
+            bool ret = MyAlertDialog.showAlertIfCondition(
+              context,
+              eventTitleController.text.isEmpty,
+              "MISSING EVENT NAME",
+              "You must give a name to the event",
+            );
+            if (ret) return;
 
-              ret = MyAlertDialog.showAlertIfCondition(
-                context,
-                locations.isEmpty,
-                "MISSING EVENT PLACES",
-                "You must choose where to hold the event",
-              );
-              if (ret) return;
+            ret = MyAlertDialog.showAlertIfCondition(
+              context,
+              locations.isEmpty,
+              "MISSING EVENT PLACES",
+              "You must choose where to hold the event",
+            );
+            if (ret) return;
 
-              ret = MyAlertDialog.showAlertIfCondition(
-                context,
-                dates.isEmpty,
-                "MISSING EVENT DATES",
-                "You must choose when to hold the event",
-              );
-              if (ret) return;
+            ret = MyAlertDialog.showAlertIfCondition(
+              context,
+              dates.isEmpty,
+              "MISSING EVENT DATES",
+              "You must choose when to hold the event",
+            );
+            if (ret) return;
 
-              var utcDeadline =
-                  DateFormatter.toUtcString(deadlineController.text);
-              Map<String, dynamic> utcDates = {};
-              dates.forEach((day, slots) {
-                slots.forEach((slot, _) {
-                  var startDateString =
-                      "${day.split(" ")[0]} ${slot.split("-")[0]}:00";
-                  var endDateString =
-                      "${day.split(" ")[0]} ${slot.split("-")[1]}:00";
-                  var startDateUtc = DateFormatter.string2DateTime(
-                      DateFormatter.toUtcString(startDateString));
-                  var endDateUtc = DateFormatter.string2DateTime(
-                      DateFormatter.toUtcString(endDateString));
-                  String utcDay = DateFormat("yyyy-MM-dd").format(startDateUtc);
-                  var startUtc = DateFormat("HH:mm").format(startDateUtc);
-                  var endUtc = DateFormat("HH:mm").format(endDateUtc);
-                  if (!utcDates.containsKey(utcDay)) {
-                    utcDates[utcDay] = [];
-                  }
-                  utcDates[utcDay].add({
-                    "start": startUtc,
-                    "end": endUtc,
-                  });
+            var utcDeadline =
+                DateFormatter.toUtcString(deadlineController.text);
+            Map<String, dynamic> utcDates = {};
+            dates.forEach((day, slots) {
+              slots.forEach((slot, _) {
+                var startDateString =
+                    "${day.split(" ")[0]} ${slot.split("-")[0]}:00";
+                var endDateString =
+                    "${day.split(" ")[0]} ${slot.split("-")[1]}:00";
+                var startDateUtc = DateFormatter.string2DateTime(
+                    DateFormatter.toUtcString(startDateString));
+                var endDateUtc = DateFormatter.string2DateTime(
+                    DateFormatter.toUtcString(endDateString));
+                String utcDay = DateFormat("yyyy-MM-dd").format(startDateUtc);
+                var startUtc = DateFormat("HH:mm").format(startDateUtc);
+                var endUtc = DateFormat("HH:mm").format(endDateUtc);
+                if (!utcDates.containsKey(utcDay)) {
+                  utcDates[utcDay] = [];
+                }
+                utcDates[utcDay].add({
+                  "start": startUtc,
+                  "end": endUtc,
                 });
               });
-              var locationsMap = locations.map((location) {
-                return {
-                  "name": location.name,
-                  "site": location.site,
-                  "lat": location.lat,
-                  "lon": location.lon,
-                  "icon": location.icon,
-                };
-              }).toList();
-              LoadingOverlay.show(context);
-              var dbPoll =
-                  await Provider.of<FirebasePoll>(context, listen: false)
-                      .createPoll(
-                context: context,
-                pollName: eventTitleController.text,
-                organizerUid: curUid,
-                pollDesc: eventDescController.text,
-                deadline: utcDeadline,
-                dates: utcDates,
-                locations: locationsMap,
-                public: true,
-              );
-              ret = MyAlertDialog.showAlertIfCondition(
-                context,
-                dbPoll == null,
-                "DUPLICATE POLL",
-                "A poll with this name already exists",
-              );
-              if (ret) {
-                LoadingOverlay.hide(context);
-                return;
-              }
-
-              String pollId = "${eventTitleController.text}_$curUid";
-              await Provider.of<FirebasePollEventInvite>(context, listen: false)
-                  .createPollEventInvite(
-                context: context,
-                pollEventId: pollId,
-                inviteeId: curUid,
-              );
-              await Future.wait(invitees
-                  .map((invitee) => Provider.of<FirebasePollEventInvite>(
-                              context,
-                              listen: false)
-                          .createPollEventInvite(
-                        context: context,
-                        pollEventId: pollId,
-                        inviteeId: invitee.uid,
-                      ))
-                  .toList());
+            });
+            var locationsMap = locations.map((location) {
+              return {
+                "name": location.name,
+                "site": location.site,
+                "lat": location.lat,
+                "lon": location.lon,
+                "icon": location.icon,
+              };
+            }).toList();
+            LoadingOverlay.show(context);
+            var dbPoll = await Provider.of<FirebasePoll>(context, listen: false)
+                .createPoll(
+              context: context,
+              pollName: eventTitleController.text,
+              organizerUid: curUid,
+              pollDesc: eventDescController.text,
+              deadline: utcDeadline,
+              dates: utcDates,
+              locations: locationsMap,
+              public: true,
+            );
+            ret = MyAlertDialog.showAlertIfCondition(
+              context,
+              dbPoll == null,
+              "DUPLICATE POLL",
+              "A poll with this name already exists",
+            );
+            if (ret) {
               LoadingOverlay.hide(context);
-              Navigator.of(context).pop();
-              Navigator.push(
-                context,
-                ScreenTransition(
-                    builder: (context) => PollDetailScreen(pollId: pollId)),
-              );
-            }
-          },
-          onStepCancel: () {
-            if (_activeStepIndex == 0) {
               return;
             }
-            setState(() {
-              _activeStepIndex -= 1;
-            });
-          },
-          onStepTapped: (int index) {
-            setState(() {
-              _activeStepIndex = index;
-            });
-          },
-          // override continue cancel of stepper
-          controlsBuilder: (context, controls) {
-            final isLastStep = _activeStepIndex == stepList().length - 1;
-            return Container(
-              margin: const EdgeInsets.only(
-                bottom: 0,
-                top: 10,
-                left: 10,
-                right: 10,
-              ),
-              child: Row(
-                children: [
-                  if (_activeStepIndex > 0)
-                    Expanded(
-                      child: MyButton(
-                        text: "Back",
-                        onPressed: controls.onStepCancel!,
-                      ),
-                    ),
-                  SizedBox(
-                    width: _activeStepIndex > 0 ? 10 : 0,
-                  ),
+
+            String pollId = "${eventTitleController.text}_$curUid";
+            await Provider.of<FirebasePollEventInvite>(context, listen: false)
+                .createPollEventInvite(
+              context: context,
+              pollEventId: pollId,
+              inviteeId: curUid,
+            );
+            await Future.wait(invitees
+                .map((invitee) =>
+                    Provider.of<FirebasePollEventInvite>(context, listen: false)
+                        .createPollEventInvite(
+                      context: context,
+                      pollEventId: pollId,
+                      inviteeId: invitee.uid,
+                    ))
+                .toList());
+            LoadingOverlay.hide(context);
+            Navigator.of(context).pop();
+            Navigator.push(
+              context,
+              ScreenTransition(
+                  builder: (context) => PollDetailScreen(pollId: pollId)),
+            );
+          }
+        },
+        onStepCancel: () {
+          if (_activeStepIndex == 0) {
+            return;
+          }
+          setState(() {
+            _activeStepIndex -= 1;
+          });
+        },
+        onStepTapped: (int index) {
+          setState(() {
+            _activeStepIndex = index;
+          });
+        },
+        // override continue cancel of stepper
+        controlsBuilder: (context, controls) {
+          final isLastStep = _activeStepIndex == stepList().length - 1;
+          return Container(
+            margin: const EdgeInsets.only(
+              bottom: 0,
+              top: 10,
+              left: 10,
+              right: 10,
+            ),
+            child: Row(
+              children: [
+                if (_activeStepIndex > 0)
                   Expanded(
                     child: MyButton(
-                      onPressed: controls.onStepContinue!,
-                      text: (isLastStep) ? 'Create' : 'Next',
+                      text: "Back",
+                      onPressed: controls.onStepCancel!,
                     ),
                   ),
-                ],
-              ),
-            );
-          },
-        ),
+                SizedBox(
+                  width: _activeStepIndex > 0 ? 10 : 0,
+                ),
+                Expanded(
+                  child: MyButton(
+                    onPressed: controls.onStepContinue!,
+                    text: (isLastStep) ? 'Create' : 'Next',
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
