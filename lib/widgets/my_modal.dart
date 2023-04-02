@@ -1,5 +1,3 @@
-import 'package:dima_app/themes/palette.dart';
-import 'package:dima_app/widgets/title.dart';
 import 'package:flutter/material.dart';
 
 class MyModal extends StatelessWidget {
@@ -56,16 +54,17 @@ class MyModal extends StatelessWidget {
                           width: 80,
                           height: 3,
                           decoration: BoxDecoration(
-                            color: Palette.greyColor.withOpacity(0.5),
+                            // color: Palette.greyColor.withOpacity(0.5),
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(20)),
                           ),
                         ),
                         if (title.isNotEmpty)
-                          MyTitle(
-                            text: title,
-                            alignment: Alignment.topCenter,
-                          ),
+                          Text(
+                            title,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          )
                       ],
                     ),
                   ),
@@ -97,16 +96,16 @@ class MyModal extends StatelessWidget {
                           width: 80,
                           height: 3,
                           decoration: BoxDecoration(
-                            color: Palette.greyColor.withOpacity(0.5),
+                            // color: Palette.greyColor.withOpacity(0.5),
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(20)),
                           ),
                         ),
                         if (title.isNotEmpty)
-                          MyTitle(
-                            text: title,
-                            alignment: Alignment.topCenter,
-                          ),
+                          Text(
+                            title,
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          )
                       ],
                     ),
                   ),

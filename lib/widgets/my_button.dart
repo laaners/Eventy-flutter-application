@@ -7,16 +7,17 @@ class MyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.0),
-          ),
+    return Container(
+      alignment: Alignment.center,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: const ButtonStyle(
+          padding:
+              MaterialStatePropertyAll<EdgeInsetsGeometry>(EdgeInsets.all(20)),
+          textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 18)),
         ),
+        child: Text(text),
       ),
-      child: Text(text),
     );
   }
 }

@@ -1,4 +1,3 @@
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -37,9 +36,6 @@ class _MyTextFieldState extends State<MyTextField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Palette.greyColor),
-      ),
       child: TextFormField(
         focusNode: _focus,
         autofocus: false,
@@ -47,9 +43,6 @@ class _MyTextFieldState extends State<MyTextField> {
         keyboardType: TextInputType.text,
         minLines: widget.maxLines,
         maxLines: null, // widget.maxLines,
-        style: TextStyle(
-          color: Provider.of<ThemeSwitch>(context).themeData.primaryColor,
-        ),
         buildCounter: (
           context, {
           required currentLength,
@@ -63,9 +56,6 @@ class _MyTextFieldState extends State<MyTextField> {
                     alignment: Alignment.topRight,
                     child: Text(
                       "$currentLength/$maxLength",
-                      style: const TextStyle(
-                        color: Palette.greyColor,
-                      ),
                     ),
                   ),
                 )
@@ -75,9 +65,6 @@ class _MyTextFieldState extends State<MyTextField> {
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(15),
           hintText: widget.hintText,
-          hintStyle: const TextStyle(
-            color: Palette.greyColor,
-          ),
           hintMaxLines: 2,
         ),
         maxLength: widget.maxLength,

@@ -1,4 +1,3 @@
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,9 +14,9 @@ class PillBox extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           decoration: BoxDecoration(
-            color: Provider.of<ThemeSwitch>(context, listen: true)
-                .themeData
-                .scaffoldBackgroundColor,
+            // color: Provider.of<ThemeSwitch>(context, listen: true)
+            //     .themeData
+            //     .scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(35),
             boxShadow: [
               BoxShadow(

@@ -1,4 +1,3 @@
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,9 +26,8 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
             delegate: CustomDelegate(),
           );
         },
-        child: Icon(
+        child: const Icon(
           Icons.search,
-          color: Provider.of<ThemeSwitch>(context).themeData.primaryColor,
         ),
       );
 
@@ -39,8 +37,6 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       title: Text(title),
       backgroundColor: Colors.transparent,
-      iconTheme:
-          Provider.of<ThemeSwitch>(context).themeData.appBarTheme.iconTheme,
       actions: upRightActions,
     );
   }
