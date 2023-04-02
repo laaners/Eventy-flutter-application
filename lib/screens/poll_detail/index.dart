@@ -245,11 +245,13 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                         text: pollData.pollName,
                         alignment: Alignment.topLeft,
                       ),
-                      InviteesPill(
-                        pollData: pollData,
-                        pollEventId: widget.pollId,
-                        invites: pollInvites,
-                        refreshPollDetail: refreshPollDetail,
+                      Center(
+                        child: InviteesPill(
+                          pollData: pollData,
+                          pollEventId: widget.pollId,
+                          invites: pollInvites,
+                          refreshPollDetail: refreshPollDetail,
+                        ),
                       ),
                       Container(
                           padding: const EdgeInsets.symmetric(vertical: 5)),

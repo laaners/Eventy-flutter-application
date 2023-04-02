@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../server/firebase_user.dart';
 
 class DeleteDialog extends StatefulWidget {
-  DeleteDialog({super.key});
+  const DeleteDialog({super.key});
 
   @override
   State<DeleteDialog> createState() => _DeleteDialogState();

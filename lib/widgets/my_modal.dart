@@ -1,4 +1,5 @@
 import 'package:dima_app/themes/palette.dart';
+import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/title.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +30,7 @@ class MyModal extends StatelessWidget {
       children: [
         doneCancelMode
             ? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
                     alignment: Alignment.topRight,
@@ -114,12 +115,23 @@ class MyModal extends StatelessWidget {
               ),
         Expanded(
           child: Container(
-            margin: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: ListView(
-              shrinkWrap: true,
-              physics: const ClampingScrollPhysics(),
-              children: [child],
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Container(
+                margin: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: ListView(
+                  shrinkWrap: true,
+                  physics: const ClampingScrollPhysics(),
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(top: 15),
+                      child: child,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

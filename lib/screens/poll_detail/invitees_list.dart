@@ -14,6 +14,7 @@ import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
+import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -74,6 +75,7 @@ class _InviteesListState extends State<InviteesList> {
     }));
 
     // delete removed invites, filter out organizer (impossible case but whatever) and curuid
+    // ignore: use_build_context_synchronously
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     List<String> toRemove = oldInvitees
         .where((oldId) =>
@@ -140,8 +142,10 @@ class _InviteesListState extends State<InviteesList> {
               title: "Partecipants",
               upRightActions: [],
             ),
-            body: Center(
-              child: Text("empty"),
+            body: ResponsiveWrapper(
+              child: Center(
+                child: Text("No other partecipants"),
+              ),
             ),
           );
   }
@@ -217,13 +221,17 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
             listSticky: null,
             labels: const ["Partecipants", "Invite"],
             tabbars: [
-              ListView(
-                children: usersData
-                    .map((user) => InviteeTile(
-                          userData: user,
-                        ))
-                    .toList(),
-              ),
+              usersData.isNotEmpty
+                  ? ListView(
+                      children: usersData
+                          .map((user) => InviteeTile(
+                                userData: user,
+                              ))
+                          .toList(),
+                    )
+                  : const Center(
+                      child: Text("No other partecipants"),
+                    ),
               ListView(
                 children: [
                   StepInvite(
@@ -248,14 +256,18 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
               title: widget.pollData.pollName,
               upRightActions: [],
             ),
-            body: ListView(
-              children: usersData
-                  .map(
-                    (user) => InviteeTile(
-                      userData: user,
+            body: ResponsiveWrapper(
+              child: usersData.isNotEmpty
+                  ? ListView(
+                      children: usersData
+                          .map((user) => InviteeTile(
+                                userData: user,
+                              ))
+                          .toList(),
+                    )
+                  : const Center(
+                      child: Text("No other partecipants"),
                     ),
-                  )
-                  .toList(),
             ),
           );
   }

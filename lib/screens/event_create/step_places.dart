@@ -3,6 +3,7 @@ import 'package:dima_app/screens/event_create/select_virtual.dart';
 import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/themes/palette.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';
 
@@ -60,6 +61,7 @@ class _StepPlacesState extends State<StepPlaces> {
                     value: virtualMeeting,
                     onChanged: (value) {
                       if (value) {
+                        /*
                         showModalBottomSheet(
                           useRootNavigator: true,
                           isScrollControlled: true,
@@ -83,6 +85,25 @@ class _StepPlacesState extends State<StepPlaces> {
                               ),
                             ),
                           ),
+                        );
+                        */
+                        MyModal.show(
+                          context: context,
+                          child: SelectVirtual(
+                            defaultOptions: Location("", "", 1, 1, "videocam"),
+                            locations: widget.locations,
+                            addLocation: widget.addLocation,
+                            removeLocation: widget.removeLocation,
+                            setVirtualMeeting: (value) {
+                              setState(() {
+                                virtualMeeting = value;
+                              });
+                            },
+                          ),
+                          heightFactor: 0.85,
+                          doneCancelMode: false,
+                          onDone: () {},
+                          title: "",
                         );
                       } else {
                         widget.removeLocation("Virtual meeting");
@@ -118,23 +139,19 @@ class _StepPlacesState extends State<StepPlaces> {
               ),
             ),
             onTap: () {
-              showModalBottomSheet(
-                useRootNavigator: true,
-                isScrollControlled: true,
+              MyModal.show(
                 context: context,
-                builder: (context) => FractionallySizedBox(
-                  heightFactor: 0.85,
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 15, bottom: 15),
-                    child: SelectLocation(
-                      locations: widget.locations,
-                      addLocation: widget.addLocation,
-                      removeLocation: widget.removeLocation,
-                      defaultLocation:
-                          Location("", "", 0, 0, "location_on_outlined"),
-                    ),
-                  ),
+                child: SelectLocation(
+                  locations: widget.locations,
+                  addLocation: widget.addLocation,
+                  removeLocation: widget.removeLocation,
+                  defaultLocation:
+                      Location("", "", 0, 0, "location_on_outlined"),
                 ),
+                heightFactor: 0.85,
+                doneCancelMode: false,
+                onDone: () {},
+                title: "",
               );
             },
           ),
@@ -193,28 +210,24 @@ class _StepPlacesState extends State<StepPlaces> {
                 },
               ),
               onTap: () {
-                showModalBottomSheet(
-                  useRootNavigator: true,
-                  isScrollControlled: true,
+                MyModal.show(
                   context: context,
-                  builder: (context) => FractionallySizedBox(
-                    heightFactor: 0.85,
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 15, bottom: 15),
-                      child: SelectVirtual(
-                        defaultOptions: widget.locations
-                            .firstWhere((_) => _.name == "Virtual meeting"),
-                        locations: widget.locations,
-                        addLocation: widget.addLocation,
-                        removeLocation: widget.removeLocation,
-                        setVirtualMeeting: (value) {
-                          setState(() {
-                            virtualMeeting = value;
-                          });
-                        },
-                      ),
-                    ),
+                  child: SelectVirtual(
+                    defaultOptions: widget.locations
+                        .firstWhere((_) => _.name == "Virtual meeting"),
+                    locations: widget.locations,
+                    addLocation: widget.addLocation,
+                    removeLocation: widget.removeLocation,
+                    setVirtualMeeting: (value) {
+                      setState(() {
+                        virtualMeeting = value;
+                      });
+                    },
                   ),
+                  heightFactor: 0.85,
+                  doneCancelMode: false,
+                  onDone: () {},
+                  title: "",
                 );
               },
             ),
@@ -262,6 +275,7 @@ class _StepPlacesState extends State<StepPlaces> {
                 },
               ),
               onTap: () {
+                /*
                 showModalBottomSheet(
                   useRootNavigator: true,
                   isScrollControlled: true,
@@ -278,6 +292,20 @@ class _StepPlacesState extends State<StepPlaces> {
                       ),
                     ),
                   ),
+                );
+                */
+                MyModal.show(
+                  context: context,
+                  child: SelectLocation(
+                    locations: widget.locations,
+                    addLocation: widget.addLocation,
+                    removeLocation: widget.removeLocation,
+                    defaultLocation: location,
+                  ),
+                  heightFactor: 0.85,
+                  doneCancelMode: false,
+                  onDone: () {},
+                  title: "",
                 );
               },
             ),

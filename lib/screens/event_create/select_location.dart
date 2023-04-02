@@ -110,156 +110,88 @@ class _SelectLocationState extends State<SelectLocation> {
       lon,
       locationIcon,
     ));
-    print(widget.locations);
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        Column(
           children: [
-            Container(
-              alignment: Alignment.topRight,
-              margin: const EdgeInsets.only(left: 15, top: 0),
-              child: InkWell(
-                child: const Icon(
-                  Icons.close,
-                  size: 30,
-                ),
-                onTap: () {
-                  Navigator.pop(
-                    context,
-                    "This string will be passed back to the parent",
-                  );
-                },
-              ),
-            ),
-            Flexible(
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 8, top: 8),
-                alignment: Alignment.center,
-                child: const Text(
-                  "New location for the event",
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: LocationIcons.icons.entries
+                  .where((entry) => entry.value != LocationIcons.videocam)
+                  .map((entry) {
+                return Container(
+                  padding: const EdgeInsets.all(5),
+                  margin: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50 + 5),
+                    color: LocationIcons.icons[locationIcon] == entry.value
+                        ? Palette.lightBGColor
+                        : Colors.transparent,
                   ),
+                  child: IconButton(
+                    iconSize: 50.0,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () {
+                      setState(() {
+                        locationIcon = entry.key;
+                      });
+                    },
+                    icon: Icon(
+                      entry.value,
+                      color: Palette.greyColor,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            Container(
+              margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
+              alignment: Alignment.topLeft,
+              child: const Text(
+                "Name",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
                 ),
               ),
             ),
             Container(
-              alignment: Alignment.topRight,
-              margin: const EdgeInsets.only(right: 15, top: 0),
-              child: InkWell(
-                onTap: checkFields,
-                child: const Icon(
-                  Icons.done,
-                  size: 30,
-                ),
+              margin: const EdgeInsets.symmetric(horizontal: 15),
+              child: MyTextField(
+                maxLength: 40,
+                maxLines: 1,
+                hintText: "Name of the Location",
+                controller: locationNameController,
               ),
             ),
           ],
         ),
-        Expanded(
-          child: Container(
-            margin: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: ListView(
-              children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 1000),
-                  reverseDuration: const Duration(milliseconds: 1000),
-                  child: false
-                      ? Container()
-                      : Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: LocationIcons.icons.entries
-                                  .where((entry) =>
-                                      entry.value != LocationIcons.videocam)
-                                  .map((entry) {
-                                return Container(
-                                  padding: const EdgeInsets.all(5),
-                                  margin: const EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(50 + 5),
-                                    color: LocationIcons.icons[locationIcon] ==
-                                            entry.value
-                                        ? Palette.lightBGColor
-                                        : Colors.transparent,
-                                  ),
-                                  child: IconButton(
-                                    iconSize: 50.0,
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                    onPressed: () {
-                                      setState(() {
-                                        locationIcon = entry.key;
-                                      });
-                                    },
-                                    icon: Icon(
-                                      entry.value,
-                                      color: Palette.greyColor,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.only(
-                                  bottom: 8, top: 8, left: 15),
-                              alignment: Alignment.topLeft,
-                              child: const Text(
-                                "Name",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              child: MyTextField(
-                                maxLength: 40,
-                                maxLines: 1,
-                                hintText: "Name of the Location",
-                                controller: locationNameController,
-                              ),
-                            ),
-                          ],
-                        ),
-                ),
-                const Padding(padding: EdgeInsets.only(top: 8)),
-                SelectLocationAddress(
-                  defaultLocation: widget.defaultLocation,
-                  controller: locationAddrController,
-                  setAddress: (address) {
-                    setState(() {
-                      locationAddrController.text = address;
-                    });
-                  },
-                  setCoor: (coor) {
-                    setState(() {
-                      lat = coor[0];
-                      lon = coor[1];
-                    });
-                  },
-                  focusNode: focusNode,
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 15),
-                  child: MyButton(text: "Add location", onPressed: checkFields),
-                ),
-              ],
-            ),
-          ),
+        const Padding(padding: EdgeInsets.only(top: 8)),
+        SelectLocationAddress(
+          defaultLocation: widget.defaultLocation,
+          controller: locationAddrController,
+          setAddress: (address) {
+            setState(() {
+              locationAddrController.text = address;
+            });
+          },
+          setCoor: (coor) {
+            setState(() {
+              lat = coor[0];
+              lon = coor[1];
+            });
+          },
+          focusNode: focusNode,
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 15),
+          child: MyButton(text: "Add location", onPressed: checkFields),
         ),
       ],
     );

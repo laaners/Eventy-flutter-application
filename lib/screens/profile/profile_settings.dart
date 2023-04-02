@@ -16,7 +16,6 @@ class ProfileSettings extends StatefulWidget {
 
 class _ProfileSettingsState extends State<ProfileSettings> {
   bool _pushNotificationEnabled = true;
-  bool _darkModeEnabled = false;
 
   @override
   Widget build(BuildContext context) {
@@ -35,20 +34,20 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           },
           secondary: const Icon(Icons.notifications),
         ),
-        SwitchListTile(
-          title: const Text(
-            "Dark mode",
-          ),
-          value: _darkModeEnabled,
-          onChanged: (bool value) {
-            // This is called when the user toggles the switch.
-            setState(() {
-              _darkModeEnabled = value;
-              Provider.of<ThemeSwitch>(context, listen: false).changeTheme();
-            });
-          },
-          secondary: const Icon(Icons.dark_mode),
-        ),
+        Consumer<FirebaseUser>(builder: (context, valueUser, _) {
+          return SwitchListTile(
+            title: const Text(
+              "Dark mode",
+            ),
+            value: !valueUser.userData!.isLightMode,
+            onChanged: (bool value) {
+              // This is called when the user toggles the switch.
+              Provider.of<ThemeSwitch>(context, listen: false)
+                  .changeTheme(context);
+            },
+            secondary: const Icon(Icons.dark_mode),
+          );
+        }),
         ListTile(
           leading: const Icon(Icons.edit),
           title: const Text("Edit profile"),

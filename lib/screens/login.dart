@@ -3,6 +3,7 @@ import 'package:dima_app/screens/password_reset.dart';
 import 'package:dima_app/screens/signup.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
+import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +16,9 @@ class LogInScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       // todo: remove appBar
-      body: LogInForm(),
+      body: ResponsiveWrapper(
+        child: LogInForm(),
+      ),
     );
   }
 }
@@ -61,7 +64,7 @@ class _LogInFormState extends State<LogInForm> {
             await Provider.of<FirebaseUser>(context, listen: false)
                 .logInWithUsername(
               context: context,
-              username: "UsernameId0",
+              username: "UsernameId0jjhjl",
               password: "password",
             );
             LoadingOverlay.hide(context);

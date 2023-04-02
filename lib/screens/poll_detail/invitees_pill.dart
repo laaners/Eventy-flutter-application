@@ -25,6 +25,7 @@ class InviteesPill extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 70),
       child: SizedBox(
+        width: 250,
         child: PillBox(
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
