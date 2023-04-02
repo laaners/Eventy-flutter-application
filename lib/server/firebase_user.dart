@@ -3,11 +3,8 @@ import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
 import 'firebase_crud.dart';
-import 'firebase_follow.dart';
 
 class FirebaseUser extends ChangeNotifier {
   final FirebaseAuth _auth;
@@ -74,6 +71,7 @@ class FirebaseUser extends ChangeNotifier {
         name: name,
         surname: surname,
         profilePic: profilePic,
+        isLightMode: true,
       );
       Map<String, dynamic> userMap = userEntity.toMap();
       userMap["username_lower"] = username.toLowerCase();
@@ -117,10 +115,6 @@ class FirebaseUser extends ChangeNotifier {
       _userData = UserCollection.fromMap(
         (userDataDoc?.data()) as Map<String, dynamic>,
       );
-      var uid = _userData!.uid;
-      // ignore: use_build_context_synchronously
-      await Provider.of<FirebaseFollow>(context, listen: false)
-          .getCurrentUserFollow(uid);
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
@@ -139,7 +133,6 @@ class FirebaseUser extends ChangeNotifier {
       if (usernameValidation.docs.isNotEmpty) {
         String email = (usernameValidation.docs[0].data()
             as Map<String, dynamic>)['email'];
-
         // ignore: use_build_context_synchronously
         await loginWithEmail(
             email: email, password: password, context: context);
@@ -244,8 +237,14 @@ class FirebaseUser extends ChangeNotifier {
     return usersData;
   }
 
-  Future<bool> updateUserData(BuildContext context, String username,
-      String name, String surname, String email) async {
+  Future<bool> updateUserData({
+    required BuildContext context,
+    required String username,
+    required String name,
+    required String surname,
+    required String email,
+    required bool isLightMode,
+  }) async {
     try {
       var uid = _auth.currentUser!.uid;
 
@@ -256,9 +255,12 @@ class FirebaseUser extends ChangeNotifier {
         name: name,
         surname: surname,
         profilePic: userData!.profilePic,
+        isLightMode: isLightMode,
       );
 
-      await userCollection.doc(uid).set(userEntity.toMap());
+      Map<String, dynamic> userMap = userEntity.toMap();
+      userMap["username_lower"] = username.toLowerCase();
+      await userCollection.doc(uid).set(userMap);
       _userData = userEntity;
 
       notifyListeners();
@@ -278,6 +280,22 @@ class FirebaseUser extends ChangeNotifier {
       tmpMap["profilePic"] = profileUrl;
       _userData = UserCollection.fromMap(tmpMap);
       notifyListeners();
+    } on FirebaseException catch (e) {
+      print(e.message!);
+      // showSnackBar(context, e.message!);
+    }
+  }
+
+  Future<void> themeSwitch() async {
+    try {
+      var uid = _auth.currentUser!.uid;
+      bool curMode = userData!.isLightMode;
+      var tmpMap = _userData!.toMap();
+      tmpMap["isLightMode"] = !curMode;
+      _userData = UserCollection.fromMap(tmpMap);
+      notifyListeners();
+      await FirebaseCrud.updateDoc(
+          userCollection, uid, "isLightMode", !curMode);
     } on FirebaseException catch (e) {
       print(e.message!);
       // showSnackBar(context, e.message!);

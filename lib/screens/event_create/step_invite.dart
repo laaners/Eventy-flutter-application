@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/profile/index.dart';
-import 'package:dima_app/widgets/my_alert_dialog.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/screens/profile/view_profile.dart';
@@ -32,7 +33,6 @@ class StepInvite extends StatefulWidget {
 
 class _StepInviteState extends State<StepInvite>
     with AutomaticKeepAliveClientMixin {
-  late List<String> followersIds = [];
   late List<UserCollection> originalInvitees;
 
   @override
@@ -41,15 +41,10 @@ class _StepInviteState extends State<StepInvite>
   @override
   void initState() {
     super.initState();
-    // filter out organizer from followers
-    followersIds = Provider.of<FirebaseFollow>(context, listen: false)
-        .followersUid
-        .where((uid) => uid != widget.organizerUid)
-        .toList();
     originalInvitees = [...widget.invitees];
   }
 
-  Future addFollowers() async {
+  Future addFollowers(List<String> followersIds) async {
     await Future.wait(followersIds.map(
       (uid) => Provider.of<FirebaseUser>(context, listen: false)
           .getUserData(context, uid)
@@ -96,50 +91,87 @@ class _StepInviteState extends State<StepInvite>
                   height: 40 * 1.4,
                   child: FittedBox(
                     fit: BoxFit.fill,
-                    child: Switch(
-                      value: followersIds.every((followerUid) => widget.invitees
-                          .map((e) => e.uid)
-                          .contains(followerUid)),
-                      onChanged: (value) async {
-                        int removedFollowers = 0;
-                        if (value) {
-                          await addFollowers();
-                        } else {
-                          for (String uid in followersIds) {
-                            var curUid = Provider.of<FirebaseUser>(context,
-                                    listen: false)
-                                .user!
-                                .uid;
-                            bool isOrganizer = widget.organizerUid == curUid;
-                            bool isInOriginalInvitees = originalInvitees
-                                .map((e) => e.uid)
-                                .contains(uid);
-                            // does nothing if organizer != curUid and user is in original invitees
-
-                            if (!(!isOrganizer && isInOriginalInvitees)) {
-                              removedFollowers += 1;
-                              widget.removeInvitee(
-                                UserCollection(
-                                  uid: uid,
-                                  email: "email",
-                                  username: "",
-                                  name: "",
-                                  surname: "",
-                                  profilePic: "",
+                    child: FutureBuilder(
+                        future:
+                            Provider.of<FirebaseFollow>(context, listen: false)
+                                .getCurrentUserFollow(),
+                        builder: (
+                          context,
+                          snapshot,
+                        ) {
+                          if (snapshot.hasError) {
+                            Future.microtask(() {
+                              Navigator.of(context).pop();
+                              Navigator.push(
+                                context,
+                                ScreenTransition(
+                                  builder: (context) => ErrorScreen(
+                                    errorMsg: snapshot.error.toString(),
+                                  ),
                                 ),
                               );
-                            }
+                            });
+                            return Container();
                           }
-                        }
-                        // ignore: use_build_context_synchronously
-                        MyAlertDialog.showAlertIfCondition(
-                          context,
-                          removedFollowers == 0 && !value,
-                          "OPERATION NOT ALLOWED",
-                          "Only the organizer can remove old partecipants",
-                        );
-                      },
-                    ),
+                          if (!snapshot.hasData) {
+                            return Container();
+                          }
+                          // filter out organizer from followers
+                          List<String> followersIds = snapshot.data!.followers
+                              .where((uid) => uid != widget.organizerUid)
+                              .toList();
+                          return Switch(
+                            value: followersIds.every((followerUid) => widget
+                                .invitees
+                                .map((e) => e.uid)
+                                .contains(followerUid)),
+                            onChanged: followersIds.isEmpty
+                                ? null
+                                : (value) async {
+                                    int removedFollowers = 0;
+                                    if (value) {
+                                      await addFollowers(followersIds);
+                                    } else {
+                                      for (String uid in followersIds) {
+                                        var curUid = Provider.of<FirebaseUser>(
+                                                context,
+                                                listen: false)
+                                            .user!
+                                            .uid;
+                                        bool isOrganizer =
+                                            widget.organizerUid == curUid;
+                                        bool isInOriginalInvitees =
+                                            originalInvitees
+                                                .map((e) => e.uid)
+                                                .contains(uid);
+                                        // does nothing if organizer != curUid and user is in original invitees
+                                        if (!(!isOrganizer &&
+                                            isInOriginalInvitees)) {
+                                          removedFollowers += 1;
+                                          widget.removeInvitee(
+                                            UserCollection(
+                                              uid: uid,
+                                              email: "email",
+                                              username: "",
+                                              name: "",
+                                              surname: "",
+                                              profilePic: "",
+                                              isLightMode: true,
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    }
+                                    // ignore: use_build_context_synchronously
+                                    MyAlertDialog.showAlertIfCondition(
+                                      context,
+                                      removedFollowers == 0 && !value,
+                                      "OPERATION NOT ALLOWED",
+                                      "Only the organizer can remove old partecipants",
+                                    );
+                                  },
+                          );
+                        }),
                   ),
                 ),
               ],

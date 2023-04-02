@@ -1,11 +1,8 @@
-import 'package:collection/collection.dart';
 import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/themes/palette.dart';
-import 'package:dima_app/widgets/my_button.dart';
+import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'my_app_bar.dart';
 
 class TabbarSwitcher extends StatefulWidget {
   final String appBarTitle;
@@ -89,66 +86,68 @@ class _TabbarSwitcher extends State<TabbarSwitcher>
             : Container(),
         actions: widget.upRightActions,
       ),
-      body: SafeArea(
-        child: NestedScrollView(
-          controller: _scrollController,
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              // https://github.com/flutter/flutter/issues/37152
-              // to remove some space below tabbar
-              SliverOverlapAbsorber(
-                handle:
-                    NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                sliver: SliverPadding(
-                  // space between sticky elements and app bar
-                  padding: const EdgeInsets.only(top: 0),
-                  sliver: SliverAppBar(
-                    elevation: 1,
-                    backgroundColor:
-                        Provider.of<ThemeSwitch>(context, listen: false)
-                            .themeData
-                            .scaffoldBackgroundColor,
-                    pinned: true,
-                    expandedHeight: widget.stickyHeight,
-                    automaticallyImplyLeading: false,
-                    centerTitle: true,
-                    bottom: PreferredSize(
-                      // height between app bar and tabbar
-                      preferredSize: const Size.fromHeight(0),
-                      child: TabBar(
-                        unselectedLabelColor:
-                            Provider.of<ThemeSwitch>(context, listen: false)
-                                .themeData
-                                .primaryColor,
-                        labelColor: Palette.blueColor,
-                        tabs: widget.labels.map((e) => Tab(text: e)).toList(),
-                        controller: _tabController,
-                        indicatorSize: TabBarIndicatorSize.tab,
+      body: ResponsiveWrapper(
+        child: SafeArea(
+          child: NestedScrollView(
+            controller: _scrollController,
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return [
+                // https://github.com/flutter/flutter/issues/37152
+                // to remove some space below tabbar
+                SliverOverlapAbsorber(
+                  handle:
+                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                  sliver: SliverPadding(
+                    // space between sticky elements and app bar
+                    padding: const EdgeInsets.only(top: 0),
+                    sliver: SliverAppBar(
+                      elevation: 1,
+                      backgroundColor:
+                          Provider.of<ThemeSwitch>(context, listen: false)
+                              .themeData
+                              .scaffoldBackgroundColor,
+                      pinned: true,
+                      expandedHeight: widget.stickyHeight,
+                      automaticallyImplyLeading: false,
+                      centerTitle: true,
+                      bottom: PreferredSize(
+                        // height between app bar and tabbar
+                        preferredSize: const Size.fromHeight(0),
+                        child: TabBar(
+                          unselectedLabelColor:
+                              Provider.of<ThemeSwitch>(context, listen: false)
+                                  .themeData
+                                  .primaryColor,
+                          labelColor: Palette.blueColor,
+                          tabs: widget.labels.map((e) => Tab(text: e)).toList(),
+                          controller: _tabController,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                        ),
                       ),
+                      flexibleSpace:
+                          widget.stickyHeight != 0 && widget.listSticky != null
+                              ? FlexibleSpaceBar(
+                                  collapseMode: CollapseMode.pin,
+                                  background: widget.listSticky,
+                                )
+                              : null,
                     ),
-                    flexibleSpace:
-                        widget.stickyHeight != 0 && widget.listSticky != null
-                            ? FlexibleSpaceBar(
-                                collapseMode: CollapseMode.pin,
-                                background: widget.listSticky,
-                              )
-                            : null,
                   ),
                 ),
-              ),
-            ];
-          },
-          body: Column(
-            children: [
-              Expanded(
-                child: TabBarView(
-                  // for best performance, add to the stateful widgets
-                  // with AutomaticKeepAliveClientMixin
-                  controller: _tabController,
-                  children: widget.tabbars,
+              ];
+            },
+            body: Column(
+              children: [
+                Expanded(
+                  child: TabBarView(
+                    // for best performance, add to the stateful widgets
+                    // with AutomaticKeepAliveClientMixin
+                    controller: _tabController,
+                    children: widget.tabbars,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

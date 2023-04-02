@@ -5,6 +5,7 @@ class UserCollection {
   final String name;
   final String surname;
   final String profilePic;
+  final bool isLightMode;
 
   static const collectionName = "user";
 
@@ -15,6 +16,7 @@ class UserCollection {
     required this.name,
     required this.surname,
     required this.profilePic,
+    required this.isLightMode,
   });
 
   UserCollection copyWith({
@@ -24,6 +26,7 @@ class UserCollection {
     String? name,
     String? surname,
     String? profilePic,
+    bool? isLightMode,
   }) {
     return UserCollection(
       uid: uid ?? this.uid,
@@ -32,6 +35,7 @@ class UserCollection {
       name: name ?? this.name,
       surname: surname ?? this.surname,
       profilePic: profilePic ?? this.profilePic,
+      isLightMode: isLightMode ?? this.isLightMode,
     );
   }
 
@@ -43,6 +47,7 @@ class UserCollection {
       'name': name,
       'surname': surname,
       'profilePic': profilePic,
+      'isLightMode': isLightMode,
     };
   }
 
@@ -54,12 +59,13 @@ class UserCollection {
       name: map['name'] as String,
       surname: map['surname'] as String,
       profilePic: map['profilePic'] as String,
+      isLightMode: map['isLightMode'] as bool,
     );
   }
 
   @override
   String toString() {
-    return 'UserCollection(uid: $uid, email: $email, username: $username, name: $name, surname: $surname, profilePic: $profilePic)';
+    return 'UserCollection(uid: $uid, email: $email, username: $username, name: $name, surname: $surname, profilePic: $profilePic, isLightMode: $isLightMode)';
   }
 
   @override
@@ -71,7 +77,8 @@ class UserCollection {
         other.username == username &&
         other.name == name &&
         other.surname == surname &&
-        other.profilePic == profilePic;
+        other.profilePic == profilePic &&
+        other.isLightMode == isLightMode;
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/my_app_bar.dart';
@@ -19,8 +20,10 @@ class FollowListScreen extends StatelessWidget {
         title: title,
         upRightActions: [MyAppBar.SearchAction(context)],
       ),
-      body: UserList(
-        users: users,
+      body: ResponsiveWrapper(
+        child: UserList(
+          users: users,
+        ),
       ),
     );
   }

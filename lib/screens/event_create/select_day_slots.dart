@@ -1,6 +1,7 @@
 import 'package:dima_app/screens/event_create/select_slot.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/themes/palette.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -136,6 +137,8 @@ class _SelectDaySlotsState extends State<SelectDaySlots> {
               ),
             ),
             onTap: () async {
+              /*
+              */
               await showModalBottomSheet(
                 useRootNavigator: true,
                 isScrollControlled: true,
