@@ -18,10 +18,9 @@ class PillBox extends StatelessWidget {
             borderRadius: BorderRadius.circular(50),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
+                color: Theme.of(context).shadowColor.withOpacity(0.2),
                 spreadRadius: 1,
                 blurRadius: 5,
-                offset: const Offset(0, 6), // changes position of shadow
               ),
             ],
           ),
