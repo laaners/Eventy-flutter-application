@@ -8,33 +8,53 @@ import 'firebase_crud.dart';
 
 class FirebaseFollow extends ChangeNotifier {
   final FirebaseFirestore _firestore;
+  final User? _user;
 
-  FirebaseFollow(this._firestore);
+  FirebaseFollow(this._firestore, this._user) {
+    if (_user != null) {
+      getCurrentUserFollow();
+    }
+  }
 
-  List<String> _followersUid = [];
-  List<String> _followingUid = [];
+  // List<String> _followersUid = [];
+  // List<String> _followingUid = [];
 
   // getters
-  List<String> get followersUid => _followersUid;
-  List<String> get followingUid => _followingUid;
+  // List<String> get followersUid => _followersUid;
+  // List<String> get followingUid => _followingUid;
 
   CollectionReference get followCollection =>
       _firestore.collection(FollowCollection.collectionName);
 
-  Future<void> getCurrentUserFollow(String uid) async {
-    var document = await FirebaseCrud.readDoc(followCollection, uid);
-    if (document!.exists) {
-      final follow = (document.data()) as Map<String, dynamic>?;
-      _followersUid = List<String>.from(follow!["follower"]);
-      _followingUid = List<String>.from(follow["following"]);
-      notifyListeners();
-    } else {
-      _followersUid = [];
-      _followingUid = [];
-    }
+  Future<FollowCollection> getCurrentUserFollow() async {
+    String uid = _user!.uid;
+    return await getFollow(uid);
   }
 
-  Future<List<String>?> getFollowers(
+  Future<FollowCollection> getFollow(String uid) async {
+    try {
+      var document = await FirebaseCrud.readDoc(followCollection, uid);
+      if (document!.exists) {
+        var follow = (document.data()) as Map<String, dynamic>;
+        return FollowCollection(
+          uid: uid,
+          followers:
+              (follow["follower"] as List).map((e) => e as String).toList(),
+          following:
+              (follow["following"] as List).map((e) => e as String).toList(),
+        );
+      }
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return FollowCollection(
+      uid: uid,
+      followers: [],
+      following: [],
+    );
+  }
+
+  Future<List<String>> getFollowers(
     BuildContext context,
     String userUid,
   ) async {
@@ -50,7 +70,7 @@ class FirebaseFollow extends ChangeNotifier {
     return [];
   }
 
-  Future<List<String>?> getFollowing(
+  Future<List<String>> getFollowing(
     BuildContext context,
     String userUid,
   ) async {
@@ -88,9 +108,6 @@ class FirebaseFollow extends ChangeNotifier {
         // ignore: use_build_context_synchronously
         addFollowing(context, followUid, uid, false);
       }
-      // ignore: use_build_context_synchronously
-      _followersUid = (await getFollowers(context, uid))!;
-      notifyListeners();
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -118,9 +135,6 @@ class FirebaseFollow extends ChangeNotifier {
         // ignore: use_build_context_synchronously
         addFollower(context, followUid, uid, false);
       }
-      // ignore: use_build_context_synchronously
-      _followersUid = (await getFollowers(context, uid))!;
-      notifyListeners();
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -148,9 +162,6 @@ class FirebaseFollow extends ChangeNotifier {
         // ignore: use_build_context_synchronously
         removeFollowing(context, followUid, uid, false);
       }
-      // ignore: use_build_context_synchronously
-      _followersUid = (await getFollowers(context, uid))!;
-      notifyListeners();
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
@@ -178,9 +189,6 @@ class FirebaseFollow extends ChangeNotifier {
         // ignore: use_build_context_synchronously
         removeFollower(context, followUid, uid, false);
       }
-      // ignore: use_build_context_synchronously
-      _followersUid = (await getFollowers(context, uid))!;
-      notifyListeners();
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }

@@ -42,21 +42,12 @@ class ProfilePic extends StatelessWidget {
                     },
                   ),
                 ))
-          : Container(
-              decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(50)),
-              width: 100,
-              height: 100,
-              child: Center(
-                child: Text(
-                  "${userData?.name[0]}${userData?.surname[0]}",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: radius / 2,
-                  ),
-                ),
+          : Text(
+              "${userData?.name[0]}${userData?.surname[0]}",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: radius / 2,
               ),
             ),
     );

@@ -1,4 +1,3 @@
-import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/widgets/poll_list.dart';
 import 'package:flutter/material.dart';
 

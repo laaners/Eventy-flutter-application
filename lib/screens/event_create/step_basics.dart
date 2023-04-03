@@ -12,6 +12,10 @@ class StepBasics extends StatefulWidget {
   final Map<String, dynamic> dates;
   final ValueChanged<List<String>> removeDays;
   final ValueChanged<DateTime> setDeadline;
+  final bool visibility;
+  final VoidCallback changeVisibility;
+  final bool canInvite;
+  final VoidCallback changeCanInvite;
 
   const StepBasics({
     super.key,
@@ -21,6 +25,10 @@ class StepBasics extends StatefulWidget {
     required this.setDeadline,
     required this.dates,
     required this.removeDays,
+    required this.visibility,
+    required this.changeVisibility,
+    required this.canInvite,
+    required this.changeCanInvite,
   });
 
   @override
@@ -207,6 +215,46 @@ class _StepBasicsState extends State<StepBasics> {
               ),
             );
           },
+        ),
+        Row(
+          children: [
+            IconButton(
+              onPressed: widget.changeVisibility,
+              icon: Icon(
+                widget.visibility ? Icons.visibility : Icons.visibility_off,
+              ),
+            ),
+            Text(
+              widget.visibility ? "Public event" : "Private event",
+              style: TextStyle(
+                color: Provider.of<ThemeSwitch>(context, listen: false)
+                    .themeData
+                    .primaryColor,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            IconButton(
+              onPressed: widget.changeCanInvite,
+              icon: Icon(
+                widget.canInvite ? Icons.meeting_room : Icons.door_back_door,
+              ),
+            ),
+            Text(
+              widget.canInvite
+                  ? "Anyone can invite other users"
+                  : "Only you can invite other users",
+              style: TextStyle(
+                color: Provider.of<ThemeSwitch>(context, listen: false)
+                    .themeData
+                    .primaryColor,
+                fontSize: 16,
+              ),
+            ),
+          ],
         ),
       ],
     );

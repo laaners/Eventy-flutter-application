@@ -1,6 +1,7 @@
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_button.dart';
+import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +12,10 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
+      // todo: remove appBar
+      body: ResponsiveWrapper(
+        child: SignUpForm(),
+      ),
       appBar: MyAppBar(title: "", upRightActions: []),
       body: SignUpForm(),
     );

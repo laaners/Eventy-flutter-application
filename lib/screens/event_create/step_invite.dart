@@ -2,12 +2,13 @@ import 'dart:async';
 
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/profile/index.dart';
-import 'package:dima_app/screens/profile/profile_pic.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:dima_app/widgets/my_alert_dialog.dart';
+import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/screens/profile/view_profile.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
-import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';
@@ -17,40 +18,47 @@ class StepInvite extends StatefulWidget {
   final List<UserCollection> invitees;
   final ValueChanged<UserCollection> addInvitee;
   final ValueChanged<UserCollection> removeInvitee;
+  final String organizerUid;
   const StepInvite({
     super.key,
     required this.invitees,
     required this.addInvitee,
     required this.removeInvitee,
+    required this.organizerUid,
   });
 
   @override
   State<StepInvite> createState() => _StepInviteState();
 }
 
-class _StepInviteState extends State<StepInvite> {
-  Future addFollowers() async {
-    List<String> followersIds =
-        Provider.of<FirebaseFollow>(context, listen: false).followersUid;
+class _StepInviteState extends State<StepInvite>
+    with AutomaticKeepAliveClientMixin {
+  late List<UserCollection> originalInvitees;
 
-    await Future.wait(followersIds
-        .map(
-          (uid) => Provider.of<FirebaseUser>(context, listen: false)
-              .getUserData(context, uid)
-              .then(
-            (value) {
-              if (value != null) widget.addInvitee(value);
-            },
-          ),
-        )
-        .toList());
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    originalInvitees = [...widget.invitees];
+  }
+
+  Future addFollowers(List<String> followersIds) async {
+    await Future.wait(followersIds.map(
+      (uid) => Provider.of<FirebaseUser>(context, listen: false)
+          .getUserData(context, uid)
+          .then(
+        (value) {
+          if (value != null) widget.addInvitee(value);
+        },
+      ),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
-    List<String> followersIds =
-        Provider.of<FirebaseFollow>(context, listen: false).followersUid;
-
+    super.build(context);
     return Container(
       margin: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom, top: 8, left: 15),
@@ -59,7 +67,7 @@ class _StepInviteState extends State<StepInvite> {
           Container(
             alignment: Alignment.topLeft,
             child: const Text(
-              "Invite people to the event",
+              "Invite people to vote",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
@@ -83,28 +91,87 @@ class _StepInviteState extends State<StepInvite> {
                   height: 40 * 1.4,
                   child: FittedBox(
                     fit: BoxFit.fill,
-                    child: Switch(
-                      value: followersIds.every((followerUid) => widget.invitees
-                          .map((e) => e.uid)
-                          .contains(followerUid)),
-                      onChanged: (value) async {
-                        if (value) {
-                          await addFollowers();
-                        } else {
-                          for (String uid in followersIds) {
-                            widget.removeInvitee(
-                              UserCollection(
-                                  uid: uid,
-                                  email: "email",
-                                  username: "",
-                                  name: "",
-                                  surname: "",
-                                  profilePic: ""),
-                            );
+                    child: FutureBuilder(
+                        future:
+                            Provider.of<FirebaseFollow>(context, listen: false)
+                                .getCurrentUserFollow(),
+                        builder: (
+                          context,
+                          snapshot,
+                        ) {
+                          if (snapshot.hasError) {
+                            Future.microtask(() {
+                              Navigator.of(context).pop();
+                              Navigator.push(
+                                context,
+                                ScreenTransition(
+                                  builder: (context) => ErrorScreen(
+                                    errorMsg: snapshot.error.toString(),
+                                  ),
+                                ),
+                              );
+                            });
+                            return Container();
                           }
-                        }
-                      },
-                    ),
+                          if (!snapshot.hasData) {
+                            return Container();
+                          }
+                          // filter out organizer from followers
+                          List<String> followersIds = snapshot.data!.followers
+                              .where((uid) => uid != widget.organizerUid)
+                              .toList();
+                          return Switch(
+                            value: followersIds.every((followerUid) => widget
+                                .invitees
+                                .map((e) => e.uid)
+                                .contains(followerUid)),
+                            onChanged: followersIds.isEmpty
+                                ? null
+                                : (value) async {
+                                    int removedFollowers = 0;
+                                    if (value) {
+                                      await addFollowers(followersIds);
+                                    } else {
+                                      for (String uid in followersIds) {
+                                        var curUid = Provider.of<FirebaseUser>(
+                                                context,
+                                                listen: false)
+                                            .user!
+                                            .uid;
+                                        bool isOrganizer =
+                                            widget.organizerUid == curUid;
+                                        bool isInOriginalInvitees =
+                                            originalInvitees
+                                                .map((e) => e.uid)
+                                                .contains(uid);
+                                        // does nothing if organizer != curUid and user is in original invitees
+                                        if (!(!isOrganizer &&
+                                            isInOriginalInvitees)) {
+                                          removedFollowers += 1;
+                                          widget.removeInvitee(
+                                            UserCollection(
+                                              uid: uid,
+                                              email: "email",
+                                              username: "",
+                                              name: "",
+                                              surname: "",
+                                              profilePic: "",
+                                              isLightMode: true,
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    }
+                                    // ignore: use_build_context_synchronously
+                                    MyAlertDialog.showAlertIfCondition(
+                                      context,
+                                      removedFollowers == 0 && !value,
+                                      "OPERATION NOT ALLOWED",
+                                      "Only the organizer can remove old partecipants",
+                                    );
+                                  },
+                          );
+                        }),
                   ),
                 ),
               ],
@@ -119,9 +186,11 @@ class _StepInviteState extends State<StepInvite> {
                 return InviteProfilePic(
                   user: user,
                   invitees: widget.invitees,
+                  originalInvitees: originalInvitees,
                   addMode: false,
                   removeInvitee: widget.removeInvitee,
                   addInvitee: widget.addInvitee,
+                  organizerUid: widget.organizerUid,
                 );
               }).toList(),
             ),
@@ -130,6 +199,7 @@ class _StepInviteState extends State<StepInvite> {
             invitees: widget.invitees,
             addInvitee: widget.addInvitee,
             removeInvitee: widget.removeInvitee,
+            organizerUid: widget.organizerUid,
           ),
         ],
       ),
@@ -139,10 +209,12 @@ class _StepInviteState extends State<StepInvite> {
 
 class InviteProfilePic extends StatefulWidget {
   final List<UserCollection> invitees;
+  final List<UserCollection> originalInvitees;
   final ValueChanged<UserCollection> addInvitee;
   final ValueChanged<UserCollection> removeInvitee;
   final UserCollection user;
   final bool addMode;
+  final String organizerUid;
   const InviteProfilePic({
     super.key,
     required this.addInvitee,
@@ -150,6 +222,8 @@ class InviteProfilePic extends StatefulWidget {
     required this.addMode,
     required this.invitees,
     required this.user,
+    required this.originalInvitees,
+    required this.organizerUid,
   });
 
   @override
@@ -157,6 +231,57 @@ class InviteProfilePic extends StatefulWidget {
 }
 
 class _InviteProfilePicState extends State<InviteProfilePic> {
+  Widget? getTopIcon() {
+    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+    bool isOrganizer = widget.organizerUid == curUid;
+    bool isInOriginalInvitees =
+        widget.originalInvitees.map((e) => e.uid).contains(widget.user.uid);
+    // show nothing if in cancelmode and organizer != curUid and user is in original invitees
+    if (!widget.addMode && !isOrganizer && isInOriginalInvitees) {
+      return null;
+    }
+    // show cancel if in cancelmode, not organizer but newly added user isn't in original invitees
+    if (!widget.addMode && !isOrganizer && !isInOriginalInvitees) {
+      return Positioned(
+        right: 2.0,
+        top: 2.0,
+        child: IconButton(
+          iconSize: 25,
+          padding: const EdgeInsets.all(0),
+          constraints: const BoxConstraints(),
+          icon: Icon(
+            widget.addMode ? Icons.add_circle : Icons.cancel,
+            color: widget.addMode ? Colors.blue : Colors.red,
+          ),
+          onPressed: () {
+            widget.addMode
+                ? widget.addInvitee(widget.user)
+                : widget.removeInvitee(widget.user);
+          },
+        ),
+      );
+    }
+    // show anything if organizer or in add mode (default)
+    return Positioned(
+      right: 2.0,
+      top: 2.0,
+      child: IconButton(
+        iconSize: 25,
+        padding: const EdgeInsets.all(0),
+        constraints: const BoxConstraints(),
+        icon: Icon(
+          widget.addMode ? Icons.add_circle : Icons.cancel,
+          color: widget.addMode ? Colors.blue : Colors.red,
+        ),
+        onPressed: () {
+          widget.addMode
+              ? widget.addInvitee(widget.user)
+              : widget.removeInvitee(widget.user);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -180,24 +305,8 @@ class _InviteProfilePicState extends State<InviteProfilePic> {
               ],
             ),
           ),
-          Positioned(
-            right: 2.0,
-            top: 2.0,
-            child: IconButton(
-              iconSize: 25,
-              padding: const EdgeInsets.all(0),
-              constraints: const BoxConstraints(),
-              icon: Icon(
-                widget.addMode ? Icons.add_circle : Icons.cancel,
-                color: widget.addMode ? Colors.blue : Colors.red,
-              ),
-              onPressed: () {
-                widget.addMode
-                    ? widget.addInvitee(widget.user)
-                    : widget.removeInvitee(widget.user);
-              },
-            ),
-          ),
+          // show nothing if in cancelmode and organizer != curUid and user is in original invitees
+          getTopIcon() ?? Container()
         ],
       ),
       onTap: () {
@@ -227,12 +336,14 @@ class SearchUsers extends StatefulWidget {
   final List<UserCollection> invitees;
   final ValueChanged<UserCollection> addInvitee;
   final ValueChanged<UserCollection> removeInvitee;
+  final String organizerUid;
 
   const SearchUsers({
     super.key,
     required this.addInvitee,
     required this.removeInvitee,
     required this.invitees,
+    required this.organizerUid,
   });
 
   @override
@@ -243,6 +354,7 @@ class _SearchUsersState extends State<SearchUsers> {
   List<UserCollection> usersMatching = [];
   // true after next query, false when input text is empty
   bool loadingUsers = false;
+  final FocusNode _focus = FocusNode();
   final TextEditingController _controller = TextEditingController();
 
   @override
@@ -265,6 +377,7 @@ class _SearchUsersState extends State<SearchUsers> {
               controller: _controller,
               autofocus: false,
               decoration: const InputDecoration(hintText: "Search here"),
+              focusNode: _focus,
               onChanged: (text) async {
                 if (text.isEmpty) {
                   setState(() {
@@ -278,15 +391,34 @@ class _SearchUsersState extends State<SearchUsers> {
                       await Provider.of<FirebaseUser>(context, listen: false)
                           .getUsersData(context, text);
                   setState(() {
-                    usersMatching = tmp;
+                    // filter out organizer and current user
+                    usersMatching = tmp.where((element) {
+                      return !widget.invitees
+                              .map((e) => e.uid)
+                              .contains(element.uid) &&
+                          element.uid != userData.uid &&
+                          element.uid != widget.organizerUid;
+                    }).toList();
                   });
                 }
               },
             ),
           ),
-          Container(
-            height: 150,
-            child: usersMatching.isNotEmpty
+          SizedBox(
+            height: (!_focus.hasFocus && usersMatching.isEmpty) ||
+                    _controller.text.isEmpty
+                ? 0
+                : 110,
+            child: usersMatching
+                    .where((element) {
+                      return !widget.invitees
+                              .map((e) => e.uid)
+                              .contains(element.uid) &&
+                          element.uid != userData.uid &&
+                          element.uid != widget.organizerUid;
+                    })
+                    .toList()
+                    .isNotEmpty
                 ? HorizontalScroller(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -295,12 +427,15 @@ class _SearchUsersState extends State<SearchUsers> {
                           return !widget.invitees
                                   .map((e) => e.uid)
                                   .contains(element.uid) &&
-                              element.uid != userData.uid;
+                              element.uid != userData.uid &&
+                              element.uid != widget.organizerUid;
                         })
                         .toList()
                         .map(
                           (e) => InviteProfilePic(
                             invitees: widget.invitees,
+                            originalInvitees: [],
+                            organizerUid: "",
                             user: e,
                             addInvitee: widget.addInvitee,
                             removeInvitee: widget.removeInvitee,

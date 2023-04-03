@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../screens/error.dart';
 import '../screens/profile/index.dart';
-import '../screens/profile/profile_pic.dart';
+import 'profile_pic.dart';
 import '../screens/profile/view_profile.dart';
 import '../server/firebase_user.dart';
 import '../server/tables/user_collection.dart';
@@ -16,8 +16,11 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final List<Widget> upRightActions;
 
-  const MyAppBar(
-      {super.key, required this.title, required this.upRightActions});
+  const MyAppBar({
+    super.key,
+    required this.title,
+    required this.upRightActions,
+  });
 
   static Widget SearchAction(context) => TextButton(
         onPressed: () async {

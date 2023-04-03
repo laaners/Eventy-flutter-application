@@ -14,10 +14,10 @@ import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
-import 'package:dima_app/widgets/lists_switcher.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
+import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:dima_app/widgets/user_list.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -37,8 +37,10 @@ class PollDetailScreen extends StatefulWidget {
   State<PollDetailScreen> createState() => _PollDetailScreenState();
 }
 
-class _PollDetailScreenState extends State<PollDetailScreen> {
+class _PollDetailScreenState extends State<PollDetailScreen>
+    with AutomaticKeepAliveClientMixin {
   Future<Map<String, dynamic>?>? _future;
+  bool _refresh = true;
 
   Future<Map<String, dynamic>?> getPollDataAndInvites(
       BuildContext context) async {
@@ -137,136 +139,120 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   initState() {
     super.initState();
     _future = getPollDataAndInvites(context);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void refreshPollDetail() {
+    setState(() {
+      _future = null;
+      _future = getPollDataAndInvites(context);
+      _refresh = !_refresh;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     return StreamBuilder(
-        stream: Provider.of<FirebasePollEventInvite>(context, listen: false)
-            .getPollEventInviteSnapshot(context, widget.pollId, curUid),
-        builder: (
-          BuildContext context,
-          AsyncSnapshot<DocumentSnapshot<Object?>> snapshot,
-        ) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LoadingSpinner();
-          }
-          if (snapshot.hasError) {
-            Future.microtask(() {
-              Navigator.of(context).pop();
-              Navigator.push(
-                context,
-                ScreenTransition(
-                  builder: (context) => ErrorScreen(
-                    errorMsg: snapshot.error.toString(),
-                  ),
+      stream: Provider.of<FirebasePollEventInvite>(context, listen: false)
+          .getPollEventInviteSnapshot(context, widget.pollId, curUid),
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<DocumentSnapshot<Object?>> snapshot,
+      ) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const LoadingSpinner();
+        }
+        if (snapshot.hasError) {
+          Future.microtask(() {
+            Navigator.of(context).pop();
+            Navigator.push(
+              context,
+              ScreenTransition(
+                builder: (context) => ErrorScreen(
+                  errorMsg: snapshot.error.toString(),
                 ),
-              );
-            });
-            return Container();
-          }
-          if (!snapshot.data!.exists) {
-            Future.microtask(() {
-              Navigator.of(context).pop();
-              Navigator.push(
-                context,
-                ScreenTransition(
-                  builder: (context) => const ErrorScreen(
-                    errorMsg: "The organizer limited your access to this poll",
-                  ),
+              ),
+            );
+          });
+          return Container();
+        }
+        if (!snapshot.data!.exists) {
+          Future.microtask(() {
+            Navigator.of(context).pop();
+            Navigator.push(
+              context,
+              ScreenTransition(
+                builder: (context) => const ErrorScreen(
+                  errorMsg: "The organizer limited your access to this poll",
                 ),
-              );
-            });
-            return Container();
-          }
-          return FutureBuilder<Map<String, dynamic>?>(
-            future: _future,
-            builder: (
-              BuildContext context,
-              AsyncSnapshot<Map<String, dynamic>?> snapshot,
-            ) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const LoadingSpinner();
-              }
-              if (snapshot.hasError || !snapshot.hasData) {
-                Future.microtask(() {
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    ScreenTransition(
-                      builder: (context) => ErrorScreen(
-                        errorMsg: snapshot.error.toString(),
-                      ),
+              ),
+            );
+          });
+          return Container();
+        }
+        return FutureBuilder<Map<String, dynamic>?>(
+          future: _future,
+          builder: (
+            BuildContext context,
+            AsyncSnapshot<Map<String, dynamic>?> snapshot,
+          ) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const LoadingSpinner();
+            }
+            if (snapshot.hasError || !snapshot.hasData) {
+              Future.microtask(() {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  ScreenTransition(
+                    builder: (context) => ErrorScreen(
+                      errorMsg: snapshot.error.toString(),
                     ),
-                  );
-                });
-                return Container();
-              }
-              PollCollection pollData = snapshot.data!["data"];
-              List<PollEventInviteCollection> pollInvites =
-                  snapshot.data!["invites"];
-              List<VoteLocationCollection> votesLocations =
-                  snapshot.data!["locations"];
-              votesLocations.sort((a, b) =>
-                  b.getPositiveVotes().length - a.getPositiveVotes().length);
-              List<VoteDateCollection> votesDates = snapshot.data!["dates"];
-              votesDates.sort((a, b) =>
-                  b.getPositiveVotes().length - a.getPositiveVotes().length);
-              return Scaffold(
-                appBar: MyAppBar(
-                  title: "Poll Detail",
-                  upRightActions: [
-                    TextButton(
-                      onPressed: () async {
-                        LoadingOverlay.show(context);
-                        String url =
-                            "https://eventy.page.link?pollId=${pollData.pollName}_${pollData.organizerUid}";
-                        final dynamicLinkParams = DynamicLinkParameters(
-                          link: Uri.parse(url),
-                          uriPrefix: "https://eventy.page.link",
-                          androidParameters: const AndroidParameters(
-                            packageName: "com.example.dima_app",
-                          ),
-                          iosParameters: const IOSParameters(
-                            bundleId: "com.example.dima_app",
-                          ),
-                        );
-                        final dynamicLongLink = await FirebaseDynamicLinks
-                            .instance
-                            .buildLink(dynamicLinkParams);
-                        final ShortDynamicLink dynamicShortLink =
-                            await FirebaseDynamicLinks.instance
-                                .buildShortLink(dynamicLinkParams);
-                        Uri finalUrl = dynamicShortLink.shortUrl;
-                        print(finalUrl);
-                        print(dynamicLongLink);
-                        await Share.share(finalUrl.toString());
-                        LoadingOverlay.hide(context);
-                      },
-                      child: Icon(
-                        Icons.share_outlined,
-                      ),
-                    )
-                  ],
-                ),
-                body: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  child: ListView(
+                  ),
+                );
+              });
+              return Container();
+            }
+            PollCollection pollData = snapshot.data!["data"];
+            List<PollEventInviteCollection> pollInvites =
+                snapshot.data!["invites"];
+            List<VoteLocationCollection> votesLocations =
+                snapshot.data!["locations"];
+            votesLocations.sort((a, b) =>
+                b.getPositiveVotes().length - a.getPositiveVotes().length);
+            List<VoteDateCollection> votesDates = snapshot.data!["dates"];
+            votesDates.sort((a, b) =>
+                b.getPositiveVotes().length - a.getPositiveVotes().length);
+            var curUid =
+                Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+
+            return TabbarSwitcher(
+                listSticky: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(pollData.pollName),
-                      InviteesPill(
-                        pollEventId: widget.pollId,
-                        invites: pollInvites,
+                      MyTitle(
+                        text: pollData.pollName,
+                        alignment: Alignment.topLeft,
                       ),
+                      Center(
+                        child: InviteesPill(
+                          pollData: pollData,
+                          pollEventId: widget.pollId,
+                          invites: pollInvites,
+                          refreshPollDetail: refreshPollDetail,
+                        ),
+                      ),
+                      Container(
+                          padding: const EdgeInsets.symmetric(vertical: 5)),
                       const Text(
                         "Organized by",
                         style: TextStyle(
@@ -285,44 +271,74 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
                       Container(
                           padding: const EdgeInsets.symmetric(vertical: 5)),
                       Text(pollData.pollDesc.isEmpty
-                          ? "The organized did not provide any description"
+                          ? "The organizer did not provide any description"
                           : pollData.pollDesc),
                       Container(
                           padding: const EdgeInsets.symmetric(vertical: 5)),
-                      ListsSwitcher(
-                        labels: const ["Locations", "Dates"],
-                        lists: [
-                          LocationsList(
-                            organizerUid: pollData.organizerUid,
-                            pollId: widget.pollId,
-                            locations: pollData.locations,
-                            invites: pollInvites,
-                            votesLocations: votesLocations,
-                          ),
-                          DatesList(
-                            organizerUid: pollData.organizerUid,
-                            pollId: widget.pollId,
-                            dates: pollData.dates,
-                            invites: pollInvites,
-                            votesDates: votesDates,
-                          ),
-                        ],
-                      ),
-                      const Text(
-                        "Deadline",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                      Text(pollData.deadline),
-                      Text(pollData.public.toString()),
                     ],
                   ),
                 ),
-              );
-            },
-          );
-        });
+                stickyHeight: 310 + pollData.pollDesc.length.toDouble() / 5,
+                labels: const ["Locations", "Dates"],
+                appBarTitle: pollData.pollName,
+                upRightActions:
+                    pollData.organizerUid != curUid && !pollData.canInvite
+                        ? []
+                        : [
+                            TextButton(
+                              onPressed: () async {
+                                LoadingOverlay.show(context);
+                                String url =
+                                    "https://eventy.page.link?pollId=${pollData.pollName}_${pollData.organizerUid}";
+                                final dynamicLinkParams = DynamicLinkParameters(
+                                  link: Uri.parse(url),
+                                  uriPrefix: "https://eventy.page.link",
+                                  androidParameters: const AndroidParameters(
+                                    packageName: "com.example.dima_app",
+                                  ),
+                                  iosParameters: const IOSParameters(
+                                    bundleId: "com.example.dima_app",
+                                  ),
+                                );
+                                final dynamicLongLink =
+                                    await FirebaseDynamicLinks.instance
+                                        .buildLink(dynamicLinkParams);
+                                final ShortDynamicLink dynamicShortLink =
+                                    await FirebaseDynamicLinks.instance
+                                        .buildShortLink(dynamicLinkParams);
+                                Uri finalUrl = dynamicShortLink.shortUrl;
+                                print(finalUrl);
+                                print(dynamicLongLink);
+                                await Share.share(finalUrl.toString());
+                                LoadingOverlay.hide(context);
+                              },
+                              child: Icon(
+                                Icons.share_outlined,
+                                color: Provider.of<ThemeSwitch>(context)
+                                    .themeData
+                                    .primaryColor,
+                              ),
+                            )
+                          ],
+                tabbars: [
+                  LocationsList(
+                    organizerUid: pollData.organizerUid,
+                    pollId: widget.pollId,
+                    locations: pollData.locations,
+                    invites: pollInvites,
+                    votesLocations: votesLocations,
+                  ),
+                  DatesList(
+                    organizerUid: pollData.organizerUid,
+                    pollId: widget.pollId,
+                    dates: pollData.dates,
+                    invites: pollInvites,
+                    votesDates: votesDates,
+                  ),
+                ]);
+          },
+        );
+      },
+    );
   }
 }

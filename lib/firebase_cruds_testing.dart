@@ -191,6 +191,7 @@ class FirebaseCrudsTesting {
           dates: utcDates,
           locations: locations,
           public: next(0, 2) % 2 == 0,
+          canInvite: next(0, 2) % 2 == 0,
         );
 
         String pollId = "${eventName}_$organizerUid";

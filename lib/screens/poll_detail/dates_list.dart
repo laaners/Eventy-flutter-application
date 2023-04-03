@@ -27,7 +27,8 @@ class DatesList extends StatefulWidget {
   State<DatesList> createState() => _DatesListState();
 }
 
-class _DatesListState extends State<DatesList> {
+class _DatesListState extends State<DatesList>
+    with AutomaticKeepAliveClientMixin {
   bool sortedByVotes = true;
   late List<VoteDateCollection> votesDates;
 
@@ -38,9 +39,13 @@ class _DatesListState extends State<DatesList> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    return Column(
+    return ListView(
       children: [
         MyButton(
           text: "sort test",

@@ -1,6 +1,5 @@
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/server/firebase_event.dart';
-import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:flutter/material.dart';

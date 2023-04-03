@@ -78,7 +78,11 @@ Future<void> main() async {
         */
         ChangeNotifierProvider(
             create: (context) => FirebaseUser(auth, firestore)),
-        ChangeNotifierProvider(create: (context) => FirebaseFollow(firestore)),
+        ChangeNotifierProxyProvider<FirebaseUser, FirebaseFollow>(
+          create: (context) => FirebaseFollow(firestore, null),
+          update: (BuildContext context, value, FirebaseFollow? previous) =>
+              FirebaseFollow(firestore, value.user),
+        ),
         ChangeNotifierProvider(create: (context) => FirebasePoll(firestore)),
         ChangeNotifierProvider(create: (context) => FirebaseEvent(firestore)),
         ChangeNotifierProvider(
@@ -108,7 +112,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
-    initUser();
     initLink();
     super.initState();
   }
@@ -143,19 +146,10 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void initUser() async {
-    var userData =
-        await Provider.of<FirebaseUser>(context, listen: false).initUserData();
-    if (userData != null) {
-      var uid = userData.uid;
-      // ignore: use_build_context_synchronously
-      await Provider.of<FirebaseFollow>(context, listen: false)
-          .getCurrentUserFollow(uid);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    bool isAuthenticated =
+        Provider.of<FirebaseUser>(context, listen: true).user != null;
     return MaterialApp(
       title: 'Eventy',
       theme: lightTheme,
@@ -180,7 +174,8 @@ class MainScreen extends StatefulWidget {
 class _MainScreen extends State<MainScreen> {
   // https://stackoverflow.com/questions/52298686/flutter-pop-to-root-when-bottom-navigation-tapped
   int currentIndex = 0;
-  final CupertinoTabController tabController = CupertinoTabController();
+  late final CupertinoTabController
+      tabController; // = CupertinoTabController();
 
   final GlobalKey<NavigatorState> firstTabNavKey = GlobalKey<NavigatorState>();
   final GlobalKey<NavigatorState> secondTabNavKey = GlobalKey<NavigatorState>();
@@ -195,7 +190,6 @@ class _MainScreen extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    tabController.index = 0;
   }
 
   @override
@@ -206,7 +200,7 @@ class _MainScreen extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
-      controller: tabController,
+      controller: Provider.of<CupertinoTabController>(context, listen: true),
       tabBar: CupertinoTabBar(
         onTap: (index) {
           // back home only if not switching tab
@@ -248,7 +242,6 @@ class _MainScreen extends State<MainScreen> {
             Provider.of<DynamicLinksHandler>(context, listen: true).dynamicLink;
         bool pushed =
             Provider.of<DynamicLinksHandler>(context, listen: false).pushed;
-
         if (dynamicLink != null && !pushed) {
           Map<String, dynamic> queryParams = dynamicLink.link.queryParameters;
           String pollId = queryParams["pollId"];
