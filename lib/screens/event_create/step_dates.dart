@@ -386,9 +386,6 @@ class _StepDatesState extends State<StepDates> {
                               ),
                               child: Text(
                                 events.length.toString(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                ),
                               ),
                             ),
                           ),

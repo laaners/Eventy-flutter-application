@@ -286,6 +286,85 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: const Text("Firebase delete"),
                   ),
+                  Container(
+                    color: Theme.of(context).canvasColor,
+                    child: Text("canvas color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).cardColor,
+                    child: Text("card color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).dialogBackgroundColor,
+                    child: Text("dialog bg color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).disabledColor,
+                    child: Text("disabled color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).dividerColor,
+                    child: Text("divider color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).focusColor,
+                    child: Text("focus color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).highlightColor,
+                    child: Text("highlight color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).hintColor,
+                    child: Text("hint color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).hoverColor,
+                    child: Text("hover color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).indicatorColor,
+                    child: Text(
+                      "indicator color",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  Container(
+                    color: Theme.of(context).primaryColor,
+                    child: Text("primary color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).primaryColorDark,
+                    child: Text(
+                      "primary dark color",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  Container(
+                    color: Theme.of(context).primaryColorLight,
+                    child: Text("primary light color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    child: Text(
+                      "scaffold bg color",
+                    ),
+                  ),
+                  Container(
+                    color: Theme.of(context).splashColor,
+                    child: Text("splash color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).shadowColor,
+                    child: Text(
+                      "shadow color",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  Container(
+                    color: Theme.of(context).unselectedWidgetColor,
+                    child: Text("unselected widget color"),
+                  ),
                   /*
                 TextButton(
                   onPressed: () async {

@@ -100,7 +100,7 @@ class _LogInFormState extends State<LogInForm> {
               TextFormField(
                 controller: _usernameController,
                 decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.face, color: Colors.grey),
+                  prefixIcon: Icon(Icons.face),
                   border: OutlineInputBorder(),
                   labelText: 'Username',
                   labelStyle: TextStyle(fontStyle: FontStyle.italic),
@@ -120,7 +120,7 @@ class _LogInFormState extends State<LogInForm> {
                 controller: _passwordController,
                 obscureText: _passwordVisible,
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
+                  prefixIcon: const Icon(Icons.lock_open),
                   hintText: 'Password',
                   border: const OutlineInputBorder(),
                   labelText: 'Password',

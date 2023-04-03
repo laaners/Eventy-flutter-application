@@ -62,7 +62,7 @@ class _SignUpFormState extends State<SignUpForm> {
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _usernameController,
               decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.face, color: Colors.grey),
+                prefixIcon: Icon(Icons.face),
                 border: OutlineInputBorder(),
                 labelText: 'Username',
                 labelStyle: TextStyle(fontStyle: FontStyle.italic),
@@ -92,7 +92,7 @@ class _SignUpFormState extends State<SignUpForm> {
             child: TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.perm_identity, color: Colors.grey),
+                prefixIcon: Icon(Icons.perm_identity),
                 border: OutlineInputBorder(),
                 labelText: 'Name',
                 labelStyle: TextStyle(fontStyle: FontStyle.italic),
@@ -110,7 +110,7 @@ class _SignUpFormState extends State<SignUpForm> {
             child: TextFormField(
               controller: _surnameController,
               decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.perm_identity, color: Colors.grey),
+                prefixIcon: Icon(Icons.perm_identity),
                 border: OutlineInputBorder(),
                 labelText: 'Surname',
                 labelStyle: TextStyle(fontStyle: FontStyle.italic),
@@ -128,7 +128,7 @@ class _SignUpFormState extends State<SignUpForm> {
             child: TextFormField(
               controller: _emailController,
               decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.mail, color: Colors.grey),
+                prefixIcon: Icon(Icons.mail),
                 border: OutlineInputBorder(),
                 labelText: 'E-mail',
                 labelStyle: TextStyle(fontStyle: FontStyle.italic),
@@ -151,7 +151,7 @@ class _SignUpFormState extends State<SignUpForm> {
               controller: _passwordController,
               obscureText: _passwordInvisible,
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
+                prefixIcon: const Icon(Icons.lock_open),
                 hintText: 'Password',
                 border: const OutlineInputBorder(),
                 labelText: 'Your password',
@@ -182,7 +182,7 @@ class _SignUpFormState extends State<SignUpForm> {
             child: TextFormField(
               obscureText: _passwordInvisible,
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
+                prefixIcon: const Icon(Icons.lock_open),
                 hintText: 'Password',
                 border: const OutlineInputBorder(),
                 labelText: 'Confirm password',

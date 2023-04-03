@@ -16,8 +16,7 @@ class ProfilePic extends StatelessWidget {
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: radius,
-      backgroundColor: Colors.orange,
-      //foregroundColor: Colors.orange,
+      backgroundColor: Theme.of(context).primaryColor,
       child: userData?.profilePic != "default"
           ? (loading
               ? const Center(child: CircularProgressIndicator())

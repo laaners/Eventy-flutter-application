@@ -33,7 +33,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                 child: TextFormField(
                   controller: _emailController,
                   decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.mail, color: Colors.grey),
+                    prefixIcon: Icon(Icons.mail),
                     border: OutlineInputBorder(),
                     labelText: 'E-mail',
                     labelStyle: TextStyle(fontStyle: FontStyle.italic),

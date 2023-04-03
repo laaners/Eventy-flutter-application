@@ -14,7 +14,6 @@ class ErrorScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: const Text("Error"),
-        backgroundColor: Colors.transparent,
         actions: const [],
       ),
       body: ResponsiveWrapper(

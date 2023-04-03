@@ -98,23 +98,18 @@ class _ChangeImageState extends State<ChangeImage> {
               },
             ),
             Positioned(
-              right: 10.0,
+              right: 0.0,
               bottom: 0.0,
-              child: Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                ),
+              child: CircleAvatar(
+                radius: 25,
                 child: IconButton(
-                  iconSize: 20.0,
-                  padding: EdgeInsets.zero,
+                  iconSize: 30.0,
                   constraints: const BoxConstraints(),
                   onPressed: () {
                     _showPicker(context);
                   },
                   icon: const Icon(
                     Icons.photo_camera,
-                    color: Colors.white,
                   ),
                 ),
               ),

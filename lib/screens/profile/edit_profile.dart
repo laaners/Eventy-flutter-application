@@ -59,14 +59,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       body: ResponsiveWrapper(
         child: Form(
           key: _formkey,
-          // TODO: (?) remove update button and make the update on back button using
-          // onWillpop attribute which intercepts the pop of the screen and checks
-          // whether the data inserted is valid
           child: ListView(
             children: [
               Container(
                 margin: const EdgeInsets.all(10),
-                child: ChangeImage(),
+                child: const ChangeImage(),
               ),
               Container(
                 padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
