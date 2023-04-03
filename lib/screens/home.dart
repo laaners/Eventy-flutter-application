@@ -11,6 +11,7 @@ import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -288,129 +289,189 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   Container(
                     color: Theme.of(context).canvasColor,
-                    child: Text("canvas color"),
+                    child: const Text("canvas color"),
                   ),
                   Container(
                     color: Theme.of(context).cardColor,
-                    child: Text("card color"),
+                    child: const Text("card color"),
                   ),
                   Container(
                     color: Theme.of(context).dialogBackgroundColor,
-                    child: Text("dialog bg color"),
+                    child: const Text("dialog bg color"),
                   ),
                   Container(
                     color: Theme.of(context).disabledColor,
-                    child: Text("disabled color"),
+                    child: const Text("disabled color"),
                   ),
                   Container(
                     color: Theme.of(context).dividerColor,
-                    child: Text("divider color"),
+                    child: const Text("divider color"),
                   ),
                   Container(
                     color: Theme.of(context).focusColor,
-                    child: Text("focus color"),
+                    child: const Text("focus color"),
                   ),
                   Container(
                     color: Theme.of(context).highlightColor,
-                    child: Text("highlight color"),
+                    child: const Text("highlight color"),
                   ),
                   Container(
                     color: Theme.of(context).hintColor,
-                    child: Text("hint color"),
+                    child: const Text("hint color"),
                   ),
                   Container(
                     color: Theme.of(context).hoverColor,
-                    child: Text("hover color"),
+                    child: const Text("hover color"),
                   ),
                   Container(
                     color: Theme.of(context).indicatorColor,
-                    child: Text(
+                    child: const Text(
                       "indicator color",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
                   Container(
                     color: Theme.of(context).primaryColor,
-                    child: Text("primary color"),
+                    child: const Text("primary color"),
                   ),
                   Container(
                     color: Theme.of(context).primaryColorDark,
-                    child: Text(
+                    child: const Text(
                       "primary dark color",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
                   Container(
                     color: Theme.of(context).primaryColorLight,
-                    child: Text("primary light color"),
+                    child: const Text("primary light color"),
                   ),
                   Container(
                     color: Theme.of(context).scaffoldBackgroundColor,
-                    child: Text(
+                    child: const Text(
                       "scaffold bg color",
                     ),
                   ),
                   Container(
                     color: Theme.of(context).splashColor,
-                    child: Text("splash color"),
+                    child: const Text("splash color"),
                   ),
                   Container(
                     color: Theme.of(context).shadowColor,
-                    child: Text(
+                    child: const Text(
                       "shadow color",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
                   Container(
                     color: Theme.of(context).unselectedWidgetColor,
-                    child: Text("unselected widget color"),
+                    child: const Text("unselected widget color"),
                   ),
                   Container(
                     color: Theme.of(context).colorScheme.error,
-                    child: Text("colorsheme error color"),
+                    child: const Text("colorsheme error color"),
                   ),
                   Container(
                     color: Theme.of(context).colorScheme.background,
-                    child: Text("colorsheme bg color"),
+                    child: const Text("colorsheme bg color"),
                   ),
                   Container(
                     color: Theme.of(context).colorScheme.onBackground,
-                    child: Text("colorsheme on bg color"),
+                    child: const Text("colorsheme on bg color"),
                   ),
                   Container(
                     color: Theme.of(context).colorScheme.onError,
-                    child: Text("colorsheme on error color"),
+                    child: const Text("colorsheme on error color"),
                   ),
                   Container(
                     color: Theme.of(context).colorScheme.onPrimary,
-                    child: Text("colorsheme onprimary color"),
+                    child: const Text("colorsheme onprimary color"),
                   ),
                   Container(
                     color: Theme.of(context).colorScheme.onSecondary,
-                    child: Text("colorsheme onsecondary color"),
+                    child: const Text("colorsheme onsecondary color"),
                   ),
                   Container(
                     color: Theme.of(context).colorScheme.onSurface,
-                    child: Text("colorsheme on surface color"),
+                    child: const Text("colorsheme on surface color"),
                   ),
                   Container(
                     color: Theme.of(context).colorScheme.primary,
-                    child: Text("colorsheme primary color"),
+                    child: const Text("colorsheme primary color"),
                   ),
                   Container(
                     color: Theme.of(context).colorScheme.secondary,
-                    child: Text("colorsheme error color"),
+                    child: const Text("colorsheme error color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.inverseSurface,
+                    child: const Text("colorsheme inverse surface color"),
                   ),
 
-                  // long shape
-                  Center(
-                    child: Container(
-                      color: Colors.orange,
-                      width: 20,
-                      height: 1000,
-                    ),
+                  Container(
+                    color: Theme.of(context).colorScheme.surface,
+                    child: const Text("colorsheme surface color"),
                   ),
-                  const Text("ok"),
+                  Container(
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                    child: const Text("colorsheme on error container color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    child: const Text("colorsheme on primary container color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                    child:
+                        const Text("colorsheme on secondary container color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    child: const Text("colorsheme on surface variant color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    child: const Text("colorsheme primary container color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    child: const Text("colorsheme secondary container color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    child: const Text("colorsheme surface variant color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.background,
+                    child: const Text("colorsheme background color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.tertiary,
+                    child: const Text("colorsheme tertiary color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.onTertiary,
+                    child: const Text("colorsheme on tertiary color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.tertiaryContainer,
+                    child: const Text("colorsheme tertiary container color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.onTertiaryContainer,
+                    child: const Text("colorsheme on tertiary container color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.scrim,
+                    child: const Text("colorsheme scrim color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.outline,
+                    child: const Text("colorsheme outline color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                    child: const Text("colorsheme outline variant color"),
+                  ),
                 ],
               ),
             ),
