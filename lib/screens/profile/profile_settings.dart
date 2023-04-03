@@ -1,6 +1,5 @@
 import 'package:dima_app/screens/profile/edit_profile.dart';
 import 'package:dima_app/screens/profile/delete_dialog.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/themes/theme_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

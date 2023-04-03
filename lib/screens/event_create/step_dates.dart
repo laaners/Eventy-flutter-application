@@ -1,7 +1,6 @@
 import 'package:dima_app/screens/event_create/select_day_slots.dart';
 import 'package:dima_app/screens/event_create/select_slot.dart';
 import 'package:dima_app/server/date_methods.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';

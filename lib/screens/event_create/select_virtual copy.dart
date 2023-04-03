@@ -1,6 +1,5 @@
 import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/location_icons.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -146,7 +145,6 @@ class _SelectVirtualState extends State<SelectVirtual> {
                   child: Container(
                     padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                      color: Palette.lightBGColor,
                       borderRadius: BorderRadius.circular(50 + 5),
                     ),
                     child: IconButton(
@@ -156,7 +154,6 @@ class _SelectVirtualState extends State<SelectVirtual> {
                       onPressed: () {},
                       icon: Icon(
                         LocationIcons.videocam,
-                        color: Palette.greyColor,
                       ),
                     ),
                   ),
