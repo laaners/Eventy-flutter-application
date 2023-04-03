@@ -41,13 +41,13 @@ class FadingListViewWidget extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.purple,
+                Theme.of(context).primaryColor,
                 Colors.transparent,
                 Colors.transparent,
-                Colors.purple
+                Theme.of(context).primaryColor
               ],
               stops: [
-                0.0,
+                0,
                 0.1,
                 0.9,
                 1.0
@@ -59,8 +59,8 @@ class FadingListViewWidget extends StatelessWidget {
             itemCount: 100,
             itemBuilder: (BuildContext context, int index) {
               return Card(
-                color: Colors.orangeAccent,
-                child: ListTile(
+                color: Theme.of(context).colorScheme.error,
+                child: const ListTile(
                   title: Text('test test test test test test'),
                 ),
               );

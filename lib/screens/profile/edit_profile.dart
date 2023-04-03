@@ -139,7 +139,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.mail, color: Colors.grey),
+                  prefixIcon: const Icon(Icons.mail),
                   border: const OutlineInputBorder(),
                   hintText: userData!.email,
                   labelStyle: const TextStyle(fontStyle: FontStyle.italic),

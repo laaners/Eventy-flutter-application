@@ -44,10 +44,7 @@ class ProfilePic extends StatelessWidget {
           : Text(
               "${userData?.name[0]}${userData?.surname[0]}",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: radius / 2,
-              ),
+              style: Theme.of(context).textTheme.displayLarge,
             ),
     );
   }

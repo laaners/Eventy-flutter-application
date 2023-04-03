@@ -32,6 +32,9 @@ class _DeleteDialogState extends State<DeleteDialog> {
         children: [
           const Text(
               'This action cannot be undone. This will permanently delete your account.'),
+          const SizedBox(
+            height: 15.0,
+          ),
           TextFormField(
             controller: _passwordController,
             obscureText: _passwordVisible,
