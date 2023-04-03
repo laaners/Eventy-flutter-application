@@ -2,7 +2,6 @@ import 'package:dima_app/screens/event_create/select_location.dart';
 import 'package:dima_app/screens/event_create/select_virtual.dart';
 import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/location_icons.dart';
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';

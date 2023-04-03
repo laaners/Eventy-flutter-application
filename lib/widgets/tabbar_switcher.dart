@@ -1,4 +1,3 @@
-import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -101,7 +100,6 @@ class _TabbarSwitcher extends State<TabbarSwitcher>
                         // height between app bar and tabbar
                         preferredSize: const Size.fromHeight(0),
                         child: TabBar(
-                          labelColor: Palette.blueColor,
                           tabs: widget.labels.map((e) => Tab(text: e)).toList(),
                           controller: _tabController,
                           indicatorSize: TabBarIndicatorSize.tab,
