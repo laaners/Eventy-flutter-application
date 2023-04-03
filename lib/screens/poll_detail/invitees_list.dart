@@ -1,4 +1,3 @@
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/event_create/step_invite.dart';
 import 'package:dima_app/screens/profile/index.dart';
@@ -210,9 +209,6 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
                       },
                       child: Icon(
                         Icons.done,
-                        color: Provider.of<ThemeSwitch>(context)
-                            .themeData
-                            .primaryColor,
                       ),
                     )
                   ]

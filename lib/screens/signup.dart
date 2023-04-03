@@ -17,7 +17,6 @@ class SignUpScreen extends StatelessWidget {
         child: SignUpForm(),
       ),
       appBar: MyAppBar(title: "", upRightActions: []),
-      body: SignUpForm(),
     );
   }
 }

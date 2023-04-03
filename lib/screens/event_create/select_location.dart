@@ -128,9 +128,9 @@ class _SelectLocationState extends State<SelectLocation> {
                   margin: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(50 + 5),
-                    color: LocationIcons.icons[locationIcon] == entry.value
-                        ? Palette.lightBGColor
-                        : Colors.transparent,
+                    // color: LocationIcons.icons[locationIcon] == entry.value
+                    //     ? Palette.lightBGColor
+                    //     : Colors.transparent,
                   ),
                   child: IconButton(
                     iconSize: 50.0,
@@ -143,7 +143,6 @@ class _SelectLocationState extends State<SelectLocation> {
                     },
                     icon: Icon(
                       entry.value,
-                      color: Palette.greyColor,
                     ),
                   ),
                 );

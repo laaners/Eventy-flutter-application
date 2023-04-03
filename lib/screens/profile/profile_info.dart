@@ -7,7 +7,6 @@ import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../server/firebase_follow.dart';
-import '../../themes/palette.dart';
 import 'follow_list.dart';
 
 class ProfileInfo extends StatelessWidget {
@@ -22,49 +21,16 @@ class ProfileInfo extends StatelessWidget {
         Center(
           child: Column(
             children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    margin: const EdgeInsets.all(10),
-                    child: ProfilePic(
-                      userData: widget.userData,
-                      loading: false,
-                      radius: 90,
-                    ),
-                  ),
-                  isCurrentUser
-                      ? Container()
-                      : Positioned(
-                          right: 10.0,
-                          bottom: 0.0,
-                          child: Container(
-                            padding: const EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                              // color: Palette.lightBGColor,
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            child: IconButton(
-                              iconSize: 20.0,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: () {
-                                Provider.of<FirebaseFollow>(context,
-                                        listen: false)
-                                    .addFollower(context, widget.userData!.uid,
-                                        curUid, true);
-                              },
-                              icon: const Icon(
-                                Icons.person_add,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                ],
+              Container(
+                margin: const EdgeInsets.all(10),
+                child: ProfilePic(
+                  userData: userData,
+                  loading: false,
+                  radius: 90,
+                ),
               ),
-              Text('@${widget.userData!.username}'),
-              Text("${widget.userData?.name} ${widget.userData?.surname}"),
+              Text('@${userData!.username}'),
+              Text("${userData?.name} ${userData?.surname}"),
             ],
           ),
         ),

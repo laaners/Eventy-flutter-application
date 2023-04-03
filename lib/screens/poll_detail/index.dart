@@ -239,9 +239,9 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      MyTitle(
-                        text: pollData.pollName,
-                        alignment: Alignment.topLeft,
+                      Text(
+                        pollData.pollName,
+                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       Center(
                         child: InviteesPill(
@@ -314,9 +314,6 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                               },
                               child: Icon(
                                 Icons.share_outlined,
-                                color: Provider.of<ThemeSwitch>(context)
-                                    .themeData
-                                    .primaryColor,
                               ),
                             )
                           ],

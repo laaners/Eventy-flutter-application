@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/firebase_cruds_testing.dart';
 import 'package:dima_app/screens/event_create/step_invite.dart';
-import 'package:dima_app/screens/search.dart';
 import 'package:dima_app/server/firebase_crud.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_user.dart';
@@ -300,9 +299,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: const Text("Postgres test"),
                 ),
                 */
-
-                  // List DB fetch
-                  const UsersList2(),
 
                   // long shape
                   Center(

@@ -1,4 +1,3 @@
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/themes/palette.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
@@ -71,17 +70,9 @@ class _TabbarSwitcher extends State<TabbarSwitcher>
       */
       appBar: AppBar(
         toolbarHeight: 50,
-        backgroundColor: Provider.of<ThemeSwitch>(context, listen: false)
-            .themeData
-            .scaffoldBackgroundColor,
         title: _isShrink || widget.stickyHeight == 0
             ? Text(
                 widget.appBarTitle,
-                style: TextStyle(
-                  color: Provider.of<ThemeSwitch>(context, listen: false)
-                      .themeData
-                      .primaryColor,
-                ),
               )
             : Container(),
         actions: widget.upRightActions,
@@ -102,10 +93,6 @@ class _TabbarSwitcher extends State<TabbarSwitcher>
                     padding: const EdgeInsets.only(top: 0),
                     sliver: SliverAppBar(
                       elevation: 1,
-                      backgroundColor:
-                          Provider.of<ThemeSwitch>(context, listen: false)
-                              .themeData
-                              .scaffoldBackgroundColor,
                       pinned: true,
                       expandedHeight: widget.stickyHeight,
                       automaticallyImplyLeading: false,
@@ -114,10 +101,6 @@ class _TabbarSwitcher extends State<TabbarSwitcher>
                         // height between app bar and tabbar
                         preferredSize: const Size.fromHeight(0),
                         child: TabBar(
-                          unselectedLabelColor:
-                              Provider.of<ThemeSwitch>(context, listen: false)
-                                  .themeData
-                                  .primaryColor,
                           labelColor: Palette.blueColor,
                           tabs: widget.labels.map((e) => Tab(text: e)).toList(),
                           controller: _tabController,

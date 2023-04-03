@@ -92,7 +92,6 @@ class _SelectVirtualState extends State<SelectVirtual> {
           child: Container(
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-              color: Palette.lightBGColor,
               borderRadius: BorderRadius.circular(50 + 5),
             ),
             child: IconButton(
@@ -102,7 +101,6 @@ class _SelectVirtualState extends State<SelectVirtual> {
               onPressed: () {},
               icon: Icon(
                 LocationIcons.videocam,
-                color: Palette.greyColor,
               ),
             ),
           ),

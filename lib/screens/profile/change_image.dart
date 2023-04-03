@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:dima_app/screens/profile/profile_pic.dart';
+import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';

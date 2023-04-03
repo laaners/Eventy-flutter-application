@@ -1,4 +1,3 @@
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +15,6 @@ class ErrorScreen extends StatelessWidget {
         centerTitle: true,
         title: const Text("Error"),
         backgroundColor: Colors.transparent,
-        iconTheme:
-            Provider.of<ThemeSwitch>(context).themeData.appBarTheme.iconTheme,
         actions: const [],
       ),
       body: ResponsiveWrapper(

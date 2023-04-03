@@ -226,12 +226,6 @@ class _StepBasicsState extends State<StepBasics> {
             ),
             Text(
               widget.visibility ? "Public event" : "Private event",
-              style: TextStyle(
-                color: Provider.of<ThemeSwitch>(context, listen: false)
-                    .themeData
-                    .primaryColor,
-                fontSize: 16,
-              ),
             ),
           ],
         ),
@@ -247,12 +241,6 @@ class _StepBasicsState extends State<StepBasics> {
               widget.canInvite
                   ? "Anyone can invite other users"
                   : "Only you can invite other users",
-              style: TextStyle(
-                color: Provider.of<ThemeSwitch>(context, listen: false)
-                    .themeData
-                    .primaryColor,
-                fontSize: 16,
-              ),
             ),
           ],
         ),

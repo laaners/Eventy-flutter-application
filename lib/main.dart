@@ -92,6 +92,11 @@ Future<void> main() async {
         // DARK/LIGHT THEME
         ChangeNotifierProvider(create: (context) => ThemeManager()),
 
+        // GLOBAL TAB CONTROLLER
+        ChangeNotifierProvider<CupertinoTabController>(
+          create: (context) => CupertinoTabController(),
+        ),
+
         // DYNAMIC LINK
         ChangeNotifierProvider(create: (context) => DynamicLinksHandler()),
       ],
@@ -146,6 +151,23 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+//   @override
+//   Widget build(BuildContext context) {
+//     bool isAuthenticated =
+//         Provider.of<FirebaseUser>(context, listen: true).user != null;
+//     return MaterialApp(
+//       title: 'Eventy',
+//       theme: lightTheme,
+//       darkTheme: darkTheme,
+//       themeMode: Provider.of<ThemeManager>(context).themeMode,
+//       home: Consumer<FirebaseUser>(
+//         builder: (context, value, child) {
+//           return value.user != null ? const MainScreen() : const LogInScreen();
+//         },
+//       ),
+//     );
+//   }
+
   @override
   Widget build(BuildContext context) {
     bool isAuthenticated =
@@ -155,11 +177,31 @@ class _MyAppState extends State<MyApp> {
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: Provider.of<ThemeManager>(context).themeMode,
-      home: Consumer<FirebaseUser>(
-        builder: (context, value, child) {
-          return value.user != null ? const MainScreen() : const LogInScreen();
-        },
-      ),
+      home: isAuthenticated
+          ? Builder(builder: (context) {
+              bool hasUserData =
+                  Provider.of<FirebaseUser>(context, listen: true).userData !=
+                      null;
+              return hasUserData
+                  ? const MainScreen()
+                  : FutureBuilder(
+                      future: Provider.of<FirebaseUser>(context, listen: true)
+                          .initUserData(),
+                      builder: (
+                        context,
+                        snapshot,
+                      ) {
+                        if (snapshot.connectionState ==
+                                ConnectionState.waiting ||
+                            snapshot.hasError ||
+                            !snapshot.hasData) {
+                          return const LogInScreen();
+                        }
+                        return const MainScreen();
+                      },
+                    );
+            })
+          : const LogInScreen(),
     );
   }
 }

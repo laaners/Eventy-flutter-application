@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:dima_app/providers/theme_switch.dart';
 import 'package:dima_app/screens/profile/index.dart';
 import 'package:dima_app/screens/profile/profile_settings.dart';
 import 'package:dima_app/server/firebase_user.dart';
@@ -72,11 +71,6 @@ class ResponsiveWrapper extends StatelessWidget {
                               return ListTile(
                                 leading: Icon(
                                   obj["icon"] as IconData,
-                                  color: activeIndex == index
-                                      ? Provider.of<ThemeSwitch>(context)
-                                          .themeData
-                                          .primaryColor
-                                      : null,
                                 ),
                                 title: Text(obj["label"] as String),
                                 // trailing: const Icon(Icons.navigate_next),

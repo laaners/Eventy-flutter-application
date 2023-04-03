@@ -17,6 +17,7 @@ class ProfileSettings extends StatefulWidget {
 
 class _ProfileSettingsState extends State<ProfileSettings> {
   bool _pushNotificationEnabled = true;
+  bool _darkModeEnabled = false;
 
   @override
   Widget build(BuildContext context) {
