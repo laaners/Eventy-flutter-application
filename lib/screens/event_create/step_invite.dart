@@ -243,15 +243,17 @@ class _InviteProfilePicState extends State<InviteProfilePic> {
     // show cancel if in cancelmode, not organizer but newly added user isn't in original invitees
     if (!widget.addMode && !isOrganizer && !isInOriginalInvitees) {
       return Positioned(
-        right: 2.0,
-        top: 2.0,
+        right: -10.0,
+        top: -10.0,
         child: IconButton(
           iconSize: 25,
           padding: const EdgeInsets.all(0),
           constraints: const BoxConstraints(),
           icon: Icon(
             widget.addMode ? Icons.add_circle : Icons.cancel,
-            color: widget.addMode ? Colors.blue : Colors.red,
+            color: widget.addMode
+                ? Theme.of(context).primaryColorLight
+                : Theme.of(context).colorScheme.error,
           ),
           onPressed: () {
             widget.addMode
@@ -263,15 +265,17 @@ class _InviteProfilePicState extends State<InviteProfilePic> {
     }
     // show anything if organizer or in add mode (default)
     return Positioned(
-      right: 2.0,
-      top: 2.0,
+      right: -10,
+      top: -10,
       child: IconButton(
         iconSize: 25,
         padding: const EdgeInsets.all(0),
         constraints: const BoxConstraints(),
         icon: Icon(
           widget.addMode ? Icons.add_circle : Icons.cancel,
-          color: widget.addMode ? Colors.blue : Colors.red,
+          color: widget.addMode
+              ? Theme.of(context).primaryColorLight
+              : Theme.of(context).colorScheme.error,
         ),
         onPressed: () {
           widget.addMode

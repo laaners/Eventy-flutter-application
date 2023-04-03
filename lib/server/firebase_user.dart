@@ -286,22 +286,6 @@ class FirebaseUser extends ChangeNotifier {
     }
   }
 
-  Future<void> themeSwitch() async {
-    try {
-      var uid = _auth.currentUser!.uid;
-      bool curMode = userData!.isLightMode;
-      var tmpMap = _userData!.toMap();
-      tmpMap["isLightMode"] = !curMode;
-      _userData = UserCollection.fromMap(tmpMap);
-      notifyListeners();
-      await FirebaseCrud.updateDoc(
-          userCollection, uid, "isLightMode", !curMode);
-    } on FirebaseException catch (e) {
-      print(e.message!);
-      // showSnackBar(context, e.message!);
-    }
-  }
-
   Future<bool> usernameAlreadyExists(String username) async {
     try {
       var usernameValidation =

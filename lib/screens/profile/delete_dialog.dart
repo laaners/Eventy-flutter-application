@@ -36,7 +36,7 @@ class _DeleteDialogState extends State<DeleteDialog> {
             controller: _passwordController,
             obscureText: _passwordVisible,
             decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
+              prefixIcon: const Icon(Icons.lock_open),
               hintText: 'Enter password',
               border: const OutlineInputBorder(),
               labelStyle: const TextStyle(fontStyle: FontStyle.italic),
@@ -63,10 +63,9 @@ class _DeleteDialogState extends State<DeleteDialog> {
         ),
         TextButton(
           style: ButtonStyle(
-              backgroundColor:
-                  MaterialStatePropertyAll(Colors.red.withOpacity(0.5)),
-              shadowColor:
-                  MaterialStatePropertyAll(Colors.red.withOpacity(0.5))),
+            backgroundColor:
+                MaterialStatePropertyAll(Theme.of(context).colorScheme.error),
+          ),
           onPressed: () async {
             bool reauthSuccess = await Provider.of<FirebaseUser>(context,
                     listen: false)
@@ -77,9 +76,9 @@ class _DeleteDialogState extends State<DeleteDialog> {
               Navigator.pop(context, 'Delete');
             }
           },
-          child: const Text(
+          child: Text(
             'Delete',
-            style: TextStyle(color: Colors.red),
+            style: TextStyle(color: Theme.of(context).colorScheme.onError),
           ),
         ),
       ],

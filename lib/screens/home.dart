@@ -365,19 +365,42 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Theme.of(context).unselectedWidgetColor,
                     child: Text("unselected widget color"),
                   ),
-                  /*
-                TextButton(
-                  onPressed: () async {
-                    var rows =
-                        await Provider.of<PostgresMethods>(context, listen: false)
-                            .test(context);
-                    for (final row in rows) {
-                      debugPrint(row["users"]["username"]);
-                    }
-                  },
-                  child: const Text("Postgres test"),
-                ),
-                */
+                  Container(
+                    color: Theme.of(context).colorScheme.error,
+                    child: Text("colorsheme error color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.background,
+                    child: Text("colorsheme bg color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.onBackground,
+                    child: Text("colorsheme on bg color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.onError,
+                    child: Text("colorsheme on error color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    child: Text("colorsheme onprimary color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                    child: Text("colorsheme onsecondary color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    child: Text("colorsheme on surface color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.primary,
+                    child: Text("colorsheme primary color"),
+                  ),
+                  Container(
+                    color: Theme.of(context).colorScheme.secondary,
+                    child: Text("colorsheme error color"),
+                  ),
 
                   // long shape
                   Center(

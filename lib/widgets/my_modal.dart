@@ -54,8 +54,9 @@ class MyModal extends StatelessWidget {
                           alignment: Alignment.center,
                           width: 80,
                           height: 3,
+                          child: Text("text"),
                           decoration: BoxDecoration(
-                            // color: Palette.greyColor.withOpacity(0.5),
+                            color: Colors.grey,
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(20)),
                           ),

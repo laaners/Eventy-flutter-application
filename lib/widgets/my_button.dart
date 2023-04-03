@@ -16,7 +16,7 @@ class MyButton extends StatelessWidget {
               MaterialStatePropertyAll<EdgeInsetsGeometry>(EdgeInsets.all(20)),
           textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 18)),
         ),
-        child: Text(text),
+        child: Text(text.toUpperCase()),
       ),
     );
   }
