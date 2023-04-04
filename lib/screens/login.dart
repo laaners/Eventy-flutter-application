@@ -8,6 +8,8 @@ import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/logo.dart';
+
 class LogInScreen extends StatelessWidget {
   const LogInScreen({super.key});
 
@@ -74,9 +76,8 @@ class _LogInFormState extends State<LogInForm> {
         const SizedBox(
           height: 50,
         ),
-        SizedBox(
-          height: 170,
-          child: Image.asset('images/logo.png'),
+        EventyLogo(
+          extWidth: 180,
         ),
         Text(
           "Eventy",

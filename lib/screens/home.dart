@@ -20,6 +20,8 @@ import 'package:provider/provider.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/provider_samples.dart';
 
+import '../widgets/logo.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -518,46 +520,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Theme.of(context).colorScheme.outlineVariant,
                     child: const Text("colorsheme outline variant color"),
                   ),
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        height: 150,
-                        width: 165,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(35),
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 15,
-                        child: Container(
-                          height: 100,
-                          width: 140,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.vertical(
-                                top: Radius.zero, bottom: Radius.circular(22)),
-                            color: Theme.of(context).colorScheme.onBackground,
-                          ),
-                        ),
-                      ),
-                      // Positioned(
-                      //   bottom: 15,
-                      //   child: Container(
-                      //     height: 100,
-                      //     width: 140,
-                      //     decoration: BoxDecoration(
-                      //       borderRadius: const BorderRadius.vertical(
-                      //           top: Radius.zero, bottom: Radius.circular(22)),
-                      //       color: Theme.of(context).primaryColorLight,
-                      //     ),
-                      //   ),
-                      // )
-                    ],
+                  const SizedBox(
+                    height: 100,
                   ),
+                  EventyLogo(),
                   Container(
                     child: Image.asset('images/logo.png'),
-                  )
+                  ),
                 ],
               ),
             ),
