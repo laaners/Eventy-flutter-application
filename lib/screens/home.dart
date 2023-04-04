@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/firebase_cruds_testing.dart';
+import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/event_create/step_invite.dart';
+import 'package:dima_app/screens/login.dart';
 import 'package:dima_app/server/firebase_crud.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_user.dart';
@@ -120,7 +122,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
 
-                  TextFormField(),
                   Text(Provider.of<Something>(context).stringa),
                   // equivalente a quello sopra
                   Text(context.watch<Something>().stringa),
@@ -141,6 +142,50 @@ class _HomeScreenState extends State<HomeScreen> {
                       // context.read<CounterProviderSample>().incrementCounter();
                     },
                     child: const Icon(Icons.add),
+                  ),
+
+                  MyButton(
+                    text: "Error page",
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const ErrorScreen(errorMsg: 'MY error Message'),
+                        ),
+                      );
+                    },
+                  ),
+
+                  MyButton(
+                    text: "Time Picker",
+                    onPressed: () {
+                      showTimePicker(
+                          context: context,
+                          initialEntryMode: TimePickerEntryMode.input,
+                          initialTime: TimeOfDay.fromDateTime(DateTime.now()));
+                    },
+                  ),
+
+                  MyButton(
+                    text: "Date Range Picker",
+                    onPressed: () {
+                      showDateRangePicker(
+                          context: context,
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(9999));
+                    },
+                  ),
+
+                  MyButton(
+                    text: "Date Picker",
+                    onPressed: () {
+                      showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(9999));
+                    },
                   ),
 
                   //Stream provider
@@ -287,6 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: const Text("Firebase delete"),
                   ),
+
                   Container(
                     color: Theme.of(context).canvasColor,
                     child: const Text("canvas color"),
@@ -472,6 +518,46 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Theme.of(context).colorScheme.outlineVariant,
                     child: const Text("colorsheme outline variant color"),
                   ),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        height: 150,
+                        width: 165,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(35),
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 15,
+                        child: Container(
+                          height: 100,
+                          width: 140,
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.vertical(
+                                top: Radius.zero, bottom: Radius.circular(22)),
+                            color: Theme.of(context).colorScheme.onBackground,
+                          ),
+                        ),
+                      ),
+                      // Positioned(
+                      //   bottom: 15,
+                      //   child: Container(
+                      //     height: 100,
+                      //     width: 140,
+                      //     decoration: BoxDecoration(
+                      //       borderRadius: const BorderRadius.vertical(
+                      //           top: Radius.zero, bottom: Radius.circular(22)),
+                      //       color: Theme.of(context).primaryColorLight,
+                      //     ),
+                      //   ),
+                      // )
+                    ],
+                  ),
+                  Container(
+                    child: Image.asset('images/logo.png'),
+                  )
                 ],
               ),
             ),
