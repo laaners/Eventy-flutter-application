@@ -227,27 +227,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void initLink() async {
-    /*0
-    final PendingDynamicLinkData? initialLink =
-        await FirebaseDynamicLinks.instance.getInitialLink();
-    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
-      print("ok---------------------------");
-      print(dynamicLinkData);
-      /*
-      setState(() {
-        tabController.index = 1;
-      });
-      */
-      Navigator.of(context).push(
-        ScreenTransition(
-          builder: (context) => PollDetailScreen(pollId: pollId),
-        ),
-      );
-      // Navigator.pushNamed(context, dynamicLinkData.link.path);
-    }).onError((error) {
-      // Handle errors
-    });
-    */
     FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
       Provider.of<DynamicLinksHandler>(context, listen: false)
           .setLink(dynamicLinkData);
@@ -255,23 +234,6 @@ class _MyAppState extends State<MyApp> {
       // Handle errors
     });
   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     bool isAuthenticated =
-//         Provider.of<FirebaseUser>(context, listen: true).user != null;
-//     return MaterialApp(
-//       title: 'Eventy',
-//       theme: lightTheme,
-//       darkTheme: darkTheme,
-//       themeMode: Provider.of<ThemeManager>(context).themeMode,
-//       home: Consumer<FirebaseUser>(
-//         builder: (context, value, child) {
-//           return value.user != null ? const MainScreen() : const LogInScreen();
-//         },
-//       ),
-//     );
-//   }
 
   @override
   Widget build(BuildContext context) {

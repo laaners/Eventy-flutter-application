@@ -24,12 +24,6 @@ class EventsScreen extends StatelessWidget {
       body: ResponsiveWrapper(
         child: ListView(
           children: [
-            const Center(
-              child: Text(
-                "EVENTS",
-                style: TextStyle(fontSize: 40),
-              ),
-            ),
             ElevatedButton(
               onPressed: () {
                 // ignore: use_build_context_synchronously

@@ -1,4 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+import 'my_button.dart';
 
 // OK only alert dialog, usually for errors or warning
 class MyAlertDialog extends StatelessWidget {
@@ -17,13 +20,12 @@ class MyAlertDialog extends StatelessWidget {
     String content,
   ) {
     if (condition) {
-      showCupertinoModalPopup(
-        context: context,
-        builder: (BuildContext context) => MyAlertDialog(
-          title: title,
-          content: content,
-        ),
-      );
+      showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => MyAlertDialog(
+                title: title,
+                content: content,
+              ));
       return true;
     }
     return false;
@@ -31,31 +33,16 @@ class MyAlertDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoAlertDialog(
+    return AlertDialog(
       title: Text(title),
       content: Text(content),
-      actions: <CupertinoDialogAction>[
-        CupertinoDialogAction(
-          /// This parameter indicates this action is the default,
-          /// and turns the action's text to bold text.
-          isDefaultAction: true,
+      actions: <Widget>[
+        MyButton(
+          text: '   OK   ',
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('OK'),
-        ),
-        /*
-        CupertinoDialogAction(
-          /// This parameter indicates the action would perform
-          /// a destructive action such as deletion, and turns
-          /// the action's text color to red.
-          isDestructiveAction: true,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Yes'),
-        ),
-        */
+        )
       ],
     );
   }

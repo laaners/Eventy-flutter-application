@@ -8,6 +8,8 @@ import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/logo.dart';
+
 class LogInScreen extends StatelessWidget {
   const LogInScreen({super.key});
 
@@ -46,7 +48,7 @@ class _LogInFormState extends State<LogInForm> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       children: [
         TextButton(
           key: GlobalKey(debugLabel: 'test1'),
@@ -74,9 +76,8 @@ class _LogInFormState extends State<LogInForm> {
         const SizedBox(
           height: 50,
         ),
-        SizedBox(
-          height: 170,
-          child: Image.asset('images/logo.png'),
+        EventyLogo(
+          extWidth: 180,
         ),
         Text(
           "Eventy",
@@ -100,7 +101,7 @@ class _LogInFormState extends State<LogInForm> {
               TextFormField(
                 controller: _usernameController,
                 decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.face, color: Colors.grey),
+                  prefixIcon: Icon(Icons.face),
                   border: OutlineInputBorder(),
                   labelText: 'Username',
                   labelStyle: TextStyle(fontStyle: FontStyle.italic),
@@ -120,7 +121,7 @@ class _LogInFormState extends State<LogInForm> {
                 controller: _passwordController,
                 obscureText: _passwordVisible,
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
+                  prefixIcon: const Icon(Icons.lock_open),
                   hintText: 'Password',
                   border: const OutlineInputBorder(),
                   labelText: 'Password',
@@ -163,6 +164,9 @@ class _LogInFormState extends State<LogInForm> {
                   ),
                 ),
               ),
+              const SizedBox(
+                height: 25,
+              ),
               MyButton(
                 text: "LOG IN",
                 onPressed: () async {
@@ -178,35 +182,35 @@ class _LogInFormState extends State<LogInForm> {
                   }
                 },
               ),
-              Container(
-                margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Don't have an account?",
+              const SizedBox(
+                height: 25,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Don't have an account?",
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  TextButton(
+                    key: const Key("log-in-to-sign-up-screen"),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SignUpScreen()),
+                      );
+                    },
+                    child: const Text(
+                      "Sign up",
                       style: TextStyle(
                         fontStyle: FontStyle.italic,
                       ),
                     ),
-                    TextButton(
-                      key: const Key("log-in-to-sign-up-screen"),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SignUpScreen()),
-                        );
-                      },
-                      child: const Text(
-                        "Sign up",
-                        style: TextStyle(
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
             ],
           ),

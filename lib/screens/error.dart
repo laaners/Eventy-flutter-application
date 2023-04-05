@@ -10,13 +10,6 @@ class ErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: const Text("Error"),
-        backgroundColor: Colors.transparent,
-        actions: const [],
-      ),
       body: ResponsiveWrapper(
         child: Center(
           child: ListView(
@@ -27,14 +20,10 @@ class ErrorScreen extends StatelessWidget {
                 height: 80,
               ),
               Container(padding: const EdgeInsets.only(top: 30)),
-              const Center(
-                child: Text(
-                  "AN ERROR HAS OCCURRED",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                ),
+              Text(
+                "AN ERROR HAS OCCURRED",
+                style: Theme.of(context).textTheme.displaySmall,
+                textAlign: TextAlign.center,
               ),
               Container(padding: const EdgeInsets.only(top: 10)),
               Center(

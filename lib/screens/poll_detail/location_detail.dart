@@ -216,16 +216,8 @@ class LocationDetail extends StatelessWidget {
                 pollOptionsSplashColor: Colors.white,
                 votedProgressColor: Colors.grey.withOpacity(0.3),
                 votedBackgroundColor: Colors.grey.withOpacity(0.2),
-                /*
-                    votesTextStyle: themeData.textTheme.subtitle1,
-                    votedPercentageTextStyle:
-                        themeData.textTheme.headline4?.copyWith(
-                      color: Colors.black(),
-                    ),
-                    */
                 votedCheckmark: const Icon(
                   Icons.check,
-                  color: Colors.black,
                 ),
                 pollTitle: Container(),
                 pollOptions: getOptions(locationCollection),
@@ -249,55 +241,6 @@ class LocationDetail extends StatelessWidget {
             );
           },
         ),
-        /*
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 15),
-                  child: MyPolls(
-                    hasVoted: true,
-                    userVotedOptionId: userVotedOptionId,
-                    heightBetweenTitleAndOptions: 0,
-                    pollId: '1',
-                    onVoted: (MyPollOption pollOption, int newTotalVotes) async {
-                      print('Voted: ${pollOption.id}');
-                      print(pollOption.votes);
-                      return true;
-                    },
-                    pollOptionsSplashColor: Colors.white,
-                    votedProgressColor: Colors.grey.withOpacity(0.3),
-                    votedBackgroundColor: Colors.grey.withOpacity(0.2),
-                    /*
-                    votesTextStyle: themeData.textTheme.subtitle1,
-                    votedPercentageTextStyle:
-                        themeData.textTheme.headline4?.copyWith(
-                      color: Colors.black(),
-                    ),
-                    */
-                    votedCheckmark: const Icon(
-                      Icons.check,
-                      color: Colors.black,
-                    ),
-                    pollTitle: Container(),
-                    pollOptions: pollOptions,
-                    metaWidget: Row(
-                      children: const [
-                        Text(
-                          '•',
-                          style: TextStyle(
-                            fontSize: 20,
-                          ),
-                        ),
-                        Text(
-                          '2 weeks left',
-                          style: TextStyle(
-                            fontSize: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                
-                */
         const Padding(padding: EdgeInsets.only(top: 8)),
         location.name == "Virtual meeting"
             ? ListTile(
@@ -322,11 +265,6 @@ class LocationDetail extends StatelessWidget {
                   initialValue: location.site.isEmpty
                       ? "The organizer did not provide any link"
                       : location.site,
-                  style: TextStyle(
-                      // color: Provider.of<ThemeSwitch>(context)
-                      //     .themeData
-                      //     .primaryColor,
-                      ),
                   enabled: false,
                   autofocus: false,
                 ),

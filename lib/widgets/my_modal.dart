@@ -55,7 +55,7 @@ class MyModal extends StatelessWidget {
                           width: 80,
                           height: 3,
                           decoration: BoxDecoration(
-                            // color: Palette.greyColor.withOpacity(0.5),
+                            color: Theme.of(context).colorScheme.outline,
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(20)),
                           ),
@@ -92,12 +92,12 @@ class MyModal extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Container(
-                          margin: const EdgeInsets.only(bottom: 15, top: 8),
+                          margin: const EdgeInsets.only(bottom: 10, top: 10),
                           alignment: Alignment.center,
                           width: 80,
                           height: 3,
                           decoration: BoxDecoration(
-                            // color: Palette.greyColor.withOpacity(0.5),
+                            color: Theme.of(context).colorScheme.outline,
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(20)),
                           ),

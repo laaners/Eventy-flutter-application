@@ -48,7 +48,7 @@ class _ChangeProfileScreenState extends State<ChangePasswordScreen> {
                   controller: _currentPasswordController,
                   obscureText: _passwordInvisibleOld,
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
+                    prefixIcon: const Icon(Icons.lock_open),
                     hintText: 'Current password',
                     border: const OutlineInputBorder(),
                     labelText: 'Your password',
@@ -80,7 +80,7 @@ class _ChangeProfileScreenState extends State<ChangePasswordScreen> {
                   controller: _passwordController,
                   obscureText: _passwordInvisibleNew,
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
+                    prefixIcon: const Icon(Icons.lock_open),
                     hintText: 'New password',
                     border: const OutlineInputBorder(),
                     labelText: 'Your new password',
@@ -111,7 +111,7 @@ class _ChangeProfileScreenState extends State<ChangePasswordScreen> {
                 child: TextFormField(
                   obscureText: _passwordInvisibleNew,
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
+                    prefixIcon: const Icon(Icons.lock_open),
                     hintText: 'New password',
                     border: const OutlineInputBorder(),
                     labelText: 'Confirm new password',

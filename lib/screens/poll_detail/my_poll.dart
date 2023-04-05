@@ -314,7 +314,6 @@ class MyPolls extends HookWidget {
                                       votedCheckmark ??
                                           const Icon(
                                             Icons.check_circle_outline_rounded,
-                                            color: Colors.black,
                                             size: 16,
                                           ),
                                     const Spacer(),
@@ -373,7 +372,6 @@ class MyPolls extends HookWidget {
                                     : pollOptionsFillColor,
                                 border: pollOptionsBorder ??
                                     Border.all(
-                                      color: Colors.black,
                                       width: 1,
                                     ),
                                 borderRadius: pollOptionsBorderRadius ??

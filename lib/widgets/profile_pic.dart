@@ -16,8 +16,7 @@ class ProfilePic extends StatelessWidget {
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: radius,
-      backgroundColor: Colors.orange,
-      //foregroundColor: Colors.orange,
+      backgroundColor: Theme.of(context).primaryColor,
       child: userData?.profilePic != "default"
           ? (loading
               ? const Center(child: CircularProgressIndicator())
@@ -45,10 +44,7 @@ class ProfilePic extends StatelessWidget {
           : Text(
               "${userData?.name[0]}${userData?.surname[0]}",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: radius / 2,
-              ),
+              style: Theme.of(context).textTheme.displayLarge,
             ),
     );
   }

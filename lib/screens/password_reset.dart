@@ -1,4 +1,6 @@
 import 'package:dima_app/server/firebase_user.dart';
+import 'package:dima_app/widgets/my_app_bar.dart';
+import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,17 +25,19 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const MyAppBar(title: "", upRightActions: []),
       body: ResponsiveWrapper(
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
             children: <Widget>[
+              const Spacer(),
               Container(
-                margin: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: TextFormField(
                   controller: _emailController,
                   decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.mail, color: Colors.grey),
+                    prefixIcon: Icon(Icons.mail),
                     border: OutlineInputBorder(),
                     labelText: 'E-mail',
                     labelStyle: TextStyle(fontStyle: FontStyle.italic),
@@ -51,28 +55,20 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                   },
                 ),
               ),
-              Container(
-                margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                alignment: Alignment.center,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      // If the form is valid, display a snackbar and call a server or save the information in the database.
-                      Provider.of<FirebaseUser>(context, listen: false)
-                          .sendPasswordResetEmail(
-                              context, _emailController.text);
-                    }
-                  },
-                  style: const ButtonStyle(
-                    padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
-                        EdgeInsets.all(20)),
-                  ),
-                  child: const Text(
-                    "SEND EMAIL",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
+              const SizedBox(
+                height: 30,
               ),
+              MyButton(
+                text: "Send EMail",
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    // If the form is valid, display a snackbar and call a server or save the information in the database.
+                    Provider.of<FirebaseUser>(context, listen: false)
+                        .sendPasswordResetEmail(context, _emailController.text);
+                  }
+                },
+              ),
+              const Spacer()
             ],
           ),
         ),

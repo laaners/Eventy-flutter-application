@@ -55,158 +55,164 @@ class _SignUpFormState extends State<SignUpForm> {
     return Form(
       key: _formKey,
       child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         children: <Widget>[
-          Container(
-            margin: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-            child: TextFormField(
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              controller: _usernameController,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.face, color: Colors.grey),
-                border: OutlineInputBorder(),
-                labelText: 'Username',
-                labelStyle: TextStyle(fontStyle: FontStyle.italic),
-              ),
-              onChanged: (username) async {
-                // TODO: add delay to the call
-                bool tmp =
-                    await Provider.of<FirebaseUser>(context, listen: false)
-                        .usernameAlreadyExists(username);
-                setState(() {
-                  _usernameAlreadyExist = tmp;
-                  print(_usernameAlreadyExist);
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Username cannot be empty';
-                } else if (_usernameAlreadyExist) {
-                  return 'Username already exists';
-                }
-                return null;
-              },
-            ),
+          const SizedBox(
+            height: 20,
           ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-            child: TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.perm_identity, color: Colors.grey),
-                border: OutlineInputBorder(),
-                labelText: 'Name',
-                labelStyle: TextStyle(fontStyle: FontStyle.italic),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Name cannot be empty';
-                }
-                return null;
-              },
-            ),
+          Text(
+            "Sign Up",
+            style: Theme.of(context).textTheme.headlineLarge,
           ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-            child: TextFormField(
-              controller: _surnameController,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.perm_identity, color: Colors.grey),
-                border: OutlineInputBorder(),
-                labelText: 'Surname',
-                labelStyle: TextStyle(fontStyle: FontStyle.italic),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Surname cannot be empty';
-                }
-                return null;
-              },
-            ),
+          const SizedBox(
+            height: 30,
           ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-            child: TextFormField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.mail, color: Colors.grey),
-                border: OutlineInputBorder(),
-                labelText: 'E-mail',
-                labelStyle: TextStyle(fontStyle: FontStyle.italic),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter an e-mail address';
-                }
-                final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                if (!emailRegex.hasMatch(value)) {
-                  return 'Please enter a valid e-mail address';
-                }
-                return null;
-              },
+          TextFormField(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            controller: _usernameController,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.face),
+              border: OutlineInputBorder(),
+              labelText: 'Username',
+              labelStyle: TextStyle(fontStyle: FontStyle.italic),
             ),
+            onChanged: (username) async {
+              // TODO: add delay to the call
+              bool tmp = await Provider.of<FirebaseUser>(context, listen: false)
+                  .usernameAlreadyExists(username);
+              setState(() {
+                _usernameAlreadyExist = tmp;
+                print(_usernameAlreadyExist);
+              });
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Username cannot be empty';
+              } else if (_usernameAlreadyExist) {
+                return 'Username already exists';
+              }
+              return null;
+            },
           ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-            child: TextFormField(
-              controller: _passwordController,
-              obscureText: _passwordInvisible,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
-                hintText: 'Password',
-                border: const OutlineInputBorder(),
-                labelText: 'Your password',
-                labelStyle: const TextStyle(fontStyle: FontStyle.italic),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _passwordInvisible = !_passwordInvisible;
-                    });
-                  },
-                  icon: Icon(
-                    _passwordInvisible
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                  ),
+          const SizedBox(
+            height: 20,
+          ),
+          TextFormField(
+            controller: _nameController,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.perm_identity),
+              border: OutlineInputBorder(),
+              labelText: 'Name',
+              labelStyle: TextStyle(fontStyle: FontStyle.italic),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Name cannot be empty';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          TextFormField(
+            controller: _surnameController,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.perm_identity),
+              border: OutlineInputBorder(),
+              labelText: 'Surname',
+              labelStyle: TextStyle(fontStyle: FontStyle.italic),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Surname cannot be empty';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          TextFormField(
+            controller: _emailController,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.mail),
+              border: OutlineInputBorder(),
+              labelText: 'E-mail',
+              labelStyle: TextStyle(fontStyle: FontStyle.italic),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter an e-mail address';
+              }
+              final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+              if (!emailRegex.hasMatch(value)) {
+                return 'Please enter a valid e-mail address';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          TextFormField(
+            controller: _passwordController,
+            obscureText: _passwordInvisible,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.lock_open),
+              hintText: 'Password',
+              border: const OutlineInputBorder(),
+              labelText: 'Your password',
+              labelStyle: const TextStyle(fontStyle: FontStyle.italic),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  setState(() {
+                    _passwordInvisible = !_passwordInvisible;
+                  });
+                },
+                icon: Icon(
+                  _passwordInvisible ? Icons.visibility_off : Icons.visibility,
                 ),
               ),
-              validator: (value) {
-                if (value == null || value.length < 8) {
-                  return 'Password must be at least 8 characters long';
-                }
-                return null;
-              },
             ),
+            validator: (value) {
+              if (value == null || value.length < 8) {
+                return 'Password must be at least 8 characters long';
+              }
+              return null;
+            },
           ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-            child: TextFormField(
-              obscureText: _passwordInvisible,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.lock_open, color: Colors.grey),
-                hintText: 'Password',
-                border: const OutlineInputBorder(),
-                labelText: 'Confirm password',
-                labelStyle: const TextStyle(fontStyle: FontStyle.italic),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _passwordInvisible = !_passwordInvisible;
-                    });
-                  },
-                  icon: Icon(
-                    _passwordInvisible
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                  ),
+          const SizedBox(
+            height: 20,
+          ),
+          TextFormField(
+            obscureText: _passwordInvisible,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.lock_open),
+              hintText: 'Password',
+              border: const OutlineInputBorder(),
+              labelText: 'Confirm password',
+              labelStyle: const TextStyle(fontStyle: FontStyle.italic),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  setState(() {
+                    _passwordInvisible = !_passwordInvisible;
+                  });
+                },
+                icon: Icon(
+                  _passwordInvisible ? Icons.visibility_off : Icons.visibility,
                 ),
               ),
-              validator: (value) {
-                if (value != _passwordController.text) {
-                  return 'Passwords do not match';
-                }
-                return null;
-              },
             ),
+            validator: (value) {
+              if (value != _passwordController.text) {
+                return 'Passwords do not match';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(
+            height: 30,
           ),
           MyButton(
             text: "SIGN UP",
