@@ -34,7 +34,12 @@ class LocationDetail extends StatelessWidget {
     return [
       MyPollOption(
         id: Availability.yes,
-        title: const Text(" Present", style: TextStyle(fontSize: 20)),
+        title: Row(
+          children: const [
+            Icon(Icons.check_circle),
+            Text(" Present", style: TextStyle(fontSize: 20)),
+          ],
+        ),
         votes: locationCollection != null
             ? 1 +
                 (locationCollection
@@ -48,7 +53,12 @@ class LocationDetail extends StatelessWidget {
       ),
       MyPollOption(
         id: Availability.iff,
-        title: const Text("If need be", style: TextStyle(fontSize: 20)),
+        title: Row(
+          children: const [
+            Icon(Icons.offline_pin),
+            Text(" If need be", style: TextStyle(fontSize: 20)),
+          ],
+        ),
         votes: locationCollection != null
             ? locationCollection
                 .getVotesKind(
@@ -61,7 +71,12 @@ class LocationDetail extends StatelessWidget {
       ),
       MyPollOption(
         id: Availability.not,
-        title: const Text("Not present", style: TextStyle(fontSize: 20)),
+        title: Row(
+          children: [
+            Icon(Icons.unpublished),
+            const Text(" Not present", style: TextStyle(fontSize: 20)),
+          ],
+        ),
         votes: locationCollection != null
             ? locationCollection
                 .getVotesKind(
@@ -74,7 +89,12 @@ class LocationDetail extends StatelessWidget {
       ),
       MyPollOption(
         id: Availability.empty,
-        title: const Text("Pending", style: TextStyle(fontSize: 20)),
+        title: Row(
+          children: const [
+            Icon(Icons.help),
+            Text(" Pending", style: TextStyle(fontSize: 20)),
+          ],
+        ),
         votes: locationCollection != null
             ? locationCollection
                 .getVotesKind(

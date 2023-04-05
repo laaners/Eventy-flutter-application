@@ -1,3 +1,4 @@
+import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -93,14 +94,16 @@ class CustomDelegate extends SearchDelegate<String> {
                 return Container();
               }
               usersData = snapshot.data!;
-              return ListView.builder(
-                itemCount: usersData.length,
-                itemBuilder: (_, i) {
-                  var user = usersData[i];
-                  return UserTileSearch(
-                    userData: user,
-                  );
-                },
+              return ResponsiveWrapper(
+                child: ListView.builder(
+                  itemCount: usersData.length,
+                  itemBuilder: (_, i) {
+                    var user = usersData[i];
+                    return UserTileSearch(
+                      userData: user,
+                    );
+                  },
+                ),
               );
             },
           );

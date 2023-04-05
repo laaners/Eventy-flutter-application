@@ -17,8 +17,10 @@ import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:dima_app/provider_samples.dart';
 import 'firebase_options.dart';
@@ -35,6 +37,80 @@ Future<void> main() async {
   final PendingDynamicLinkData? initialLink =
       await FirebaseDynamicLinks.instance.getInitialLink();
   dynamicLinksHandler.setLink(initialLink);
+
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  String? token = await messaging.getToken();
+  print(token);
+
+  print('User granted permission: ${settings.authorizationStatus}');
+
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel', // id
+    'High Importance Notifications', // title
+    description:
+        'This channel is used for important notifications.', // description
+    importance: Importance.max,
+  );
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.notification}');
+
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
+
+    // If `onMessage` is triggered with a notification, construct our own
+    // local notification to show to users using the created channel.
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings('app_icon');
+    if (notification != null && android != null) {
+      flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              channelDescription: channel.description,
+              priority: Priority.max,
+              importance: Importance.max,
+              icon: 'app_icon',
+              // other properties...
+            ),
+          ));
+    }
+  });
+
+  /*
+  FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
+    // If you're going to use other Firebase services in the background, such as Firestore,
+    // make sure you call `initializeApp` before using other Firebase services.
+
+    // await Firebase.initializeApp();
+
+    print("Handling a background message: ${message.messageId}");
+    print(message.mutableContent);
+  });
+   */
 
   runApp(
     MultiProvider(
@@ -119,6 +195,35 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     initLink();
     super.initState();
+  }
+
+  void setupInteractedMessage() async {
+    // Get any messages which caused the application to open from
+    // a terminated state.
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    // If the message also contains a data property with a "type" of "chat",
+    // navigate to a chat screen
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    }
+
+    // Also handle any interaction when the app is in the background via a
+    // Stream listener
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    if (message.data['type'] == 'chat') {
+      String pollId = message.data['pollId'];
+      Navigator.push(
+        context,
+        ScreenTransition(
+          builder: (context) => PollDetailScreen(pollId: pollId),
+        ),
+      );
+    }
   }
 
   void initLink() async {

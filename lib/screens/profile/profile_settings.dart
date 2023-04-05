@@ -75,7 +75,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
         ),
         ListTile(
           leading: const Icon(Icons.logout),
-          title: const Text("Sing Out"),
+          title: const Text("Sign Out"),
           trailing: const Icon(Icons.navigate_next),
           onTap: () async {
             await Provider.of<FirebaseUser>(context, listen: false)
