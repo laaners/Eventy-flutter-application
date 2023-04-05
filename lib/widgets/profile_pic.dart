@@ -41,10 +41,16 @@ class ProfilePic extends StatelessWidget {
                     },
                   ),
                 ))
-          : Text(
-              "${userData?.name[0]}${userData?.surname[0]}",
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.displayLarge,
+          : Container(
+              margin: const EdgeInsets.all(10),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  "${userData?.name[0].toUpperCase()}${userData?.surname[0].toUpperCase()}",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.displayLarge,
+                ),
+              ),
             ),
     );
   }

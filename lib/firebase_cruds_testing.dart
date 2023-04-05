@@ -105,7 +105,6 @@ class FirebaseCrudsTesting {
           // ignore: use_build_context_synchronously
           await Provider.of<FirebaseFollow>(context, listen: false)
               .addFollowing(context, uid, followUid, true);
-          print("add following");
         }
       }
     }

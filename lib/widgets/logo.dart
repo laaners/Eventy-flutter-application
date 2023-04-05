@@ -30,7 +30,7 @@ class EventyLogo extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.vertical(
                 top: Radius.zero, bottom: Radius.circular(intRadius)),
-            color: Theme.of(context).colorScheme.primaryContainer,
+            color: Theme.of(context).colorScheme.background,
           ),
         ),
         Antenna(
@@ -97,7 +97,7 @@ class Eye extends StatelessWidget {
         border: Border.all(
             color: Theme.of(context).colorScheme.onPrimaryContainer,
             width: width / 6),
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.primaryContainer,
       ),
     );
   }
@@ -120,7 +120,7 @@ class Mouth extends StatelessWidget {
         border: Border.all(
             color: Theme.of(context).colorScheme.onPrimaryContainer,
             width: width / 6),
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.primaryContainer,
       ),
     );
   }
