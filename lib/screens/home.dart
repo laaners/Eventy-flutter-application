@@ -149,8 +149,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   MyButton(
                     text: "Error page",
                     onPressed: () {
-                      Navigator.push(
-                        context,
+                      // TODO: change other calls to error page like this
+                      Navigator.of(context, rootNavigator: true).push(
                         MaterialPageRoute(
                           builder: (context) =>
                               const ErrorScreen(errorMsg: 'MY error Message'),

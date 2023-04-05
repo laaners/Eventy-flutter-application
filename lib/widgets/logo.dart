@@ -7,7 +7,7 @@ class EventyLogo extends StatelessWidget {
   late double intRadius = .11 * intWidth;
   late double antennaHeight = 0.17 * extWidth;
 
-  EventyLogo({super.key, this.extWidth = 370});
+  EventyLogo({super.key, this.extWidth = 300});
 
   @override
   Widget build(BuildContext context) {
