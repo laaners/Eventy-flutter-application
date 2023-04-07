@@ -54,3 +54,7 @@ windows/flutter/generated_plugin_registrant.h
 windows/flutter/generated_plugins.cmake
 ios/Podfile
 macos/Podfile
+deleteall.js
+
+node_modules
+serviceAccountKey.json

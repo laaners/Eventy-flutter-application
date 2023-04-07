@@ -171,7 +171,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           name: _nameController.text,
                           surname: _surnameController.text,
                           email: _emailController.text,
-                          isLightMode: userData!.isLightMode,
                         ) ==
                         true) {
                       // ignore: use_build_context_synchronously

@@ -1,8 +1,7 @@
 import 'package:collection/collection.dart';
-import 'package:dima_app/screens/profile/index.dart';
 import 'package:dima_app/screens/profile/profile_settings.dart';
 import 'package:dima_app/server/firebase_user.dart';
-import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +13,18 @@ class ResponsiveWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isAuthenticated =
+        Provider.of<FirebaseUser>(context, listen: true).user != null;
     return SafeArea(
-      child: Consumer<FirebaseUser>(
-        builder: (context, value, _) {
-          return value.user != null &&
-                  MediaQuery.of(context).orientation == Orientation.landscape
+      child: Builder(
+        builder: (context) {
+          UserCollection? userData =
+              Provider.of<FirebaseUser>(context, listen: true).userData;
+          bool hasUserData = userData != null;
+          return isAuthenticated &&
+                  hasUserData &&
+                  MediaQuery.of(context).orientation == Orientation.landscape &&
+                  false
               ? Stack(
                   children: [
                     Container(
@@ -46,14 +52,13 @@ class ResponsiveWrapper extends StatelessWidget {
                                 Container(
                                   margin: const EdgeInsets.all(10),
                                   child: ProfilePic(
-                                    userData: value.userData,
+                                    userData: userData,
                                     loading: false,
                                     radius: 90,
                                   ),
                                 ),
-                                Text('@${value.userData!.username}'),
-                                Text(
-                                    "${value.userData!.name} ${value.userData!.surname}"),
+                                Text('@${userData.username}'),
+                                Text("${userData.name} ${userData.surname}"),
                               ],
                             ),
                             ...[
@@ -69,8 +74,17 @@ class ResponsiveWrapper extends StatelessWidget {
                                           listen: true)
                                       .index;
                               return ListTile(
-                                leading: Icon(
-                                  obj["icon"] as IconData,
+                                leading: IconTheme(
+                                  data: index == activeIndex
+                                      ? Theme.of(context)
+                                          .bottomNavigationBarTheme
+                                          .selectedIconTheme!
+                                      : Theme.of(context)
+                                          .bottomNavigationBarTheme
+                                          .unselectedIconTheme!,
+                                  child: Icon(
+                                    obj["icon"] as IconData,
+                                  ),
                                 ),
                                 title: Text(obj["label"] as String),
                                 // trailing: const Icon(Icons.navigate_next),
@@ -92,7 +106,7 @@ class ResponsiveWrapper extends StatelessWidget {
               : Container(
                   alignment: Alignment.topCenter,
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 600),
+                    constraints: const BoxConstraints(maxWidth: 6000),
                     child: Container(
                       child: child,
                     ),

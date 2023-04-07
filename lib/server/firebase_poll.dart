@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
+import 'package:dima_app/server/firebase_vote.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
@@ -43,9 +46,6 @@ class FirebasePoll extends ChangeNotifier {
       String pollId = "${pollName}_$organizerUid";
       var pollExistence = await FirebaseCrud.readDoc(pollCollection, pollId);
       if (pollExistence!.exists) {
-        // ignore: use_build_context_synchronously
-        /// showSnackBar(context, "A poll with this name already exists");
-        // ignore: use_build_context_synchronously
         return null;
       }
 
@@ -157,5 +157,76 @@ class FirebasePoll extends ChangeNotifier {
       print(e.message!);
     }
     return [];
+  }
+
+  Future<void> deletePoll({
+    required BuildContext context,
+    required String pollId,
+  }) async {
+    try {
+      var document = await FirebaseCrud.readDoc(pollCollection, pollId);
+      if (document!.exists) {
+        var tmp = document.data() as Map<String, dynamic>;
+        tmp["locations"] = (tmp["locations"] as List).map((e) {
+          e["lat"] = e["lat"].toDouble();
+          e["lon"] = e["lon"].toDouble();
+          return e as Map<String, dynamic>;
+        }).toList();
+        // utc string
+        tmp["deadline"] =
+            DateFormatter.dateTime2String(tmp["deadline"].toDate());
+        tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
+        PollCollection pollData = PollCollection.fromMap(tmp);
+
+        // delete invites
+        await Provider.of<FirebasePollEventInvite>(context, listen: false)
+            .getInvitesFromPollEventId(context, pollId)
+            .then((value) async {
+          await Future.wait(value
+              .map((invite) =>
+                  Provider.of<FirebasePollEventInvite>(context, listen: false)
+                      .deletePollEventInvite(
+                    context: context,
+                    pollEventId: pollId,
+                    inviteeId: invite.inviteeId,
+                  ))
+              .toList());
+        });
+        // delete location votes
+        await Future.wait(pollData.locations
+            .map((location) => Provider.of<FirebaseVote>(context, listen: false)
+                    .deleteVoteLocation(
+                  context: context,
+                  pollId: pollId,
+                  locationName: location["name"],
+                ))
+            .toList());
+
+        // delete dates votes
+        List<Future<dynamic>> promises = pollData.dates.keys
+            .map((date) {
+              return pollData.dates[date].map((slot) {
+                return Provider.of<FirebaseVote>(context, listen: false)
+                    .deleteVoteDate(
+                  context: context,
+                  pollId: pollId,
+                  date: date,
+                  start: slot["start"],
+                  end: slot["end"],
+                );
+              }).toList();
+            })
+            .toList()
+            .expand((x) => x)
+            .toList()
+            .cast();
+        await Future.wait(promises);
+
+        // delete poll
+        await FirebaseCrud.deleteDoc(pollCollection, pollId);
+      }
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
   }
 }

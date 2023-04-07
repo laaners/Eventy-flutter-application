@@ -96,6 +96,26 @@ class FirebaseVote extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteVoteLocation({
+    required BuildContext context,
+    required String pollId,
+    required String locationName,
+  }) async {
+    try {
+      String voteId = "${pollId}_$locationName";
+      var document = await FirebaseCrud.readDoc(
+        voteLocationCollection,
+        voteId,
+      );
+      if (document!.exists) {
+        await FirebaseCrud.deleteDoc(voteLocationCollection, voteId);
+      }
+    } on FirebaseException catch (e) {
+      // showSnackBar(context, e.message!);
+      print(e.message!);
+    }
+  }
+
   Stream<DocumentSnapshot<Object?>>? getVoteDateSnapshot(
     BuildContext context,
     String pollId,
@@ -199,6 +219,28 @@ class FirebaseVote extends ChangeNotifier {
         });
       }
     } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+  }
+
+  Future<void> deleteVoteDate({
+    required BuildContext context,
+    required String pollId,
+    required String date,
+    required String start,
+    required String end,
+  }) async {
+    try {
+      var voteId = "${pollId}_${date}_${start}_$end";
+      var document = await FirebaseCrud.readDoc(
+        voteDateCollection,
+        voteId,
+      );
+      if (document!.exists) {
+        await FirebaseCrud.deleteDoc(voteDateCollection, voteId);
+      }
+    } on FirebaseException catch (e) {
+      // showSnackBar(context, e.message!);
       print(e.message!);
     }
   }

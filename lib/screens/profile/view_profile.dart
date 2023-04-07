@@ -36,7 +36,7 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
         listSticky: ProfileInfo(
           userData: widget.userData,
         ),
-        stickyHeight: 320,
+        stickyHeight: 360,
         upRightActions: [MyAppBar.SearchAction(context)],
       ),
       /*

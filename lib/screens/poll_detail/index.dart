@@ -328,6 +328,7 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                   DatesList(
                     organizerUid: pollData.organizerUid,
                     pollId: widget.pollId,
+                    deadline: pollData.deadline,
                     dates: pollData.dates,
                     invites: pollInvites,
                     votesDates: votesDates,

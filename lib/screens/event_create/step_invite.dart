@@ -156,7 +156,6 @@ class _StepInviteState extends State<StepInvite>
                                               name: "",
                                               surname: "",
                                               profilePic: "",
-                                              isLightMode: true,
                                             ),
                                           );
                                         }

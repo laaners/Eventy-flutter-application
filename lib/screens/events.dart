@@ -28,7 +28,7 @@ class EventsScreen extends StatelessWidget {
               onPressed: () {
                 // ignore: use_build_context_synchronously
                 String pollId =
-                    "Event 0 of UsernameId0_u8oRJn2HdAQP459lnSVmFxgtsW93";
+                    "Event 0 of UsernameId14_0DmBO8Fw0ofrK9RbXIO4dYlEIg03";
                 Widget test = PollDetailScreen(
                   pollId: pollId,
                 );

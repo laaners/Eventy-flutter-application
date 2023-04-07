@@ -56,7 +56,7 @@ class _PollListState extends State<PollList> {
           );
         }
         var pollsData = snapshot.data!;
-        return Column(
+        return ListView(
           children: pollsData
               .map(
                 (e) => PollTile(
