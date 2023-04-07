@@ -71,8 +71,7 @@ class FirebaseCrudsTesting {
   static void signUpNewUsers(BuildContext context) async {
     for (int i = 0; i < someIds.length; i++) {
       int id = someIds[i];
-      Provider.of<FirebaseUser>(context, listen: false)
-          .signUpWithEmail(
+      await Provider.of<FirebaseUser>(context, listen: false).signUpWithEmail(
         email: "$id@nonexistent.com",
         password: "password",
         username: i % 2 == 0 ? "UsernameId$i" : "usernameId$i",
@@ -81,10 +80,9 @@ class FirebaseCrudsTesting {
         profilePic:
             "https://images.ygoprodeck.com/images/cards_cropped/$id.jpg",
         context: context,
-      )
-          .then((value) {
-        Provider.of<FirebaseUser>(context, listen: false).signOut(context);
-      });
+      );
+      // ignore: use_build_context_synchronously
+      await Provider.of<FirebaseUser>(context, listen: false).signOut(context);
       // ignore: use_build_context_synchronously
     }
   }

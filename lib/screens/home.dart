@@ -90,28 +90,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: const Text("dynamic link"),
                   ),
-                  StreamBuilder(
-                    stream: FirebaseCrud.readSnapshot(
-                        Provider.of<FirebaseUser>(context, listen: false)
-                            .userCollection,
-                        "DIfNcKvzaramvCteTHktEzGI22y1"),
-                    builder: (
-                      BuildContext context,
-                      AsyncSnapshot<DocumentSnapshot<Object?>> snapshot,
-                    ) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const LoadingSpinner();
-                      }
-                      if (snapshot.hasError || snapshot.data == null) {
-                        return const Text(
-                            "user retrieval failed or non-existent");
-                      }
-                      UserCollection userData = UserCollection.fromMap(
-                        (snapshot.data!.data()) as Map<String, dynamic>,
-                      );
-                      return Text(userData.name);
-                    },
-                  ),
                   const Text("ok"),
                   Consumer<FirebaseUser>(
                     builder: (context, value, child) {

@@ -149,14 +149,24 @@ class FirebaseFollow extends ChangeNotifier {
     try {
       var document = await FirebaseCrud.readDoc(followCollection, uid);
       if (document!.exists) {
-        await followCollection.doc(uid).update({
-          "follower": FieldValue.arrayRemove([followUid])
-        });
-      } else {
-        followCollection.doc(uid).set({
-          "follower": [followUid],
-          "following": []
-        });
+        var follow = (document.data()) as Map<String, dynamic>;
+        FollowCollection followData = FollowCollection(
+          uid: uid,
+          followers:
+              (follow["follower"] as List).map((e) => e as String).toList(),
+          following:
+              (follow["following"] as List).map((e) => e as String).toList(),
+        );
+        if (followData.followers.isNotEmpty &&
+            followData.followers.contains(followUid) &&
+            followData.followers.length == 1 &&
+            followData.following.isEmpty) {
+          await FirebaseCrud.deleteDoc(followCollection, uid);
+        } else {
+          await followCollection.doc(uid).update({
+            "follower": FieldValue.arrayRemove([followUid])
+          });
+        }
       }
       if (removeMutual) {
         // ignore: use_build_context_synchronously
@@ -176,14 +186,24 @@ class FirebaseFollow extends ChangeNotifier {
     try {
       var document = await FirebaseCrud.readDoc(followCollection, uid);
       if (document!.exists) {
-        await followCollection.doc(uid).update({
-          "following": FieldValue.arrayRemove([followUid])
-        });
-      } else {
-        followCollection.doc(uid).set({
-          "follower": [],
-          "following": [followUid]
-        });
+        var follow = (document.data()) as Map<String, dynamic>;
+        FollowCollection followData = FollowCollection(
+          uid: uid,
+          followers:
+              (follow["follower"] as List).map((e) => e as String).toList(),
+          following:
+              (follow["following"] as List).map((e) => e as String).toList(),
+        );
+        if (followData.following.isNotEmpty &&
+            followData.following.contains(followUid) &&
+            followData.following.length == 1 &&
+            followData.followers.isEmpty) {
+          await FirebaseCrud.deleteDoc(followCollection, uid);
+        } else {
+          await followCollection.doc(uid).update({
+            "following": FieldValue.arrayRemove([followUid])
+          });
+        }
       }
       if (removeMutual) {
         // ignore: use_build_context_synchronously

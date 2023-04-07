@@ -9,6 +9,7 @@ import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 
 class LocationsList extends StatefulWidget {
   final String organizerUid;
@@ -31,13 +32,18 @@ class LocationsList extends StatefulWidget {
 
 class _LocationsListState extends State<LocationsList>
     with AutomaticKeepAliveClientMixin {
-  bool sortedByVotes = true;
+  bool votesDesc = true;
+  bool alphabeticAsc = true;
   late List<VoteLocationCollection> votesLocations;
 
   @override
   void initState() {
     super.initState();
     votesLocations = widget.votesLocations;
+    votesLocations.sort((a, b) =>
+        a.locationName.toLowerCase().compareTo(b.locationName.toLowerCase()));
+    votesLocations.sort(
+        (a, b) => b.getPositiveVotes().length - a.getPositiveVotes().length);
   }
 
   @override
@@ -57,25 +63,39 @@ class _LocationsListState extends State<LocationsList>
               IconButton(
                 onPressed: () {
                   setState(() {
-                    votesLocations.sort((a, b) => a.locationName
-                        .toLowerCase()
-                        .compareTo(b.locationName.toLowerCase()));
+                    alphabeticAsc = !alphabeticAsc;
+                    alphabeticAsc
+                        ? votesLocations.sort((a, b) => a.locationName
+                            .toLowerCase()
+                            .compareTo(b.locationName.toLowerCase()))
+                        : votesLocations.sort((a, b) => b.locationName
+                            .toLowerCase()
+                            .compareTo(a.locationName.toLowerCase()));
                   });
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.sort_by_alpha,
                 ),
               ),
               IconButton(
                 onPressed: () {
                   setState(() {
-                    votesLocations.sort((a, b) =>
-                        b.getPositiveVotes().length -
-                        a.getPositiveVotes().length);
+                    votesDesc = !votesDesc;
+                    votesDesc
+                        ? votesLocations.sort((a, b) =>
+                            b.getPositiveVotes().length -
+                            a.getPositiveVotes().length)
+                        : votesLocations.sort((a, b) =>
+                            a.getPositiveVotes().length -
+                            b.getPositiveVotes().length);
                   });
                 },
-                icon: Icon(
-                  Icons.sort,
+                icon: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationX(votesDesc ? 0 : math.pi),
+                  child: const Icon(
+                    Icons.sort,
+                  ),
                 ),
               ),
             ],

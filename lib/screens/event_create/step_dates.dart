@@ -206,6 +206,7 @@ class _StepDatesState extends State<StepDates> {
             return Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
+                color: Theme.of(context).primaryColor,
               ),
               margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
               padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
@@ -213,7 +214,6 @@ class _StepDatesState extends State<StepDates> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
                     child: Text(
                       "$start-$end",
                       style: const TextStyle(
@@ -222,28 +222,31 @@ class _StepDatesState extends State<StepDates> {
                       ),
                     ),
                   ),
-                  IconButton(
-                    padding: const EdgeInsets.only(
-                      top: 0,
-                      bottom: 0,
-                      right: 0,
-                      left: 5,
+                  Container(
+                    padding: const EdgeInsets.all(0),
+                    child: IconButton(
+                      padding: const EdgeInsets.only(
+                        top: 0,
+                        bottom: 0,
+                        right: 0,
+                        left: 5,
+                      ),
+                      constraints: const BoxConstraints(),
+                      icon: const Icon(
+                        Icons.cancel,
+                      ),
+                      onPressed: () {
+                        widget.dates.forEach((k, v) {
+                          widget.removeDate([k, "$start-$end"]);
+                        });
+                        widget.removeEmpty();
+                        setState(() {
+                          _timeSlots.removeWhere((item) =>
+                              item["start"] == start && item["end"] == end);
+                          _fixedTimeSlots = _timeSlots.isEmpty ? false : true;
+                        });
+                      },
                     ),
-                    constraints: const BoxConstraints(),
-                    icon: const Icon(
-                      Icons.cancel,
-                    ),
-                    onPressed: () {
-                      widget.dates.forEach((k, v) {
-                        widget.removeDate([k, "$start-$end"]);
-                      });
-                      widget.removeEmpty();
-                      setState(() {
-                        _timeSlots.removeWhere((item) =>
-                            item["start"] == start && item["end"] == end);
-                        _fixedTimeSlots = _timeSlots.isEmpty ? false : true;
-                      });
-                    },
                   ),
                 ],
               ),
@@ -293,18 +296,21 @@ class _StepDatesState extends State<StepDates> {
                   return Container(
                     margin: const EdgeInsets.all(1),
                     decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColorDark,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
                       child: Text(
                         day.day.toString(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
+                          color: Theme.of(context).colorScheme.onPrimary,
                         ),
                       ),
                     ),
                   );
                 }
+                return null;
               },
               defaultBuilder: (context, day, focusedDay) {
                 return Container(
@@ -348,6 +354,7 @@ class _StepDatesState extends State<StepDates> {
                       width: 5,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50),
+                        color: Theme.of(context).primaryColorDark,
                       ),
                     ),
                   ],
@@ -358,11 +365,12 @@ class _StepDatesState extends State<StepDates> {
                   margin: const EdgeInsets.all(1),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
+                    color: Theme.of(context).focusColor,
                   ),
                   child: Center(
                     child: Text(
                       day.day.toString(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                       ),
                     ),
@@ -379,6 +387,7 @@ class _StepDatesState extends State<StepDates> {
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(3),
+                                color: Theme.of(context).focusColor,
                               ),
                               padding: const EdgeInsets.symmetric(
                                 vertical: 1.5,

@@ -1,4 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dima_app/server/firebase_follow.dart';
+import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -71,7 +75,6 @@ class FirebaseUser extends ChangeNotifier {
         name: name,
         surname: surname,
         profilePic: profilePic,
-        isLightMode: true,
       );
       Map<String, dynamic> userMap = userEntity.toMap();
       userMap["username_lower"] = username.toLowerCase();
@@ -170,8 +173,39 @@ class FirebaseUser extends ChangeNotifier {
   Future<void> deleteAccount(BuildContext context) async {
     try {
       var uid = _auth.currentUser?.uid;
-      await _auth.currentUser!.delete();
-      await FirebaseCrud.deleteDoc(userCollection, uid!);
+      uid = "u8oRJn2HdAQP459lnSVmFxgtsW93";
+
+      // remove from followers/following
+      print("DOING: Deleting followers/following");
+      Provider.of<FirebaseFollow>(context, listen: false)
+          .getCurrentUserFollow()
+          .then((value) async {
+        await Future.wait(value.followers
+            .map((followUid) =>
+                Provider.of<FirebaseFollow>(context, listen: false)
+                    .removeFollower(context, uid!, followUid, true))
+            .toList());
+        Future.wait(value.following
+            .map((followUid) =>
+                Provider.of<FirebaseFollow>(context, listen: false)
+                    .removeFollowing(context, uid!, followUid, true))
+            .toList());
+      });
+      print("DONE: Deleting followers/following");
+
+      // delete associated polls
+      print("DOING: Deleting associated polls");
+      Provider.of<FirebasePoll>(context, listen: false)
+          .getUserPolls(context, uid)
+          .then((value) async {
+        await Future.wait(value.map((pollData) {
+          String pollId = "${pollData.pollName}_$uid";
+          return Provider.of<FirebasePoll>(context, listen: false)
+              .deletePoll(context: context, pollId: pollId);
+        }).toList());
+      });
+      print("DONE: Deleting associated polls");
+      await FirebaseCrud.deleteDoc(userCollection, uid);
       notifyListeners();
       _userData = null;
     } on FirebaseAuthException catch (e) {
@@ -243,7 +277,6 @@ class FirebaseUser extends ChangeNotifier {
     required String name,
     required String surname,
     required String email,
-    required bool isLightMode,
   }) async {
     try {
       var uid = _auth.currentUser!.uid;
@@ -255,7 +288,6 @@ class FirebaseUser extends ChangeNotifier {
         name: name,
         surname: surname,
         profilePic: userData!.profilePic,
-        isLightMode: isLightMode,
       );
 
       Map<String, dynamic> userMap = userEntity.toMap();

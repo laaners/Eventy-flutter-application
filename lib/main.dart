@@ -25,6 +25,59 @@ import 'package:provider/provider.dart';
 import 'package:dima_app/provider_samples.dart';
 import 'firebase_options.dart';
 
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+
+  // await Firebase.initializeApp();
+  /*
+    print("Handling a background message: ${message.messageId}");
+    print(message.mutableContent)
+       print('Got a message whilst in the foreground!');
+    print('Message data: ${message.notification}');
+    */
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel', // id
+    'High Importance Notifications', // title
+    description:
+        'This channel is used for important notifications.', // description
+    importance: Importance.max,
+  );
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+  print("bg message");
+
+  RemoteNotification? notification = message.notification;
+  AndroidNotification? android = message.notification?.android;
+
+  // If `onMessage` is triggered with a notification, construct our own
+  // local notification to show to users using the created channel.
+  if (notification != null && android != null) {
+    flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channelDescription: channel.description,
+            priority: Priority.max,
+            importance: Importance.max,
+            icon: 'app_icon',
+            // other properties...
+          ),
+        ));
+  }
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -70,17 +123,19 @@ Future<void> main() async {
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
+  const initializationSettingsAndroid =
+      AndroidInitializationSettings('app_icon');
+
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print('Got a message whilst in the foreground!');
     print('Message data: ${message.notification}');
+    print("FOREE");
 
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification?.android;
 
     // If `onMessage` is triggered with a notification, construct our own
     // local notification to show to users using the created channel.
-    var initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
     if (notification != null && android != null) {
       flutterLocalNotificationsPlugin.show(
           notification.hashCode,
@@ -100,17 +155,7 @@ Future<void> main() async {
     }
   });
 
-  /*
-  FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
-    // If you're going to use other Firebase services in the background, such as Firestore,
-    // make sure you call `initializeApp` before using other Firebase services.
-
-    // await Firebase.initializeApp();
-
-    print("Handling a background message: ${message.messageId}");
-    print(message.mutableContent);
-  });
-   */
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   runApp(
     MultiProvider(
