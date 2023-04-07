@@ -90,7 +90,29 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: const Text("dynamic link"),
                   ),
-                  const Text("ok"),
+                  // StreamBuilder(
+                  //   stream: FirebaseCrud.readSnapshot(
+                  //       Provider.of<FirebaseUser>(context, listen: false)
+                  //           .userCollection,
+                  //       "DIfNcKvzaramvCteTHktEzGI22y1"),
+                  //   builder: (
+                  //     BuildContext context,
+                  //     AsyncSnapshot<DocumentSnapshot<Object?>> snapshot,
+                  //   ) {
+                  //     if (snapshot.connectionState == ConnectionState.waiting) {
+                  //       return const LoadingSpinner();
+                  //     }
+                  //     if (snapshot.hasError || snapshot.data == null) {
+                  //       return const Text(
+                  //           "user retrieval failed or non-existent");
+                  //     }
+                  //     UserCollection userData = UserCollection.fromMap(
+                  //       (snapshot.data!.data()) as Map<String, dynamic>,
+                  //     );
+                  //     return Text(userData.name);
+                  //   },
+                  // ),
+                  // const Text("ok"),
                   Consumer<FirebaseUser>(
                     builder: (context, value, child) {
                       return Text("${value.user}");
@@ -127,8 +149,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   MyButton(
                     text: "Error page",
                     onPressed: () {
-                      Navigator.push(
-                        context,
+                      // TODO: change other calls to error page like this
+                      Navigator.of(context, rootNavigator: true).push(
                         MaterialPageRoute(
                           builder: (context) =>
                               const ErrorScreen(errorMsg: 'MY error Message'),
@@ -505,6 +527,68 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     child: Image.asset('images/logo.png'),
                   ),
+                  // Generate samples to display of all Theme.of(context).textTheme fonts available
+                  Text("Normal text"),
+                  Text('textTheme.bodyLarge text',
+                      style: Theme.of(context).textTheme.bodyLarge),
+                  Text('textTheme.bodyMedium text',
+                      style: Theme.of(context).textTheme.bodyMedium),
+                  Text('textTheme.bodySmall text',
+                      style: Theme.of(context).textTheme.bodySmall),
+                  Text('textTheme.displayLarge text',
+                      style: Theme.of(context).textTheme.displayLarge),
+                  Text('textTheme.displayMedium text',
+                      style: Theme.of(context).textTheme.displayMedium),
+                  Text('textTheme.displaySmall text',
+                      style: Theme.of(context).textTheme.displaySmall),
+                  Text('textTheme.headlineLarge text',
+                      style: Theme.of(context).textTheme.headlineLarge),
+                  Text('textTheme.headlineMedium text',
+                      style: Theme.of(context).textTheme.headlineMedium),
+                  Text('textTheme.headlineSmall text',
+                      style: Theme.of(context).textTheme.headlineSmall),
+                  Text('textTheme.labelLarge text',
+                      style: Theme.of(context).textTheme.labelLarge),
+                  Text('textTheme.labelMedium text',
+                      style: Theme.of(context).textTheme.labelMedium),
+                  Text('textTheme.labelSmall text',
+                      style: Theme.of(context).textTheme.labelSmall),
+                  Text('textTheme.titleLarge text',
+                      style: Theme.of(context).textTheme.titleLarge),
+                  Text('textTheme.titleMedium text',
+                      style: Theme.of(context).textTheme.titleMedium),
+                  Text('textTheme.titleSmall text',
+                      style: Theme.of(context).textTheme.titleSmall),
+                  Text('primaryTextTheme.bodyLarge text',
+                      style: Theme.of(context).primaryTextTheme.bodyLarge),
+                  Text('primaryTextTheme.bodyMedium text',
+                      style: Theme.of(context).primaryTextTheme.bodyMedium),
+                  Text('primaryTextTheme.bodySmall text',
+                      style: Theme.of(context).primaryTextTheme.bodySmall),
+                  Text('primaryTextTheme.displayLarge text',
+                      style: Theme.of(context).primaryTextTheme.displayLarge),
+                  Text('primaryTextTheme.displayMedium text',
+                      style: Theme.of(context).primaryTextTheme.displayMedium),
+                  Text('primaryTextTheme.displaySmall text',
+                      style: Theme.of(context).primaryTextTheme.displaySmall),
+                  Text('primaryTextTheme.headlineLarge text',
+                      style: Theme.of(context).primaryTextTheme.headlineLarge),
+                  Text('primaryTextTheme.headlineMedium text',
+                      style: Theme.of(context).primaryTextTheme.headlineMedium),
+                  Text('primaryTextTheme.headlineSmall text',
+                      style: Theme.of(context).primaryTextTheme.headlineSmall),
+                  Text('primaryTextTheme.labelLarge text',
+                      style: Theme.of(context).primaryTextTheme.labelLarge),
+                  Text('primaryTextTheme.labelMedium text',
+                      style: Theme.of(context).primaryTextTheme.labelMedium),
+                  Text('primaryTextTheme.labelSmall text',
+                      style: Theme.of(context).primaryTextTheme.labelSmall),
+                  Text('primaryTextTheme.titleLarge text',
+                      style: Theme.of(context).primaryTextTheme.titleLarge),
+                  Text('primaryTextTheme.titleMedium text',
+                      style: Theme.of(context).primaryTextTheme.titleMedium),
+                  Text('primaryTextTheme.titleSmall text',
+                      style: Theme.of(context).primaryTextTheme.titleSmall),
                 ],
               ),
             ),

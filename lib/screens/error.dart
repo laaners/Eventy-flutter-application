@@ -3,9 +3,11 @@ import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/logo.dart';
+
 class ErrorScreen extends StatelessWidget {
   final String errorMsg;
-  const ErrorScreen({super.key, required this.errorMsg});
+  const ErrorScreen({super.key, this.errorMsg = ""});
 
   @override
   Widget build(BuildContext context) {
@@ -15,10 +17,7 @@ class ErrorScreen extends StatelessWidget {
           child: ListView(
             shrinkWrap: true,
             children: [
-              const Image(
-                image: AssetImage('images/logo.png'),
-                height: 80,
-              ),
+              EventyLogo(),
               Container(padding: const EdgeInsets.only(top: 30)),
               Text(
                 "AN ERROR HAS OCCURRED",
@@ -30,14 +29,15 @@ class ErrorScreen extends StatelessWidget {
                 child: Text(errorMsg),
               ),
               Container(padding: const EdgeInsets.only(top: 10)),
-              Center(
-                child: MyButton(
-                  text: "GO BACK!",
-                  onPressed: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                    // Navigator.of(context).pop();
-                  },
-                ),
+              const SizedBox(
+                height: 40,
+              ),
+              MyButton(
+                text: "GO BACK!",
+                onPressed: () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  // Navigator.of(context).pop();
+                },
               ),
             ],
           ),

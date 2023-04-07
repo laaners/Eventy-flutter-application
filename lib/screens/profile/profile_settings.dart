@@ -1,9 +1,9 @@
+import 'package:dima_app/providers/preferences.dart';
 import 'package:dima_app/screens/profile/edit_profile.dart';
 import 'package:dima_app/screens/profile/delete_dialog.dart';
 import 'package:dima_app/themes/theme_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../server/firebase_user.dart';
 import 'change_password.dart';
 
@@ -15,8 +15,8 @@ class ProfileSettings extends StatefulWidget {
 }
 
 class _ProfileSettingsState extends State<ProfileSettings> {
-  bool _pushNotificationEnabled = true;
-  bool _darkModeEnabled = false;
+  bool _pushNotificationEnabled = Preferences.getBool('isPush');
+  bool _darkModeEnabled = Preferences.getBool('isDark');
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +30,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           onChanged: (bool value) {
             setState(() {
               _pushNotificationEnabled = value;
+              Preferences.setBool('isPush', value);
             });
           },
           secondary: const Icon(Icons.notifications),

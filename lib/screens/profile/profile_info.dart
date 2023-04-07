@@ -29,8 +29,12 @@ class ProfileInfo extends StatelessWidget {
                   radius: 90,
                 ),
               ),
-              Text('@${userData!.username}'),
-              Text("${userData?.name} ${userData?.surname}"),
+              Text(
+                '@${userData!.username}',
+                style: Theme.of(context).textTheme.displaySmall,
+              ),
+              Text("${userData?.name} ${userData?.surname}",
+                  style: Theme.of(context).textTheme.headlineSmall),
             ],
           ),
         ),
@@ -97,7 +101,7 @@ class ProfileInfo extends StatelessWidget {
               ],
             );
           },
-        )
+        ),
       ],
     );
   }

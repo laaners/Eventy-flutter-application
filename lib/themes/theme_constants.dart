@@ -24,6 +24,8 @@ e.g., Theme.of(context).textTheme.headlineLarge
 /* Which textTheme/primaryTextTheme should I use?
   Plain Text:
 - Eventy name                   --> textTheme.displayLarge
+- Username in Profile view      --> textTheme.displaySmall
+- Name/Surname in Profile view  --> textTheme.headlineSmall
 - Screen titles, e.g. "Log In"  --> textTheme.headlineLarge
 - Step labels e.g., "Basics"    --> textTheme.labelLarge
 */
