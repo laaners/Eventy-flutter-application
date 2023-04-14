@@ -6,6 +6,12 @@ import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:dima_app/themes/layout_constants.dart';
+import '../../server/tables/user_collection.dart';
+
+import '../../widgets/profile_pic.dart';
+import 'follow_buttons.dart';
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -14,7 +20,14 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  UserCollection? userData;
   int _refresh = 1;
+
+  @override
+  void initState() {
+    userData = Provider.of<FirebaseUser>(context, listen: false).userData;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,25 +39,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return;
       },
       child: Scaffold(
-        appBar: MyAppBar(
+        appBar: const MyAppBar(
           title: "Profile",
-          upRightActions: [MyAppBar.SearchAction(context)],
+          upRightActions: [],
         ),
         body: ResponsiveWrapper(
-          child: ListView(
+          child: Column(
             children: [
-              Container(
-                margin: const EdgeInsets.all(10),
-                child: Column(children: [
-                  ProfileInfo(
-                    userData: Provider.of<FirebaseUser>(context, listen: true)
-                        .userData,
+              Column(
+                children: [
+                  ProfilePic(
+                    userData: userData,
+                    loading: false,
+                    radius: LayoutConstants.kProfilePicRadius,
+                  ),
+                  const SizedBox(height: LayoutConstants.kHeight),
+                  ProfileInfo(userData: userData),
+                  const SizedBox(height: LayoutConstants.kHeight),
+                  FollowButtons(
+                    userData: userData,
                   ),
                   const Divider(
-                    height: 30,
+                    height: LayoutConstants.kDividerHeight,
                   ),
                   const ProfileSettings(),
-                ]),
+                ],
               ),
             ],
           ),
