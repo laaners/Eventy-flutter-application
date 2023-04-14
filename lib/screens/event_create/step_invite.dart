@@ -326,7 +326,8 @@ class _InviteProfilePicState extends State<InviteProfilePic> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ViewProfileScreen(userData: widget.user),
+              builder: (context) =>
+                  ViewProfileScreen(profileUserData: widget.user),
             ),
           );
         }

@@ -102,7 +102,8 @@ class _UserTileState extends State<UserTile> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ViewProfileScreen(userData: userData),
+                    builder: (context) =>
+                        ViewProfileScreen(profileUserData: userData),
                   ),
                 );
               }
