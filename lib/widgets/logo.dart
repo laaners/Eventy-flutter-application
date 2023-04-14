@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 
-class EventyLogo extends StatelessWidget {
+class EventyLogo extends StatefulWidget {
   final double extWidth;
-  late double intWidth = extWidth * .86;
-  late double extRadius = .16 * extWidth;
-  late double intRadius = .11 * intWidth;
-  late double antennaHeight = 0.17 * extWidth;
 
-  EventyLogo({super.key, this.extWidth = 300});
+  const EventyLogo({super.key, this.extWidth = 300});
+
+  @override
+  State<EventyLogo> createState() => _EventyLogoState();
+}
+
+class _EventyLogoState extends State<EventyLogo> {
+  late double intWidth = widget.extWidth * .86;
+  late double extRadius = .16 * widget.extWidth;
+  late double intRadius = .11 * intWidth;
+  late double antennaHeight = 0.17 * widget.extWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +21,8 @@ class EventyLogo extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         Container(
-          height: 0.9 * extWidth,
-          width: extWidth,
+          height: 0.9 * widget.extWidth,
+          width: widget.extWidth,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(extRadius),
             color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -24,7 +30,7 @@ class EventyLogo extends StatelessWidget {
         ),
         Container(
           transform: Matrix4.identity()
-            ..translate(0.0, (extWidth - intWidth) * .5, 0.0),
+            ..translate(0.0, (widget.extWidth - intWidth) * .5, 0.0),
           height: 0.7 * intWidth,
           width: intWidth,
           decoration: BoxDecoration(
@@ -42,14 +48,14 @@ class EventyLogo extends StatelessWidget {
           isLeft: false,
         ),
         Eye(
-          width: extWidth / 4,
+          width: widget.extWidth / 4,
           isLeft: true,
         ),
         Eye(
-          width: extWidth / 4,
+          width: widget.extWidth / 4,
           isLeft: false,
         ),
-        Mouth(width: extWidth / 4)
+        Mouth(width: widget.extWidth / 4)
       ],
     );
   }
