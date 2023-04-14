@@ -86,6 +86,7 @@ class FirebaseFollow extends ChangeNotifier {
     return [];
   }
 
+  /// Add the current user [followUid] to [uid]'s follower list
   Future<void> addFollower(
     BuildContext context,
     String uid,
@@ -212,5 +213,32 @@ class FirebaseFollow extends ChangeNotifier {
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
+  }
+
+  /// Check if the current user [uid] is following the user [followUid]
+  Future<bool> isFollowing(
+    BuildContext context,
+    String uid,
+    String followUid,
+  ) async {
+    try {
+      var document = await FirebaseCrud.readDoc(followCollection, uid);
+      if (document!.exists) {
+        var follow = (document.data()) as Map<String, dynamic>;
+        FollowCollection followData = FollowCollection(
+          uid: uid,
+          followers:
+              (follow["follower"] as List).map((e) => e as String).toList(),
+          following:
+              (follow["following"] as List).map((e) => e as String).toList(),
+        );
+        if (followData.following.contains(followUid)) {
+          return true;
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      showSnackBar(context, e.message!);
+    }
+    return false;
   }
 }
