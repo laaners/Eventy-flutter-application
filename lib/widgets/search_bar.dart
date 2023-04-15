@@ -1,4 +1,5 @@
 import 'package:dima_app/server/firebase_user.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -134,10 +135,11 @@ class UserTile extends StatelessWidget {
           var curUid =
               Provider.of<FirebaseUser>(context, listen: false).user!.uid;
           if (curUid == userData.uid) {
+            Widget newScreen = const ProfileScreen();
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => const ProfileScreen(),
+              ScreenTransition(
+                builder: (context) => newScreen,
               ),
             );
           } else {

@@ -15,6 +15,7 @@ import 'package:dima_app/server/firebase_vote.dart';
 import 'package:dima_app/themes/theme_constants.dart';
 import 'package:dima_app/themes/theme_manager.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -338,10 +339,12 @@ class _MainScreen extends State<MainScreen> {
   final GlobalKey<NavigatorState> thirdTabNavKey = GlobalKey<NavigatorState>();
   final GlobalKey<NavigatorState> fourthTabNavKey = GlobalKey<NavigatorState>();
 
+  /*
   final Map<String, Widget Function(BuildContext)> routes = {
     '/events': (context) => const EventsScreen(),
     '/main': (context) => const MainScreen(),
   };
+  */
 
   @override
   void initState() {
@@ -444,26 +447,25 @@ class _MainScreen extends State<MainScreen> {
               true;
           // return const CupertinoPageScaffold(child: EventsScreen());
         }
-
         switch (index) {
           case 0:
             return CupertinoTabView(
               navigatorKey: firstTabNavKey,
-              routes: routes,
+              // routes: routes,
               builder: (context) =>
                   const CupertinoPageScaffold(child: HomeScreen()),
             );
           case 1:
             return CupertinoTabView(
               navigatorKey: secondTabNavKey,
-              routes: routes,
+              // routes: routes,
               builder: (context) =>
                   const CupertinoPageScaffold(child: EventsScreen()),
             );
           case 2:
             return CupertinoTabView(
               navigatorKey: thirdTabNavKey,
-              routes: routes,
+              // routes: routes,
               builder: (context) =>
                   const CupertinoPageScaffold(child: ProfileScreen()),
             );

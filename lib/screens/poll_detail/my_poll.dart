@@ -11,11 +11,11 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 // It can be used in any way and also in a [ListView] or [Column].
 class MyPolls extends HookWidget {
   // CUSTOM: organizer and curUid
-  final String organizedUid;
+  final String organizerUid;
   final String curUid;
   const MyPolls({
     super.key,
-    required this.organizedUid,
+    required this.organizerUid,
     required this.curUid,
     required this.pollId,
     this.hasVoted = false,
@@ -256,13 +256,13 @@ class MyPolls extends HookWidget {
                           onTap: () async {
                             if (MyAlertDialog.showAlertIfCondition(
                                 context,
-                                curUid == organizedUid &&
+                                curUid == organizerUid &&
                                     pollOption.id != Availability.yes,
                                 "YOU CANNOT VOTE",
                                 "You are the organizer, you must be present at the event!")) {
                               return;
                             }
-                            if (curUid == organizedUid) return;
+                            if (curUid == organizerUid) return;
                             MyPollOption? prevOption = votedOption.value;
                             if (isLoading.value) return;
                             votedOption.value = pollOption;

@@ -7,17 +7,30 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ResponsiveWrapper extends StatelessWidget {
+import 'loading_spinner.dart';
+
+class ResponsiveWrapper extends StatefulWidget {
   final Widget child;
   const ResponsiveWrapper({super.key, required this.child});
+
+  @override
+  State<ResponsiveWrapper> createState() => _ResponsiveWrapperState();
+}
+
+class _ResponsiveWrapperState extends State<ResponsiveWrapper> {
+  final Future _future = Future.delayed(const Duration(milliseconds: 150));
 
   @override
   Widget build(BuildContext context) {
     bool isAuthenticated =
         Provider.of<FirebaseUser>(context, listen: true).user != null;
     return SafeArea(
-      child: Builder(
-        builder: (context) {
+      child: FutureBuilder(
+        future: _future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const LoadingSpinner();
+          }
           UserCollection? userData =
               Provider.of<FirebaseUser>(context, listen: true).userData;
           bool hasUserData = userData != null;
@@ -35,7 +48,7 @@ class ResponsiveWrapper extends StatelessWidget {
                         ),
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: child,
+                          child: widget.child,
                         ),
                       ),
                     ),
@@ -108,7 +121,7 @@ class ResponsiveWrapper extends StatelessWidget {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 6000),
                     child: Container(
-                      child: child,
+                      child: widget.child,
                     ),
                   ),
                 );

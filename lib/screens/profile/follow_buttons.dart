@@ -8,21 +8,15 @@ import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class FollowButtons extends StatefulWidget {
+class FollowButtons extends StatelessWidget {
   final UserCollection? userData;
-
   const FollowButtons({super.key, this.userData});
 
-  @override
-  State<FollowButtons> createState() => _FollowButtonsState();
-}
-
-class _FollowButtonsState extends State<FollowButtons> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<FollowCollection>(
       future: Provider.of<FirebaseFollow>(context, listen: false)
-          .getFollow(widget.userData!.uid),
+          .getFollow(userData!.uid),
       builder: (
         BuildContext context,
         AsyncSnapshot<FollowCollection> snapshot,
@@ -58,7 +52,7 @@ class _FollowButtonsState extends State<FollowButtons> {
                     MaterialPageRoute(
                       builder: (context) => FollowListScreen(
                         users: follow.followers,
-                        title: "${widget.userData?.username} Followers",
+                        title: "${userData?.username} Followers",
                       ),
                     ),
                   );
@@ -72,7 +66,7 @@ class _FollowButtonsState extends State<FollowButtons> {
                   MaterialPageRoute(
                     builder: (context) => FollowListScreen(
                       users: follow.following,
-                      title: "${widget.userData?.username} Following",
+                      title: "${userData?.username} Following",
                     ),
                   ),
                 );

@@ -92,18 +92,19 @@ class _UserTileState extends State<UserTile> {
               var curUid =
                   Provider.of<FirebaseUser>(context, listen: false).user!.uid;
               if (curUid == userData.uid) {
+                Widget newScreen = const ProfileScreen();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfileScreen(),
+                  ScreenTransition(
+                    builder: (context) => newScreen,
                   ),
                 );
               } else {
+                Widget newScreen = ViewProfileScreen(profileUserData: userData);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ViewProfileScreen(profileUserData: userData),
+                  ScreenTransition(
+                    builder: (context) => newScreen,
                   ),
                 );
               }

@@ -5,6 +5,7 @@ import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/gmaps.dart';
+import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,12 +30,12 @@ class EventsScreen extends StatelessWidget {
                 // ignore: use_build_context_synchronously
                 String pollId =
                     "Event 0 of UsernameId14_0DmBO8Fw0ofrK9RbXIO4dYlEIg03";
-                Widget test = PollDetailScreen(
+                Widget newScreen = PollDetailScreen(
                   pollId: pollId,
                 );
                 Navigator.push(
                   context,
-                  ScreenTransition(builder: (context) => test),
+                  ScreenTransition(builder: (context) => newScreen),
                 );
               },
               child: const Text("TO POLL DETAIL (WITH TABBAR)"),
@@ -52,6 +53,8 @@ class EventsScreen extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () async {
+                LoadingOverlay.show(context);
+                /*
                 await showModalBottomSheet(
                   useRootNavigator: true,
                   isScrollControlled: true,
@@ -71,6 +74,7 @@ class EventsScreen extends StatelessWidget {
                     ),
                   ),
                 );
+                */
               },
               child: const Text("map test"),
             ),

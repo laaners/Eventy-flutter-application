@@ -39,9 +39,10 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       centerTitle: true,
-      title: Text(title),
-      backgroundColor: Colors.transparent,
+      title: Text(title, overflow: TextOverflow.fade),
+      // backgroundColor: Colors.transparent,
       actions: upRightActions,
+      scrolledUnderElevation: 0,
     );
   }
 }
@@ -130,18 +131,19 @@ class UserTileSearch extends StatelessWidget {
           var curUid =
               Provider.of<FirebaseUser>(context, listen: false).user!.uid;
           if (curUid == userData.uid) {
+            Widget newScreen = const ProfileScreen();
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => const ProfileScreen(),
+              ScreenTransition(
+                builder: (context) => newScreen,
               ),
             );
           } else {
+            Widget newScreen = ViewProfileScreen(profileUserData: userData);
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    ViewProfileScreen(profileUserData: userData),
+              ScreenTransition(
+                builder: (context) => newScreen,
               ),
             );
           }

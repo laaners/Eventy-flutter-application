@@ -12,6 +12,7 @@ import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
+import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_button.dart';
@@ -330,7 +331,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
               Navigator.push(
                 context,
                 ScreenTransition(
-                    builder: (context) => PollDetailScreen(pollId: pollId)),
+                  builder: (context) => PollDetailScreen(pollId: pollId),
+                ),
               );
             }
           },
