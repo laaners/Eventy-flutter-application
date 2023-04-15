@@ -6,6 +6,7 @@ class LoadingOverlay {
   static OverlayEntry? overlay;
 
   static void show(BuildContext context) {
+    print("should show");
     if (overlay != null) return;
     overlay = OverlayEntry(builder: (BuildContext context) {
       return const FullScreenLoader();

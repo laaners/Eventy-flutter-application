@@ -1,8 +1,10 @@
+import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/profile/follow_buttons.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/themes/layout_constants.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/event_list.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/poll_list.dart';
@@ -15,34 +17,23 @@ import 'profile_info.dart';
 
 class ViewProfileScreen extends StatefulWidget {
   final UserCollection profileUserData;
-  const ViewProfileScreen({super.key, required this.profileUserData});
+  const ViewProfileScreen({
+    super.key,
+    required this.profileUserData,
+  });
 
   @override
   State<ViewProfileScreen> createState() => _ViewProfileScreenState();
 }
 
 class _ViewProfileScreenState extends State<ViewProfileScreen> {
-  bool _refresh = true;
   late UserCollection userData;
-  bool? _isFollowing;
-
-  void initIsFollowing() async {
-    await Provider.of<FirebaseFollow>(context, listen: false)
-        .isFollowing(
-          context,
-          userData.uid,
-          widget.profileUserData.uid,
-        )
-        .then((value) => setState(() {
-              _isFollowing = value;
-            }));
-  }
+  bool _refresh = true;
 
   @override
   void initState() {
-    super.initState();
     userData = Provider.of<FirebaseUser>(context, listen: false).userData!;
-    initIsFollowing();
+    super.initState();
   }
 
   @override
@@ -72,17 +63,42 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
                   loading: false,
                   radius: LayoutConstants.kProfilePicRadius,
                 ),
-                Positioned(
-                  bottom: -10,
-                  child: _isFollowing == null
-                      ? const SizedBox(
-                          width: LayoutConstants.kButtonWidth,
-                          height: LayoutConstants.kButtonWidth,
-                          child: FittedBox(
-                              fit: BoxFit.scaleDown, child: LoadingSpinner()))
-                      : TextButton.icon(
+                FutureBuilder<bool>(
+                    future: Provider.of<FirebaseFollow>(context, listen: false)
+                        .isFollowing(
+                      context,
+                      userData.uid,
+                      widget.profileUserData.uid,
+                    ),
+                    builder: (
+                      BuildContext context,
+                      AsyncSnapshot<bool?> snapshot,
+                    ) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const LoadingSpinner();
+                      }
+                      if (snapshot.hasError || !snapshot.hasData) {
+                        Future.microtask(() {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            ScreenTransition(
+                              builder: (context) => ErrorScreen(
+                                errorMsg: snapshot.error.toString(),
+                              ),
+                            ),
+                          );
+                        });
+                        return Container();
+                      }
+                      bool isFollowing = snapshot.data!;
+                      return Positioned(
+                        bottom: -10,
+                        child: TextButton.icon(
                           onPressed: () async {
-                            if (_isFollowing!) {
+                            print("------------------------");
+                            if (isFollowing) {
+                              print("remove");
                               await Provider.of<FirebaseFollow>(context,
                                       listen: false)
                                   .removeFollower(
@@ -90,7 +106,9 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
                                       widget.profileUserData.uid,
                                       userData.uid,
                                       true);
+                              print("done remove");
                             } else {
+                              print("add");
                               await Provider.of<FirebaseFollow>(context,
                                       listen: false)
                                   .addFollower(
@@ -98,17 +116,29 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
                                       widget.profileUserData.uid,
                                       userData.uid,
                                       true);
+                              print("done add");
                             }
-                            // TODO: async/await seems to not work properly, isFollowing retrieves old data.
-                            // add delay of two seconds
+                            /*
+                                // TODO: async/await seems to not work properly, isFollowing retrieves old data.
+                                // add delay of two seconds
+                                await Future.delayed(
+                                    const Duration(milliseconds: 100));
+                                initIsFollowing();
+                                */
                             await Future.delayed(
                                 const Duration(milliseconds: 100));
-                            initIsFollowing();
+                            isFollowing = !isFollowing;
+                            print(isFollowing);
+                            setState(() {
+                              _refresh = !_refresh;
+                            });
                           },
-                          icon: Icon(_isFollowing!
-                              ? Icons.person_remove
-                              : Icons.person_add),
-                          label: Text(_isFollowing! ? "Unfollow" : "Follow"),
+                          icon: Icon(
+                            isFollowing
+                                ? Icons.person_remove
+                                : Icons.person_add,
+                          ),
+                          label: Text(isFollowing ? "Unfollow" : "Follow"),
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(
                               Theme.of(context).colorScheme.secondaryContainer,
@@ -124,15 +154,14 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
                             ),
                           ),
                         ),
-                ),
+                      );
+                    }),
               ],
             ),
             const SizedBox(height: LayoutConstants.kHeight),
             ProfileInfo(userData: widget.profileUserData),
             const SizedBox(height: LayoutConstants.kHeight),
-            FollowButtons(
-              userData: widget.profileUserData,
-            ),
+            FollowButtons(userData: widget.profileUserData),
           ],
         ),
         stickyHeight: 400,

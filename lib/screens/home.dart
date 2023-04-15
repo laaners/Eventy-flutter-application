@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("rebuild home");
     return Scaffold(
       appBar: MyAppBar(
         title: "Home",

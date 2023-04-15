@@ -312,7 +312,7 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                                 await Share.share(finalUrl.toString());
                                 LoadingOverlay.hide(context);
                               },
-                              child: Icon(
+                              child: const Icon(
                                 Icons.share_outlined,
                               ),
                             )

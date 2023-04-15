@@ -316,18 +316,19 @@ class _InviteProfilePicState extends State<InviteProfilePic> {
         var curUid =
             Provider.of<FirebaseUser>(context, listen: false).user!.uid;
         if (curUid == widget.user.uid) {
+          Widget newScreen = const ProfileScreen();
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ProfileScreen(),
+            ScreenTransition(
+              builder: (context) => newScreen,
             ),
           );
         } else {
+          Widget newScreen = ViewProfileScreen(profileUserData: widget.user);
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  ViewProfileScreen(profileUserData: widget.user),
+            ScreenTransition(
+              builder: (context) => newScreen,
             ),
           );
         }

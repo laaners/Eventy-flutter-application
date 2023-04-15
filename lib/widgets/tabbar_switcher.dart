@@ -1,6 +1,5 @@
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class TabbarSwitcher extends StatefulWidget {
   final String appBarTitle;
@@ -68,13 +67,15 @@ class _TabbarSwitcher extends State<TabbarSwitcher>
       ),
       */
       appBar: AppBar(
-        toolbarHeight: 50,
+        // toolbarHeight: 50,
         title: _isShrink || widget.stickyHeight == 0
             ? Text(
                 widget.appBarTitle,
+                overflow: TextOverflow.fade,
               )
             : Container(),
         actions: widget.upRightActions,
+        scrolledUnderElevation: 0,
       ),
       body: ResponsiveWrapper(
         child: SafeArea(
@@ -91,6 +92,7 @@ class _TabbarSwitcher extends State<TabbarSwitcher>
                     // space between sticky elements and app bar
                     padding: const EdgeInsets.only(top: 0),
                     sliver: SliverAppBar(
+                      scrolledUnderElevation: 0,
                       elevation: 1,
                       pinned: true,
                       expandedHeight: widget.stickyHeight,

@@ -213,40 +213,29 @@ class _StepDatesState extends State<StepDates> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Container(
-                    child: Text(
-                      "$start-$end",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  Text(
+                    "$start-$end",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(0),
-                    child: IconButton(
-                      padding: const EdgeInsets.only(
-                        top: 0,
-                        bottom: 0,
-                        right: 0,
-                        left: 5,
-                      ),
-                      constraints: const BoxConstraints(),
-                      icon: const Icon(
-                        Icons.cancel,
-                      ),
-                      onPressed: () {
-                        widget.dates.forEach((k, v) {
-                          widget.removeDate([k, "$start-$end"]);
-                        });
-                        widget.removeEmpty();
-                        setState(() {
-                          _timeSlots.removeWhere((item) =>
-                              item["start"] == start && item["end"] == end);
-                          _fixedTimeSlots = _timeSlots.isEmpty ? false : true;
-                        });
-                      },
+                  Container(width: 5),
+                  InkWell(
+                    child: const Icon(
+                      Icons.cancel,
                     ),
+                    onTap: () {
+                      widget.dates.forEach((k, v) {
+                        widget.removeDate([k, "$start-$end"]);
+                      });
+                      widget.removeEmpty();
+                      setState(() {
+                        _timeSlots.removeWhere((item) =>
+                            item["start"] == start && item["end"] == end);
+                        _fixedTimeSlots = _timeSlots.isEmpty ? false : true;
+                      });
+                    },
                   ),
                 ],
               ),
@@ -370,7 +359,7 @@ class _StepDatesState extends State<StepDates> {
                   child: Center(
                     child: Text(
                       day.day.toString(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                       ),
                     ),

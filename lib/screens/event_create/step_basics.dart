@@ -49,10 +49,14 @@ class _StepBasicsState extends State<StepBasics> {
     return Column(
       children: [
         Container(
-          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
+          margin: const EdgeInsets.only(bottom: 0, top: 8, left: 15),
           alignment: Alignment.topLeft,
           child: const Text(
-            "Set the basic details",
+            "Select the locations",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
         Container(

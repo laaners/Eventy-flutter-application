@@ -1,6 +1,7 @@
 import 'package:dima_app/screens/profile/profile_info.dart';
 import 'package:dima_app/screens/profile/profile_settings.dart';
 import 'package:dima_app/server/firebase_user.dart';
+import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   UserCollection? userData;
-  int _refresh = 1;
+  bool _refresh = true;
 
   @override
   void initState() {
@@ -34,7 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return RefreshIndicator(
       onRefresh: () async {
         setState(() {
-          _refresh = 0;
+          _refresh = !_refresh;
         });
         return;
       },
@@ -44,10 +45,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           upRightActions: [],
         ),
         body: ResponsiveWrapper(
-          child: Column(
+          child: ListView(
             children: [
               Column(
                 children: [
+                  const SizedBox(height: LayoutConstants.kHeight),
                   ProfilePic(
                     userData: userData,
                     loading: false,
@@ -56,12 +58,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: LayoutConstants.kHeight),
                   ProfileInfo(userData: userData),
                   const SizedBox(height: LayoutConstants.kHeight),
-                  FollowButtons(
-                    userData: userData,
-                  ),
-                  const Divider(
-                    height: LayoutConstants.kDividerHeight,
-                  ),
+                  FollowButtons(userData: userData),
+                  const Divider(height: LayoutConstants.kDividerHeight),
                   const ProfileSettings(),
                 ],
               ),
