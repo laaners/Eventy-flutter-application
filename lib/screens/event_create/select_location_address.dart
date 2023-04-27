@@ -58,33 +58,38 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Padding(padding: EdgeInsets.only(top: 0)),
         ListTile(
-          title: const Text(
-            "Address",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+          title: Container(
+            margin: const EdgeInsets.only(bottom: 8, top: 8),
+            alignment: Alignment.topLeft,
+            child: Text(
+              "Address",
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),
           horizontalTitleGap: 0,
-          trailing: IconButton(
-            iconSize: 25,
-            onPressed: () {
-              setState(() {
-                widget.setAddress("");
-                locationSuggestions = [];
-                showMap = false;
-              });
-            },
-            icon: Icon(
-                widget.controller.text.isEmpty ? Icons.search : Icons.cancel),
-          ),
           subtitle: TextFormField(
+            decoration: InputDecoration(
+              hintText: "Search here",
+              isDense: true,
+              suffixIcon: IconButton(
+                iconSize: 25,
+                onPressed: () {
+                  setState(() {
+                    widget.setAddress("");
+                    locationSuggestions = [];
+                    showMap = false;
+                  });
+                },
+                icon: Icon(widget.controller.text.isEmpty
+                    ? Icons.search
+                    : Icons.cancel),
+              ),
+              border: InputBorder.none,
+            ),
             autofocus: false,
             focusNode: widget.focusNode,
             controller: widget.controller,
-            decoration: const InputDecoration(hintText: "Search here"),
             onChanged: (text) async {
               if (text.isEmpty) {
                 setState(() {

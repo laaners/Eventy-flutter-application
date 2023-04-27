@@ -151,12 +151,9 @@ class _SelectLocationState extends State<SelectLocation> {
             Container(
               margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
               alignment: Alignment.topLeft,
-              child: const Text(
+              child: Text(
                 "Name",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
             ),
             Container(

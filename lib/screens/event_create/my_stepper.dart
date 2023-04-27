@@ -868,7 +868,7 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
             ),
             children: <Widget>[
               // CUSTOM: controls on top
-              _buildVerticalControls(widget.currentStep),
+              // _buildVerticalControls(widget.currentStep),
               // CUSTOM: remove strange scroll behavior
               /*
               AnimatedSize(
@@ -885,6 +885,8 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
             ],
           ),
         ),
+        // CUSTOM: controls on navbar
+        _buildVerticalControls(widget.currentStep),
       ],
     );
   }

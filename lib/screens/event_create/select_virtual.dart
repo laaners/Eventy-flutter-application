@@ -3,6 +3,7 @@ import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SelectVirtual extends StatefulWidget {
   final List<Location> locations;
@@ -24,7 +25,6 @@ class SelectVirtual extends StatefulWidget {
 }
 
 class _SelectVirtualState extends State<SelectVirtual> {
-  TextEditingController locationNameController = TextEditingController();
   TextEditingController locationAddrController = TextEditingController();
   List<String> locationSuggestions = [];
   String location = "Search Location";
@@ -32,8 +32,13 @@ class _SelectVirtualState extends State<SelectVirtual> {
   @override
   void initState() {
     super.initState();
-    locationNameController.text = "Virtual meeting";
     locationAddrController.text = widget.defaultOptions.site;
+  }
+
+  @override
+  void dispose() {
+    locationAddrController.dispose();
+    super.dispose();
   }
 
   void checkFields() {
@@ -56,7 +61,7 @@ class _SelectVirtualState extends State<SelectVirtual> {
               isDefaultAction: true,
               onPressed: () {
                 widget.addLocation(Location(
-                  locationNameController.text,
+                  "Virtual meeting",
                   locationAddrController.text,
                   0,
                   0,
@@ -76,13 +81,15 @@ class _SelectVirtualState extends State<SelectVirtual> {
     widget.setVirtualMeeting(true);
     Navigator.pop(context);
     widget.addLocation(Location(
-      locationNameController.text,
+      "Virtual meeting",
       locationAddrController.text,
       0,
       0,
       "videocam",
     ));
   }
+
+  int count = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -106,33 +113,33 @@ class _SelectVirtualState extends State<SelectVirtual> {
           ),
         ),
         ListTile(
-          title: const Text(
-            "Virtual room link (optional)",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+          title: Container(
+            padding: const EdgeInsets.only(top: 8, bottom: 8),
+            child: Text(
+              "Virtual room link (optional)",
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),
-          horizontalTitleGap: 0,
-          trailing: IconButton(
-            iconSize: 25,
-            onPressed: () {
-              setState(() {
-                locationAddrController.text = "";
-              });
-            },
-            icon: Icon(locationAddrController.text.isEmpty
-                ? Icons.link
-                : Icons.cancel),
-          ),
-          subtitle: TextField(
+          subtitle: TextFormField(
             autofocus: false,
             controller: locationAddrController,
-            decoration: const InputDecoration(hintText: "Paste the link here"),
+            decoration: InputDecoration(
+              hintText: "Paste the link here",
+              isDense: true,
+              suffixIcon: IconButton(
+                iconSize: 25,
+                onPressed: () async {
+                  await Clipboard.setData(
+                      ClipboardData(text: locationAddrController.text));
+                },
+                icon: const Icon(Icons.link),
+              ),
+              border: InputBorder.none,
+            ),
           ),
         ),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 15),
+          margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
           child: MyButton(
             text: "Add virtual room",
             onPressed: checkFields,

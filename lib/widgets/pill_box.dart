@@ -12,7 +12,7 @@ class PillBox extends StatelessWidget {
       child: FittedBox(
         fit: BoxFit.fill,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(15, 0, 30, 0),
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.onPrimary,
             borderRadius: BorderRadius.circular(50),

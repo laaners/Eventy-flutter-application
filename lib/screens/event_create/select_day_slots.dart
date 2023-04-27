@@ -43,13 +43,6 @@ class _SelectDaySlotsState extends State<SelectDaySlots> {
           slotList.add(
             Container(
               padding: const EdgeInsets.symmetric(vertical: 1.0),
-              decoration: const BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    width: 1,
-                  ),
-                ),
-              ),
               child: ListTile(
                 title: Text(
                   "${k.replaceAll('-', ' - ')}",

@@ -31,6 +31,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scroll = ScrollController();
+  final TextEditingController _locationAddrController = TextEditingController();
   List<String> inviteeIds = [];
 
   @override
@@ -44,6 +45,42 @@ class _HomeScreenState extends State<HomeScreen> {
       body: ResponsiveWrapper(
         child: Column(
           children: [
+            ListTile(
+              title: Container(
+                padding: const EdgeInsets.only(top: 8, bottom: 8),
+                child: Text(
+                  "Virtual room link (optional)",
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+              ),
+              subtitle: TextFormField(
+                autofocus: false,
+                controller: _locationAddrController,
+                onChanged: (text) {
+                  print(_locationAddrController.text.isEmpty);
+                },
+                decoration: InputDecoration(
+                  hintText: "Paste the link here",
+                  isDense: true,
+                  suffixIcon: IconButton(
+                    iconSize: 25,
+                    onPressed: () async {
+                      setState(() {
+                        _locationAddrController.text = "";
+                      });
+                    },
+                    icon: Icon(_locationAddrController.text.isEmpty
+                        ? Icons.link
+                        : Icons.cancel),
+                  ),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+            Text(
+              _locationAddrController.text + "ok",
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
             const Text("ok"),
             Expanded(
               child: ListView(

@@ -56,7 +56,7 @@ class _LocationsListState extends State<LocationsList>
   Widget build(BuildContext context) {
     super.build(context);
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    return ListView(
+    return Column(
       children: [
         Container(
           alignment: Alignment.topRight,
@@ -104,32 +104,34 @@ class _LocationsListState extends State<LocationsList>
             ],
           ),
         ),
-        Column(
-          children: votesLocations.map((voteLocation) {
-            var location = widget.locations.firstWhere(
-              (element) => element["name"] == voteLocation.locationName,
-            );
-            return LocationTile(
-              pollId: widget.pollId,
-              organizerUid: widget.organizerUid,
-              invites: widget.invites,
-              location: Location(
-                location["name"],
-                location["site"],
-                location["lat"],
-                location["lon"],
-                location["icon"],
-              ),
-              voteLocation: voteLocation,
-              modifyVote: (int newAvailability) {
-                setState(() {
-                  votesLocations[votesLocations.indexWhere(
-                          (e) => e.locationName == location["name"])]
-                      .votes[curUid] = newAvailability;
-                });
-              },
-            );
-          }).toList(),
+        Expanded(
+          child: ListView(
+            children: votesLocations.map((voteLocation) {
+              var location = widget.locations.firstWhere(
+                (element) => element["name"] == voteLocation.locationName,
+              );
+              return LocationTile(
+                pollId: widget.pollId,
+                organizerUid: widget.organizerUid,
+                invites: widget.invites,
+                location: Location(
+                  location["name"],
+                  location["site"],
+                  location["lat"],
+                  location["lon"],
+                  location["icon"],
+                ),
+                voteLocation: voteLocation,
+                modifyVote: (int newAvailability) {
+                  setState(() {
+                    votesLocations[votesLocations.indexWhere(
+                            (e) => e.locationName == location["name"])]
+                        .votes[curUid] = newAvailability;
+                  });
+                },
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
@@ -162,7 +164,6 @@ class LocationTile extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        color: Theme.of(context).focusColor,
       ),
       child: ListTile(
         minLeadingWidth: 0,

@@ -29,14 +29,11 @@ class _StepPlacesState extends State<StepPlaces> {
     return Column(
       children: [
         Container(
-          margin: const EdgeInsets.only(bottom: 0, top: 8, left: 16),
+          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 16),
           alignment: Alignment.topLeft,
-          child: const Text(
+          child: Text(
             "Select the locations",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
         ),
         PillBox(
@@ -44,13 +41,11 @@ class _StepPlacesState extends State<StepPlaces> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 "Virtual meeting",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+                style: Theme.of(context).textTheme.titleLarge,
               ),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 5)),
               SizedBox(
                 width: 50 * 1.4,
                 height: 40 * 1.4,
@@ -118,50 +113,47 @@ class _StepPlacesState extends State<StepPlaces> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 1.0),
-          child: ListTile(
-            title: const Text(
-              "Add a location",
-            ),
-            leading: Container(
+          padding: const EdgeInsets.symmetric(vertical: 5.0),
+          child: Column(children: [
+            Container(
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
               ),
-              child: const Icon(
-                Icons.add_location_alt,
+              child: InkWell(
+                onTap: () {
+                  MyModal.show(
+                    context: context,
+                    child: SelectLocation(
+                      locations: widget.locations,
+                      addLocation: widget.addLocation,
+                      removeLocation: widget.removeLocation,
+                      defaultLocation:
+                          Location("", "", 0, 0, "location_on_outlined"),
+                    ),
+                    heightFactor: 0.85,
+                    doneCancelMode: false,
+                    onDone: () {},
+                    title: "",
+                  );
+                },
+                child: const Icon(
+                  Icons.add_location_alt,
+                  size: 60,
+                ),
               ),
             ),
-            onTap: () {
-              MyModal.show(
-                context: context,
-                child: SelectLocation(
-                  locations: widget.locations,
-                  addLocation: widget.addLocation,
-                  removeLocation: widget.removeLocation,
-                  defaultLocation:
-                      Location("", "", 0, 0, "location_on_outlined"),
-                ),
-                heightFactor: 0.85,
-                doneCancelMode: false,
-                onDone: () {},
-                title: "",
-              );
-            },
-          ),
+            Text(
+              "Add a location",
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ]),
         ),
         if (widget.locations
             .map((x) => x.name)
             .contains("Virtual meeting")) //(virtualMeeting)
           Container(
             padding: const EdgeInsets.symmetric(vertical: 1.0),
-            decoration: const BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  width: 1,
-                ),
-              ),
-            ),
             child: ListTile(
               title: Text(
                 widget.locations
@@ -229,13 +221,6 @@ class _StepPlacesState extends State<StepPlaces> {
             .map((location) {
           return Container(
             padding: const EdgeInsets.symmetric(vertical: 1.0),
-            decoration: const BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  width: 1,
-                ),
-              ),
-            ),
             child: ListTile(
               title: Text(
                 location.name,

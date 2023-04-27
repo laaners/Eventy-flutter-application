@@ -354,7 +354,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             final isLastStep = _activeStepIndex == stepList().length - 1;
             return Container(
               margin: const EdgeInsets.only(
-                bottom: 0,
+                bottom: 10,
                 top: 10,
                 left: 10,
                 right: 10,

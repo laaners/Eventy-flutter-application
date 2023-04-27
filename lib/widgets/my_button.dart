@@ -7,13 +7,13 @@ class MyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
+    return SizedBox(
+      width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
         style: const ButtonStyle(
           padding:
-              MaterialStatePropertyAll<EdgeInsetsGeometry>(EdgeInsets.all(20)),
+              MaterialStatePropertyAll<EdgeInsetsGeometry>(EdgeInsets.all(15)),
           textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 18)),
         ),
         child: Text(text.toUpperCase()),
