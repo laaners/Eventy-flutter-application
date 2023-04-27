@@ -42,8 +42,7 @@ class EventsScreen extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
+                Navigator.of(context, rootNavigator: true).push(
                   ScreenTransition(
                     builder: (context) => const EventCreateScreen(),
                   ),

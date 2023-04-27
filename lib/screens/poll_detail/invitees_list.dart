@@ -46,15 +46,11 @@ class _InviteesListState extends State<InviteesList> {
     users = widget.invites.map((e) => e.inviteeId).toList();
 
     // this list will be passed to step_invite, must filter out from the list
-    // the organizer and the current user itself
+    // the organizer (and the current user itself ? uid != curUid &&)
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     _future = Provider.of<FirebaseUser>(context, listen: false)
-        .getUsersDataFromList(
-            context,
-            users
-                .where((uid) =>
-                    uid != curUid && uid != widget.pollData.organizerUid)
-                .toList());
+        .getUsersDataFromList(context,
+            users.where((uid) => uid != widget.pollData.organizerUid).toList());
   }
 
   Future updateInvitees(List<String> newInvitees) async {

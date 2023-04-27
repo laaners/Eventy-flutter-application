@@ -65,14 +65,11 @@ class _StepDatesState extends State<StepDates> {
     return Column(
       children: [
         Container(
-          margin: const EdgeInsets.only(bottom: 0, top: 8, left: 16),
+          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 16),
           alignment: Alignment.topLeft,
-          child: const Text(
-            "Select the dates, time and duration",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+          child: Text(
+            "Dates, time and duration",
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
         ),
         PillBox(
@@ -80,13 +77,11 @@ class _StepDatesState extends State<StepDates> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
-                "Same time(s) for all dates",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+              Text(
+                "Same time for all dates",
+                style: Theme.of(context).textTheme.titleLarge,
               ),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 5)),
               SizedBox(
                 width: 50 * 1.4,
                 height: 40 * 1.4,

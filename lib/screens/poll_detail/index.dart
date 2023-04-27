@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/poll_detail/dates_list.dart';
@@ -233,6 +235,10 @@ class _PollDetailScreenState extends State<PollDetailScreen>
             var curUid =
                 Provider.of<FirebaseUser>(context, listen: false).user!.uid;
 
+            String aboutEventText = pollData.pollDesc.isEmpty
+                ? "The organizer did not provide any description The organizer did not provide any description The organizer did not provide any description"
+                : pollData.pollDesc;
+
             return TabbarSwitcher(
                 listSticky: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 15),
@@ -242,6 +248,9 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                       Text(
                         pollData.pollName,
                         style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
                       ),
                       Center(
                         child: InviteesPill(
@@ -253,32 +262,28 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                       ),
                       Container(
                           padding: const EdgeInsets.symmetric(vertical: 5)),
-                      const Text(
+                      Text(
                         "Organized by",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       UserTile(userUid: pollData.organizerUid),
-                      const Text(
+                      Text(
                         "About this event",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       Container(
                           padding: const EdgeInsets.symmetric(vertical: 5)),
-                      Text(pollData.pollDesc.isEmpty
-                          ? "The organizer did not provide any description"
-                          : pollData.pollDesc),
+                      Flexible(
+                        child: Text(
+                          aboutEventText,
+                        ),
+                      ),
                       Container(
                           padding: const EdgeInsets.symmetric(vertical: 5)),
                     ],
                   ),
                 ),
-                stickyHeight: 310 + pollData.pollDesc.length.toDouble() / 5,
+                stickyHeight: 310 + aboutEventText.length.toDouble() / 2,
                 labels: const ["Locations", "Dates"],
                 appBarTitle: pollData.pollName,
                 upRightActions:

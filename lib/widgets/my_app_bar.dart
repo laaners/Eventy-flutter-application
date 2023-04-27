@@ -39,7 +39,11 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       centerTitle: true,
-      title: Text(title, overflow: TextOverflow.fade),
+      title: Text(
+        title,
+        overflow: TextOverflow.fade,
+        style: Theme.of(context).textTheme.headlineSmall,
+      ),
       // backgroundColor: Colors.transparent,
       actions: upRightActions,
       scrolledUnderElevation: 0,

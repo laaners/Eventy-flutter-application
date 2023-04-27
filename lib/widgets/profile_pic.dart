@@ -12,6 +12,20 @@ class ProfilePic extends StatelessWidget {
     required this.radius,
   });
 
+  Widget capitalNameSurnameAvatar(context) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          "${userData?.name[0].toUpperCase()}${userData?.surname[0].toUpperCase()}",
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.displayLarge,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
@@ -19,7 +33,7 @@ class ProfilePic extends StatelessWidget {
       backgroundColor: Theme.of(context).primaryColor,
       child: userData?.profilePic != "default"
           ? (loading
-              ? const Center(child: CircularProgressIndicator())
+              ? capitalNameSurnameAvatar(context)
               : ClipRRect(
                   borderRadius: BorderRadius.circular(radius),
                   child: Image.network(
@@ -41,17 +55,7 @@ class ProfilePic extends StatelessWidget {
                     },
                   ),
                 ))
-          : Container(
-              margin: const EdgeInsets.all(10),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  "${userData?.name[0].toUpperCase()}${userData?.surname[0].toUpperCase()}",
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displayLarge,
-                ),
-              ),
-            ),
+          : capitalNameSurnameAvatar(context),
     );
   }
 }

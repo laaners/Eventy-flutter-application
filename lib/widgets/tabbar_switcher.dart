@@ -72,6 +72,7 @@ class _TabbarSwitcher extends State<TabbarSwitcher>
             ? Text(
                 widget.appBarTitle,
                 overflow: TextOverflow.fade,
+                style: Theme.of(context).textTheme.headlineSmall,
               )
             : Container(),
         actions: widget.upRightActions,
