@@ -6,6 +6,7 @@ import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
+import 'package:dima_app/themes/layout_constants.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
@@ -56,7 +57,7 @@ class _LocationsListState extends State<LocationsList>
   Widget build(BuildContext context) {
     super.build(context);
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    return Column(
+    return Stack(
       children: [
         Container(
           alignment: Alignment.topRight,
@@ -104,33 +105,40 @@ class _LocationsListState extends State<LocationsList>
             ],
           ),
         ),
-        Expanded(
-          child: ListView(
-            children: votesLocations.map((voteLocation) {
-              var location = widget.locations.firstWhere(
-                (element) => element["name"] == voteLocation.locationName,
-              );
-              return LocationTile(
-                pollId: widget.pollId,
-                organizerUid: widget.organizerUid,
-                invites: widget.invites,
-                location: Location(
-                  location["name"],
-                  location["site"],
-                  location["lat"],
-                  location["lon"],
-                  location["icon"],
+        Container(
+          margin: const EdgeInsets.only(top: 50),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  children: votesLocations.map((voteLocation) {
+                    var location = widget.locations.firstWhere(
+                      (element) => element["name"] == voteLocation.locationName,
+                    );
+                    return LocationTile(
+                      pollId: widget.pollId,
+                      organizerUid: widget.organizerUid,
+                      invites: widget.invites,
+                      location: Location(
+                        location["name"],
+                        location["site"],
+                        location["lat"],
+                        location["lon"],
+                        location["icon"],
+                      ),
+                      voteLocation: voteLocation,
+                      modifyVote: (int newAvailability) {
+                        setState(() {
+                          votesLocations[votesLocations.indexWhere(
+                                  (e) => e.locationName == location["name"])]
+                              .votes[curUid] = newAvailability;
+                        });
+                      },
+                    );
+                  }).toList(),
                 ),
-                voteLocation: voteLocation,
-                modifyVote: (int newAvailability) {
-                  setState(() {
-                    votesLocations[votesLocations.indexWhere(
-                            (e) => e.locationName == location["name"])]
-                        .votes[curUid] = newAvailability;
-                  });
-                },
-              );
-            }).toList(),
+              ),
+            ],
           ),
         ),
       ],
@@ -161,7 +169,7 @@ class LocationTile extends StatelessWidget {
     int curVote = voteLocation.votes[curUid];
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 1.0),
-      margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+      margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
       ),

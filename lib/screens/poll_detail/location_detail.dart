@@ -117,10 +117,7 @@ class LocationDetail extends StatelessWidget {
           alignment: Alignment.topLeft,
           child: Text(
             location.name,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
         ),
         Center(
@@ -143,12 +140,9 @@ class LocationDetail extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
           alignment: Alignment.topLeft,
-          child: const Text(
+          child: Text(
             "Votes",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
         ),
         const Padding(padding: EdgeInsets.only(top: 8)),
@@ -244,29 +238,32 @@ class LocationDetail extends StatelessWidget {
         const Padding(padding: EdgeInsets.only(top: 8)),
         location.name == "Virtual meeting"
             ? ListTile(
-                title: const Text(
-                  "Virtual room link",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                title: Container(
+                  padding: const EdgeInsets.only(top: 8, bottom: 8),
+                  child: Text(
+                    "Virtual room link",
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
-                ),
-                horizontalTitleGap: 0,
-                trailing: IconButton(
-                  iconSize: 25,
-                  onPressed: () async {
-                    await Clipboard.setData(
-                      ClipboardData(text: location.site),
-                    );
-                  },
-                  icon: const Icon(Icons.copy),
                 ),
                 subtitle: TextFormField(
                   initialValue: location.site.isEmpty
                       ? "The organizer did not provide any link"
                       : location.site,
-                  enabled: false,
                   autofocus: false,
+                  decoration: InputDecoration(
+                    hintText: "Paste the link here",
+                    isDense: true,
+                    suffixIcon: IconButton(
+                      iconSize: 25,
+                      onPressed: () async {
+                        await Clipboard.setData(
+                          ClipboardData(text: location.site),
+                        );
+                      },
+                      icon: const Icon(Icons.copy),
+                    ),
+                    border: InputBorder.none,
+                  ),
                 ),
               )
             : Column(

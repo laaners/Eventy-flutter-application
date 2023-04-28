@@ -16,6 +16,7 @@ import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:dima_app/widgets/delay_widget.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
@@ -23,6 +24,7 @@ import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:dima_app/widgets/user_list.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -157,6 +159,16 @@ class _PollDetailScreenState extends State<PollDetailScreen>
     });
   }
 
+  // Here it is!
+  Size textSize(String text, TextStyle style) {
+    final TextPainter textPainter = TextPainter(
+        text: TextSpan(text: text, style: style),
+        maxLines: 1,
+        textDirection: ui.TextDirection.ltr)
+      ..layout(minWidth: 0, maxWidth: double.infinity);
+    return textPainter.size;
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -236,8 +248,15 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                 Provider.of<FirebaseUser>(context, listen: false).user!.uid;
 
             String aboutEventText = pollData.pollDesc.isEmpty
-                ? "The organizer did not provide any description The organizer did not provide any description The organizer did not provide any description"
+                ? "The organizer did not provide any description"
                 : pollData.pollDesc;
+
+            double lines =
+                textSize(aboutEventText, Theme.of(context).textTheme.bodyLarge!)
+                        .width /
+                    MediaQuery.of(context).size.width;
+            lines *= 2;
+            lines += 1;
 
             return TabbarSwitcher(
                 listSticky: Container(
@@ -272,10 +291,12 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       Container(
-                          padding: const EdgeInsets.symmetric(vertical: 5)),
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                      ),
                       Flexible(
                         child: Text(
                           aboutEventText,
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ),
                       Container(
@@ -283,7 +304,8 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                     ],
                   ),
                 ),
-                stickyHeight: 310 + aboutEventText.length.toDouble() / 2,
+                stickyHeight: 310 +
+                    lines * Theme.of(context).textTheme.bodyLarge!.fontSize!,
                 labels: const ["Locations", "Dates"],
                 appBarTitle: pollData.pollName,
                 upRightActions:
@@ -330,13 +352,15 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                     invites: pollInvites,
                     votesLocations: votesLocations,
                   ),
-                  DatesList(
-                    organizerUid: pollData.organizerUid,
-                    pollId: widget.pollId,
-                    deadline: pollData.deadline,
-                    dates: pollData.dates,
-                    invites: pollInvites,
-                    votesDates: votesDates,
+                  DelayWidget(
+                    child: DatesList(
+                      organizerUid: pollData.organizerUid,
+                      pollId: widget.pollId,
+                      deadline: pollData.deadline,
+                      dates: pollData.dates,
+                      invites: pollInvites,
+                      votesDates: votesDates,
+                    ),
                   ),
                 ]);
           },

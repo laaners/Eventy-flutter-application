@@ -1,3 +1,4 @@
+import 'package:dima_app/themes/layout_constants.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 
@@ -128,6 +129,62 @@ class _TabbarSwitcher extends State<TabbarSwitcher>
                     // with AutomaticKeepAliveClientMixin
                     controller: _tabController,
                     children: widget.tabbars,
+                    /*
+                    children: [
+                      Stack(
+                        children: [
+                          Container(
+                            child: Text('Header'),
+                          ),
+                          Container(
+                            margin:
+                                EdgeInsets.only(top: LayoutConstants.kHeight),
+                            child: Column(
+                              children: <Widget>[
+                                Expanded(
+                                  child: ListView(
+                                    children: [
+                                      ...List.generate(
+                                        33,
+                                        (index) => Text(
+                                          "tab B: $index",
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      CustomScrollView(
+                        slivers: [
+                          SliverFillRemaining(
+                            hasScrollBody: true,
+                            child: Column(
+                              children: <Widget>[
+                                const Text('Header'),
+                                Expanded(
+                                  child: ListView(
+                                    children: [
+                                      ...List.generate(
+                                        33,
+                                        (index) => Text(
+                                          "tab B: $index",
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                const Text('Footer'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    */
                   ),
                 ),
               ],

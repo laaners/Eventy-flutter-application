@@ -28,14 +28,7 @@ class _StepPlacesState extends State<StepPlaces> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 16),
-          alignment: Alignment.topLeft,
-          child: Text(
-            "Select the locations",
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-        ),
+        Container(padding: const EdgeInsets.only(bottom: 8, top: 8)),
         PillBox(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
