@@ -1,3 +1,4 @@
+import 'package:dima_app/screens/poll_detail/date_detail.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
@@ -6,6 +7,7 @@ import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -102,94 +104,103 @@ class DateTile extends StatelessWidget {
 
     DateTime dateTime =
         DateFormatter.string2DateTime("${voteDate.date} 00:00:00");
-    return Container(
-      margin: const EdgeInsets.all(5),
-      padding: const EdgeInsets.all(10),
-      width: 110,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Theme.of(context).focusColor,
-      ),
-      child: Column(
-        children: [
-          Text(
-            DateFormat("MMM").format(dateTime),
-            style: Theme.of(context).textTheme.titleMedium,
+    return InkWell(
+      onTap: () {
+        MyModal.show(
+          context: context,
+          child: DateDetail(
+            pollId: pollId,
+            organizerUid: organizerUid,
+            invites: invites,
+            voteDate: voteDate,
+            modifyVote: modifyVote,
           ),
-          Text(
-            DateFormat("dd").format(dateTime),
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          Text(
-            DateFormat("EEEE").format(dateTime),
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          Text(
-            "${voteDate.start}-${voteDate.end}",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    (voteDate.getPositiveVotes().length).toString(),
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  Container(width: 2),
-                  const Icon(
-                    Icons.check,
-                    color: Colors.green,
-                    size: 22,
-                  ),
-                ],
-              ),
-              InkWell(
-                customBorder: const CircleBorder(),
-                child: Ink(
-                  decoration: const BoxDecoration(shape: BoxShape.circle),
-                  child: Icon(Availability.icons[curVote]),
+          heightFactor: 0.85,
+          doneCancelMode: false,
+          onDone: () {},
+          title: "",
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.all(5),
+        padding: const EdgeInsets.all(10),
+        width: 110,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Theme.of(context).focusColor,
+        ),
+        child: Column(
+          children: [
+            Text(
+              DateFormat("MMM").format(dateTime),
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Text(
+              DateFormat("dd").format(dateTime),
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            Text(
+              DateFormat("EEEE").format(dateTime),
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Text(
+              "${voteDate.start}-${voteDate.end}",
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      (voteDate.getPositiveVotes().length).toString(),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Container(width: 2),
+                    const Icon(
+                      Icons.check,
+                      color: Colors.green,
+                      size: 22,
+                    ),
+                  ],
                 ),
-                onTap: () async {
-                  if (MyAlertDialog.showAlertIfCondition(
-                      context,
-                      curUid == organizerUid,
-                      "YOU CANNOT VOTE",
-                      "You are the organizer, you must be present at the event!")) {
-                    return;
-                  }
-                  int newAvailability =
-                      curVote + 1 > 2 ? Availability.empty : curVote + 1;
+                InkWell(
+                  customBorder: const CircleBorder(),
+                  child: Ink(
+                    decoration: const BoxDecoration(shape: BoxShape.circle),
+                    child: Icon(Availability.icons[curVote]),
+                  ),
+                  onTap: () async {
+                    if (MyAlertDialog.showAlertIfCondition(
+                        context,
+                        curUid == organizerUid,
+                        "YOU CANNOT VOTE",
+                        "You are the organizer, you must be present at the event!")) {
+                      return;
+                    }
+                    int newAvailability =
+                        curVote + 1 > 2 ? Availability.empty : curVote + 1;
 
-                  var startDateString = "${voteDate.date} ${voteDate.start}:00";
-                  var endDateString = "${voteDate.date} ${voteDate.end}:00";
-                  var startDateUtc = DateFormatter.string2DateTime(
-                      DateFormatter.toUtcString(startDateString));
-                  var endDateUtc = DateFormatter.string2DateTime(
-                      DateFormatter.toUtcString(endDateString));
-                  String utcDay = DateFormat("yyyy-MM-dd").format(startDateUtc);
-                  var startUtc = DateFormat("HH:mm").format(startDateUtc);
-                  var endUtc = DateFormat("HH:mm").format(endDateUtc);
-                  await Provider.of<FirebaseVote>(context, listen: false)
-                      .userVoteDate(
-                    context,
-                    pollId,
-                    utcDay,
-                    startUtc,
-                    endUtc,
-                    curUid,
-                    newAvailability,
-                  );
-                  modifyVote(newAvailability);
-                },
-              ),
-            ],
-          ),
-        ],
+                    await Provider.of<FirebaseVote>(context, listen: false)
+                        .userVoteDate(
+                      context,
+                      pollId,
+                      voteDate.date,
+                      voteDate.start,
+                      voteDate.end,
+                      curUid,
+                      newAvailability,
+                    );
+                    modifyVote(newAvailability);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
     return Container(

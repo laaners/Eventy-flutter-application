@@ -5,6 +5,7 @@ import 'package:dima_app/screens/event_create/step_invite.dart';
 import 'package:dima_app/screens/login.dart';
 import 'package:dima_app/server/firebase_crud.dart';
 import 'package:dima_app/server/firebase_follow.dart';
+import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
@@ -86,6 +87,15 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ListView(
                 controller: _scroll,
                 children: [
+                  MyButton(
+                      text: "delete a poll",
+                      onPressed: () async {
+                        await Provider.of<FirebasePoll>(context, listen: false)
+                            .deletePoll(
+                                context: context,
+                                pollId:
+                                    "Event 2 of UsernameId16_FXLaBqT6DhQhPujaHMQE4AKFaXX2");
+                      }),
                   MyButton(
                     onPressed: () {
                       FirebaseCrudsTesting.createFollowingFollowers(context);

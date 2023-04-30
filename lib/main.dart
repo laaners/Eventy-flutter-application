@@ -292,6 +292,12 @@ class _MyAppState extends State<MyApp> {
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: Provider.of<ThemeManager>(context).themeMode,
+      initialRoute: '/',
+      routes: {
+        // When navigating to the "/second" route, build the SecondScreen widget.
+        '/events': (context) => const EventsScreen(),
+        '/main': (context) => const MainScreen(),
+      },
       home: isAuthenticated
           ? Builder(builder: (context) {
               bool hasUserData =
@@ -339,12 +345,11 @@ class _MainScreen extends State<MainScreen> {
   final GlobalKey<NavigatorState> thirdTabNavKey = GlobalKey<NavigatorState>();
   final GlobalKey<NavigatorState> fourthTabNavKey = GlobalKey<NavigatorState>();
 
-  /*
   final Map<String, Widget Function(BuildContext)> routes = {
     '/events': (context) => const EventsScreen(),
     '/main': (context) => const MainScreen(),
+    '/home': (context) => const HomeScreen(),
   };
-  */
 
   @override
   void initState() {
@@ -451,21 +456,21 @@ class _MainScreen extends State<MainScreen> {
           case 0:
             return CupertinoTabView(
               navigatorKey: firstTabNavKey,
-              // routes: routes,
+              routes: routes,
               builder: (context) =>
                   const CupertinoPageScaffold(child: HomeScreen()),
             );
           case 1:
             return CupertinoTabView(
               navigatorKey: secondTabNavKey,
-              // routes: routes,
+              routes: routes,
               builder: (context) =>
                   const CupertinoPageScaffold(child: EventsScreen()),
             );
           case 2:
             return CupertinoTabView(
               navigatorKey: thirdTabNavKey,
-              // routes: routes,
+              routes: routes,
               builder: (context) =>
                   const CupertinoPageScaffold(child: ProfileScreen()),
             );

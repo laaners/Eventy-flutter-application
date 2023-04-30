@@ -19,19 +19,19 @@ class FirebaseEvent extends ChangeNotifier {
     required String eventName,
     required String organizerUid,
     required String eventDesc,
-    required String deadline,
-    required Map<String, dynamic> dates,
+    required Map<String, dynamic> date,
     required Map<String, dynamic> location,
     required bool public,
+    required bool canInvite,
   }) async {
     EventCollection event = EventCollection(
       eventName: eventName,
       organizerUid: organizerUid,
       eventDesc: eventDesc,
-      deadline: deadline,
-      dates: dates,
+      date: date,
       location: location,
       public: public,
+      canInvite: canInvite,
     );
     try {
       String eventId = "${eventName}_$organizerUid";

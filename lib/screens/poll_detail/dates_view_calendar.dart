@@ -30,6 +30,7 @@ class DatesViewCalendar extends StatefulWidget {
 
 class _DatesViewCalendarState extends State<DatesViewCalendar> {
   late DateTime _focusedDay;
+  DateTime? _filterDay;
 
   @override
   void initState() {
@@ -131,7 +132,7 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
                   margin: const EdgeInsets.all(1),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: day == _focusedDay
+                    color: day == _filterDay
                         ? Theme.of(context).primaryColorLight
                         : Theme.of(context).focusColor,
                   ),
@@ -140,7 +141,7 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
                       day.day.toString(),
                       style: TextStyle(
                         fontSize: 18,
-                        color: day == _focusedDay
+                        color: day == _filterDay
                             ? Theme.of(context).colorScheme.onPrimary
                             : null,
                       ),
@@ -158,7 +159,7 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(3),
-                                color: day == _focusedDay
+                                color: day == _filterDay
                                     ? Theme.of(context).primaryColorLight
                                     : Theme.of(context).focusColor,
                               ),
@@ -169,7 +170,7 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
                               child: Text(
                                 events.length.toString(),
                                 style: TextStyle(
-                                  color: day == _focusedDay
+                                  color: day == _filterDay
                                       ? Theme.of(context).colorScheme.onPrimary
                                       : null,
                                 ),
@@ -216,13 +217,14 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
             },
             onDaySelected: (selectedDay, focusedDay) {
               // print(DateFormatter.dateTime2String(selectedDay));
+              _focusedDay = selectedDay;
               if (widget.votesDates.map((e) => e.date).toList().contains(
                   DateFormatter.dateTime2String(selectedDay).split(" ")[0])) {
-                if (selectedDay == _focusedDay) {
+                if (selectedDay == _filterDay) {
                   widget.filterDates("all");
-                  _focusedDay = DateFormatter.string2DateTime(widget.deadline);
+                  _filterDay = null;
                 } else {
-                  _focusedDay = selectedDay;
+                  _filterDay = selectedDay;
                   widget.filterDates(
                       DateFormat("yyyy-MM-dd").format(selectedDay));
                 }

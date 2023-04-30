@@ -2,13 +2,18 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/server/date_methods.dart';
+import 'package:dima_app/server/firebase_event.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
+import 'package:dima_app/server/tables/availability.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
+import 'package:dima_app/server/tables/vote_date_collection.dart';
+import 'package:dima_app/server/tables/vote_location_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_crud.dart';
@@ -48,11 +53,13 @@ class FirebasePoll extends ChangeNotifier {
       if (pollExistence!.exists) {
         return null;
       }
-
       // await pollCollection.doc(pollId).set(poll.toMap());
       var test = poll.toMap();
-      // deadline in utc
-      test["deadline"] = DateFormatter.string2DateTime(deadline);
+      // dates to utc
+      test["deadline"] =
+          DateFormatter.string2DateTime(DateFormatter.toUtcString(deadline));
+      test["dates"] =
+          PollCollection.datesToUtc(test["dates"] as Map<String, dynamic>);
       await pollCollection.doc(pollId).set(test);
     } on FirebaseException catch (e) {
       // showSnackBar(context, e.message!);
@@ -79,7 +86,9 @@ class FirebasePoll extends ChangeNotifier {
       // utc string
       tmp["deadline"] = DateFormatter.dateTime2String(tmp["deadline"].toDate());
       tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
-      var pollDetails = PollCollection.fromMap(tmp);
+      tmp["dates"] =
+          PollCollection.datesToLocal(tmp["dates"] as Map<String, dynamic>);
+      PollCollection pollDetails = PollCollection.fromMap(tmp);
       return pollDetails;
     } on FirebaseException catch (e) {
       showSnackBar(context, e.message!);
@@ -105,6 +114,8 @@ class FirebasePoll extends ChangeNotifier {
           tmp["deadline"] =
               DateFormatter.dateTime2String(tmp["deadline"].toDate());
           tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
+          tmp["dates"] =
+              PollCollection.datesToLocal(tmp["dates"] as Map<String, dynamic>);
           var pollDetails = PollCollection.fromMap(tmp);
           return pollDetails;
         }).toList();
@@ -133,7 +144,7 @@ class FirebasePoll extends ChangeNotifier {
           await pollCollection.where("organizerUid", isEqualTo: userUid).get();
 
       if (documents.docs.isNotEmpty) {
-        final List<Map<String, dynamic>> polls = documents.docs.where((doc) {
+        List<Map<String, dynamic>> polls = documents.docs.where((doc) {
           var tmp = doc.data() as Map<String, dynamic>;
           return tmp["public"] == true || curUserInvitesIds.contains(doc.id);
         }).map((doc) {
@@ -146,9 +157,26 @@ class FirebasePoll extends ChangeNotifier {
           tmp["deadline"] =
               DateFormatter.dateTime2String(tmp["deadline"].toDate());
           tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
+          tmp["dates"] =
+              PollCollection.datesToLocal(tmp["dates"] as Map<String, dynamic>);
           var pollDetails = PollCollection.fromMap(tmp);
           bool invited = curUserInvitesIds.contains(doc.id);
-          return {"pollDetails": pollDetails, "invited": invited};
+          return {"pollDetails": pollDetails, "invited": invited, "id": doc.id};
+        }).toList();
+        // check if the deadline for one event was met, if true then update the database by deleting it (and creating corresponding an event)
+        polls = polls.where((e) {
+          PollCollection pollData = e["pollDetails"] as PollCollection;
+          String nowDate =
+              DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
+          // today is below deadline
+          if (DateFormatter.toLocalString(pollData.deadline)
+                  .compareTo(nowDate) >
+              0) {
+            return true;
+          }
+          // deadline reached, delete the poll
+          deletePoll(context: context, pollId: e["id"]);
+          return false;
         }).toList();
         return polls;
       }
@@ -172,11 +200,95 @@ class FirebasePoll extends ChangeNotifier {
           e["lon"] = e["lon"].toDouble();
           return e as Map<String, dynamic>;
         }).toList();
+
+        PollCollection pollData = PollCollection.fromMap(tmp);
+
+        print(pollData);
+
+        // get most voted options
+        List<VoteLocationCollection> votesLocations =
+            await Future.wait(pollData.locations.map((location) {
+          return Provider.of<FirebaseVote>(context, listen: false)
+              .getVotesLocation(context, pollId, location["name"])
+              .then((value) {
+            if (value != null) {
+              value.votes[pollData.organizerUid] = Availability.yes;
+              return value;
+            } else {
+              return VoteLocationCollection(
+                locationName: location["name"],
+                pollId: pollId,
+                votes: {
+                  pollData.organizerUid: Availability.yes,
+                },
+              );
+            }
+          });
+        }).toList());
+
+        List<Future<VoteDateCollection>> promises = pollData.dates.keys
+            .map((date) {
+              return pollData.dates[date].map((slot) {
+                return Provider.of<FirebaseVote>(context, listen: false)
+                    .getVotesDate(
+                        context, pollId, date, slot["start"], slot["end"])
+                    .then((value) {
+                  if (value != null) {
+                    value.votes[pollData.organizerUid] = Availability.yes;
+                    return value;
+                  } else {
+                    return VoteDateCollection(
+                      pollId: pollId,
+                      date: date,
+                      start: slot["start"],
+                      end: slot["end"],
+                      votes: {
+                        pollData.organizerUid: Availability.yes,
+                      },
+                    );
+                  }
+                });
+              }).toList();
+            })
+            .toList()
+            .expand((x) => x)
+            .toList()
+            .cast();
+
+        List<VoteDateCollection> votesDates = await Future.wait(promises);
+        List<VoteDateCollection> localDates = [];
+        for (var voteDate in votesDates) {
+          var startDateString = "${voteDate.date} ${voteDate.start}:00";
+          var endDateString = "${voteDate.date} ${voteDate.end}:00";
+          var startDateLocal = DateFormatter.string2DateTime(
+              DateFormatter.toLocalString(startDateString));
+          var endDateLocal = DateFormatter.string2DateTime(
+              DateFormatter.toLocalString(endDateString));
+          String localDay = DateFormat("yyyy-MM-dd").format(startDateLocal);
+          var startLocal = DateFormat("HH:mm").format(startDateLocal);
+          var endLocal = DateFormat("HH:mm").format(endDateLocal);
+          localDates.add(VoteDateCollection(
+            pollId: pollId,
+            date: localDay,
+            start: startLocal,
+            end: endLocal,
+            votes: voteDate.votes,
+          ));
+        }
+        votesDates = localDates;
+
+        var obj = {
+          "data": pollData,
+          "locations": votesLocations,
+          "dates": votesDates,
+        };
+        print(obj);
+        return;
+
         // utc string
         tmp["deadline"] =
             DateFormatter.dateTime2String(tmp["deadline"].toDate());
         tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
-        PollCollection pollData = PollCollection.fromMap(tmp);
 
         // delete invites
         await Provider.of<FirebasePollEventInvite>(context, listen: false)
@@ -192,6 +304,7 @@ class FirebasePoll extends ChangeNotifier {
                   ))
               .toList());
         });
+
         // delete location votes
         await Future.wait(pollData.locations
             .map((location) => Provider.of<FirebaseVote>(context, listen: false)
@@ -203,7 +316,7 @@ class FirebasePoll extends ChangeNotifier {
             .toList());
 
         // delete dates votes
-        List<Future<dynamic>> promises = pollData.dates.keys
+        promises = pollData.dates.keys
             .map((date) {
               return pollData.dates[date].map((slot) {
                 return Provider.of<FirebaseVote>(context, listen: false)
@@ -224,6 +337,18 @@ class FirebasePoll extends ChangeNotifier {
 
         // delete poll
         await FirebaseCrud.deleteDoc(pollCollection, pollId);
+
+        // create event
+        await Provider.of<FirebaseEvent>(context, listen: false).createEvent(
+          context: context,
+          eventName: pollData.pollName,
+          organizerUid: pollData.organizerUid,
+          eventDesc: pollData.pollDesc,
+          date: {},
+          location: {},
+          public: pollData.public,
+          canInvite: pollData.canInvite,
+        );
       }
     } on FirebaseException catch (e) {
       print(e.message!);

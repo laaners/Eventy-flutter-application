@@ -1,4 +1,6 @@
+import 'package:dima_app/server/date_methods.dart';
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 
 class PollCollection {
   final String pollName;
@@ -22,6 +24,56 @@ class PollCollection {
 
   // PK = pollName_organizerUid
   static const collectionName = "poll";
+
+  static Map<String, dynamic> datesToUtc(Map<String, dynamic> dates) {
+    Map<String, dynamic> utcDates = {};
+    dates.forEach((day, slots) {
+      slots.forEach((slot, _) {
+        var startDateString = "${day.split(" ")[0]} ${slot.split("-")[0]}:00";
+        var endDateString = "${day.split(" ")[0]} ${slot.split("-")[1]}:00";
+        var startDateUtc = DateFormatter.string2DateTime(
+            DateFormatter.toUtcString(startDateString));
+        var endDateUtc = DateFormatter.string2DateTime(
+            DateFormatter.toUtcString(endDateString));
+        String utcDay = DateFormat("yyyy-MM-dd").format(startDateUtc);
+        var startUtc = DateFormat("HH:mm").format(startDateUtc);
+        var endUtc = DateFormat("HH:mm").format(endDateUtc);
+        if (!utcDates.containsKey(utcDay)) {
+          utcDates[utcDay] = [];
+        }
+        utcDates[utcDay].add({
+          "start": startUtc,
+          "end": endUtc,
+        });
+      });
+    });
+    return utcDates;
+  }
+
+  static Map<String, dynamic> datesToLocal(Map<String, dynamic> dates) {
+    Map<String, dynamic> localDates = {};
+    dates.forEach((day, slots) {
+      slots.forEach((slot) {
+        var startDateString = "${day.split(" ")[0]} ${slot["start"]}:00";
+        var endDateString = "${day.split(" ")[0]} ${slot["end"]}:00";
+        var startDateLocal = DateFormatter.string2DateTime(
+            DateFormatter.toLocalString(startDateString));
+        var endDateLocal = DateFormatter.string2DateTime(
+            DateFormatter.toLocalString(endDateString));
+        String localDay = DateFormat("yyyy-MM-dd").format(startDateLocal);
+        var startLocal = DateFormat("HH:mm").format(startDateLocal);
+        var endLocal = DateFormat("HH:mm").format(endDateLocal);
+        if (!localDates.containsKey(localDay)) {
+          localDates[localDay] = [];
+        }
+        localDates[localDay].add({
+          "start": startLocal,
+          "end": endLocal,
+        });
+      });
+    });
+    return localDates;
+  }
 
   PollCollection copyWith({
     String? pollName,

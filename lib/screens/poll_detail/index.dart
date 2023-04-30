@@ -109,27 +109,6 @@ class _PollDetailScreenState extends State<PollDetailScreen>
           .cast();
 
       List<VoteDateCollection> votesDates = await Future.wait(promises);
-      List<VoteDateCollection> localDates = [];
-      for (var voteDate in votesDates) {
-        var startDateString = "${voteDate.date} ${voteDate.start}:00";
-        var endDateString = "${voteDate.date} ${voteDate.end}:00";
-        var startDateLocal = DateFormatter.string2DateTime(
-            DateFormatter.toLocalString(startDateString));
-        var endDateLocal = DateFormatter.string2DateTime(
-            DateFormatter.toLocalString(endDateString));
-        String localDay = DateFormat("yyyy-MM-dd").format(startDateLocal);
-        var startLocal = DateFormat("HH:mm").format(startDateLocal);
-        var endLocal = DateFormat("HH:mm").format(endDateLocal);
-        localDates.add(VoteDateCollection(
-          pollId: widget.pollId,
-          date: localDay,
-          start: startLocal,
-          end: endLocal,
-          votes: voteDate.votes,
-        ));
-      }
-      votesDates = localDates;
-
       return {
         "data": pollData,
         "invites": pollInvites,
@@ -257,6 +236,16 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                     MediaQuery.of(context).size.width;
             lines *= 2;
             lines += 1;
+            double descPadding =
+                lines * Theme.of(context).textTheme.bodyLarge!.fontSize!;
+
+            lines = textSize(pollData.pollName,
+                        Theme.of(context).textTheme.headlineMedium!)
+                    .width /
+                MediaQuery.of(context).size.width;
+            lines += 1;
+            double titlePadding =
+                lines * Theme.of(context).textTheme.headlineMedium!.fontSize!;
 
             return TabbarSwitcher(
                 listSticky: Container(
@@ -304,8 +293,7 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                     ],
                   ),
                 ),
-                stickyHeight: 310 +
-                    lines * Theme.of(context).textTheme.bodyLarge!.fontSize!,
+                stickyHeight: 310 + descPadding + titlePadding,
                 labels: const ["Locations", "Dates"],
                 appBarTitle: pollData.pollName,
                 upRightActions:

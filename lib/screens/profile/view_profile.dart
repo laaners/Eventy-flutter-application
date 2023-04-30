@@ -47,10 +47,10 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
       },
       child: TabbarSwitcher(
         appBarTitle: widget.profileUserData.name,
-        labels: const ["Events", "Polls"],
+        labels: const ["Polls", "Events"],
         tabbars: [
+          PollList(userUid: widget.profileUserData.uid),
           EventList(userUid: widget.profileUserData.uid),
-          PollList(userUid: widget.profileUserData.uid)
         ],
         listSticky: Column(
           children: [
@@ -160,11 +160,10 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
             ),
             const SizedBox(height: LayoutConstants.kHeight),
             ProfileInfo(userData: widget.profileUserData),
-            const SizedBox(height: LayoutConstants.kHeight),
             FollowButtons(userData: widget.profileUserData),
           ],
         ),
-        stickyHeight: 400,
+        stickyHeight: 350,
         upRightActions: [MyAppBar.SearchAction(context)],
       ),
     );
