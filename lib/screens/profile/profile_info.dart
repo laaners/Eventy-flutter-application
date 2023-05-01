@@ -14,10 +14,14 @@ class ProfileInfo extends StatelessWidget {
       children: [
         Text(
           '@${userData!.username}',
-          style: Theme.of(context).textTheme.displaySmall,
+          style: Theme.of(context).textTheme.titleLarge,
+          overflow: TextOverflow.ellipsis,
         ),
-        Text("${userData?.name} ${userData?.surname}",
-            style: Theme.of(context).textTheme.headlineSmall),
+        Text(
+          "${userData!.name} ${userData?.surname}",
+          style: Theme.of(context).textTheme.titleMedium,
+          overflow: TextOverflow.ellipsis,
+        ),
       ],
     );
   }

@@ -1,8 +1,8 @@
-import 'package:dima_app/screens/poll_detail/dates_view_grid.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class DatesViewCalendar extends StatefulWidget {
@@ -12,6 +12,7 @@ class DatesViewCalendar extends StatefulWidget {
   final Map<String, dynamic> dates;
   final List<PollEventInviteCollection> invites;
   final List<VoteDateCollection> votesDates;
+  final ValueChanged<String> filterDates;
   const DatesViewCalendar({
     super.key,
     required this.organizerUid,
@@ -20,6 +21,7 @@ class DatesViewCalendar extends StatefulWidget {
     required this.dates,
     required this.invites,
     required this.votesDates,
+    required this.filterDates,
   });
 
   @override
@@ -27,17 +29,12 @@ class DatesViewCalendar extends StatefulWidget {
 }
 
 class _DatesViewCalendarState extends State<DatesViewCalendar> {
-  late List<VoteDateCollection> votesDates;
-
   late DateTime _focusedDay;
+  DateTime? _filterDay;
 
   @override
   void initState() {
     super.initState();
-    votesDates = widget.votesDates;
-    votesDates.sort((a, b) => a.end.compareTo(b.end));
-    votesDates.sort((a, b) => a.start.compareTo(b.start));
-    votesDates.sort((a, b) => a.date.compareTo(b.date));
     _focusedDay = DateFormatter.string2DateTime(widget.deadline);
   }
 
@@ -45,14 +42,6 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        DatesViewGrid(
-          organizerUid: widget.organizerUid,
-          pollId: widget.pollId,
-          deadline: widget.deadline,
-          dates: widget.dates,
-          invites: widget.invites,
-          votesDates: widget.votesDates,
-        ),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 10),
           child: TableCalendar(
@@ -143,13 +132,18 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
                   margin: const EdgeInsets.all(1),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: Theme.of(context).focusColor,
+                    color: day == _filterDay
+                        ? Theme.of(context).primaryColorLight
+                        : Theme.of(context).focusColor,
                   ),
                   child: Center(
                     child: Text(
                       day.day.toString(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
+                        color: day == _filterDay
+                            ? Theme.of(context).colorScheme.onPrimary
+                            : null,
                       ),
                     ),
                   ),
@@ -165,7 +159,9 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(3),
-                                color: Theme.of(context).focusColor,
+                                color: day == _filterDay
+                                    ? Theme.of(context).primaryColorLight
+                                    : Theme.of(context).focusColor,
                               ),
                               padding: const EdgeInsets.symmetric(
                                 vertical: 1.5,
@@ -173,6 +169,11 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
                               ),
                               child: Text(
                                 events.length.toString(),
+                                style: TextStyle(
+                                  color: day == _filterDay
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : null,
+                                ),
                               ),
                             ),
                           ),
@@ -187,7 +188,7 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
             // lastDay: DateFormatter.string2DateTime(votesDates.last.date),
             // lastDay: DateTime(DateTime.now().year + 50),
             lastDay: DateFormatter.string2DateTime(
-                "${votesDates.last.date} 00:00:00"),
+                "${widget.votesDates.reduce((curr, next) => curr.date.compareTo(next.date) > 0 ? curr : next).date} 00:00:00"),
             focusedDay: _focusedDay.compareTo(
                         DateFormatter.string2DateTime(widget.deadline)
                             .add(const Duration(days: 1))) <=
@@ -196,7 +197,7 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
                     .add(const Duration(days: 1))
                 : _focusedDay,
             selectedDayPredicate: (day) {
-              return votesDates
+              return widget.votesDates
                   .map((e) => e.date)
                   .toList()
                   .contains(DateFormatter.dateTime2String(day).split(" ")[0]);
@@ -215,9 +216,19 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
               return [];
             },
             onDaySelected: (selectedDay, focusedDay) {
-              print(DateFormatter.dateTime2String(selectedDay));
-              print("do something on press");
+              // print(DateFormatter.dateTime2String(selectedDay));
               _focusedDay = selectedDay;
+              if (widget.votesDates.map((e) => e.date).toList().contains(
+                  DateFormatter.dateTime2String(selectedDay).split(" ")[0])) {
+                if (selectedDay == _filterDay) {
+                  widget.filterDates("all");
+                  _filterDay = null;
+                } else {
+                  _filterDay = selectedDay;
+                  widget.filterDates(
+                      DateFormat("yyyy-MM-dd").format(selectedDay));
+                }
+              }
             },
           ),
         ),

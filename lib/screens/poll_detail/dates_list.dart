@@ -2,6 +2,7 @@ import 'package:dima_app/screens/poll_detail/dates_view_calendar.dart';
 import 'package:dima_app/screens/poll_detail/dates_view_grid.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
+import 'package:dima_app/themes/layout_constants.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -29,8 +30,6 @@ class DatesList extends StatefulWidget {
 
 class _DatesListState extends State<DatesList>
     with AutomaticKeepAliveClientMixin {
-  bool _calendarView = true;
-
   @override
   bool get wantKeepAlive => true;
 
@@ -38,122 +37,108 @@ class _DatesListState extends State<DatesList>
   bool chronoAsc = true;
   bool votesDesc = true;
 
+  bool Function(VoteDateCollection voteDate) filter =
+      (VoteDateCollection voteDate) => true;
+
   @override
   void initState() {
     super.initState();
-    votesDates = widget.votesDates;
-    votesDates.sort((a, b) => "${a.date} ${a.start}-${a.end}"
-        .compareTo("${b.date} ${b.start}-${b.end}"));
+    votesDates = List.from(widget.votesDates);
     votesDates.sort(
         (a, b) => b.getPositiveVotes().length - a.getPositiveVotes().length);
+    votesDates.sort((a, b) => "${a.date} ${a.start}-${a.end}"
+        .compareTo("${b.date} ${b.start}-${b.end}"));
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Column(
+    return Stack(
       children: [
         Container(
           alignment: Alignment.topRight,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  IconButton(
-                    color: _calendarView ? null : Theme.of(context).focusColor,
-                    onPressed: () {
-                      setState(() {
-                        _calendarView = true;
-                      });
-                    },
-                    icon: const Icon(
-                      Icons.calendar_month,
-                    ),
-                  ),
-                  IconButton(
-                    color: !_calendarView ? null : Theme.of(context).focusColor,
-                    onPressed: () {
-                      setState(() {
-                        _calendarView = false;
-                      });
-                    },
-                    icon: const Icon(
-                      Icons.view_column_rounded,
-                    ),
-                  ),
-                ],
-              ),
-              if (!_calendarView)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          chronoAsc = !chronoAsc;
-                          chronoAsc
-                              ? votesDates.sort((a, b) =>
-                                  "${a.date} ${a.start}-${a.end}".compareTo(
-                                      "${b.date} ${b.start}-${b.end}"))
-                              : votesDates.sort((a, b) =>
-                                  "${b.date} ${b.start}-${b.end}".compareTo(
-                                      "${a.date} ${a.start}-${a.end}"));
-                        });
-                      },
-                      icon: const Icon(
-                        Icons.access_time_outlined,
-                      ),
-                    ),
-                    IconButton(
-                      color:
-                          !_calendarView ? null : Theme.of(context).focusColor,
-                      onPressed: () {
-                        setState(() {
-                          votesDesc = !votesDesc;
-                          votesDesc
-                              ? votesDates.sort((a, b) =>
-                                  b.getPositiveVotes().length -
-                                  a.getPositiveVotes().length)
-                              : votesDates.sort((a, b) =>
-                                  a.getPositiveVotes().length -
-                                  b.getPositiveVotes().length);
-                        });
-                      },
-                      icon: Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.rotationX(votesDesc ? 0 : math.pi),
-                        child: const Icon(
-                          Icons.sort,
-                        ),
-                      ),
-                    ),
-                  ],
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    chronoAsc = !chronoAsc;
+                    chronoAsc
+                        ? votesDates.sort((a, b) =>
+                            "${a.date} ${a.start}-${a.end}"
+                                .compareTo("${b.date} ${b.start}-${b.end}"))
+                        : votesDates.sort((a, b) =>
+                            "${b.date} ${b.start}-${b.end}"
+                                .compareTo("${a.date} ${a.start}-${a.end}"));
+                  });
+                },
+                icon: const Icon(
+                  Icons.access_time_outlined,
                 ),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    votesDesc = !votesDesc;
+                    votesDesc
+                        ? votesDates.sort((a, b) =>
+                            b.getPositiveVotes().length -
+                            a.getPositiveVotes().length)
+                        : votesDates.sort((a, b) =>
+                            a.getPositiveVotes().length -
+                            b.getPositiveVotes().length);
+                  });
+                },
+                icon: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationX(votesDesc ? 0 : math.pi),
+                  child: const Icon(
+                    Icons.sort,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
-        Expanded(
-          child: ListView(
+        Container(
+          margin: const EdgeInsets.only(top: 50),
+          child: Column(
             children: [
-              _calendarView
-                  ? DatesViewCalendar(
+              Expanded(
+                child: ListView(
+                  children: [
+                    DatesViewGrid(
                       organizerUid: widget.organizerUid,
                       pollId: widget.pollId,
                       deadline: widget.deadline,
                       dates: widget.dates,
                       invites: widget.invites,
-                      votesDates: votesDates,
-                    )
-                  : DatesViewGrid(
-                      organizerUid: widget.organizerUid,
-                      pollId: widget.pollId,
-                      deadline: widget.deadline,
-                      dates: widget.dates,
-                      invites: widget.invites,
-                      votesDates: widget.votesDates,
+                      votesDates: votesDates.where(filter).toList(),
                     ),
+                    DatesViewCalendar(
+                        organizerUid: widget.organizerUid,
+                        pollId: widget.pollId,
+                        deadline: widget.deadline,
+                        dates: widget.dates,
+                        invites: widget.invites,
+                        votesDates: widget.votesDates,
+                        filterDates: (selectedDateString) {
+                          setState(() {
+                            if (selectedDateString == "all") {
+                              filter = (VoteDateCollection voteDate) {
+                                return true;
+                              };
+                            } else {
+                              filter = (VoteDateCollection voteDate) {
+                                return voteDate.date == selectedDateString;
+                              };
+                            }
+                          });
+                        }),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

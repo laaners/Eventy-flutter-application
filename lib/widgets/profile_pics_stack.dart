@@ -62,8 +62,7 @@ class _ProfilePicsStackState extends State<ProfilePicsStack> {
         List<UserCollection> users = snapshot.data!;
         return SizedBox(
           height: widget.radius * 2,
-          width: (widget.radius * 2 - widget.offset) * widget.uids.length +
-              widget.offset,
+          width: (widget.radius * 2 - widget.offset) * 3 + widget.offset,
           child: Stack(
             children: [
               ...users.mapIndexed((index, user) {
@@ -76,6 +75,20 @@ class _ProfilePicsStackState extends State<ProfilePicsStack> {
                   ),
                 );
               }).toList(),
+              if (users.isEmpty)
+                Positioned(
+                  left: 0,
+                  child: ProfilePic(
+                    userData: Provider.of<FirebaseUser>(context).userData,
+                    loading: false,
+                    radius: widget.radius,
+                  ),
+                ),
+              for (var index = users.length; index < 2; index++)
+                Positioned(
+                  left: (widget.radius * 2 - widget.offset) * index,
+                  child: Container(width: widget.radius * 2),
+                )
             ],
           ),
         );

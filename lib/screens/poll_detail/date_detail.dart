@@ -1,36 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/poll_detail/my_poll.dart';
+import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
 import 'package:dima_app/server/tables/availability.dart';
-import 'package:dima_app/server/tables/location.dart';
-import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
-import 'package:dima_app/server/tables/vote_location_collection.dart';
+import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
-import 'package:dima_app/widgets/gmaps.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class LocationDetail extends StatelessWidget {
+class DateDetail extends StatelessWidget {
   final String pollId;
   final String organizerUid;
   final List<PollEventInviteCollection> invites;
-  final Location location;
+  final VoteDateCollection voteDate;
   final ValueChanged<int> modifyVote;
-  const LocationDetail({
+  const DateDetail({
     super.key,
     required this.pollId,
     required this.organizerUid,
     required this.invites,
-    required this.location,
     required this.modifyVote,
+    required this.voteDate,
   });
 
-  List<MyPollOption> getOptions(VoteLocationCollection? locationCollection) {
+  List<MyPollOption> getOptions(VoteDateCollection? voteDateCollection) {
     return [
       MyPollOption(
         id: Availability.yes,
@@ -40,9 +38,9 @@ class LocationDetail extends StatelessWidget {
             const Text(" Present", style: TextStyle(fontSize: 20)),
           ],
         ),
-        votes: locationCollection != null
+        votes: voteDateCollection != null
             ? 1 +
-                (locationCollection
+                (voteDateCollection
                     .getVotesKind(
                       Availability.yes,
                       invites,
@@ -59,8 +57,8 @@ class LocationDetail extends StatelessWidget {
             const Text(" If need be", style: TextStyle(fontSize: 20)),
           ],
         ),
-        votes: locationCollection != null
-            ? locationCollection
+        votes: voteDateCollection != null
+            ? voteDateCollection
                 .getVotesKind(
                   Availability.iff,
                   invites,
@@ -77,8 +75,8 @@ class LocationDetail extends StatelessWidget {
             const Text(" Not present", style: TextStyle(fontSize: 20)),
           ],
         ),
-        votes: locationCollection != null
-            ? locationCollection
+        votes: voteDateCollection != null
+            ? voteDateCollection
                 .getVotesKind(
                   Availability.not,
                   invites,
@@ -95,8 +93,8 @@ class LocationDetail extends StatelessWidget {
             const Text(" Pending", style: TextStyle(fontSize: 20)),
           ],
         ),
-        votes: locationCollection != null
-            ? locationCollection
+        votes: voteDateCollection != null
+            ? voteDateCollection
                 .getVotesKind(
                   Availability.empty,
                   invites,
@@ -110,45 +108,39 @@ class LocationDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DateTime dateTime =
+        DateFormatter.string2DateTime("${voteDate.date} 00:00:00");
     return Column(
       children: [
         Container(
           margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
           alignment: Alignment.topLeft,
           child: Text(
-            location.name,
+            DateFormat("MMMM dd yyyy").format(dateTime),
             style: Theme.of(context).textTheme.headlineMedium,
-          ),
-        ),
-        Center(
-          child: Container(
-            padding: const EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50 + 5),
-            ),
-            child: IconButton(
-              iconSize: 100.0,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              onPressed: () {},
-              icon: Icon(
-                LocationIcons.icons[location.icon],
-              ),
-            ),
           ),
         ),
         Container(
           margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
           alignment: Alignment.topLeft,
           child: Text(
-            "Votes",
+            DateFormat("EEEE").format(dateTime),
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
+          alignment: Alignment.topLeft,
+          child: Text(
+            "From ${voteDate.start} to ${voteDate.end}",
             style: Theme.of(context).textTheme.headlineSmall,
           ),
         ),
         const Padding(padding: EdgeInsets.only(top: 8)),
         StreamBuilder(
           stream: Provider.of<FirebaseVote>(context, listen: false)
-              .getVoteLocationSnapshot(context, pollId, location.name),
+              .getVoteDateSnapshot(
+                  context, pollId, voteDate.date, voteDate.start, voteDate.end),
           builder: (
             BuildContext context,
             AsyncSnapshot<DocumentSnapshot<Object?>> snapshot,
@@ -170,16 +162,16 @@ class LocationDetail extends StatelessWidget {
               });
               return Container();
             }
-            VoteLocationCollection? locationCollection;
+            VoteDateCollection? voteDateCollection;
             var curUid =
                 Provider.of<FirebaseUser>(context, listen: false).user!.uid;
             int userVotedOptionId = Availability.empty;
             if (snapshot.data!.exists) {
-              locationCollection = VoteLocationCollection.fromMap(
+              voteDateCollection = VoteDateCollection.fromMap(
                 (snapshot.data!.data()) as Map<String, dynamic>,
               );
               userVotedOptionId =
-                  locationCollection.votes[curUid] ?? Availability.empty;
+                  voteDateCollection.votes[curUid] ?? Availability.empty;
             }
             userVotedOptionId =
                 organizerUid == curUid ? Availability.yes : userVotedOptionId;
@@ -197,10 +189,12 @@ class LocationDetail extends StatelessWidget {
                 onVoted: (MyPollOption pollOption, int newTotalVotes) async {
                   int newAvailability = pollOption.id!;
                   await Provider.of<FirebaseVote>(context, listen: false)
-                      .userVoteLocation(
+                      .userVoteDate(
                     context,
                     pollId,
-                    location.name,
+                    voteDate.date,
+                    voteDate.start,
+                    voteDate.end,
                     curUid,
                     newAvailability,
                   );
@@ -214,7 +208,7 @@ class LocationDetail extends StatelessWidget {
                   Icons.check,
                 ),
                 pollTitle: Container(),
-                pollOptions: getOptions(locationCollection),
+                pollOptions: getOptions(voteDateCollection),
                 metaWidget: Row(
                   children: const [
                     Text(
@@ -236,70 +230,6 @@ class LocationDetail extends StatelessWidget {
           },
         ),
         const Padding(padding: EdgeInsets.only(top: 8)),
-        location.name == "Virtual meeting"
-            ? ListTile(
-                title: Container(
-                  padding: const EdgeInsets.only(top: 8, bottom: 8),
-                  child: Text(
-                    "Virtual room link",
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                ),
-                subtitle: TextFormField(
-                  initialValue: location.site.isEmpty
-                      ? "The organizer did not provide any link"
-                      : location.site,
-                  autofocus: false,
-                  decoration: InputDecoration(
-                    hintText: "Paste the link here",
-                    isDense: true,
-                    suffixIcon: IconButton(
-                      iconSize: 25,
-                      onPressed: () async {
-                        await Clipboard.setData(
-                          ClipboardData(text: location.site),
-                        );
-                      },
-                      icon: const Icon(Icons.copy),
-                    ),
-                    border: InputBorder.none,
-                  ),
-                ),
-              )
-            : Column(
-                children: [
-                  const Padding(padding: EdgeInsets.only(top: 0)),
-                  ListTile(
-                    title: const Text(
-                      "Address",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                    horizontalTitleGap: 0,
-                    trailing: IconButton(
-                      iconSize: 25,
-                      onPressed: () async {
-                        await Clipboard.setData(
-                          ClipboardData(text: location.site),
-                        );
-                      },
-                      icon: const Icon(Icons.copy),
-                    ),
-                    subtitle: TextFormField(
-                      initialValue: location.site,
-                      autofocus: false,
-                      enabled: false,
-                    ),
-                  ),
-                  GmapFromCoor(
-                    lat: location.lat,
-                    lon: location.lon,
-                    address: location.site,
-                  ),
-                ],
-              ),
       ],
     );
   }

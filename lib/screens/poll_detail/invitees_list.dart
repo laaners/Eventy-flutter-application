@@ -95,54 +95,42 @@ class _InviteesListState extends State<InviteesList> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.invites.isNotEmpty
-        ? FutureBuilder(
-            future: _future,
-            builder: (
+    return FutureBuilder(
+      future: _future,
+      builder: (
+        context,
+        snapshot,
+      ) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const LoadingSpinner();
+        }
+        if (snapshot.hasError) {
+          Future.microtask(() {
+            Navigator.of(context).pop();
+            Navigator.push(
               context,
-              snapshot,
-            ) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const LoadingSpinner();
-              }
-              if (snapshot.hasError) {
-                Future.microtask(() {
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    ScreenTransition(
-                      builder: (context) => ErrorScreen(
-                        errorMsg: snapshot.error.toString(),
-                      ),
-                    ),
-                  );
-                });
-                return Container();
-              }
-              if (!snapshot.hasData) {
-                return Container();
-              }
-              List<UserCollection> usersData = snapshot.data!;
-              return InviteesListIntermediate(
-                pollEventId: widget.pollEventId,
-                pollData: widget.pollData,
-                users: users,
-                updateInvitees: updateInvitees,
-                usersDataInitial: usersData,
-              );
-            },
-          )
-        : const Scaffold(
-            appBar: MyAppBar(
-              title: "Partecipants",
-              upRightActions: [],
-            ),
-            body: ResponsiveWrapper(
-              child: Center(
-                child: Text("No other partecipants"),
+              ScreenTransition(
+                builder: (context) => ErrorScreen(
+                  errorMsg: snapshot.error.toString(),
+                ),
               ),
-            ),
-          );
+            );
+          });
+          return Container();
+        }
+        if (!snapshot.hasData) {
+          return Container();
+        }
+        List<UserCollection> usersData = snapshot.data!;
+        return InviteesListIntermediate(
+          pollEventId: widget.pollEventId,
+          pollData: widget.pollData,
+          users: users,
+          updateInvitees: updateInvitees,
+          usersDataInitial: usersData,
+        );
+      },
+    );
   }
 }
 

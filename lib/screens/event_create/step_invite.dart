@@ -64,16 +64,7 @@ class _StepInviteState extends State<StepInvite>
           bottom: MediaQuery.of(context).viewInsets.bottom, top: 8, left: 15),
       child: Column(
         children: [
-          Container(
-            alignment: Alignment.topLeft,
-            child: const Text(
-              "Invite people to vote",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              ),
-            ),
-          ),
+          Container(padding: const EdgeInsets.only(bottom: 8, top: 8)),
           PillBox(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

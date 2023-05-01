@@ -4,17 +4,17 @@ class EventCollection {
   final String eventName;
   final String organizerUid;
   final String eventDesc;
-  final String deadline;
   final bool public;
-  final Map<String, dynamic> dates;
+  final bool canInvite;
+  final Map<String, dynamic> date;
   final Map<String, dynamic> location;
   EventCollection({
     required this.eventName,
     required this.organizerUid,
     required this.eventDesc,
-    required this.deadline,
     required this.public,
-    required this.dates,
+    required this.canInvite,
+    required this.date,
     required this.location,
   });
 
@@ -26,16 +26,17 @@ class EventCollection {
     String? eventDesc,
     String? deadline,
     bool? public,
-    Map<String, dynamic>? dates,
+    bool? canInvite,
+    Map<String, dynamic>? date,
     Map<String, dynamic>? location,
   }) {
     return EventCollection(
       eventName: eventName ?? this.eventName,
       organizerUid: organizerUid ?? this.organizerUid,
       eventDesc: eventDesc ?? this.eventDesc,
-      deadline: deadline ?? this.deadline,
       public: public ?? this.public,
-      dates: dates ?? this.dates,
+      canInvite: canInvite ?? this.canInvite,
+      date: date ?? this.date,
       location: location ?? this.location,
     );
   }
@@ -45,9 +46,9 @@ class EventCollection {
       'eventName': eventName,
       'organizerUid': organizerUid,
       'eventDesc': eventDesc,
-      'deadline': deadline,
       'public': public,
-      'dates': dates,
+      'canInvite': canInvite,
+      'date': date,
       'location': location,
     };
   }
@@ -57,9 +58,9 @@ class EventCollection {
       eventName: map['eventName'] as String,
       organizerUid: map['organizerUid'] as String,
       eventDesc: map['eventDesc'] as String,
-      deadline: map['deadline'] as String,
       public: map['public'] as bool,
-      dates: Map<String, dynamic>.from(map['dates'] as Map<String, dynamic>),
+      canInvite: map['canInvite'] as bool,
+      date: Map<String, dynamic>.from(map['date'] as Map<String, dynamic>),
       location:
           Map<String, dynamic>.from(map['location'] as Map<String, dynamic>),
     );
@@ -67,7 +68,7 @@ class EventCollection {
 
   @override
   String toString() {
-    return 'EventCollection(eventName: $eventName, organizerUid: $organizerUid, eventDesc: $eventDesc, deadline: $deadline, public: $public, dates: $dates, location: $location)';
+    return 'EventCollection(eventName: $eventName, organizerUid: $organizerUid, eventDesc: $eventDesc, public: $public, canInvite: $canInvite, date: $date, location: $location)';
   }
 
   @override
@@ -77,9 +78,9 @@ class EventCollection {
     return other.eventName == eventName &&
         other.organizerUid == organizerUid &&
         other.eventDesc == eventDesc &&
-        other.deadline == deadline &&
         other.public == public &&
-        mapEquals(other.dates, dates) &&
+        other.canInvite == canInvite &&
+        mapEquals(other.date, date) &&
         mapEquals(other.location, location);
   }
 
@@ -88,9 +89,9 @@ class EventCollection {
     return eventName.hashCode ^
         organizerUid.hashCode ^
         eventDesc.hashCode ^
-        deadline.hashCode ^
         public.hashCode ^
-        dates.hashCode ^
+        canInvite.hashCode ^
+        date.hashCode ^
         location.hashCode;
   }
 }

@@ -31,16 +31,17 @@ class InviteesPill extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Row(
               children: [
-                ProfilePicsStack(
-                  radius: 40,
-                  offset: 30,
-                  uids: invites
-                      .map((e) => e.inviteeId)
-                      .where((e) => e != pollData.organizerUid)
-                      .toList()
-                      .sublist(
-                          0, invites.length < 4 ? invites.length - 1 : 4 - 1),
-                ),
+                if (invites.isNotEmpty)
+                  ProfilePicsStack(
+                    radius: 40,
+                    offset: 30,
+                    uids: invites
+                        .map((e) => e.inviteeId)
+                        .where((e) => e != pollData.organizerUid)
+                        .toList()
+                        .sublist(
+                            0, invites.length < 4 ? invites.length - 1 : 4 - 1),
+                  ),
                 Container(padding: const EdgeInsets.all(8)),
                 TextButton(
                   onPressed: () {
@@ -60,8 +61,8 @@ class InviteesPill extends StatelessWidget {
                     );
                   },
                   child: Text(
-                    "${(invites.length - 1).toString()} invited",
-                    style: Theme.of(context).textTheme.displaySmall,
+                    "${invites.isEmpty ? "0" : (invites.length - 1).toString()} invited",
+                    style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ),
               ],
