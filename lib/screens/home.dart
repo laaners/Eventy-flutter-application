@@ -1,21 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+
 import 'package:dima_app/firebase_cruds_testing.dart';
 import 'package:dima_app/screens/error.dart';
-import 'package:dima_app/screens/event_create/step_invite.dart';
-import 'package:dima_app/screens/login.dart';
 import 'package:dima_app/server/firebase_crud.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_user.dart';
+import 'package:dima_app/server/messaging.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
-import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
-import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dima_app/widgets/my_app_bar.dart';
@@ -46,38 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
       body: ResponsiveWrapper(
         child: Column(
           children: [
-            ListTile(
-              title: Container(
-                padding: const EdgeInsets.only(top: 8, bottom: 8),
-                child: Text(
-                  "Virtual room link (optional)",
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-              ),
-              subtitle: TextFormField(
-                autofocus: false,
-                controller: _locationAddrController,
-                onChanged: (text) {
-                  print(_locationAddrController.text.isEmpty);
-                },
-                decoration: InputDecoration(
-                  hintText: "Paste the link here",
-                  isDense: true,
-                  suffixIcon: IconButton(
-                    iconSize: 25,
-                    onPressed: () async {
-                      setState(() {
-                        _locationAddrController.text = "";
-                      });
-                    },
-                    icon: Icon(_locationAddrController.text.isEmpty
-                        ? Icons.link
-                        : Icons.cancel),
-                  ),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
             Text(
               _locationAddrController.text + "ok",
               style: Theme.of(context).textTheme.headlineSmall,
@@ -87,6 +54,34 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ListView(
                 controller: _scroll,
                 children: [
+                  MyButton(
+                    text: "Subscribe to topic",
+                    onPressed: () {
+                      FirebaseMessaging.instance.subscribeToTopic("finance");
+                      print("subscribed");
+                    },
+                  ),
+                  MyButton(
+                    text: "Unsubscribe from topic",
+                    onPressed: () {
+                      FirebaseMessaging.instance
+                          .unsubscribeFromTopic("finance");
+                      print("unsubscribed");
+                    },
+                  ),
+                  MyButton(
+                      text: "send a notification",
+                      onPressed: () async {
+                        String topic =
+                            Provider.of<FirebaseUser>(context, listen: false)
+                                .user!
+                                .uid;
+                        Messaging.sendNotification(
+                          topic: topic,
+                          title: "title",
+                          body: "body",
+                        );
+                      }),
                   MyButton(
                       text: "delete a poll",
                       onPressed: () async {

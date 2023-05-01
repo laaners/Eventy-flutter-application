@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/poll_detail/my_poll.dart';
+import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
 import 'package:dima_app/server/tables/availability.dart';
@@ -9,6 +10,7 @@ import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class DateDetail extends StatelessWidget {
@@ -106,13 +108,15 @@ class DateDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DateTime dateTime =
+        DateFormatter.string2DateTime("${voteDate.date} 00:00:00");
     return Column(
       children: [
         Container(
           margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
           alignment: Alignment.topLeft,
           child: Text(
-            voteDate.date,
+            DateFormat("MMMM dd yyyy").format(dateTime),
             style: Theme.of(context).textTheme.headlineMedium,
           ),
         ),
@@ -120,7 +124,15 @@ class DateDetail extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
           alignment: Alignment.topLeft,
           child: Text(
-            "Votes",
+            DateFormat("EEEE").format(dateTime),
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
+          alignment: Alignment.topLeft,
+          child: Text(
+            "From ${voteDate.start} to ${voteDate.end}",
             style: Theme.of(context).textTheme.headlineSmall,
           ),
         ),

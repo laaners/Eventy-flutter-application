@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/screens/error.dart';
+import 'package:dima_app/screens/event_create/index.dart';
+import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/poll_detail/dates_list.dart';
 import 'package:dima_app/screens/poll_detail/invitees_pill.dart';
 import 'package:dima_app/screens/poll_detail/locations_list.dart';
@@ -15,11 +17,12 @@ import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
+import 'package:dima_app/themes/layout_constants.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/delay_widget.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
-import 'package:dima_app/widgets/my_app_bar.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:dima_app/widgets/user_list.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -138,7 +141,6 @@ class _PollDetailScreenState extends State<PollDetailScreen>
     });
   }
 
-  // Here it is!
   Size textSize(String text, TextStyle style) {
     final TextPainter textPainter = TextPainter(
         text: TextSpan(text: text, style: style),
@@ -289,49 +291,112 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                         ),
                       ),
                       Container(
-                          padding: const EdgeInsets.symmetric(vertical: 5)),
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                      ),
+                      Text(
+                        "Last day to vote",
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                      ),
+                      Flexible(
+                        child: Text(
+                          DateFormat("MMMM dd yyyy, EEEE 'at' hh:mm").format(
+                            DateFormatter.string2DateTime(pollData.deadline),
+                          ),
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                stickyHeight: 310 + descPadding + titlePadding,
+                stickyHeight: 350 + descPadding + titlePadding,
                 labels: const ["Locations", "Dates"],
                 appBarTitle: pollData.pollName,
-                upRightActions:
-                    pollData.organizerUid != curUid && !pollData.canInvite
-                        ? []
-                        : [
-                            TextButton(
-                              onPressed: () async {
-                                LoadingOverlay.show(context);
-                                String url =
-                                    "https://eventy.page.link?pollId=${pollData.pollName}_${pollData.organizerUid}";
-                                final dynamicLinkParams = DynamicLinkParameters(
-                                  link: Uri.parse(url),
-                                  uriPrefix: "https://eventy.page.link",
-                                  androidParameters: const AndroidParameters(
-                                    packageName: "com.example.dima_app",
+                upRightActions: pollData.organizerUid != curUid &&
+                        !pollData.canInvite
+                    ? []
+                    : [
+                        if (pollData.organizerUid == curUid)
+                          Container(
+                            margin: const EdgeInsets.only(
+                              right: LayoutConstants.kHorizontalPadding,
+                            ),
+                            child: InkWell(
+                              customBorder: const CircleBorder(),
+                              child: Ink(
+                                decoration:
+                                    const BoxDecoration(shape: BoxShape.circle),
+                                child: const Icon(
+                                  Icons.event_available,
+                                ),
+                              ),
+                              onTap: () async {
+                                // should create event
+                                /*
+                                MyModal.show(
+                                  context: context,
+                                  child: Column(
+                                    children: [],
                                   ),
-                                  iosParameters: const IOSParameters(
-                                    bundleId: "com.example.dima_app",
+                                  heightFactor: 0.85,
+                                  doneCancelMode: false,
+                                  onDone: () {},
+                                  title: "",
+                                );
+                                */
+                                Navigator.of(context, rootNavigator: false)
+                                    .pushReplacement(
+                                  ScreenTransition(
+                                    builder: (context) => const HomeScreen(),
                                   ),
                                 );
-                                final dynamicLongLink =
-                                    await FirebaseDynamicLinks.instance
-                                        .buildLink(dynamicLinkParams);
-                                final ShortDynamicLink dynamicShortLink =
-                                    await FirebaseDynamicLinks.instance
-                                        .buildShortLink(dynamicLinkParams);
-                                Uri finalUrl = dynamicShortLink.shortUrl;
-                                print(finalUrl);
-                                print(dynamicLongLink);
-                                await Share.share(finalUrl.toString());
-                                LoadingOverlay.hide(context);
                               },
+                            ),
+                          ),
+                        Container(
+                          margin: const EdgeInsets.only(
+                            right: LayoutConstants.kHorizontalPadding,
+                          ),
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            child: Ink(
+                              decoration:
+                                  const BoxDecoration(shape: BoxShape.circle),
                               child: const Icon(
                                 Icons.share_outlined,
                               ),
-                            )
-                          ],
+                            ),
+                            onTap: () async {
+                              LoadingOverlay.show(context);
+                              String url =
+                                  "https://eventy.page.link?pollId=${pollData.pollName}_${pollData.organizerUid}";
+                              final dynamicLinkParams = DynamicLinkParameters(
+                                link: Uri.parse(url),
+                                uriPrefix: "https://eventy.page.link",
+                                androidParameters: const AndroidParameters(
+                                  packageName: "com.example.dima_app",
+                                ),
+                                iosParameters: const IOSParameters(
+                                  bundleId: "com.example.dima_app",
+                                ),
+                              );
+                              final dynamicLongLink = await FirebaseDynamicLinks
+                                  .instance
+                                  .buildLink(dynamicLinkParams);
+                              final ShortDynamicLink dynamicShortLink =
+                                  await FirebaseDynamicLinks.instance
+                                      .buildShortLink(dynamicLinkParams);
+                              Uri finalUrl = dynamicShortLink.shortUrl;
+                              print(finalUrl);
+                              print(dynamicLongLink);
+                              await Share.share(finalUrl.toString());
+                              LoadingOverlay.hide(context);
+                            },
+                          ),
+                        ),
+                      ],
                 tabbars: [
                   LocationsList(
                     organizerUid: pollData.organizerUid,

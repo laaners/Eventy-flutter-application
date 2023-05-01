@@ -51,6 +51,7 @@ class EventsScreen extends StatelessWidget {
                   ),
                 );
                 if (result != null) {
+                  // ignore: use_build_context_synchronously
                   Navigator.of(context, rootNavigator: false).push(
                     ScreenTransition(
                       builder: (context) => PollDetailScreen(

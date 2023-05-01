@@ -58,3 +58,4 @@ deleteall.js
 
 node_modules
 serviceAccountKey.json
+messaging_server

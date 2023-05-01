@@ -26,7 +26,7 @@ class ResponsiveWrapper extends StatelessWidget {
         child: isAuthenticated &&
                 hasUserData &&
                 MediaQuery.of(context).orientation == Orientation.landscape &&
-                false
+                true
             ? Stack(
                 children: [
                   Container(

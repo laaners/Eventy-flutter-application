@@ -7,6 +7,7 @@ import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
 import 'package:dima_app/server/tables/availability.dart';
+import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
@@ -200,10 +201,13 @@ class FirebasePoll extends ChangeNotifier {
           e["lon"] = e["lon"].toDouble();
           return e as Map<String, dynamic>;
         }).toList();
+        tmp["deadline"] =
+            DateFormatter.dateTime2String(tmp["deadline"].toDate());
+        tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
+        tmp["dates"] =
+            PollCollection.datesToLocal(tmp["dates"] as Map<String, dynamic>);
 
         PollCollection pollData = PollCollection.fromMap(tmp);
-
-        print(pollData);
 
         // get most voted options
         List<VoteLocationCollection> votesLocations =
@@ -256,54 +260,59 @@ class FirebasePoll extends ChangeNotifier {
             .cast();
 
         List<VoteDateCollection> votesDates = await Future.wait(promises);
-        List<VoteDateCollection> localDates = [];
-        for (var voteDate in votesDates) {
-          var startDateString = "${voteDate.date} ${voteDate.start}:00";
-          var endDateString = "${voteDate.date} ${voteDate.end}:00";
-          var startDateLocal = DateFormatter.string2DateTime(
-              DateFormatter.toLocalString(startDateString));
-          var endDateLocal = DateFormatter.string2DateTime(
-              DateFormatter.toLocalString(endDateString));
-          String localDay = DateFormat("yyyy-MM-dd").format(startDateLocal);
-          var startLocal = DateFormat("HH:mm").format(startDateLocal);
-          var endLocal = DateFormat("HH:mm").format(endDateLocal);
-          localDates.add(VoteDateCollection(
-            pollId: pollId,
-            date: localDay,
-            start: startLocal,
-            end: endLocal,
-            votes: voteDate.votes,
-          ));
-        }
-        votesDates = localDates;
+
+        List<PollEventInviteCollection> invites =
+            await Provider.of<FirebasePollEventInvite>(context, listen: false)
+                .getInvitesFromPollEventId(context, pollId);
 
         var obj = {
-          "data": pollData,
           "locations": votesLocations,
           "dates": votesDates,
+          "data": pollData,
         };
-        print(obj);
-        return;
 
-        // utc string
-        tmp["deadline"] =
-            DateFormatter.dateTime2String(tmp["deadline"].toDate());
-        tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
+        votesLocations.sort((a, b) =>
+            b.getPositiveVotes().length - a.getPositiveVotes().length);
+        VoteLocationCollection eventVoteLocation = votesLocations.first;
+        Map<String, dynamic> eventLocation = pollData.locations.firstWhere(
+            (element) => element["name"] == eventVoteLocation.locationName);
+        eventLocation["invites"] = invites.map((invite) {
+          return {
+            "inviteeId": invite.inviteeId,
+            "vote": eventVoteLocation.votes[invite.inviteeId] ?? -1,
+          };
+        }).toList();
+
+        votesDates.sort((a, b) =>
+            b.getPositiveVotes().length - a.getPositiveVotes().length);
+        VoteDateCollection eventVoteDate = votesDates.first;
+        Map<String, String> utcInfo = VoteDateCollection.dateToUtc(
+          eventVoteDate.date,
+          eventVoteDate.start,
+          eventVoteDate.end,
+        );
+        Map<String, dynamic> eventDate = {
+          "date": utcInfo["date"],
+          "start": utcInfo["start"],
+          "end": utcInfo["end"],
+          "invites": invites.map((invite) {
+            return {
+              "inviteeId": invite.inviteeId,
+              "vote": eventVoteDate.votes[invite.inviteeId] ?? -1,
+            };
+          }).toList(),
+        };
 
         // delete invites
-        await Provider.of<FirebasePollEventInvite>(context, listen: false)
-            .getInvitesFromPollEventId(context, pollId)
-            .then((value) async {
-          await Future.wait(value
-              .map((invite) =>
-                  Provider.of<FirebasePollEventInvite>(context, listen: false)
-                      .deletePollEventInvite(
-                    context: context,
-                    pollEventId: pollId,
-                    inviteeId: invite.inviteeId,
-                  ))
-              .toList());
-        });
+        await Future.wait(invites
+            .map((invite) =>
+                Provider.of<FirebasePollEventInvite>(context, listen: false)
+                    .deletePollEventInvite(
+                  context: context,
+                  pollEventId: pollId,
+                  inviteeId: invite.inviteeId,
+                ))
+            .toList());
 
         // delete location votes
         await Future.wait(pollData.locations
@@ -316,7 +325,7 @@ class FirebasePoll extends ChangeNotifier {
             .toList());
 
         // delete dates votes
-        promises = pollData.dates.keys
+        List<Future<void>> promisesVotesDates = pollData.dates.keys
             .map((date) {
               return pollData.dates[date].map((slot) {
                 return Provider.of<FirebaseVote>(context, listen: false)
@@ -333,7 +342,7 @@ class FirebasePoll extends ChangeNotifier {
             .expand((x) => x)
             .toList()
             .cast();
-        await Future.wait(promises);
+        await Future.wait(promisesVotesDates);
 
         // delete poll
         await FirebaseCrud.deleteDoc(pollCollection, pollId);
@@ -344,8 +353,8 @@ class FirebasePoll extends ChangeNotifier {
           eventName: pollData.pollName,
           organizerUid: pollData.organizerUid,
           eventDesc: pollData.pollDesc,
-          date: {},
-          location: {},
+          date: eventDate,
+          location: eventLocation,
           public: pollData.public,
           canInvite: pollData.canInvite,
         );
