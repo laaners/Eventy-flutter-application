@@ -27,7 +27,6 @@ e.g., Theme.of(context).textTheme.headlineLarge
 - Username in Profile view      --> textTheme.displaySmall
 - Name/Surname in Profile view  --> textTheme.headlineSmall
 - Screen titles, e.g. "Log In"  --> textTheme.headlineLarge
-- Step labels e.g., "Basics"    --> textTheme.labelLarge
 */
 
 // This theme was made for FlexColorScheme version 6.1.1. Make sure
