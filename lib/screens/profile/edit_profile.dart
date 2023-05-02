@@ -1,4 +1,5 @@
 import 'package:dima_app/screens/profile/change_image.dart';
+import 'package:dima_app/themes/layout_constants.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
@@ -59,7 +60,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: Form(
           key: _formkey,
           child: ListView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(
+                horizontal: LayoutConstants.kHorizontalPadding),
             children: [
               const SizedBox(
                 height: 10,
