@@ -22,11 +22,11 @@ class LayoutConstants {
   /// Button width used for text buttons
   static const double kButtonWidth = 110.0;
 
-  static const double kIconSize = 20.0;
-  static const double kIconSizeSmall = 15.0;
-  static const double kIconSizeLarge = 30.0;
+  // static const double kIconSize = 20.0;
+  // static const double kIconSizeSmall = 15.0;
+  // static const double kIconSizeLarge = 30.0;
 
-  static const double kAvatarSize = 50.0;
-  static const double kAvatarSizeSmall = 40.0;
-  static const double kAvatarSizeLarge = 60.0;
+  // static const double kAvatarSize = 50.0;
+  // static const double kAvatarSizeSmall = 40.0;
+  // static const double kAvatarSizeLarge = 60.0;
 }
