@@ -1,5 +1,7 @@
+import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 
 import 'availability.dart';
 
@@ -17,6 +19,32 @@ class VoteDateCollection {
     required this.votes,
   });
   static const collectionName = "vote_date";
+
+  static Map<String, String> dateToUtc(date, start, end) {
+    var startDateString = "$date $start:00";
+    var endDateString = "$date $end:00";
+    var startDateUtc = DateFormatter.string2DateTime(
+        DateFormatter.toUtcString(startDateString));
+    var endDateUtc =
+        DateFormatter.string2DateTime(DateFormatter.toUtcString(endDateString));
+    String utcDay = DateFormat("yyyy-MM-dd").format(startDateUtc);
+    var startUtc = DateFormat("HH:mm").format(startDateUtc);
+    var endUtc = DateFormat("HH:mm").format(endDateUtc);
+    return {"date": utcDay, "start": startUtc, "end": endUtc};
+  }
+
+  static Map<String, String> dateToLocal(date, start, end) {
+    var startDateString = "$date $start:00";
+    var endDateString = "$date $end:00";
+    var startDateLocal = DateFormatter.string2DateTime(
+        DateFormatter.toLocalString(startDateString));
+    var endDateLocal = DateFormatter.string2DateTime(
+        DateFormatter.toLocalString(endDateString));
+    String localDay = DateFormat("yyyy-MM-dd").format(startDateLocal);
+    var startLocal = DateFormat("HH:mm").format(startDateLocal);
+    var endLocal = DateFormat("HH:mm").format(endDateLocal);
+    return {"date": localDay, "start": startLocal, "end": endLocal};
+  }
 
   Map<String, dynamic> getVotesKind(
     int kind,

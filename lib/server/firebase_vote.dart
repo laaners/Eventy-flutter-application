@@ -33,17 +33,6 @@ class FirebaseVote extends ChangeNotifier {
     return null;
   }
 
-  Stream<QuerySnapshot<Object?>>? getVotesLocationsSnapshots(String pollId) {
-    try {
-      return voteLocationCollection
-          .where('pollId', isEqualTo: pollId)
-          .snapshots();
-    } on FirebaseException catch (e) {
-      print(e.message!);
-    }
-    return null;
-  }
-
   Future<VoteLocationCollection?> getVotesLocation(
     BuildContext context,
     String pollId,
@@ -124,21 +113,15 @@ class FirebaseVote extends ChangeNotifier {
     String end,
   ) {
     try {
-      var voteId = "${pollId}_${date}_${start}_$end";
+      Map<String, String> utcInfo =
+          VoteDateCollection.dateToUtc(date, start, end);
+      var voteId =
+          "${pollId}_${utcInfo["date"]}_${utcInfo["start"]}_${utcInfo["end"]}";
       var document = FirebaseCrud.readSnapshot(
         voteDateCollection,
         voteId,
       );
       return document;
-    } on FirebaseException catch (e) {
-      print(e.message!);
-    }
-    return null;
-  }
-
-  Stream<QuerySnapshot<Object?>>? getVotesDatesSnapshots(String pollId) {
-    try {
-      return voteDateCollection.where('pollId', isEqualTo: pollId).snapshots();
     } on FirebaseException catch (e) {
       print(e.message!);
     }
@@ -153,7 +136,10 @@ class FirebaseVote extends ChangeNotifier {
     String end,
   ) async {
     try {
-      var voteId = "${pollId}_${date}_${start}_$end";
+      Map<String, String> utcInfo =
+          VoteDateCollection.dateToUtc(date, start, end);
+      var voteId =
+          "${pollId}_${utcInfo["date"]}_${utcInfo["start"]}_${utcInfo["end"]}";
       var document = await FirebaseCrud.readDoc(
         voteDateCollection,
         voteId,
@@ -162,6 +148,10 @@ class FirebaseVote extends ChangeNotifier {
         return null;
       }
       var tmp = document.data() as Map<String, dynamic>;
+      // back to local
+      tmp["date"] = date;
+      tmp["start"] = start;
+      tmp["end"] = end;
       var voteDate = VoteDateCollection.fromMap(tmp);
       return voteDate;
       /*
@@ -200,7 +190,10 @@ class FirebaseVote extends ChangeNotifier {
     int availability,
   ) async {
     try {
-      var voteId = "${pollId}_${date}_${start}_$end";
+      Map<String, String> utcInfo =
+          VoteDateCollection.dateToUtc(date, start, end);
+      var voteId =
+          "${pollId}_${utcInfo["date"]}_${utcInfo["start"]}_${utcInfo["end"]}";
       var document = await FirebaseCrud.readDoc(
         voteDateCollection,
         voteId,
@@ -231,7 +224,10 @@ class FirebaseVote extends ChangeNotifier {
     required String end,
   }) async {
     try {
-      var voteId = "${pollId}_${date}_${start}_$end";
+      Map<String, String> utcInfo =
+          VoteDateCollection.dateToUtc(date, start, end);
+      var voteId =
+          "${pollId}_${utcInfo["date"]}_${utcInfo["start"]}_${utcInfo["end"]}";
       var document = await FirebaseCrud.readDoc(
         voteDateCollection,
         voteId,

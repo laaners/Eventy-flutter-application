@@ -125,7 +125,7 @@ class MyModal extends StatelessWidget {
                   physics: const ClampingScrollPhysics(),
                   children: [
                     Container(
-                      margin: EdgeInsets.only(top: 15),
+                      margin: const EdgeInsets.only(top: 15),
                       child: child,
                     ),
                   ],

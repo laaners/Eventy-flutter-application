@@ -48,14 +48,6 @@ class _StepBasicsState extends State<StepBasics> {
     return Column(
       children: [
         Container(
-          margin: const EdgeInsets.only(bottom: 0, top: 8, left: 15),
-          alignment: Alignment.topLeft,
-          child: Text(
-            "Select the locations",
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-        ),
-        Container(
           margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
           alignment: Alignment.topLeft,
           child: Text(

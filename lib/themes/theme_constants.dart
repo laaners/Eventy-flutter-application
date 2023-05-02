@@ -27,6 +27,13 @@ e.g., Theme.of(context).textTheme.headlineLarge
 - Username in Profile view      --> textTheme.displaySmall
 - Name/Surname in Profile view  --> textTheme.headlineSmall
 - Screen titles, e.g. "Log In"  --> textTheme.headlineLarge
+- Modal:
+    Title    --> textTheme.headlineMedium
+    Subtitle --> textTheme.headlineSmall
+- Create event/poll, stepper:
+    Step labels e.g., "Basics"                  --> textTheme.labelLarge
+    Step title e.g. "Select the locations"      --> textTheme.headlineMedium
+    Step subtitle e.g. "Description (optional)" --> textTheme.headlineSmall
 */
 
 // This theme was made for FlexColorScheme version 6.1.1. Make sure

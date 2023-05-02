@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/screens/error.dart';
+import 'package:dima_app/screens/event_create/index.dart';
+import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/poll_detail/dates_list.dart';
 import 'package:dima_app/screens/poll_detail/invitees_pill.dart';
 import 'package:dima_app/screens/poll_detail/locations_list.dart';
@@ -15,14 +17,17 @@ import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
+import 'package:dima_app/themes/layout_constants.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
+import 'package:dima_app/widgets/delay_widget.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
-import 'package:dima_app/widgets/my_app_bar.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:dima_app/widgets/user_list.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -107,27 +112,6 @@ class _PollDetailScreenState extends State<PollDetailScreen>
           .cast();
 
       List<VoteDateCollection> votesDates = await Future.wait(promises);
-      List<VoteDateCollection> localDates = [];
-      for (var voteDate in votesDates) {
-        var startDateString = "${voteDate.date} ${voteDate.start}:00";
-        var endDateString = "${voteDate.date} ${voteDate.end}:00";
-        var startDateLocal = DateFormatter.string2DateTime(
-            DateFormatter.toLocalString(startDateString));
-        var endDateLocal = DateFormatter.string2DateTime(
-            DateFormatter.toLocalString(endDateString));
-        String localDay = DateFormat("yyyy-MM-dd").format(startDateLocal);
-        var startLocal = DateFormat("HH:mm").format(startDateLocal);
-        var endLocal = DateFormat("HH:mm").format(endDateLocal);
-        localDates.add(VoteDateCollection(
-          pollId: widget.pollId,
-          date: localDay,
-          start: startLocal,
-          end: endLocal,
-          votes: voteDate.votes,
-        ));
-      }
-      votesDates = localDates;
-
       return {
         "data": pollData,
         "invites": pollInvites,
@@ -155,6 +139,15 @@ class _PollDetailScreenState extends State<PollDetailScreen>
       _future = getPollDataAndInvites(context);
       _refresh = !_refresh;
     });
+  }
+
+  Size textSize(String text, TextStyle style) {
+    final TextPainter textPainter = TextPainter(
+        text: TextSpan(text: text, style: style),
+        maxLines: 1,
+        textDirection: ui.TextDirection.ltr)
+      ..layout(minWidth: 0, maxWidth: double.infinity);
+    return textPainter.size;
   }
 
   @override
@@ -236,8 +229,25 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                 Provider.of<FirebaseUser>(context, listen: false).user!.uid;
 
             String aboutEventText = pollData.pollDesc.isEmpty
-                ? "The organizer did not provide any description The organizer did not provide any description The organizer did not provide any description"
+                ? "The organizer did not provide any description"
                 : pollData.pollDesc;
+
+            double lines =
+                textSize(aboutEventText, Theme.of(context).textTheme.bodyLarge!)
+                        .width /
+                    MediaQuery.of(context).size.width;
+            lines *= 2;
+            lines += 1;
+            double descPadding =
+                lines * Theme.of(context).textTheme.bodyLarge!.fontSize!;
+
+            lines = textSize(pollData.pollName,
+                        Theme.of(context).textTheme.headlineMedium!)
+                    .width /
+                MediaQuery.of(context).size.width;
+            lines += 1;
+            double titlePadding =
+                lines * Theme.of(context).textTheme.headlineMedium!.fontSize!;
 
             return TabbarSwitcher(
                 listSticky: Container(
@@ -272,56 +282,121 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       Container(
-                          padding: const EdgeInsets.symmetric(vertical: 5)),
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                      ),
                       Flexible(
                         child: Text(
                           aboutEventText,
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ),
                       Container(
-                          padding: const EdgeInsets.symmetric(vertical: 5)),
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                      ),
+                      Text(
+                        "Last day to vote",
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                      ),
+                      Flexible(
+                        child: Text(
+                          DateFormat("MMMM dd yyyy, EEEE 'at' hh:mm").format(
+                            DateFormatter.string2DateTime(pollData.deadline),
+                          ),
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                stickyHeight: 310 + aboutEventText.length.toDouble() / 2,
+                stickyHeight: 350 + descPadding + titlePadding,
                 labels: const ["Locations", "Dates"],
                 appBarTitle: pollData.pollName,
-                upRightActions:
-                    pollData.organizerUid != curUid && !pollData.canInvite
-                        ? []
-                        : [
-                            TextButton(
-                              onPressed: () async {
-                                LoadingOverlay.show(context);
-                                String url =
-                                    "https://eventy.page.link?pollId=${pollData.pollName}_${pollData.organizerUid}";
-                                final dynamicLinkParams = DynamicLinkParameters(
-                                  link: Uri.parse(url),
-                                  uriPrefix: "https://eventy.page.link",
-                                  androidParameters: const AndroidParameters(
-                                    packageName: "com.example.dima_app",
+                upRightActions: pollData.organizerUid != curUid &&
+                        !pollData.canInvite
+                    ? []
+                    : [
+                        if (pollData.organizerUid == curUid)
+                          Container(
+                            margin: const EdgeInsets.only(
+                              right: LayoutConstants.kHorizontalPadding,
+                            ),
+                            child: InkWell(
+                              customBorder: const CircleBorder(),
+                              child: Ink(
+                                decoration:
+                                    const BoxDecoration(shape: BoxShape.circle),
+                                child: const Icon(
+                                  Icons.event_available,
+                                ),
+                              ),
+                              onTap: () async {
+                                // should create event
+                                /*
+                                MyModal.show(
+                                  context: context,
+                                  child: Column(
+                                    children: [],
                                   ),
-                                  iosParameters: const IOSParameters(
-                                    bundleId: "com.example.dima_app",
+                                  heightFactor: 0.85,
+                                  doneCancelMode: false,
+                                  onDone: () {},
+                                  title: "",
+                                );
+                                */
+                                Navigator.of(context, rootNavigator: false)
+                                    .pushReplacement(
+                                  ScreenTransition(
+                                    builder: (context) => const HomeScreen(),
                                   ),
                                 );
-                                final dynamicLongLink =
-                                    await FirebaseDynamicLinks.instance
-                                        .buildLink(dynamicLinkParams);
-                                final ShortDynamicLink dynamicShortLink =
-                                    await FirebaseDynamicLinks.instance
-                                        .buildShortLink(dynamicLinkParams);
-                                Uri finalUrl = dynamicShortLink.shortUrl;
-                                print(finalUrl);
-                                print(dynamicLongLink);
-                                await Share.share(finalUrl.toString());
-                                LoadingOverlay.hide(context);
                               },
+                            ),
+                          ),
+                        Container(
+                          margin: const EdgeInsets.only(
+                            right: LayoutConstants.kHorizontalPadding,
+                          ),
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            child: Ink(
+                              decoration:
+                                  const BoxDecoration(shape: BoxShape.circle),
                               child: const Icon(
                                 Icons.share_outlined,
                               ),
-                            )
-                          ],
+                            ),
+                            onTap: () async {
+                              LoadingOverlay.show(context);
+                              String url =
+                                  "https://eventy.page.link?pollId=${pollData.pollName}_${pollData.organizerUid}";
+                              final dynamicLinkParams = DynamicLinkParameters(
+                                link: Uri.parse(url),
+                                uriPrefix: "https://eventy.page.link",
+                                androidParameters: const AndroidParameters(
+                                  packageName: "com.example.dima_app",
+                                ),
+                                iosParameters: const IOSParameters(
+                                  bundleId: "com.example.dima_app",
+                                ),
+                              );
+                              final dynamicLongLink = await FirebaseDynamicLinks
+                                  .instance
+                                  .buildLink(dynamicLinkParams);
+                              final ShortDynamicLink dynamicShortLink =
+                                  await FirebaseDynamicLinks.instance
+                                      .buildShortLink(dynamicLinkParams);
+                              Uri finalUrl = dynamicShortLink.shortUrl;
+                              print(finalUrl);
+                              print(dynamicLongLink);
+                              await Share.share(finalUrl.toString());
+                              LoadingOverlay.hide(context);
+                            },
+                          ),
+                        ),
+                      ],
                 tabbars: [
                   LocationsList(
                     organizerUid: pollData.organizerUid,
@@ -330,13 +405,15 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                     invites: pollInvites,
                     votesLocations: votesLocations,
                   ),
-                  DatesList(
-                    organizerUid: pollData.organizerUid,
-                    pollId: widget.pollId,
-                    deadline: pollData.deadline,
-                    dates: pollData.dates,
-                    invites: pollInvites,
-                    votesDates: votesDates,
+                  DelayWidget(
+                    child: DatesList(
+                      organizerUid: pollData.organizerUid,
+                      pollId: widget.pollId,
+                      deadline: pollData.deadline,
+                      dates: pollData.dates,
+                      invites: pollInvites,
+                      votesDates: votesDates,
+                    ),
                   ),
                 ]);
           },
