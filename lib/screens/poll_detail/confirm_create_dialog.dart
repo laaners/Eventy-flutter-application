@@ -3,14 +3,14 @@ import 'package:provider/provider.dart';
 
 import '../../server/firebase_user.dart';
 
-class DeleteDialog extends StatefulWidget {
-  const DeleteDialog({super.key});
+class ConfirmCreateDialog extends StatefulWidget {
+  const ConfirmCreateDialog({super.key});
 
   @override
-  State<DeleteDialog> createState() => _DeleteDialogState();
+  State<ConfirmCreateDialog> createState() => _ConfirmCreateDialogState();
 }
 
-class _DeleteDialogState extends State<DeleteDialog> {
+class _ConfirmCreateDialogState extends State<ConfirmCreateDialog> {
   final _passwordController = TextEditingController();
   bool _passwordVisible = false;
 
@@ -29,10 +29,8 @@ class _DeleteDialogState extends State<DeleteDialog> {
         mainAxisAlignment: MainAxisAlignment.start,
         // ignore: prefer_const_literals_to_create_immutables
         children: [
-          Text(
-            'This action cannot be undone. This will permanently delete your account.',
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
+          const Text(
+              'This action cannot be undone. This will permanently delete your account.'),
           const SizedBox(
             height: 15.0,
           ),

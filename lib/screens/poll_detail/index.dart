@@ -1,9 +1,7 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/screens/error.dart';
-import 'package:dima_app/screens/event_create/index.dart';
-import 'package:dima_app/screens/home.dart';
+import 'package:dima_app/screens/event_detail/event_detail_create.dart';
+import 'package:dima_app/screens/poll_detail/creator_options.dart';
 import 'package:dima_app/screens/poll_detail/dates_list.dart';
 import 'package:dima_app/screens/poll_detail/invitees_pill.dart';
 import 'package:dima_app/screens/poll_detail/locations_list.dart';
@@ -81,6 +79,17 @@ class _PollDetailScreenState extends State<PollDetailScreen>
           }
         });
       }).toList());
+
+      /*
+      List<Stream<DocumentSnapshot<Object?>>?> votesLocationsStreams =
+          pollData.locations.map((location) {
+        Stream<DocumentSnapshot<Object?>>? snapshot =
+            Provider.of<FirebaseVote>(context, listen: false)
+                .getVoteLocationSnapshot(context, widget.pollId, "name");
+        return snapshot;
+      }).toList();
+      print(votesLocationsStreams);
+      */
 
       List<Future<VoteDateCollection>> promises = pollData.dates.keys
           .map((date) {
@@ -166,8 +175,7 @@ class _PollDetailScreenState extends State<PollDetailScreen>
         }
         if (snapshot.hasError) {
           Future.microtask(() {
-            Navigator.of(context).pop();
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               ScreenTransition(
                 builder: (context) => ErrorScreen(
@@ -203,8 +211,7 @@ class _PollDetailScreenState extends State<PollDetailScreen>
             }
             if (snapshot.hasError || !snapshot.hasData) {
               Future.microtask(() {
-                Navigator.of(context).pop();
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   ScreenTransition(
                     builder: (context) => ErrorScreen(
@@ -250,111 +257,95 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                 lines * Theme.of(context).textTheme.headlineMedium!.fontSize!;
 
             return TabbarSwitcher(
-                listSticky: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        pollData.pollName,
-                        style: Theme.of(context).textTheme.headlineMedium,
+              listSticky: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      pollData.pollName,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                    ),
+                    Center(
+                      child: InviteesPill(
+                        pollData: pollData,
+                        pollEventId: widget.pollId,
+                        invites: pollInvites,
+                        votesLocations: votesLocations,
+                        votesDates: votesDates,
+                        refreshPollDetail: refreshPollDetail,
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
+                    ),
+                    Container(padding: const EdgeInsets.symmetric(vertical: 5)),
+                    Text(
+                      "Organized by",
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    UserTile(userUid: pollData.organizerUid),
+                    Text(
+                      "About this event",
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                    ),
+                    Flexible(
+                      child: Text(
+                        aboutEventText,
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                      Center(
-                        child: InviteesPill(
-                          pollData: pollData,
-                          pollEventId: widget.pollId,
-                          invites: pollInvites,
-                          refreshPollDetail: refreshPollDetail,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                    ),
+                    Text(
+                      "Last day to vote",
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                    ),
+                    Flexible(
+                      child: Text(
+                        DateFormat("MMMM dd yyyy, EEEE 'at' hh:mm").format(
+                          DateFormatter.string2DateTime(pollData.deadline),
                         ),
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                      Container(
-                          padding: const EdgeInsets.symmetric(vertical: 5)),
-                      Text(
-                        "Organized by",
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      UserTile(userUid: pollData.organizerUid),
-                      Text(
-                        "About this event",
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                      ),
-                      Flexible(
-                        child: Text(
-                          aboutEventText,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                      ),
-                      Text(
-                        "Last day to vote",
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                      ),
-                      Flexible(
-                        child: Text(
-                          DateFormat("MMMM dd yyyy, EEEE 'at' hh:mm").format(
-                            DateFormatter.string2DateTime(pollData.deadline),
-                          ),
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                stickyHeight: 350 + descPadding + titlePadding,
-                labels: const ["Locations", "Dates"],
-                appBarTitle: pollData.pollName,
-                upRightActions: pollData.organizerUid != curUid &&
-                        !pollData.canInvite
-                    ? []
-                    : [
-                        if (pollData.organizerUid == curUid)
-                          Container(
-                            margin: const EdgeInsets.only(
-                              right: LayoutConstants.kHorizontalPadding,
-                            ),
-                            child: InkWell(
-                              customBorder: const CircleBorder(),
-                              child: Ink(
-                                decoration:
-                                    const BoxDecoration(shape: BoxShape.circle),
-                                child: const Icon(
-                                  Icons.event_available,
-                                ),
-                              ),
-                              onTap: () async {
-                                // should create event
-                                /*
-                                MyModal.show(
-                                  context: context,
-                                  child: Column(
-                                    children: [],
-                                  ),
-                                  heightFactor: 0.85,
-                                  doneCancelMode: false,
-                                  onDone: () {},
-                                  title: "",
-                                );
-                                */
-                                Navigator.of(context, rootNavigator: false)
-                                    .pushReplacement(
-                                  ScreenTransition(
-                                    builder: (context) => const HomeScreen(),
-                                  ),
-                                );
-                              },
+              ),
+              stickyHeight: 350 + descPadding + titlePadding,
+              labels: const ["Locations", "Dates"],
+              appBarTitle: pollData.pollName,
+              upRightActions: pollData.organizerUid != curUid &&
+                      !pollData.canInvite
+                  ? [
+                      Container(
+                        margin: const EdgeInsets.only(
+                          right: LayoutConstants.kHorizontalPadding,
+                        ),
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          child: Ink(
+                            decoration:
+                                const BoxDecoration(shape: BoxShape.circle),
+                            child: const Icon(
+                              Icons.refresh,
                             ),
                           ),
+                          onTap: () async {
+                            refreshPollDetail();
+                          },
+                        ),
+                      ),
+                    ]
+                  : [
+                      if (pollData.organizerUid == curUid)
                         Container(
                           margin: const EdgeInsets.only(
                             right: LayoutConstants.kHorizontalPadding,
@@ -365,57 +356,124 @@ class _PollDetailScreenState extends State<PollDetailScreen>
                               decoration:
                                   const BoxDecoration(shape: BoxShape.circle),
                               child: const Icon(
-                                Icons.share_outlined,
+                                Icons.more_horiz,
                               ),
                             ),
                             onTap: () async {
-                              LoadingOverlay.show(context);
-                              String url =
-                                  "https://eventy.page.link?pollId=${pollData.pollName}_${pollData.organizerUid}";
-                              final dynamicLinkParams = DynamicLinkParameters(
-                                link: Uri.parse(url),
-                                uriPrefix: "https://eventy.page.link",
-                                androidParameters: const AndroidParameters(
-                                  packageName: "com.example.dima_app",
+                              var ris = await MyModal.show(
+                                context: context,
+                                child: CreatorOptions(
+                                  pollData: pollData,
+                                  pollEventId: widget.pollId,
+                                  invites: pollInvites,
+                                  refreshPollDetail: refreshPollDetail,
+                                  votesLocations: votesLocations,
+                                  votesDates: votesDates,
                                 ),
-                                iosParameters: const IOSParameters(
-                                  bundleId: "com.example.dima_app",
-                                ),
+                                heightFactor: 0.4,
+                                doneCancelMode: true,
+                                onDone: () {},
+                                title: "",
                               );
-                              final dynamicLongLink = await FirebaseDynamicLinks
-                                  .instance
-                                  .buildLink(dynamicLinkParams);
-                              final ShortDynamicLink dynamicShortLink =
-                                  await FirebaseDynamicLinks.instance
-                                      .buildShortLink(dynamicLinkParams);
-                              Uri finalUrl = dynamicShortLink.shortUrl;
-                              print(finalUrl);
-                              print(dynamicLongLink);
-                              await Share.share(finalUrl.toString());
-                              LoadingOverlay.hide(context);
+                              if (ris == "create_event_$curUid") {
+                                Widget newScreen = EventDetailCreate(
+                                  eventId: widget.pollId,
+                                );
+                                // ignore: use_build_context_synchronously
+                                Navigator.of(context).pushReplacement(
+                                  ScreenTransition(
+                                    builder: (context) => newScreen,
+                                  ),
+                                );
+                              } else if (ris == "delete_poll_$curUid") {
+                                // ignore: use_build_context_synchronously
+                                Navigator.pop(context,
+                                    "delete_poll_${pollData.organizerUid}");
+                              }
                             },
                           ),
                         ),
-                      ],
-                tabbars: [
-                  LocationsList(
+                      Container(
+                        margin: const EdgeInsets.only(
+                          right: LayoutConstants.kHorizontalPadding,
+                        ),
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          child: Ink(
+                            decoration:
+                                const BoxDecoration(shape: BoxShape.circle),
+                            child: const Icon(
+                              Icons.share_outlined,
+                            ),
+                          ),
+                          onTap: () async {
+                            LoadingOverlay.show(context);
+                            String url =
+                                "https://eventy.page.link?pollId=${pollData.pollName}_${pollData.organizerUid}";
+                            final dynamicLinkParams = DynamicLinkParameters(
+                              link: Uri.parse(url),
+                              uriPrefix: "https://eventy.page.link",
+                              androidParameters: const AndroidParameters(
+                                packageName: "com.example.dima_app",
+                              ),
+                              iosParameters: const IOSParameters(
+                                bundleId: "com.example.dima_app",
+                              ),
+                            );
+                            final dynamicLongLink = await FirebaseDynamicLinks
+                                .instance
+                                .buildLink(dynamicLinkParams);
+                            final ShortDynamicLink dynamicShortLink =
+                                await FirebaseDynamicLinks.instance
+                                    .buildShortLink(dynamicLinkParams);
+                            Uri finalUrl = dynamicShortLink.shortUrl;
+                            print(finalUrl);
+                            print(dynamicLongLink);
+                            await Share.share(finalUrl.toString());
+                            LoadingOverlay.hide(context);
+                          },
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(
+                          right: LayoutConstants.kHorizontalPadding,
+                        ),
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          child: Ink(
+                            decoration:
+                                const BoxDecoration(shape: BoxShape.circle),
+                            child: const Icon(
+                              Icons.refresh,
+                            ),
+                          ),
+                          onTap: () async {
+                            refreshPollDetail();
+                          },
+                        ),
+                      ),
+                    ],
+              tabbars: [
+                LocationsList(
+                  votingUid: curUid,
+                  organizerUid: pollData.organizerUid,
+                  pollId: widget.pollId,
+                  locations: pollData.locations,
+                  invites: pollInvites,
+                  votesLocations: votesLocations,
+                ),
+                DelayWidget(
+                  child: DatesList(
                     organizerUid: pollData.organizerUid,
                     pollId: widget.pollId,
-                    locations: pollData.locations,
+                    deadline: pollData.deadline,
+                    dates: pollData.dates,
                     invites: pollInvites,
-                    votesLocations: votesLocations,
+                    votesDates: votesDates,
                   ),
-                  DelayWidget(
-                    child: DatesList(
-                      organizerUid: pollData.organizerUid,
-                      pollId: widget.pollId,
-                      deadline: pollData.deadline,
-                      dates: pollData.dates,
-                      invites: pollInvites,
-                      votesDates: votesDates,
-                    ),
-                  ),
-                ]);
+                ),
+              ],
+            );
           },
         );
       },

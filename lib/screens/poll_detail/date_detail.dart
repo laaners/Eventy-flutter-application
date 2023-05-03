@@ -116,16 +116,8 @@ class DateDetail extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
           alignment: Alignment.topLeft,
           child: Text(
-            DateFormat("MMMM dd yyyy").format(dateTime),
+            DateFormat("MMMM dd yyyy, EEEE").format(dateTime),
             style: Theme.of(context).textTheme.headlineMedium,
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
-          alignment: Alignment.topLeft,
-          child: Text(
-            DateFormat("EEEE").format(dateTime),
-            style: Theme.of(context).textTheme.headlineSmall,
           ),
         ),
         Container(

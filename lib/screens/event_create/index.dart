@@ -6,6 +6,7 @@ import 'package:dima_app/screens/event_create/step_dates.dart';
 import 'package:dima_app/screens/event_create/step_invite.dart';
 import 'package:dima_app/screens/event_create/step_places.dart';
 import 'package:dima_app/server/date_methods.dart';
+import 'package:dima_app/server/firebase_event.dart';
 import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
@@ -219,10 +220,10 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   Future checkAndCreatePoll() async {
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     bool ret = MyAlertDialog.showAlertIfCondition(
-      context,
-      eventTitleController.text.isEmpty,
-      "MISSING EVENT NAME",
-      "You must give a name to the event",
+      context: context,
+      condition: eventTitleController.text.isEmpty,
+      title: "Missing Event Name",
+      content: "You must give a name to the event",
     );
     if (ret) {
       setState(() {
@@ -232,10 +233,10 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
     }
 
     ret = MyAlertDialog.showAlertIfCondition(
-      context,
-      locations.isEmpty,
-      "MISSING EVENT PLACES",
-      "You must choose where to hold the event",
+      context: context,
+      condition: locations.isEmpty,
+      title: "Missing event places",
+      content: "You must choose where to hold the event",
     );
     if (ret) {
       setState(() {
@@ -245,10 +246,10 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
     }
 
     ret = MyAlertDialog.showAlertIfCondition(
-      context,
-      dates.isEmpty,
-      "MISSING EVENT DATES",
-      "You must choose when to hold the event",
+      context: context,
+      condition: dates.isEmpty,
+      title: "Missing event dates",
+      content: "You must choose when to hold the event",
     );
     if (ret) {
       setState(() {
@@ -266,6 +267,27 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
         "icon": location.icon,
       };
     }).toList();
+
+    // get event will return NOT NULL if the event ALREADY EXISTS
+    var dbEvent =
+        await Provider.of<FirebaseEvent>(context, listen: false).getEventData(
+      context: context,
+      id: "${eventTitleController.text}_$curUid",
+    );
+    ret = MyAlertDialog.showAlertIfCondition(
+      context: context,
+      condition: dbEvent != null,
+      title: "Duplicate Event",
+      content: "An event with this name already exists",
+    );
+    if (ret) {
+      LoadingOverlay.hide(context);
+      setState(() {
+        _activeStepIndex = 0;
+      });
+      return;
+    }
+
     LoadingOverlay.show(context);
     var dbPoll =
         await Provider.of<FirebasePoll>(context, listen: false).createPoll(
@@ -279,11 +301,13 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
       public: visibility,
       canInvite: canInvite,
     );
+
+    // poll create will return NULL if the poll ALREADY EXISTS
     ret = MyAlertDialog.showAlertIfCondition(
-      context,
-      dbPoll == null,
-      "DUPLICATE POLL",
-      "A poll with this name already exists",
+      context: context,
+      condition: dbPoll == null,
+      title: "Duplicate Poll",
+      content: "A poll with this name already exists",
     );
     if (ret) {
       LoadingOverlay.hide(context);

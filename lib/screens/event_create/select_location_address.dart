@@ -107,50 +107,62 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
                 setState(() {
                   loadingLocations = true;
                 });
-                var test = await http.get(
-                  Uri.parse(
-                      'https://nominatim.openstreetmap.org/search/$text?format=json&addressdetails=1&limit=10'),
-                );
-                var res = jsonDecode(test.body);
-                if (res.length > 0) {
-                  setState(() {
-                    showMap = false;
-                    locationSuggestions = List<Map<String, dynamic>>.from(
-                      res.map((obj) {
-                        String city = nullableProperty(obj["address"], "city");
-                        String state =
-                            nullableProperty(obj["address"], "state");
-                        String country =
-                            nullableProperty(obj["address"], "country");
-                        String subtitle = "$city, $state $country";
-                        subtitle = subtitle.substring(0, 2) == ", "
-                            ? subtitle.substring(2)
-                            : subtitle;
+                try {
+                  var test = await http.get(
+                    Uri.parse(
+                        'https://nominatim.openstreetmap.org/search/$text?format=json&addressdetails=1&limit=10'),
+                  );
+                  var res = jsonDecode(test.body);
+                  if (res.length > 0) {
+                    setState(() {
+                      showMap = false;
+                      locationSuggestions = List<Map<String, dynamic>>.from(
+                        res.map((obj) {
+                          String city =
+                              nullableProperty(obj["address"], "city");
+                          String state =
+                              nullableProperty(obj["address"], "state");
+                          String country =
+                              nullableProperty(obj["address"], "country");
+                          String subtitle = "$city, $state $country";
+                          subtitle = subtitle.substring(0, 2) == ", "
+                              ? subtitle.substring(2)
+                              : subtitle;
 
-                        String houseNumber =
-                            nullableProperty(obj["address"], "house_number");
-                        houseNumber = houseNumber == "" ? "" : ", $houseNumber";
-                        String title = nullableProperty(obj["address"], "road");
-                        title = title == ""
-                            ? obj["display_name"]
-                            : "$title$houseNumber";
-                        var newObj = {
-                          "title": title,
-                          "subtitle": subtitle,
-                          "lat": double.parse(obj["lat"]),
-                          "lon": double.parse(obj["lon"]),
-                        };
-                        return newObj;
-                      }),
-                    );
-                    loadingLocations = false;
-                  });
-                } else {
+                          String houseNumber =
+                              nullableProperty(obj["address"], "house_number");
+                          houseNumber =
+                              houseNumber == "" ? "" : ", $houseNumber";
+                          String title =
+                              nullableProperty(obj["address"], "road");
+                          title = title == ""
+                              ? obj["display_name"]
+                              : "$title$houseNumber";
+                          var newObj = {
+                            "title": title,
+                            "subtitle": subtitle,
+                            "lat": double.parse(obj["lat"]),
+                            "lon": double.parse(obj["lon"]),
+                          };
+                          return newObj;
+                        }),
+                      );
+                      loadingLocations = false;
+                    });
+                  } else {
+                    setState(() {
+                      showMap = false;
+                      locationSuggestions = [];
+                      loadingLocations = false;
+                      widget.setCoor([0, 0]);
+                    });
+                  }
+                } on Exception catch (e) {
+                  print("Nominatim error");
                   setState(() {
                     showMap = false;
                     locationSuggestions = [];
                     loadingLocations = false;
-                    widget.setCoor([0, 0]);
                   });
                 }
               });

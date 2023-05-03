@@ -2,7 +2,6 @@ import 'package:dima_app/screens/poll_detail/dates_view_calendar.dart';
 import 'package:dima_app/screens/poll_detail/dates_view_grid.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
-import 'package:dima_app/themes/layout_constants.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 

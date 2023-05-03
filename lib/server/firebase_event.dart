@@ -14,7 +14,7 @@ class FirebaseEvent extends ChangeNotifier {
   CollectionReference get eventCollection =>
       _firestore.collection(EventCollection.collectionName);
 
-  Future<EventCollection> createEvent({
+  Future<EventCollection?> createEvent({
     required BuildContext context,
     required String eventName,
     required String organizerUid,
@@ -37,8 +37,7 @@ class FirebaseEvent extends ChangeNotifier {
       String eventId = "${eventName}_$organizerUid";
       var eventExistence = await FirebaseCrud.readDoc(eventCollection, eventId);
       if (eventExistence!.exists) {
-        // ignore: use_build_context_synchronously
-        showSnackBar(context, "A Event with this name already exists");
+        return null;
       }
       await eventCollection.doc(eventId).set(event.toMap());
     } on FirebaseAuthException catch (e) {
@@ -48,13 +47,16 @@ class FirebaseEvent extends ChangeNotifier {
     return event;
   }
 
-  Future<EventCollection?> getEventData(
-    BuildContext context,
-    String id,
-  ) async {
+  Future<EventCollection?> getEventData({
+    required BuildContext context,
+    required String id,
+  }) async {
     try {
       var eventDataDoc = await FirebaseCrud.readDoc(eventCollection, id);
-      var tmp = eventDataDoc?.data() as Map<String, dynamic>;
+      if (!eventDataDoc!.exists) {
+        return null;
+      }
+      var tmp = eventDataDoc.data() as Map<String, dynamic>;
       var eventDetails = EventCollection.fromMap(tmp);
       return eventDetails;
     } on FirebaseException catch (e) {

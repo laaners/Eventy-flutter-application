@@ -1,12 +1,15 @@
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/event_create/step_invite.dart';
+import 'package:dima_app/screens/poll_detail/locations_list.dart';
 import 'package:dima_app/screens/profile/index.dart';
-import 'package:dima_app/screens/profile/view_profile.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
+import 'package:dima_app/server/tables/vote_date_collection.dart';
+import 'package:dima_app/server/tables/vote_location_collection.dart';
+import 'package:dima_app/themes/layout_constants.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
@@ -17,19 +20,23 @@ import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dima_app/widgets/tabbar_switcher.dart' as tabbar_switcher;
+import 'package:dima_app/widgets/tabbar_switcher.dart';
 
 class InviteesList extends StatefulWidget {
-  final String pollEventId;
   final PollCollection pollData;
+  final String pollEventId;
   final List<PollEventInviteCollection> invites;
   final VoidCallback refreshPollDetail;
+  final List<VoteLocationCollection> votesLocations;
+  final List<VoteDateCollection> votesDates;
   const InviteesList({
     super.key,
     required this.invites,
     required this.pollEventId,
     required this.refreshPollDetail,
     required this.pollData,
+    required this.votesLocations,
+    required this.votesDates,
   });
 
   @override
@@ -48,9 +55,14 @@ class _InviteesListState extends State<InviteesList> {
     // this list will be passed to step_invite, must filter out from the list
     // the organizer (and the current user itself ? uid != curUid &&)
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    _future = Provider.of<FirebaseUser>(context, listen: false)
-        .getUsersDataFromList(context,
-            users.where((uid) => uid != widget.pollData.organizerUid).toList());
+    _future =
+        Provider.of<FirebaseUser>(context, listen: false).getUsersDataFromList(
+            context,
+            users
+                .where(
+                  (uid) => uid != widget.pollData.organizerUid && uid != curUid,
+                )
+                .toList());
   }
 
   Future updateInvitees(List<String> newInvitees) async {
@@ -128,6 +140,10 @@ class _InviteesListState extends State<InviteesList> {
           users: users,
           updateInvitees: updateInvitees,
           usersDataInitial: usersData,
+          refreshPollDetail: widget.refreshPollDetail,
+          votesLocations: widget.votesLocations,
+          votesDates: widget.votesDates,
+          invites: widget.invites,
         );
       },
     );
@@ -137,9 +153,13 @@ class _InviteesListState extends State<InviteesList> {
 class InviteesListIntermediate extends StatefulWidget {
   final String pollEventId;
   final PollCollection pollData;
+  final List<PollEventInviteCollection> invites;
   final List<String> users;
   final ValueChanged<List<String>> updateInvitees;
   final List<UserCollection> usersDataInitial;
+  final VoidCallback refreshPollDetail;
+  final List<VoteLocationCollection> votesLocations;
+  final List<VoteDateCollection> votesDates;
   const InviteesListIntermediate({
     super.key,
     required this.pollEventId,
@@ -147,6 +167,10 @@ class InviteesListIntermediate extends StatefulWidget {
     required this.updateInvitees,
     required this.usersDataInitial,
     required this.pollData,
+    required this.refreshPollDetail,
+    required this.votesLocations,
+    required this.votesDates,
+    required this.invites,
   });
 
   @override
@@ -181,7 +205,7 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
   Widget build(BuildContext context) {
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     return widget.pollData.organizerUid == curUid || widget.pollData.canInvite
-        ? tabbar_switcher.TabbarSwitcher(
+        ? TabbarSwitcher(
             appBarTitle: widget.pollData.pollName,
             upRightActions: widget.pollData.organizerUid == curUid ||
                     widget.pollData.canInvite
@@ -205,7 +229,13 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
                   ? ListView(
                       children: usersData
                           .map((user) => InviteeTile(
+                                pollData: widget.pollData,
                                 userData: user,
+                                refreshPollDetail: widget.refreshPollDetail,
+                                votesLocations: widget.votesLocations,
+                                votesDates: widget.votesDates,
+                                invites: widget.invites,
+                                pollEventId: widget.pollEventId,
                               ))
                           .toList(),
                     )
@@ -241,7 +271,13 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
                   ? ListView(
                       children: usersData
                           .map((user) => InviteeTile(
+                                pollData: widget.pollData,
                                 userData: user,
+                                refreshPollDetail: widget.refreshPollDetail,
+                                votesLocations: widget.votesLocations,
+                                votesDates: widget.votesDates,
+                                invites: widget.invites,
+                                pollEventId: widget.pollEventId,
                               ))
                           .toList(),
                     )
@@ -253,9 +289,32 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
   }
 }
 
-class InviteeTile extends StatelessWidget {
+class InviteeTile extends StatefulWidget {
+  final PollCollection pollData;
   final UserCollection userData;
-  const InviteeTile({super.key, required this.userData});
+  final VoidCallback refreshPollDetail;
+  final List<VoteLocationCollection> votesLocations;
+  final List<VoteDateCollection> votesDates;
+  final String pollEventId;
+  final List<PollEventInviteCollection> invites;
+  const InviteeTile({
+    super.key,
+    required this.userData,
+    required this.pollData,
+    required this.refreshPollDetail,
+    required this.votesLocations,
+    required this.votesDates,
+    required this.pollEventId,
+    required this.invites,
+  });
+
+  @override
+  State<InviteeTile> createState() => _InviteeTileState();
+}
+
+class _InviteeTileState extends State<InviteeTile> {
+  bool _refresh = false;
+  int _count = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -264,15 +323,16 @@ class InviteeTile extends StatelessWidget {
       child: ListTile(
         leading: ProfilePic(
           loading: false,
-          userData: userData,
+          userData: widget.userData,
           radius: 25,
         ),
-        title: Text("${userData.name} ${userData.surname}"),
-        subtitle: Text(userData.username),
-        onTap: () {
+        title: Text("${widget.userData.name} ${widget.userData.surname}"),
+        subtitle: Text(widget.userData.username),
+        trailing: const Icon(Icons.arrow_forward_ios_rounded),
+        onTap: () async {
           var curUid =
               Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-          if (curUid == userData.uid) {
+          if (curUid == widget.userData.uid) {
             Widget newScreen = const ProfileScreen();
             Navigator.push(
               context,
@@ -281,7 +341,56 @@ class InviteeTile extends StatelessWidget {
               ),
             );
           } else {
-            Widget newScreen = ViewProfileScreen(profileUserData: userData);
+            Widget newScreen = TabbarSwitcher(
+              listSticky: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(_count.toString()),
+                  ],
+                ),
+              ),
+              stickyHeight: 50,
+              labels: const ["Locations", "Dates"],
+              appBarTitle: "${widget.userData.username} votes",
+              upRightActions: [
+                Container(
+                  margin: const EdgeInsets.only(
+                    right: LayoutConstants.kHorizontalPadding,
+                  ),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    child: Ink(
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                      child: const Icon(
+                        Icons.refresh,
+                      ),
+                    ),
+                    onTap: () async {
+                      widget.refreshPollDetail();
+                      setState(() {
+                        print("should refresh");
+                        _refresh = !_refresh;
+                        print(_refresh);
+                        _count += 1;
+                      });
+                    },
+                  ),
+                ),
+              ],
+              tabbars: [
+                LocationsList(
+                  votingUid: widget.userData.uid,
+                  organizerUid: widget.pollData.organizerUid,
+                  pollId: widget.pollEventId,
+                  locations: widget.pollData.locations,
+                  invites: widget.invites,
+                  votesLocations: widget.votesLocations,
+                ),
+                Text("data")
+              ],
+            );
             Navigator.push(
               context,
               ScreenTransition(

@@ -229,6 +229,22 @@ class FirebaseUser extends ChangeNotifier {
     return null;
   }
 
+  Stream<DocumentSnapshot<Object?>>? getUserDataStream(
+    BuildContext context,
+    String uid,
+  ) {
+    try {
+      var document = FirebaseCrud.readSnapshot(
+        userCollection,
+        uid,
+      );
+      return document;
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return null;
+  }
+
   // Return the data of user whose username matches a
   Future<List<UserCollection>> getUsersData(
     BuildContext context,

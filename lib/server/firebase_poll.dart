@@ -265,12 +265,6 @@ class FirebasePoll extends ChangeNotifier {
             await Provider.of<FirebasePollEventInvite>(context, listen: false)
                 .getInvitesFromPollEventId(context, pollId);
 
-        var obj = {
-          "locations": votesLocations,
-          "dates": votesDates,
-          "data": pollData,
-        };
-
         votesLocations.sort((a, b) =>
             b.getPositiveVotes().length - a.getPositiveVotes().length);
         VoteLocationCollection eventVoteLocation = votesLocations.first;
@@ -361,6 +355,166 @@ class FirebasePoll extends ChangeNotifier {
       }
     } on FirebaseException catch (e) {
       print(e.message!);
+    }
+  }
+
+  Future<void> deletePollWithoutCreating({
+    required BuildContext context,
+    required String pollId,
+  }) async {
+    try {
+      var document = await FirebaseCrud.readDoc(pollCollection, pollId);
+      if (document!.exists) {
+        var tmp = document.data() as Map<String, dynamic>;
+        tmp["locations"] = (tmp["locations"] as List).map((e) {
+          e["lat"] = e["lat"].toDouble();
+          e["lon"] = e["lon"].toDouble();
+          return e as Map<String, dynamic>;
+        }).toList();
+        tmp["deadline"] =
+            DateFormatter.dateTime2String(tmp["deadline"].toDate());
+        tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
+        tmp["dates"] =
+            PollCollection.datesToLocal(tmp["dates"] as Map<String, dynamic>);
+
+        PollCollection pollData = PollCollection.fromMap(tmp);
+
+        // get most voted options
+        List<VoteLocationCollection> votesLocations =
+            await Future.wait(pollData.locations.map((location) {
+          return Provider.of<FirebaseVote>(context, listen: false)
+              .getVotesLocation(context, pollId, location["name"])
+              .then((value) {
+            if (value != null) {
+              value.votes[pollData.organizerUid] = Availability.yes;
+              return value;
+            } else {
+              return VoteLocationCollection(
+                locationName: location["name"],
+                pollId: pollId,
+                votes: {
+                  pollData.organizerUid: Availability.yes,
+                },
+              );
+            }
+          });
+        }).toList());
+
+        List<Future<VoteDateCollection>> promises = pollData.dates.keys
+            .map((date) {
+              return pollData.dates[date].map((slot) {
+                return Provider.of<FirebaseVote>(context, listen: false)
+                    .getVotesDate(
+                        context, pollId, date, slot["start"], slot["end"])
+                    .then((value) {
+                  if (value != null) {
+                    value.votes[pollData.organizerUid] = Availability.yes;
+                    return value;
+                  } else {
+                    return VoteDateCollection(
+                      pollId: pollId,
+                      date: date,
+                      start: slot["start"],
+                      end: slot["end"],
+                      votes: {
+                        pollData.organizerUid: Availability.yes,
+                      },
+                    );
+                  }
+                });
+              }).toList();
+            })
+            .toList()
+            .expand((x) => x)
+            .toList()
+            .cast();
+
+        List<VoteDateCollection> votesDates = await Future.wait(promises);
+
+        List<PollEventInviteCollection> invites =
+            await Provider.of<FirebasePollEventInvite>(context, listen: false)
+                .getInvitesFromPollEventId(context, pollId);
+
+        votesLocations.sort((a, b) =>
+            b.getPositiveVotes().length - a.getPositiveVotes().length);
+        VoteLocationCollection eventVoteLocation = votesLocations.first;
+        Map<String, dynamic> eventLocation = pollData.locations.firstWhere(
+            (element) => element["name"] == eventVoteLocation.locationName);
+        eventLocation["invites"] = invites.map((invite) {
+          return {
+            "inviteeId": invite.inviteeId,
+            "vote": eventVoteLocation.votes[invite.inviteeId] ?? -1,
+          };
+        }).toList();
+
+        votesDates.sort((a, b) =>
+            b.getPositiveVotes().length - a.getPositiveVotes().length);
+        VoteDateCollection eventVoteDate = votesDates.first;
+        Map<String, String> utcInfo = VoteDateCollection.dateToUtc(
+          eventVoteDate.date,
+          eventVoteDate.start,
+          eventVoteDate.end,
+        );
+        Map<String, dynamic> eventDate = {
+          "date": utcInfo["date"],
+          "start": utcInfo["start"],
+          "end": utcInfo["end"],
+          "invites": invites.map((invite) {
+            return {
+              "inviteeId": invite.inviteeId,
+              "vote": eventVoteDate.votes[invite.inviteeId] ?? -1,
+            };
+          }).toList(),
+        };
+
+        // delete invites
+        await Future.wait(invites
+            .map((invite) =>
+                Provider.of<FirebasePollEventInvite>(context, listen: false)
+                    .deletePollEventInvite(
+                  context: context,
+                  pollEventId: pollId,
+                  inviteeId: invite.inviteeId,
+                ))
+            .toList());
+
+        // delete location votes
+        await Future.wait(pollData.locations
+            .map((location) => Provider.of<FirebaseVote>(context, listen: false)
+                    .deleteVoteLocation(
+                  context: context,
+                  pollId: pollId,
+                  locationName: location["name"],
+                ))
+            .toList());
+
+        // delete dates votes
+        List<Future<void>> promisesVotesDates = pollData.dates.keys
+            .map((date) {
+              return pollData.dates[date].map((slot) {
+                return Provider.of<FirebaseVote>(context, listen: false)
+                    .deleteVoteDate(
+                  context: context,
+                  pollId: pollId,
+                  date: date,
+                  start: slot["start"],
+                  end: slot["end"],
+                );
+              }).toList();
+            })
+            .toList()
+            .expand((x) => x)
+            .toList()
+            .cast();
+        await Future.wait(promisesVotesDates);
+
+        // delete poll
+        await FirebaseCrud.deleteDoc(pollCollection, pollId);
+        showSnackBar(context, "Successfully deleted poll");
+      }
+    } on FirebaseException catch (e) {
+      print(e.message);
+      showSnackBar(context, "Error in poll deletion");
     }
   }
 }

@@ -104,10 +104,10 @@ class PollTile extends StatelessWidget {
         title: Text(pollData.pollName),
         subtitle: Text(pollData.organizerUid),
         onTap: () async {
+          var curUid =
+              Provider.of<FirebaseUser>(context, listen: false).user!.uid;
           // if not invited and is a public event, add invite
           if (!invited && pollData.public) {
-            var curUid =
-                Provider.of<FirebaseUser>(context, listen: false).user!.uid;
             await Provider.of<FirebasePollEventInvite>(context, listen: false)
                 .createPollEventInvite(
               context: context,
@@ -116,10 +116,21 @@ class PollTile extends StatelessWidget {
             );
             refreshParent();
           }
+
           Widget newScreen = PollDetailScreen(pollId: pollId);
           // ignore: use_build_context_synchronously
-          Navigator.push(
-              context, ScreenTransition(builder: (context) => newScreen));
+          var ris = await Navigator.of(context, rootNavigator: false).push(
+            ScreenTransition(
+              builder: (context) => newScreen,
+            ),
+          );
+          if (ris == "delete_poll_$curUid") {
+            // ignore: use_build_context_synchronously
+            await Provider.of<FirebasePoll>(context, listen: false).deletePoll(
+              context: context,
+              pollId: pollId,
+            );
+          }
         },
       ),
     );

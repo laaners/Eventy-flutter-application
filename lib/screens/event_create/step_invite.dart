@@ -61,7 +61,11 @@ class _StepInviteState extends State<StepInvite>
     super.build(context);
     return Container(
       margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom, top: 8, left: 15),
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        top: 5,
+        right: 15,
+        left: 15,
+      ),
       child: Column(
         children: [
           Container(padding: const EdgeInsets.only(bottom: 8, top: 8)),
@@ -70,13 +74,11 @@ class _StepInviteState extends State<StepInvite>
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   "Invite all your followers",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 5)),
                 SizedBox(
                   width: 50 * 1.4,
                   height: 40 * 1.4,
@@ -154,10 +156,12 @@ class _StepInviteState extends State<StepInvite>
                                     }
                                     // ignore: use_build_context_synchronously
                                     MyAlertDialog.showAlertIfCondition(
-                                      context,
-                                      removedFollowers == 0 && !value,
-                                      "OPERATION NOT ALLOWED",
-                                      "Only the organizer can remove old partecipants",
+                                      context: context,
+                                      condition:
+                                          removedFollowers == 0 && !value,
+                                      title: "Operation not allowed",
+                                      content:
+                                          "Only the organizer can remove old partecipants",
                                     );
                                   },
                           );
@@ -364,16 +368,28 @@ class _SearchUsersState extends State<SearchUsers> {
           ListTile(
             contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
             horizontalTitleGap: 0,
-            trailing: IconButton(
-              iconSize: 25,
-              icon: const Icon(Icons.search),
-              onPressed: () {},
-            ),
             subtitle: TextFormField(
-              controller: _controller,
               autofocus: false,
-              decoration: const InputDecoration(hintText: "Search here"),
+              controller: _controller,
               focusNode: _focus,
+              decoration: InputDecoration(
+                hintText: "Search here",
+                isDense: true,
+                suffixIcon: IconButton(
+                  iconSize: 25,
+                  onPressed: () {
+                    if (_controller.text.isNotEmpty) {
+                      setState(() {
+                        _controller.text = "";
+                      });
+                    }
+                  },
+                  icon: Icon(
+                    _controller.text.isEmpty ? Icons.search : Icons.cancel,
+                  ),
+                ),
+                border: InputBorder.none,
+              ),
               onChanged: (text) async {
                 if (text.isEmpty) {
                   setState(() {
@@ -400,6 +416,7 @@ class _SearchUsersState extends State<SearchUsers> {
               },
             ),
           ),
+          Container(padding: const EdgeInsets.only(bottom: 8, top: 8)),
           SizedBox(
             height: (!_focus.hasFocus && usersMatching.isEmpty) ||
                     _controller.text.isEmpty

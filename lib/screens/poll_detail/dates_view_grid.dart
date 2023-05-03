@@ -206,10 +206,12 @@ class DateTile extends StatelessWidget {
                   ),
                   onTap: () async {
                     if (MyAlertDialog.showAlertIfCondition(
-                        context,
-                        curUid == organizerUid,
-                        "YOU CANNOT VOTE",
-                        "You are the organizer, you must be present at the event!")) {
+                      context: context,
+                      condition: curUid == organizerUid,
+                      title: "You cannot vote",
+                      content:
+                          "You are the organizer, you must be present at the event!",
+                    )) {
                       return;
                     }
                     int newAvailability =
