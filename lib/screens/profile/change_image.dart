@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dima_app/themes/layout_constants.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:flutter/material.dart';
@@ -78,44 +79,70 @@ class _ChangeImageState extends State<ChangeImage> {
     }
   }
 
+  Future removePhoto(BuildContext context) async {
+    setState(() {
+      loading = true;
+    });
+    final userId = Provider.of<FirebaseUser>(context, listen: false)
+        .user
+        ?.uid; // basename(_photo!.path);
+    try {
+      await Provider.of<FirebaseUser>(context, listen: false)
+          .updateProfilePic(context, "default");
+      setState(() {
+        loading = false;
+      });
+    } catch (e) {
+      print('error occured');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: InkWell(
-        onTap: () {
-          _showPicker(context);
-        },
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Consumer<FirebaseUser>(
-              builder: (context, value, child) {
-                return ProfilePic(
-                  userData: value.userData,
-                  loading: loading,
-                  radius: 90,
-                );
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Consumer<FirebaseUser>(
+            builder: (context, value, child) {
+              return ProfilePic(
+                userData: value.userData,
+                loading: loading,
+                radius: LayoutConstants.kProfilePicRadius,
+              );
+            },
+          ),
+          Container(
+            // translate the button to the top right corner
+            transform: Matrix4.identity()
+              ..translate(LayoutConstants.kProfilePicRadius / 1.414,
+                  -LayoutConstants.kProfilePicRadius / 1.414, 0.0),
+            child: ElevatedButton(
+              onPressed: () {
+                removePhoto(context);
               },
-            ),
-            Positioned(
-              right: 0.0,
-              bottom: 0.0,
-              child: CircleAvatar(
-                radius: 25,
-                child: IconButton(
-                  iconSize: 30.0,
-                  constraints: const BoxConstraints(),
-                  onPressed: () {
-                    _showPicker(context);
-                  },
-                  icon: const Icon(
-                    Icons.photo_camera,
-                  ),
-                ),
+              style: ElevatedButton.styleFrom(
+                shape: const CircleBorder(),
               ),
+              child: const Icon(Icons.close),
             ),
-          ],
-        ),
+          ),
+          Container(
+            // translate the button to the bottom left corner
+            transform: Matrix4.identity()
+              ..translate(LayoutConstants.kProfilePicRadius / 1.414,
+                  LayoutConstants.kProfilePicRadius / 1.414, 0.0),
+            child: ElevatedButton(
+              onPressed: () async {
+                _showPicker(context);
+              },
+              style: ElevatedButton.styleFrom(
+                shape: const CircleBorder(),
+              ),
+              child: const Icon(Icons.photo_camera),
+            ),
+          ),
+        ],
       ),
     );
   }

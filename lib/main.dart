@@ -4,8 +4,10 @@ import 'package:dima_app/providers/preferences.dart';
 import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/login.dart';
+import 'package:dima_app/screens/map.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
-import 'package:dima_app/screens/profile/index.dart';
+import 'package:dima_app/screens/profile/settings.dart';
+import 'package:dima_app/screens/search.dart';
 import 'package:dima_app/server/firebase_event.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_poll.dart';
@@ -207,6 +209,7 @@ class _MainScreen extends State<MainScreen> {
   final GlobalKey<NavigatorState> secondTabNavKey = GlobalKey<NavigatorState>();
   final GlobalKey<NavigatorState> thirdTabNavKey = GlobalKey<NavigatorState>();
   final GlobalKey<NavigatorState> fourthTabNavKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> fifthTabNavKey = GlobalKey<NavigatorState>();
 
   final Map<String, Widget Function(BuildContext)> routes = {
     '/events': (context) => const EventsScreen(),
@@ -255,12 +258,21 @@ class _MainScreen extends State<MainScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.event),
-            label: 'Events',
+            icon: Icon(Icons.map),
+            label: 'Map',
+          ),
+          // add a center docker notch floating action button to the tab bar here
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            label: 'Add',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
           ),
         ],
       ),
@@ -359,23 +371,32 @@ class _MainScreen extends State<MainScreen> {
           case 0:
             return CupertinoTabView(
               navigatorKey: firstTabNavKey,
-              routes: routes,
-              builder: (context) =>
-                  const CupertinoPageScaffold(child: HomeScreen()),
+              // routes: routes,
+              builder: (context) => const HomeScreen(),
             );
           case 1:
             return CupertinoTabView(
               navigatorKey: secondTabNavKey,
-              routes: routes,
-              builder: (context) =>
-                  const CupertinoPageScaffold(child: EventsScreen()),
+              // routes: routes,
+              builder: (context) => const MapScreen(),
             );
           case 2:
             return CupertinoTabView(
               navigatorKey: thirdTabNavKey,
-              routes: routes,
-              builder: (context) =>
-                  const CupertinoPageScaffold(child: ProfileScreen()),
+              // routes: routes,
+              builder: (context) => const EventsScreen(),
+            );
+          case 3:
+            return CupertinoTabView(
+              navigatorKey: fourthTabNavKey,
+              // routes: routes,
+              builder: (context) => const SearchScreen(),
+            );
+          case 4:
+            return CupertinoTabView(
+              navigatorKey: fifthTabNavKey,
+              // routes: routes,
+              builder: (context) => const SettingsScreen(),
             );
           default:
             return const CupertinoTabView();
