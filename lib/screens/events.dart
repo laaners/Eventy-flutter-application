@@ -6,7 +6,7 @@ import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/poll_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
-import 'package:dima_app/widgets/gmaps.dart';
+import 'package:dima_app/widgets/map_widget.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/my_modal.dart';
@@ -33,7 +33,7 @@ class EventsScreen extends StatelessWidget {
               onPressed: () async {
                 // ignore: use_build_context_synchronously
                 String pollId =
-                    "Event 0 of UsernameId14_0DmBO8Fw0ofrK9RbXIO4dYlEIg03";
+                    "Event 1 of UsernameId14_0DmBO8Fw0ofrK9RbXIO4dYlEIg03";
                 var curUid =
                     // ignore: use_build_context_synchronously
                     Provider.of<FirebaseUser>(context, listen: false).user!.uid;

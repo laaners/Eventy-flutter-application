@@ -9,7 +9,7 @@ import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
-import 'package:dima_app/widgets/gmaps.dart';
+import 'package:dima_app/widgets/map_widget.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -292,7 +292,7 @@ class LocationDetail extends StatelessWidget {
                       enabled: false,
                     ),
                   ),
-                  GmapFromCoor(
+                  MapFromCoor(
                     lat: location.lat,
                     lon: location.lon,
                     address: location.site,

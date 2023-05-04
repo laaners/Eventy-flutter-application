@@ -341,55 +341,14 @@ class _InviteeTileState extends State<InviteeTile> {
               ),
             );
           } else {
-            Widget newScreen = TabbarSwitcher(
-              listSticky: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(_count.toString()),
-                  ],
-                ),
-              ),
-              stickyHeight: 50,
-              labels: const ["Locations", "Dates"],
-              appBarTitle: "${widget.userData.username} votes",
-              upRightActions: [
-                Container(
-                  margin: const EdgeInsets.only(
-                    right: LayoutConstants.kHorizontalPadding,
-                  ),
-                  child: InkWell(
-                    customBorder: const CircleBorder(),
-                    child: Ink(
-                      decoration: const BoxDecoration(shape: BoxShape.circle),
-                      child: const Icon(
-                        Icons.refresh,
-                      ),
-                    ),
-                    onTap: () async {
-                      widget.refreshPollDetail();
-                      setState(() {
-                        print("should refresh");
-                        _refresh = !_refresh;
-                        print(_refresh);
-                        _count += 1;
-                      });
-                    },
-                  ),
-                ),
-              ],
-              tabbars: [
-                LocationsList(
-                  votingUid: widget.userData.uid,
-                  organizerUid: widget.pollData.organizerUid,
-                  pollId: widget.pollEventId,
-                  locations: widget.pollData.locations,
-                  invites: widget.invites,
-                  votesLocations: widget.votesLocations,
-                ),
-                Text("data")
-              ],
+            Widget newScreen = InviteeVotesScreen(
+              pollData: widget.pollData,
+              userData: widget.userData,
+              refreshPollDetail: widget.refreshPollDetail,
+              votesLocations: widget.votesLocations,
+              votesDates: widget.votesDates,
+              invites: widget.invites,
+              pollEventId: widget.pollEventId,
             );
             Navigator.push(
               context,
@@ -400,6 +359,85 @@ class _InviteeTileState extends State<InviteeTile> {
           }
         },
       ),
+    );
+  }
+}
+
+class InviteeVotesScreen extends StatefulWidget {
+  final PollCollection pollData;
+  final UserCollection userData;
+  final VoidCallback refreshPollDetail;
+  final List<VoteLocationCollection> votesLocations;
+  final List<VoteDateCollection> votesDates;
+  final String pollEventId;
+  final List<PollEventInviteCollection> invites;
+  const InviteeVotesScreen({
+    super.key,
+    required this.pollData,
+    required this.userData,
+    required this.refreshPollDetail,
+    required this.votesLocations,
+    required this.votesDates,
+    required this.pollEventId,
+    required this.invites,
+  });
+
+  @override
+  State<InviteeVotesScreen> createState() => _InviteeVotesScreenState();
+}
+
+class _InviteeVotesScreenState extends State<InviteeVotesScreen> {
+  bool _refresh = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return TabbarSwitcher(
+      listSticky: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(_refresh.toString()),
+          ],
+        ),
+      ),
+      stickyHeight: 50,
+      labels: const ["Locations", "Dates"],
+      appBarTitle: "${widget.userData.username} votes",
+      upRightActions: [
+        Container(
+          margin: const EdgeInsets.only(
+            right: LayoutConstants.kHorizontalPadding,
+          ),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            child: Ink(
+              decoration: const BoxDecoration(shape: BoxShape.circle),
+              child: const Icon(
+                Icons.refresh,
+              ),
+            ),
+            onTap: () async {
+              widget.refreshPollDetail();
+              setState(() {
+                print("should refresh");
+                _refresh = !_refresh;
+              });
+            },
+          ),
+        ),
+      ],
+      tabbars: [
+        LocationsList(
+          votingUid: widget.userData.uid,
+          organizerUid: widget.pollData.organizerUid,
+          pollId: widget.pollEventId,
+          locations: widget.pollData.locations,
+          invites: widget.invites,
+          votesLocations: widget.votesLocations,
+        ),
+        Text(_refresh.toString())
+      ],
     );
   }
 }

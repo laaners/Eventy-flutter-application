@@ -80,17 +80,6 @@ class _PollDetailScreenState extends State<PollDetailScreen>
         });
       }).toList());
 
-      /*
-      List<Stream<DocumentSnapshot<Object?>>?> votesLocationsStreams =
-          pollData.locations.map((location) {
-        Stream<DocumentSnapshot<Object?>>? snapshot =
-            Provider.of<FirebaseVote>(context, listen: false)
-                .getVoteLocationSnapshot(context, widget.pollId, "name");
-        return snapshot;
-      }).toList();
-      print(votesLocationsStreams);
-      */
-
       List<Future<VoteDateCollection>> promises = pollData.dates.keys
           .map((date) {
             return pollData.dates[date].map((slot) {
@@ -175,8 +164,7 @@ class _PollDetailScreenState extends State<PollDetailScreen>
         }
         if (snapshot.hasError) {
           Future.microtask(() {
-            Navigator.pushReplacement(
-              context,
+            Navigator.of(context, rootNavigator: false).pushReplacement(
               ScreenTransition(
                 builder: (context) => ErrorScreen(
                   errorMsg: snapshot.error.toString(),
@@ -188,12 +176,10 @@ class _PollDetailScreenState extends State<PollDetailScreen>
         }
         if (!snapshot.data!.exists) {
           Future.microtask(() {
-            Navigator.of(context).pop();
-            Navigator.push(
-              context,
+            Navigator.of(context, rootNavigator: false).pushReplacement(
               ScreenTransition(
-                builder: (context) => const ErrorScreen(
-                  errorMsg: "The organizer limited your access to this poll",
+                builder: (context) => ErrorScreen(
+                  errorMsg: snapshot.error.toString(),
                 ),
               ),
             );
@@ -211,8 +197,7 @@ class _PollDetailScreenState extends State<PollDetailScreen>
             }
             if (snapshot.hasError || !snapshot.hasData) {
               Future.microtask(() {
-                Navigator.pushReplacement(
-                  context,
+                Navigator.of(context, rootNavigator: false).pushReplacement(
                   ScreenTransition(
                     builder: (context) => ErrorScreen(
                       errorMsg: snapshot.error.toString(),

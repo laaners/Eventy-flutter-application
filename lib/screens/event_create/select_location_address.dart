@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:dima_app/server/tables/location.dart';
-import 'package:dima_app/widgets/gmaps.dart';
+import 'package:dima_app/widgets/map_widget.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -170,7 +170,7 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
           ),
         ),
         if (showMap)
-          GmapFromCoor(lat: lat, lon: lon, address: widget.controller.text)
+          MapFromCoor(lat: lat, lon: lon, address: widget.controller.text)
         else
           loadingLocations
               ? const LoadingSpinner()

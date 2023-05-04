@@ -103,6 +103,34 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     text: "create polls",
                   ),
+                  MyButton(
+                    text: "create events",
+                    onPressed: () async {
+                      var curUid =
+                          Provider.of<FirebaseUser>(context, listen: false)
+                              .user!
+                              .uid;
+                      Provider.of<FirebaseFollow>(context, listen: false)
+                          .getFollowers(context, curUid)
+                          .then(
+                            (value) async => await Provider.of<FirebasePoll>(
+                                    context,
+                                    listen: false)
+                                .deletePoll(
+                              context: context,
+                              pollId:
+                                  "Event 0 of UsernameId0_5bbooaayEaS9nIjJtYDvWGB7Xiv2",
+                            ),
+                          );
+                      Provider.of<FirebaseFollow>(context, listen: false)
+                          .getFollowing(context, curUid);
+                      await Provider.of<FirebasePoll>(context, listen: false)
+                          .deletePoll(
+                        context: context,
+                        pollId: pollId,
+                      );
+                    },
+                  ),
                   TextButton(
                     onPressed: () async {
                       const String url =

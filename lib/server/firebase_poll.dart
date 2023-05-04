@@ -105,7 +105,7 @@ class FirebasePoll extends ChangeNotifier {
       var documents =
           await pollCollection.where("organizerUid", isEqualTo: userUid).get();
       if (documents.docs.isNotEmpty) {
-        final List<PollCollection> polls = documents.docs.map((doc) {
+        List<PollCollection> polls = documents.docs.map((doc) {
           var tmp = doc.data() as Map<String, dynamic>;
           tmp["locations"] = (tmp["locations"] as List).map((e) {
             e["lat"] = e["lat"].toDouble();
@@ -119,6 +119,21 @@ class FirebasePoll extends ChangeNotifier {
               PollCollection.datesToLocal(tmp["dates"] as Map<String, dynamic>);
           var pollDetails = PollCollection.fromMap(tmp);
           return pollDetails;
+        }).toList();
+        // check if the deadline for one event was met, if true then update the database by deleting it (and creating corresponding an event)
+        polls = polls.where((pollData) {
+          String nowDate =
+              DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
+          // today is below deadline
+          if (DateFormatter.toLocalString(pollData.deadline)
+                  .compareTo(nowDate) >
+              0) {
+            return true;
+          }
+          // deadline reached, delete the poll
+          String pollId = "${pollData.pollName}_${pollData.organizerUid}";
+          deletePoll(context: context, pollId: pollId);
+          return false;
         }).toList();
         return polls;
       }
@@ -297,7 +312,8 @@ class FirebasePoll extends ChangeNotifier {
           }).toList(),
         };
 
-        // delete invites
+        // INVITES TO KEEP
+        /*
         await Future.wait(invites
             .map((invite) =>
                 Provider.of<FirebasePollEventInvite>(context, listen: false)
@@ -307,6 +323,7 @@ class FirebasePoll extends ChangeNotifier {
                   inviteeId: invite.inviteeId,
                 ))
             .toList());
+        */
 
         // delete location votes
         await Future.wait(pollData.locations
