@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dima_app/server/tables/poll_collection.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +57,7 @@ class FirebasePollEventInvite extends ChangeNotifier {
 
       // remove invitee votes on locations and dates
 
-      PollCollection? pollData =
+      PollEventCollection? pollData =
           // ignore: use_build_context_synchronously
           await Provider.of<FirebasePoll>(context, listen: false)
               .getPollData(context, pollEventId);

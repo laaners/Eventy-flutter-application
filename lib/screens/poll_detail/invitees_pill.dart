@@ -1,4 +1,4 @@
-import 'package:dima_app/server/tables/poll_collection.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
@@ -9,12 +9,11 @@ import 'package:flutter/material.dart';
 import 'invitees_list.dart';
 
 class InviteesPill extends StatelessWidget {
-  final PollCollection pollData;
+  final PollEventCollection pollData;
   final String pollEventId;
   final List<PollEventInviteCollection> invites;
   final List<VoteLocationCollection> votesLocations;
   final List<VoteDateCollection> votesDates;
-
   final VoidCallback refreshPollDetail;
   const InviteesPill({
     super.key,

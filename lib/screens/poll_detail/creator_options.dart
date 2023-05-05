@@ -1,5 +1,5 @@
 import 'package:dima_app/screens/poll_detail/invitees_list.dart';
-import 'package:dima_app/server/tables/poll_collection.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 class CreatorOptions extends StatelessWidget {
-  final PollCollection pollData;
+  final PollEventCollection pollData;
   final String pollEventId;
   final List<PollEventInviteCollection> invites;
   final VoidCallback refreshPollDetail;
@@ -50,7 +50,7 @@ class CreatorOptions extends StatelessWidget {
           onTap: () async {
             LoadingOverlay.show(context);
             String url =
-                "https://eventy.page.link?pollId=${pollData.pollName}_${pollData.organizerUid}";
+                "https://eventy.page.link?pollId=${pollData.pollEventName}_${pollData.organizerUid}";
             final dynamicLinkParams = DynamicLinkParameters(
               link: Uri.parse(url),
               uriPrefix: "https://eventy.page.link",
@@ -161,7 +161,7 @@ class CreatorOptions extends StatelessWidget {
             );
             if (ris) {
               // ignore: use_build_context_synchronously
-              Navigator.pop(context, "create_event_${pollData.organizerUid}");
+              Navigator.pop(context, "delete_poll_${pollData.organizerUid}");
             }
           },
         ),

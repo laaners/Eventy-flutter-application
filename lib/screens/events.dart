@@ -2,9 +2,10 @@ import 'package:dima_app/screens/event_create/index.dart';
 import 'package:dima_app/screens/event_create/step_invite.dart';
 import 'package:dima_app/screens/event_detail/index.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
+import 'package:dima_app/screens/poll_event.dart';
 import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_user.dart';
-import 'package:dima_app/server/tables/poll_collection.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/map_widget.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
@@ -37,7 +38,7 @@ class EventsScreen extends StatelessWidget {
                 var curUid =
                     // ignore: use_build_context_synchronously
                     Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-                Widget newScreen = PollDetailScreen(pollId: pollId);
+                Widget newScreen = PollEventScreen(pollEventId: pollId);
                 // ignore: use_build_context_synchronously
                 var ris =
                     await Navigator.of(context, rootNavigator: false).push(
@@ -70,7 +71,7 @@ class EventsScreen extends StatelessWidget {
                   ),
                 );
                 if (pollId != null) {
-                  Widget newScreen = PollDetailScreen(pollId: pollId);
+                  Widget newScreen = PollEventScreen(pollEventId: pollId);
                   // ignore: use_build_context_synchronously
                   var ris =
                       await Navigator.of(context, rootNavigator: false).push(
@@ -81,7 +82,7 @@ class EventsScreen extends StatelessWidget {
                   if (ris == "delete_poll_$curUid") {
                     // ignore: use_build_context_synchronously
                     await Provider.of<FirebasePoll>(context, listen: false)
-                        .deletePoll(
+                        .closePoll(
                       context: context,
                       pollId: pollId,
                     );
@@ -95,7 +96,7 @@ class EventsScreen extends StatelessWidget {
               text: "IMPORTANT: no inv poll, admin deletes",
               onPressed: () async {
                 String pollId = "Event 0_0DmBO8Fw0ofrK9RbXIO4dYlEIg03";
-                Widget newScreen = PollDetailScreen(pollId: pollId);
+                Widget newScreen = PollEventScreen(pollEventId: pollId);
                 var ris =
                     await Navigator.of(context, rootNavigator: false).push(
                   ScreenTransition(
@@ -108,7 +109,7 @@ class EventsScreen extends StatelessWidget {
                 if (ris == "delete_poll_$curUid") {
                   // ignore: use_build_context_synchronously
                   await Provider.of<FirebasePoll>(context, listen: false)
-                      .deletePoll(
+                      .closePoll(
                     context: context,
                     pollId: pollId,
                   );

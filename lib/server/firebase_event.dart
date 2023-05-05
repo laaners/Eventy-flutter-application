@@ -12,6 +12,7 @@ import 'firebase_crud.dart';
 import 'firebase_poll_event_invite.dart';
 import 'firebase_user.dart';
 
+// DUMMY, EVENT AND POLLS SHARE THE SAME TABLE
 class FirebaseEvent extends ChangeNotifier {
   final FirebaseFirestore _firestore;
 
@@ -45,7 +46,9 @@ class FirebaseEvent extends ChangeNotifier {
       if (eventExistence!.exists) {
         return null;
       }
-      await eventCollection.doc(eventId).set(event.toMap());
+      var tmp = event.toMap();
+      tmp["eventName_lower"] = event.eventName.toLowerCase();
+      await eventCollection.doc(eventId).set(tmp);
     } on FirebaseAuthException catch (e) {
       // showSnackBar(context, e.message!);
       print(e.message!);
@@ -91,7 +94,7 @@ class FirebaseEvent extends ChangeNotifier {
     return [];
   }
 
-  Future<List<Map<String, dynamic>>> getOtherUserPublicOrInvitedPolls(
+  Future<List<Map<String, dynamic>>> getOtherUserPublicOrInvitedEvents(
     BuildContext context,
     String userUid,
   ) async {
@@ -107,7 +110,7 @@ class FirebaseEvent extends ChangeNotifier {
           await eventCollection.where("organizerUid", isEqualTo: userUid).get();
 
       if (documents.docs.isNotEmpty) {
-        List<Map<String, dynamic>> polls = documents.docs.where((doc) {
+        List<Map<String, dynamic>> events = documents.docs.where((doc) {
           var tmp = doc.data() as Map<String, dynamic>;
           return tmp["public"] == true || curUserInvitesIds.contains(doc.id);
         }).map((doc) {
@@ -122,7 +125,7 @@ class FirebaseEvent extends ChangeNotifier {
         }).toList();
 
         // check if the date for one event was met, if true then update the database by deleting it (and creating corresponding an event)
-        polls = polls.where((e) {
+        events = events.where((e) {
           EventCollection eventData = e["eventDetails"] as EventCollection;
           String nowDate =
               DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
@@ -139,17 +142,61 @@ class FirebaseEvent extends ChangeNotifier {
           if (DateFormatter.toLocalString(eventDate).compareTo(nowDate) > 0) {
             return true;
           }
-
-          // deadline reached, delete the poll
-          deletePoll(context: context, pollId: e["id"]);
+          // past date of 5 days, delete the event
+          print(eventDate);
+          print("Expired event, deleting");
+          deleteEvent(
+            context: context,
+            eventId: e["id"],
+            showOutcome: false,
+          );
           return false;
         }).toList();
-        return polls;
+        return events;
       }
       return [];
     } on FirebaseException catch (e) {
       print(e.message!);
     }
     return [];
+  }
+
+  Future<void> deleteEvent({
+    required BuildContext context,
+    required String eventId,
+    required bool showOutcome,
+  }) async {
+    try {
+      var document = await FirebaseCrud.readDoc(eventCollection, eventId);
+      if (document!.exists) {
+        List<PollEventInviteCollection> invites =
+            // ignore: use_build_context_synchronously
+            await Provider.of<FirebasePollEventInvite>(context, listen: false)
+                .getInvitesFromPollEventId(context, eventId);
+
+        // delete invites
+        await Future.wait(invites
+            .map((invite) =>
+                Provider.of<FirebasePollEventInvite>(context, listen: false)
+                    .deletePollEventInvite(
+                  context: context,
+                  pollEventId: eventId,
+                  inviteeId: invite.inviteeId,
+                ))
+            .toList());
+
+        // delete event
+        await FirebaseCrud.deleteDoc(eventCollection, eventId);
+        print("Successfully deleted event");
+        if (showOutcome) {
+          showSnackBar(context, "Successfully deleted poll");
+        }
+      }
+    } on FirebaseException catch (e) {
+      print(e.message);
+      if (showOutcome) {
+        showSnackBar(context, "Error in poll deletion");
+      }
+    }
   }
 }

@@ -6,6 +6,7 @@ import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/login.dart';
 import 'package:dima_app/screens/map.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
+import 'package:dima_app/screens/poll_event.dart';
 import 'package:dima_app/screens/profile/settings.dart';
 import 'package:dima_app/screens/search.dart';
 import 'package:dima_app/server/firebase_event.dart';
@@ -248,6 +249,9 @@ class _MainScreen extends State<MainScreen> {
               case 3:
                 fourthTabNavKey.currentState?.popUntil((r) => r.isFirst);
                 break;
+              case 4:
+                fifthTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                break;
             }
           }
           currentIndex = index;
@@ -263,7 +267,7 @@ class _MainScreen extends State<MainScreen> {
           ),
           // add a center docker notch floating action button to the tab bar here
           BottomNavigationBarItem(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.add_circle_outline),
             label: 'Add',
           ),
           BottomNavigationBarItem(
@@ -287,7 +291,7 @@ class _MainScreen extends State<MainScreen> {
           var curUid =
               // ignore: use_build_context_synchronously
               Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-          Widget newScreen = PollDetailScreen(pollId: pollId);
+          Widget newScreen = PollEventScreen(pollEventId: pollId);
           switch (currentIndex) {
             case 0:
               Future.delayed(Duration.zero, () async {
@@ -300,7 +304,7 @@ class _MainScreen extends State<MainScreen> {
                 if (ris == "delete_poll_$curUid") {
                   // ignore: use_build_context_synchronously
                   await Provider.of<FirebasePoll>(context, listen: false)
-                      .deletePoll(
+                      .closePoll(
                     context: context,
                     pollId: pollId,
                   );
@@ -318,7 +322,7 @@ class _MainScreen extends State<MainScreen> {
                 if (ris == "delete_poll_$curUid") {
                   // ignore: use_build_context_synchronously
                   await Provider.of<FirebasePoll>(context, listen: false)
-                      .deletePoll(
+                      .closePoll(
                     context: context,
                     pollId: pollId,
                   );
@@ -336,7 +340,7 @@ class _MainScreen extends State<MainScreen> {
                 if (ris == "delete_poll_$curUid") {
                   // ignore: use_build_context_synchronously
                   await Provider.of<FirebasePoll>(context, listen: false)
-                      .deletePoll(
+                      .closePoll(
                     context: context,
                     pollId: pollId,
                   );
@@ -354,7 +358,7 @@ class _MainScreen extends State<MainScreen> {
                 if (ris == "delete_poll_$curUid") {
                   // ignore: use_build_context_synchronously
                   await Provider.of<FirebasePoll>(context, listen: false)
-                      .deletePoll(
+                      .closePoll(
                     context: context,
                     pollId: pollId,
                   );

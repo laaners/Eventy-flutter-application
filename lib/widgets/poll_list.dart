@@ -1,9 +1,11 @@
 import 'package:dima_app/screens/error.dart';
+import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
+import 'package:dima_app/screens/poll_event.dart';
 import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
-import 'package:dima_app/server/tables/poll_collection.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:flutter/material.dart';
@@ -38,9 +40,7 @@ class _PollListState extends State<PollList> {
         }
         if (snapshot.hasError) {
           Future.microtask(() {
-            Navigator.of(context).pop();
-            Navigator.push(
-              context,
+            Navigator.of(context).pushReplacement(
               ScreenTransition(
                 builder: (context) => ErrorScreen(
                   errorMsg: snapshot.error.toString(),
@@ -60,7 +60,7 @@ class _PollListState extends State<PollList> {
           children: pollsData
               .map(
                 (e) => PollTile(
-                  pollData: e["pollDetails"] as PollCollection,
+                  pollData: e["pollDetails"] as PollEventCollection,
                   invited: e["invited"] as bool,
                   refreshParent: () {
                     setState(() {
@@ -77,7 +77,7 @@ class _PollListState extends State<PollList> {
 }
 
 class PollTile extends StatelessWidget {
-  final PollCollection pollData;
+  final PollEventCollection pollData;
   final bool invited;
   final VoidCallback refreshParent;
   const PollTile({
@@ -89,7 +89,7 @@ class PollTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String pollId = "${pollData.pollName}_${pollData.organizerUid}";
+    String pollId = "${pollData.pollEventName}_${pollData.organizerUid}";
     return SizedBox(
       height: 80,
       child: ListTile(
@@ -101,7 +101,7 @@ class PollTile extends StatelessWidget {
           backgroundColor: Colors.blue,
           child: Icon(Icons.place),
         ),
-        title: Text(pollData.pollName),
+        title: Text(pollData.pollEventName),
         subtitle: Text(pollData.organizerUid),
         onTap: () async {
           var curUid =
@@ -117,7 +117,7 @@ class PollTile extends StatelessWidget {
             refreshParent();
           }
 
-          Widget newScreen = PollDetailScreen(pollId: pollId);
+          Widget newScreen = PollEventScreen(pollEventId: pollId);
           // ignore: use_build_context_synchronously
           var ris = await Navigator.of(context, rootNavigator: false).push(
             ScreenTransition(
@@ -126,7 +126,7 @@ class PollTile extends StatelessWidget {
           );
           if (ris == "delete_poll_$curUid") {
             // ignore: use_build_context_synchronously
-            await Provider.of<FirebasePoll>(context, listen: false).deletePoll(
+            await Provider.of<FirebasePoll>(context, listen: false).closePoll(
               context: context,
               pollId: pollId,
             );

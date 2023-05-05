@@ -52,7 +52,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         }
         if (snapshot.hasError || !snapshot.hasData) {
           Future.microtask(() {
-            Navigator.of(context, rootNavigator: true).pushReplacement(
+            Navigator.of(context, rootNavigator: false).pushReplacement(
               ScreenTransition(
                 builder: (context) => ErrorScreen(
                   errorMsg: snapshot.error.toString(),

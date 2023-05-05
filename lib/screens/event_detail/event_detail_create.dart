@@ -30,7 +30,7 @@ class _EventDetailCreateState extends State<EventDetailCreate>
   @override
   initState() {
     super.initState();
-    _future = Provider.of<FirebasePoll>(context, listen: false).deletePoll(
+    _future = Provider.of<FirebasePoll>(context, listen: false).closePoll(
       context: context,
       pollId: widget.eventId,
     );

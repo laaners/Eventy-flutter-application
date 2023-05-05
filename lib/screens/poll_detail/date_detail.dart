@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dima_app/providers/preferences.dart';
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/poll_detail/my_poll.dart';
 import 'package:dima_app/server/date_methods.dart';
@@ -110,6 +111,14 @@ class DateDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     DateTime dateTime =
         DateFormatter.string2DateTime("${voteDate.date} 00:00:00");
+    var start = voteDate.start;
+    var end = voteDate.end;
+    if (!Preferences.getBool('is24Hour')) {
+      start = DateFormat("hh:mm a")
+          .format(DateFormatter.string2DateTime("2000-01-01 $start:00"));
+      end = DateFormat("hh:mm a")
+          .format(DateFormatter.string2DateTime("2000-01-01 $end:00"));
+    }
     return Column(
       children: [
         Container(
@@ -124,7 +133,7 @@ class DateDetail extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
           alignment: Alignment.topLeft,
           child: Text(
-            "From ${voteDate.start} to ${voteDate.end}",
+            "From $start to $end",
             style: Theme.of(context).textTheme.headlineSmall,
           ),
         ),

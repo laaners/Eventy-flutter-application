@@ -33,6 +33,7 @@ class _MapFromCoorState extends State<MapFromCoor> {
 
   @override
   Widget build(BuildContext context) {
+    print("ok");
     return Container(
       height: 300,
       margin: const EdgeInsets.all(15),
@@ -40,6 +41,7 @@ class _MapFromCoorState extends State<MapFromCoor> {
         options: MapOptions(
           center: LatLng(widget.lat, widget.lon),
           zoom: 16.4746,
+          maxZoom: 18,
         ),
         children: [
           TileLayer(

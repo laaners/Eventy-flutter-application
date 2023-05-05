@@ -4,7 +4,7 @@ import 'package:dima_app/screens/poll_detail/locations_list.dart';
 import 'package:dima_app/screens/profile/index.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
-import 'package:dima_app/server/tables/poll_collection.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
@@ -23,7 +23,7 @@ import 'package:provider/provider.dart';
 import 'package:dima_app/widgets/tabbar_switcher.dart';
 
 class InviteesList extends StatefulWidget {
-  final PollCollection pollData;
+  final PollEventCollection pollData;
   final String pollEventId;
   final List<PollEventInviteCollection> invites;
   final VoidCallback refreshPollDetail;
@@ -152,7 +152,7 @@ class _InviteesListState extends State<InviteesList> {
 
 class InviteesListIntermediate extends StatefulWidget {
   final String pollEventId;
-  final PollCollection pollData;
+  final PollEventCollection pollData;
   final List<PollEventInviteCollection> invites;
   final List<String> users;
   final ValueChanged<List<String>> updateInvitees;
@@ -206,7 +206,7 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     return widget.pollData.organizerUid == curUid || widget.pollData.canInvite
         ? TabbarSwitcher(
-            appBarTitle: widget.pollData.pollName,
+            appBarTitle: widget.pollData.pollEventName,
             upRightActions: widget.pollData.organizerUid == curUid ||
                     widget.pollData.canInvite
                 ? [
@@ -263,7 +263,7 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
           )
         : Scaffold(
             appBar: MyAppBar(
-              title: widget.pollData.pollName,
+              title: widget.pollData.pollEventName,
               upRightActions: [],
             ),
             body: ResponsiveWrapper(
@@ -290,7 +290,7 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
 }
 
 class InviteeTile extends StatefulWidget {
-  final PollCollection pollData;
+  final PollEventCollection pollData;
   final UserCollection userData;
   final VoidCallback refreshPollDetail;
   final List<VoteLocationCollection> votesLocations;
@@ -364,7 +364,7 @@ class _InviteeTileState extends State<InviteeTile> {
 }
 
 class InviteeVotesScreen extends StatefulWidget {
-  final PollCollection pollData;
+  final PollEventCollection pollData;
   final UserCollection userData;
   final VoidCallback refreshPollDetail;
   final List<VoteLocationCollection> votesLocations;

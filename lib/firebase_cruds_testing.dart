@@ -171,16 +171,18 @@ class FirebaseCrudsTesting {
         // ignore: use_build_context_synchronously
         print(localDates);
         print(locations);
+        // ignore: use_build_context_synchronously
         await Provider.of<FirebasePoll>(context, listen: false).createPoll(
           context: context,
-          pollName: eventName,
+          pollEventName: eventName,
           organizerUid: organizerUid,
-          pollDesc: j % 2 == 0 ? "" : "Some random desc for event $j",
+          pollEventDesc: j % 2 == 0 ? "" : "Some random desc for event $j",
           deadline: "2023-$deadlineM-$deadlineD 21:30:00",
           dates: localDates as Map<String, dynamic>,
           locations: locations as List<Map<String, dynamic>>,
           public: next(0, 2) % 2 == 0,
           canInvite: next(0, 2) % 2 == 0,
+          isClosed: false,
         );
 
         String pollId = "${eventName}_$organizerUid";

@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:dima_app/providers/preferences.dart';
 import 'package:dima_app/screens/event_create/my_stepper.dart';
 import 'package:dima_app/screens/event_create/step_basics.dart';
 import 'package:dima_app/screens/event_create/step_dates.dart';
@@ -59,9 +60,15 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   void initState() {
     super.initState();
     DateTime now = DateTime.now();
-    deadlineController.text = DateFormat("yyyy-MM-dd HH:00:00").format(
-      DateTime(now.year, now.month, now.day + 1),
-    );
+    if (Preferences.getBool("is24Hour")) {
+      deadlineController.text = DateFormat("yyyy-MM-dd HH:00:00").format(
+        DateTime(now.year, now.month, now.day + 1),
+      );
+    } else {
+      deadlineController.text = DateFormat("yyyy-MM-dd hh:00:00 a").format(
+        DateTime(now.year, now.month, now.day + 1),
+      );
+    }
   }
 
   List<MyStep> stepList() => [
@@ -268,6 +275,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
       };
     }).toList();
 
+    /*
     // get event will return NOT NULL if the event ALREADY EXISTS
     var dbEvent =
         await Provider.of<FirebaseEvent>(context, listen: false).getEventData(
@@ -287,19 +295,21 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
       });
       return;
     }
+    */
 
     LoadingOverlay.show(context);
     var dbPoll =
         await Provider.of<FirebasePoll>(context, listen: false).createPoll(
       context: context,
-      pollName: eventTitleController.text,
+      pollEventName: eventTitleController.text,
       organizerUid: curUid,
-      pollDesc: eventDescController.text,
+      pollEventDesc: eventDescController.text,
       deadline: deadlineController.text,
       dates: dates,
       locations: locationsMap,
       public: visibility,
       canInvite: canInvite,
+      isClosed: false,
     );
 
     // poll create will return NULL if the poll ALREADY EXISTS
@@ -307,7 +317,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
       context: context,
       condition: dbPoll == null,
       title: "Duplicate Poll",
-      content: "A poll with this name already exists",
+      content: "A poll or event with this name already exists",
     );
     if (ret) {
       LoadingOverlay.hide(context);
