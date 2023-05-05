@@ -108,38 +108,41 @@ class _ChangeImageState extends State<ChangeImage> {
               return ProfilePic(
                 userData: value.userData,
                 loading: loading,
-                radius: LayoutConstants.kProfilePicRadius,
+                radius: LayoutConstants.kProfilePicRadiusLarge,
               );
             },
           ),
           Container(
             // translate the button to the top right corner
             transform: Matrix4.identity()
-              ..translate(LayoutConstants.kProfilePicRadius / 1.414,
-                  -LayoutConstants.kProfilePicRadius / 1.414, 0.0),
+              ..translate(LayoutConstants.kProfilePicRadiusLarge / 1.414,
+                  -LayoutConstants.kProfilePicRadiusLarge / 1.414, 0.0),
             child: ElevatedButton(
               onPressed: () {
                 removePhoto(context);
               },
               style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.all(LayoutConstants.kIconPadding),
                 shape: const CircleBorder(),
               ),
-              child: const Icon(Icons.close),
+              child: const Icon(Icons.close, size: LayoutConstants.kIconSize),
             ),
           ),
           Container(
             // translate the button to the bottom left corner
             transform: Matrix4.identity()
-              ..translate(LayoutConstants.kProfilePicRadius / 1.414,
-                  LayoutConstants.kProfilePicRadius / 1.414, 0.0),
+              ..translate(LayoutConstants.kProfilePicRadiusLarge / 1.414,
+                  LayoutConstants.kProfilePicRadiusLarge / 1.414, 0.0),
             child: ElevatedButton(
               onPressed: () async {
                 _showPicker(context);
               },
               style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.all(LayoutConstants.kIconPadding),
                 shape: const CircleBorder(),
               ),
-              child: const Icon(Icons.photo_camera),
+              child: const Icon(Icons.photo_camera,
+                  size: LayoutConstants.kIconSize),
             ),
           ),
         ],
