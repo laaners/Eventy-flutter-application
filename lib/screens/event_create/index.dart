@@ -7,8 +7,7 @@ import 'package:dima_app/screens/event_create/step_dates.dart';
 import 'package:dima_app/screens/event_create/step_invite.dart';
 import 'package:dima_app/screens/event_create/step_places.dart';
 import 'package:dima_app/server/date_methods.dart';
-import 'package:dima_app/server/firebase_event.dart';
-import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_event.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/location.dart';
@@ -16,7 +15,6 @@ import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
-import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -299,7 +297,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
 
     LoadingOverlay.show(context);
     var dbPoll =
-        await Provider.of<FirebasePoll>(context, listen: false).createPoll(
+        await Provider.of<FirebasePollEvent>(context, listen: false).createPoll(
       context: context,
       pollEventName: eventTitleController.text,
       organizerUid: curUid,
@@ -363,6 +361,22 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
           )
         ],
       ),
+      body: ResponsiveWrapper(
+        child: MyStepper(
+          currentStep: _activeStepIndex,
+          steps: stepList(),
+          onStepTapped: (int index) {
+            setState(() {
+              _activeStepIndex = index;
+            });
+          },
+          // override continue cancel of stepper
+          controlsBuilder: (context, controls) {
+            return Container();
+          },
+        ),
+      ),
+      /*
       bottomNavigationBar: Container(
         margin: const EdgeInsets.only(
           bottom: 10,
@@ -400,21 +414,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
           ],
         ),
       ),
-      body: ResponsiveWrapper(
-        child: MyStepper(
-          currentStep: _activeStepIndex,
-          steps: stepList(),
-          onStepTapped: (int index) {
-            setState(() {
-              _activeStepIndex = index;
-            });
-          },
-          // override continue cancel of stepper
-          controlsBuilder: (context, controls) {
-            return Container();
-          },
-        ),
-      ),
+      */
     );
   }
 }

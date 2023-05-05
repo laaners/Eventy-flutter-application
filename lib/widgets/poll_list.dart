@@ -2,7 +2,7 @@ import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/screens/poll_event.dart';
-import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_event.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/poll_event_collection.dart';
@@ -29,7 +29,7 @@ class _PollListState extends State<PollList> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Provider.of<FirebasePoll>(context, listen: false)
+      future: Provider.of<FirebasePollEvent>(context, listen: false)
           .getOtherUserPublicOrInvitedPolls(context, widget.userUid),
       builder: (
         context,
@@ -126,7 +126,8 @@ class PollTile extends StatelessWidget {
           );
           if (ris == "delete_poll_$curUid") {
             // ignore: use_build_context_synchronously
-            await Provider.of<FirebasePoll>(context, listen: false).closePoll(
+            await Provider.of<FirebasePollEvent>(context, listen: false)
+                .closePoll(
               context: context,
               pollId: pollId,
             );

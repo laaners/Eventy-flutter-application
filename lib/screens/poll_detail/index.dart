@@ -1,18 +1,16 @@
 import 'package:dima_app/providers/preferences.dart';
-import 'package:dima_app/screens/event_detail/event_detail_create.dart';
 import 'package:dima_app/screens/poll_detail/creator_options.dart';
 import 'package:dima_app/screens/poll_detail/dates_list.dart';
 import 'package:dima_app/screens/poll_detail/invitees_pill.dart';
 import 'package:dima_app/screens/poll_detail/locations_list.dart';
 import 'package:dima_app/server/date_methods.dart';
-import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_event.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
 import 'package:dima_app/themes/layout_constants.dart';
-import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/delay_widget.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_modal.dart';
@@ -195,7 +193,8 @@ class PollDetailScreen extends StatelessWidget {
                       );
                       if (ris == "create_event_$curUid") {
                         // ignore: use_build_context_synchronously
-                        await Provider.of<FirebasePoll>(context, listen: false)
+                        await Provider.of<FirebasePollEvent>(context,
+                                listen: false)
                             .closePoll(
                           context: context,
                           pollId: pollId,

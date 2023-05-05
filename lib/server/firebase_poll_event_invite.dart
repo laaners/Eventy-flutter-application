@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_crud.dart';
-import 'firebase_poll.dart';
+import 'firebase_poll_event.dart';
 import 'firebase_vote.dart';
 
 class FirebasePollEventInvite extends ChangeNotifier {
@@ -59,7 +59,7 @@ class FirebasePollEventInvite extends ChangeNotifier {
 
       PollEventCollection? pollData =
           // ignore: use_build_context_synchronously
-          await Provider.of<FirebasePoll>(context, listen: false)
+          await Provider.of<FirebasePollEvent>(context, listen: false)
               .getPollData(context, pollEventId);
       if (pollData == null) return;
 
