@@ -1,3 +1,4 @@
+import 'package:dima_app/providers/preferences.dart';
 import 'package:dima_app/screens/event_create/select_slot.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/widgets/my_modal.dart';
@@ -40,12 +41,20 @@ class _SelectDaySlotsState extends State<SelectDaySlots> {
         List<dynamic> sortedSlots = widget.dates[dayString].keys.toList()
           ..sort();
         for (var k in sortedSlots) {
+          var start = k.split("-")[0];
+          var end = k.split("-")[1];
+          if (!Preferences.getBool('is24Hour')) {
+            start =
+                "${DateFormat("hh:mm a").format(DateFormatter.string2DateTime("2000-01-01 $start:00"))} ";
+            end =
+                " ${DateFormat("hh:mm a").format(DateFormatter.string2DateTime("2000-01-01 $end:00"))}";
+          }
           slotList.add(
             Container(
               padding: const EdgeInsets.symmetric(vertical: 1.0),
               child: ListTile(
                 title: Text(
-                  "${k.replaceAll('-', ' - ')}",
+                  "$start - $end",
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 20,

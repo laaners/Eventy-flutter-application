@@ -7,8 +7,7 @@ import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
 import 'package:dima_app/server/tables/availability.dart';
-import 'package:dima_app/server/tables/location.dart';
-import 'package:dima_app/server/tables/poll_collection.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
@@ -25,43 +24,46 @@ class FirebasePoll extends ChangeNotifier {
   FirebasePoll(this._firestore);
 
   CollectionReference get pollCollection =>
-      _firestore.collection(PollCollection.collectionName);
+      _firestore.collection(PollEventCollection.collectionName);
 
-  Future<PollCollection?> createPoll({
+  Future<PollEventCollection?> createPoll({
     required BuildContext context,
-    required String pollName,
+    required String pollEventName,
     required String organizerUid,
-    required String pollDesc,
+    required String pollEventDesc,
     required String deadline,
     required Map<String, dynamic> dates,
     required List<Map<String, dynamic>> locations,
     required bool public,
     required bool canInvite,
+    required bool isClosed,
   }) async {
-    PollCollection poll = PollCollection(
-      pollName: pollName,
+    PollEventCollection poll = PollEventCollection(
+      pollEventName: pollEventName,
       organizerUid: organizerUid,
-      pollDesc: pollDesc,
+      pollEventDesc: pollEventDesc,
       deadline: deadline,
       dates: dates,
       locations: locations,
       public: public,
       canInvite: canInvite,
+      isClosed: isClosed,
     );
     try {
-      String pollId = "${pollName}_$organizerUid";
+      String pollId = "${pollEventName}_$organizerUid";
       var pollExistence = await FirebaseCrud.readDoc(pollCollection, pollId);
       if (pollExistence!.exists) {
         return null;
       }
       // await pollCollection.doc(pollId).set(poll.toMap());
-      var test = poll.toMap();
+      var tmp = poll.toMap();
       // dates to utc
-      test["deadline"] =
+      tmp["deadline"] =
           DateFormatter.string2DateTime(DateFormatter.toUtcString(deadline));
-      test["dates"] =
-          PollCollection.datesToUtc(test["dates"] as Map<String, dynamic>);
-      await pollCollection.doc(pollId).set(test);
+      tmp["dates"] =
+          PollEventCollection.datesToUtc(tmp["dates"] as Map<String, dynamic>);
+      tmp["name_lower"] = poll.pollEventName.toLowerCase();
+      await pollCollection.doc(pollId).set(tmp);
     } on FirebaseException catch (e) {
       // showSnackBar(context, e.message!);
       print(e.message!);
@@ -69,7 +71,23 @@ class FirebasePoll extends ChangeNotifier {
     return poll;
   }
 
-  Future<PollCollection?> getPollData(
+  Stream<DocumentSnapshot<Object?>>? getPollDataSnapshot(
+    BuildContext context,
+    String pollId,
+  ) {
+    try {
+      var document = FirebaseCrud.readSnapshot(
+        pollCollection,
+        pollId,
+      );
+      return document;
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return null;
+  }
+
+  Future<PollEventCollection?> getPollData(
     BuildContext context,
     String id,
   ) async {
@@ -87,9 +105,9 @@ class FirebasePoll extends ChangeNotifier {
       // utc string
       tmp["deadline"] = DateFormatter.dateTime2String(tmp["deadline"].toDate());
       tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
-      tmp["dates"] =
-          PollCollection.datesToLocal(tmp["dates"] as Map<String, dynamic>);
-      PollCollection pollDetails = PollCollection.fromMap(tmp);
+      tmp["dates"] = PollEventCollection.datesToLocal(
+          tmp["dates"] as Map<String, dynamic>);
+      PollEventCollection pollDetails = PollEventCollection.fromMap(tmp);
       return pollDetails;
     } on FirebaseException catch (e) {
       showSnackBar(context, e.message!);
@@ -97,7 +115,7 @@ class FirebasePoll extends ChangeNotifier {
     return null;
   }
 
-  Future<List<PollCollection>> getUserPolls(
+  Future<List<PollEventCollection>> getUserPolls(
     BuildContext context,
     String userUid,
   ) async {
@@ -105,7 +123,7 @@ class FirebasePoll extends ChangeNotifier {
       var documents =
           await pollCollection.where("organizerUid", isEqualTo: userUid).get();
       if (documents.docs.isNotEmpty) {
-        final List<PollCollection> polls = documents.docs.map((doc) {
+        List<PollEventCollection> polls = documents.docs.map((doc) {
           var tmp = doc.data() as Map<String, dynamic>;
           tmp["locations"] = (tmp["locations"] as List).map((e) {
             e["lat"] = e["lat"].toDouble();
@@ -115,11 +133,30 @@ class FirebasePoll extends ChangeNotifier {
           tmp["deadline"] =
               DateFormatter.dateTime2String(tmp["deadline"].toDate());
           tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
-          tmp["dates"] =
-              PollCollection.datesToLocal(tmp["dates"] as Map<String, dynamic>);
-          var pollDetails = PollCollection.fromMap(tmp);
+          tmp["dates"] = PollEventCollection.datesToLocal(
+              tmp["dates"] as Map<String, dynamic>);
+          var pollDetails = PollEventCollection.fromMap(tmp);
           return pollDetails;
         }).toList();
+
+        // check if the deadline for one event was met, if true then update the database by deleting it (and creating corresponding an event)
+        List<Future> promises = [];
+        polls = polls.where((pollData) {
+          String nowDate =
+              DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
+          // today is below deadline
+          if (DateFormatter.toLocalString(pollData.deadline)
+                  .compareTo(nowDate) >
+              0) {
+            return true;
+          }
+          // deadline reached, delete the poll
+          String pollId = "${pollData.pollEventName}_${pollData.organizerUid}";
+          promises.add(closePoll(context: context, pollId: pollId));
+          return false;
+        }).toList();
+        await Future.wait(promises);
+
         return polls;
       }
       return [];
@@ -158,15 +195,18 @@ class FirebasePoll extends ChangeNotifier {
           tmp["deadline"] =
               DateFormatter.dateTime2String(tmp["deadline"].toDate());
           tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
-          tmp["dates"] =
-              PollCollection.datesToLocal(tmp["dates"] as Map<String, dynamic>);
-          var pollDetails = PollCollection.fromMap(tmp);
+          tmp["dates"] = PollEventCollection.datesToLocal(
+              tmp["dates"] as Map<String, dynamic>);
+          var pollDetails = PollEventCollection.fromMap(tmp);
           bool invited = curUserInvitesIds.contains(doc.id);
           return {"pollDetails": pollDetails, "invited": invited, "id": doc.id};
         }).toList();
+
         // check if the deadline for one event was met, if true then update the database by deleting it (and creating corresponding an event)
+        List<Future> promises = [];
         polls = polls.where((e) {
-          PollCollection pollData = e["pollDetails"] as PollCollection;
+          PollEventCollection pollData =
+              e["pollDetails"] as PollEventCollection;
           String nowDate =
               DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
           // today is below deadline
@@ -176,9 +216,10 @@ class FirebasePoll extends ChangeNotifier {
             return true;
           }
           // deadline reached, delete the poll
-          deletePoll(context: context, pollId: e["id"]);
+          promises.add(closePoll(context: context, pollId: e["id"]));
           return false;
         }).toList();
+        await Future.wait(promises);
         return polls;
       }
       return [];
@@ -186,6 +227,17 @@ class FirebasePoll extends ChangeNotifier {
       print(e.message!);
     }
     return [];
+  }
+
+  Future<void> closePoll({
+    required BuildContext context,
+    required String pollId,
+  }) async {
+    try {
+      await FirebaseCrud.updateDoc(pollCollection, pollId, "isClosed", true);
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
   }
 
   Future<void> deletePoll({
@@ -204,10 +256,10 @@ class FirebasePoll extends ChangeNotifier {
         tmp["deadline"] =
             DateFormatter.dateTime2String(tmp["deadline"].toDate());
         tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
-        tmp["dates"] =
-            PollCollection.datesToLocal(tmp["dates"] as Map<String, dynamic>);
+        tmp["dates"] = PollEventCollection.datesToLocal(
+            tmp["dates"] as Map<String, dynamic>);
 
-        PollCollection pollData = PollCollection.fromMap(tmp);
+        PollEventCollection pollData = PollEventCollection.fromMap(tmp);
 
         // get most voted options
         List<VoteLocationCollection> votesLocations =
@@ -264,12 +316,6 @@ class FirebasePoll extends ChangeNotifier {
         List<PollEventInviteCollection> invites =
             await Provider.of<FirebasePollEventInvite>(context, listen: false)
                 .getInvitesFromPollEventId(context, pollId);
-
-        var obj = {
-          "locations": votesLocations,
-          "dates": votesDates,
-          "data": pollData,
-        };
 
         votesLocations.sort((a, b) =>
             b.getPositiveVotes().length - a.getPositiveVotes().length);
@@ -346,21 +392,11 @@ class FirebasePoll extends ChangeNotifier {
 
         // delete poll
         await FirebaseCrud.deleteDoc(pollCollection, pollId);
-
-        // create event
-        await Provider.of<FirebaseEvent>(context, listen: false).createEvent(
-          context: context,
-          eventName: pollData.pollName,
-          organizerUid: pollData.organizerUid,
-          eventDesc: pollData.pollDesc,
-          date: eventDate,
-          location: eventLocation,
-          public: pollData.public,
-          canInvite: pollData.canInvite,
-        );
+        showSnackBar(context, "Successfully deleted poll");
       }
     } on FirebaseException catch (e) {
-      print(e.message!);
+      print(e.message);
+      showSnackBar(context, "Error in poll deletion");
     }
   }
 }

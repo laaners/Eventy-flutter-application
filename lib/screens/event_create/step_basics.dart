@@ -1,3 +1,4 @@
+import 'package:dima_app/providers/preferences.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
 import 'package:flutter/cupertino.dart';
@@ -99,7 +100,10 @@ class _StepBasicsState extends State<StepBasics> {
               border: InputBorder.none,
             ),
             controller: TextEditingController(
-              text: DateFormat("EEEE MMMM dd yyyy 'at' HH:mm").format(
+              text: DateFormat(Preferences.getBool("is24Hour")
+                      ? "EEEE MMMM dd yyyy 'at' HH:mm"
+                      : "EEEE MMMM dd yyyy 'at' hh:mm a")
+                  .format(
                 DateFormatter.string2DateTime(widget.deadlineController.text),
               ),
             ), //deadlineController,

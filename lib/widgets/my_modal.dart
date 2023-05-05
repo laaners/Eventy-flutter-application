@@ -1,4 +1,4 @@
-import 'package:dima_app/widgets/responsive_wrapper.dart';
+import 'package:dima_app/widgets/my_button.dart';
 import 'package:flutter/material.dart';
 
 class MyModal extends StatelessWidget {
@@ -26,92 +26,34 @@ class MyModal extends StatelessWidget {
   }) {
     return Column(
       children: [
-        doneCancelMode
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Flexible(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    alignment: Alignment.topRight,
-                    margin: const EdgeInsets.only(left: 15, top: 0),
-                    child: InkWell(
-                      child: const Icon(
-                        Icons.close,
-                        color: Colors.red,
-                        size: 30,
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
+                    margin: const EdgeInsets.only(bottom: 10, top: 10),
+                    alignment: Alignment.center,
+                    width: 80,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.outline,
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
                     ),
                   ),
-                  Flexible(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 15, top: 8),
-                          alignment: Alignment.center,
-                          width: 80,
-                          height: 3,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.outline,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20)),
-                          ),
-                        ),
-                        if (title.isNotEmpty)
-                          Text(
-                            title,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headlineMedium,
-                          )
-                      ],
-                    ),
-                  ),
-                  Container(
-                    alignment: Alignment.topRight,
-                    margin: const EdgeInsets.only(right: 15, top: 0),
-                    child: InkWell(
-                      onTap: onDone,
-                      child: const Icon(
-                        Icons.done,
-                        color: Colors.green,
-                        size: 30,
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Flexible(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 10, top: 10),
-                          alignment: Alignment.center,
-                          width: 80,
-                          height: 3,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.outline,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20)),
-                          ),
-                        ),
-                        if (title.isNotEmpty)
-                          Text(
-                            title,
-                            style: Theme.of(context).textTheme.headlineMedium,
-                          )
-                      ],
-                    ),
-                  ),
+                  if (title.isNotEmpty)
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    )
                 ],
               ),
+            ),
+          ],
+        ),
         Expanded(
           child: Container(
             alignment: Alignment.topCenter,
@@ -134,11 +76,44 @@ class MyModal extends StatelessWidget {
             ),
           ),
         ),
+        /*
+        Container(
+          margin: const EdgeInsets.all(15),
+          child: doneCancelMode
+              ? Row(
+                  children: [
+                    Expanded(
+                      child: MyButton(
+                        text: "CLOSE",
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: MyButton(
+                        text: "CLOSE",
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                  ],
+                )
+              : MyButton(
+                  text: "CLOSE",
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+        )
+        */
       ],
     );
   }
 
-  static void show({
+  static Future<dynamic> show({
     required BuildContext context,
     required Widget child,
     required double heightFactor,
@@ -146,7 +121,7 @@ class MyModal extends StatelessWidget {
     required VoidCallback onDone,
     required String title,
   }) async {
-    await showModalBottomSheet(
+    var ris = await showModalBottomSheet(
       useRootNavigator: true,
       isScrollControlled: true,
       context: context,
@@ -162,6 +137,7 @@ class MyModal extends StatelessWidget {
         ),
       ),
     );
+    return ris;
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:dima_app/server/firebase_event.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
@@ -142,53 +143,46 @@ class FirebaseCrudsTesting {
         tmp = next(1, 15);
         String deadlineD = tmp < 10 ? "0$tmp" : "$tmp";
 
-        Map<String, dynamic> utcDates = {
-          "2023-$deadlineM-${tmp + 1 < 10 ? "0${tmp + 1}" : "${tmp + 1}"}": [
-            {
-              "start": "17:10",
-              "end": "18:30",
-            }
-          ]
+        Map<String, dynamic> localDates = {
+          "2023-$deadlineM-${tmp + 1 < 10 ? "0${tmp + 1}" : "${tmp + 1}"}": {
+            "17:10-18:30": 1
+          }
         };
+
+        '{2023-05-19 00:00:00: {12:20-13:20: 1}, 2023-05-18 00:00:00: {12:20-13:20: 1, 12:25-13:20: 1}}';
 
         int numDates = next(0, 15);
         for (int k = 2; k < numDates; k++) {
           String date =
               "2023-$deadlineM-${tmp + k < 10 ? "0${tmp + k}" : "${tmp + k}"}";
-          utcDates[date] = k % 3 == 0
-              ? [
-                  {
-                    "start": "17:10",
-                    "end": "18:30",
-                  }
-                ]
-              : [];
+          localDates[date] = k % 3 == 0 ? {"17:10-18:30": 1} : {};
           int numSlots = next(1, 4);
           for (int h = 0; h < numSlots; h++) {
             int start = 8 + 1 + h;
             int end = start + 1;
-            utcDates[date].add({
-              "start": "${start < 10 ? "0$start" : "$start"}:00",
-              "end": "${end < 10 ? "0$end" : "$end"}:${next(1, 5) * 10}",
-            });
+            localDates[date][
+                "${start < 10 ? "0$start" : "$start"}:00-${end < 10 ? "0$end" : "$end"}:${next(1, 5) * 10}"] = 1;
           }
         }
 
         /*
         {pollName: j, organizerUid: u8oRJn2HdAQP459lnSVmFxgtsW93, pollDesc: , deadline: 2023-03-26 22:00:00, dates: {2023-03-31: [{start: 15:00, end: 16:00}]}, locations: [{name: Virtual meeting, site: , lat: 0.0, lon: 0.0}], public: true}
         */
-        var dbPoll =
-            // ignore: use_build_context_synchronously
-            await Provider.of<FirebasePoll>(context, listen: false).createPoll(
+        // ignore: use_build_context_synchronously
+        print(localDates);
+        print(locations);
+        // ignore: use_build_context_synchronously
+        await Provider.of<FirebasePoll>(context, listen: false).createPoll(
           context: context,
-          pollName: eventName,
+          pollEventName: eventName,
           organizerUid: organizerUid,
-          pollDesc: j % 2 == 0 ? "" : "Some random desc for event $j",
+          pollEventDesc: j % 2 == 0 ? "" : "Some random desc for event $j",
           deadline: "2023-$deadlineM-$deadlineD 21:30:00",
-          dates: utcDates,
-          locations: locations,
+          dates: localDates as Map<String, dynamic>,
+          locations: locations as List<Map<String, dynamic>>,
           public: next(0, 2) % 2 == 0,
           canInvite: next(0, 2) % 2 == 0,
+          isClosed: false,
         );
 
         String pollId = "${eventName}_$organizerUid";
@@ -232,17 +226,16 @@ class FirebaseCrudsTesting {
               next(-1, 3),
             );
           }
-          for (var key in utcDates.keys) {
-            for (int h = 0; h < utcDates[key].length; h++) {
-              var slot = utcDates[key][h];
+          for (var day in localDates.keys) {
+            for (var slot in localDates[day].keys) {
               // ignore: use_build_context_synchronously
               await Provider.of<FirebaseVote>(context, listen: false)
                   .userVoteDate(
                 context,
                 pollId,
-                key,
-                slot["start"],
-                slot["end"],
+                day.split(" ")[0],
+                "${slot.split("-")[0]}",
+                "${slot.split("-")[1]}",
                 uid,
                 next(-1, 3),
               );

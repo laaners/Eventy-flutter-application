@@ -43,7 +43,12 @@ class ProfilePic extends StatelessWidget {
                     fit: BoxFit.fill,
                     loadingBuilder: (BuildContext context, Widget child,
                         ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) return child;
+                      if (loadingProgress != null) {
+                        return capitalNameSurnameAvatar(context);
+                      } else {
+                        return child;
+                      }
+                      /*
                       return Center(
                         child: CircularProgressIndicator(
                           value: loadingProgress.expectedTotalBytes != null
@@ -52,6 +57,7 @@ class ProfilePic extends StatelessWidget {
                               : null,
                         ),
                       );
+                      */
                     },
                   ),
                 ))

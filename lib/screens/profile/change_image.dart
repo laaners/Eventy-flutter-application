@@ -1,36 +1,38 @@
 import 'dart:io';
-
+import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/themes/layout_constants.dart';
-import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:provider/provider.dart';
-import 'package:path/path.dart';
 
 class ChangeImage extends StatefulWidget {
-  const ChangeImage({super.key});
+  final File? photo;
+  final ValueChanged<File?> changePhoto;
+  final bool initialRemoved;
+  final ValueChanged<bool> changeInitialRemoved;
+  const ChangeImage({
+    super.key,
+    this.photo,
+    required this.changePhoto,
+    required this.initialRemoved,
+    required this.changeInitialRemoved,
+  });
 
   @override
   State<ChangeImage> createState() => _ChangeImageState();
 }
 
 class _ChangeImageState extends State<ChangeImage> {
-  firebase_storage.FirebaseStorage storage =
-      firebase_storage.FirebaseStorage.instance;
-
-  File? _photo;
   bool loading = false;
   final ImagePicker _picker = ImagePicker();
 
   Future imgFromGallery(BuildContext context) async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-
     setState(() {
       if (pickedFile != null) {
-        _photo = File(pickedFile.path);
-        uploadFile(context);
+        widget.changePhoto(File(pickedFile.path));
+        // uploadFile(context);
       } else {
         print('No image selected.');
       }
@@ -45,56 +47,12 @@ class _ChangeImageState extends State<ChangeImage> {
 
     setState(() {
       if (pickedFile != null) {
-        _photo = File(pickedFile.path);
-        uploadFile(context);
+        widget.changePhoto(File(pickedFile.path));
+        // uploadFile(context);
       } else {
         print('No image selected.');
       }
     });
-  }
-
-  Future uploadFile(BuildContext context) async {
-    if (_photo == null) return;
-    setState(() {
-      loading = true;
-    });
-    final userId = Provider.of<FirebaseUser>(context, listen: false)
-        .user
-        ?.uid; // basename(_photo!.path);
-    final destination = 'profile_pics/$userId';
-    try {
-      var ref =
-          firebase_storage.FirebaseStorage.instance.ref().child(destination);
-      await ref.putFile(_photo!);
-      String profileUrl = await ref.getDownloadURL();
-      // ignore: use_build_context_synchronously
-      await Provider.of<FirebaseUser>(context, listen: false)
-          .updateProfilePic(context, profileUrl);
-      print(url);
-      setState(() {
-        loading = false;
-      });
-    } catch (e) {
-      print('error occured');
-    }
-  }
-
-  Future removePhoto(BuildContext context) async {
-    setState(() {
-      loading = true;
-    });
-    final userId = Provider.of<FirebaseUser>(context, listen: false)
-        .user
-        ?.uid; // basename(_photo!.path);
-    try {
-      await Provider.of<FirebaseUser>(context, listen: false)
-          .updateProfilePic(context, "default");
-      setState(() {
-        loading = false;
-      });
-    } catch (e) {
-      print('error occured');
-    }
   }
 
   @override
@@ -105,10 +63,12 @@ class _ChangeImageState extends State<ChangeImage> {
         children: [
           Consumer<FirebaseUser>(
             builder: (context, value, child) {
-              return ProfilePic(
+              return ProfilePicTemporary(
                 userData: value.userData,
                 loading: loading,
                 radius: LayoutConstants.kProfilePicRadiusLarge,
+                imageFile: widget.photo,
+                initialRemoved: widget.initialRemoved,
               );
             },
           ),
@@ -119,7 +79,10 @@ class _ChangeImageState extends State<ChangeImage> {
                   -LayoutConstants.kProfilePicRadiusLarge / 1.414, 0.0),
             child: ElevatedButton(
               onPressed: () {
-                removePhoto(context);
+                setState(() {
+                  widget.changePhoto(null);
+                  widget.changeInitialRemoved(true);
+                });
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(LayoutConstants.kIconPadding),
@@ -180,6 +143,75 @@ class _ChangeImageState extends State<ChangeImage> {
           ),
         );
       },
+    );
+  }
+}
+
+class ProfilePicTemporary extends StatelessWidget {
+  final UserCollection? userData;
+  final bool loading;
+  final double radius;
+  final File? imageFile;
+  final bool initialRemoved;
+  const ProfilePicTemporary({
+    super.key,
+    required this.userData,
+    required this.loading,
+    required this.radius,
+    this.imageFile,
+    required this.initialRemoved,
+  });
+
+  Widget capitalNameSurnameAvatar(context) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          "${userData?.name[0].toUpperCase()}${userData?.surname[0].toUpperCase()}",
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.displayLarge,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: Theme.of(context).primaryColor,
+      child: imageFile != null
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(radius),
+              child: Image.file(
+                imageFile!,
+                width: radius * 2,
+                height: radius * 2,
+                fit: BoxFit.fill,
+              ),
+            )
+          : userData?.profilePic != "default" && !initialRemoved
+              ? (loading
+                  ? capitalNameSurnameAvatar(context)
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(radius),
+                      child: Image.network(
+                        userData!.profilePic,
+                        width: radius * 2,
+                        height: radius * 2,
+                        fit: BoxFit.fill,
+                        loadingBuilder: (BuildContext context, Widget child,
+                            ImageChunkEvent? loadingProgress) {
+                          if (loadingProgress != null) {
+                            return capitalNameSurnameAvatar(context);
+                          } else {
+                            return child;
+                          }
+                        },
+                      ),
+                    ))
+              : capitalNameSurnameAvatar(context),
     );
   }
 }

@@ -6,10 +6,7 @@ import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_location_collection.dart';
-import 'package:dima_app/themes/layout_constants.dart';
-import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
-import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +14,7 @@ import 'dart:math' as math;
 
 class LocationsList extends StatefulWidget {
   final String organizerUid;
+  final String votingUid;
   final String pollId;
   final List<Map<String, dynamic>> locations;
   final List<PollEventInviteCollection> invites;
@@ -28,6 +26,7 @@ class LocationsList extends StatefulWidget {
     required this.organizerUid,
     required this.invites,
     required this.votesLocations,
+    required this.votingUid,
   });
 
   @override
@@ -116,6 +115,7 @@ class _LocationsListState extends State<LocationsList>
                       (element) => element["name"] == voteLocation.locationName,
                     );
                     return LocationTile(
+                      votingUid: widget.votingUid,
                       pollId: widget.pollId,
                       organizerUid: widget.organizerUid,
                       invites: widget.invites,
@@ -128,11 +128,13 @@ class _LocationsListState extends State<LocationsList>
                       ),
                       voteLocation: voteLocation,
                       modifyVote: (int newAvailability) {
-                        setState(() {
-                          votesLocations[votesLocations.indexWhere(
-                                  (e) => e.locationName == location["name"])]
-                              .votes[curUid] = newAvailability;
-                        });
+                        if (widget.votingUid == curUid) {
+                          setState(() {
+                            votesLocations[votesLocations.indexWhere(
+                                    (e) => e.locationName == location["name"])]
+                                .votes[curUid] = newAvailability;
+                          });
+                        }
                       },
                     );
                   }).toList(),
@@ -147,6 +149,7 @@ class _LocationsListState extends State<LocationsList>
 }
 
 class LocationTile extends StatelessWidget {
+  final String votingUid;
   final String pollId;
   final String organizerUid;
   final List<PollEventInviteCollection> invites;
@@ -161,12 +164,13 @@ class LocationTile extends StatelessWidget {
     required this.location,
     required this.voteLocation,
     required this.modifyVote,
+    required this.votingUid,
   });
 
   @override
   Widget build(BuildContext context) {
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    int curVote = voteLocation.votes[curUid];
+    int curVote = voteLocation.votes[votingUid] ?? Availability.empty;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 1.0),
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
@@ -217,47 +221,32 @@ class LocationTile extends StatelessWidget {
               child: Icon(Availability.icons[curVote]),
             ),
             onTap: () async {
-              if (MyAlertDialog.showAlertIfCondition(
+              if (votingUid == curUid) {
+                if (MyAlertDialog.showAlertIfCondition(
+                  context: context,
+                  condition: votingUid == organizerUid,
+                  title: "You cannot vote",
+                  content:
+                      "You are the organizer, you must be present at the event!",
+                )) {
+                  return;
+                }
+                int newAvailability =
+                    curVote + 1 > 2 ? Availability.empty : curVote + 1;
+                await Provider.of<FirebaseVote>(context, listen: false)
+                    .userVoteLocation(
                   context,
-                  curUid == organizerUid,
-                  "YOU CANNOT VOTE",
-                  "You are the organizer, you must be present at the event!")) {
-                return;
+                  pollId,
+                  location.name,
+                  votingUid,
+                  newAvailability,
+                );
+                modifyVote(newAvailability);
               }
-              int newAvailability =
-                  curVote + 1 > 2 ? Availability.empty : curVote + 1;
-              await Provider.of<FirebaseVote>(context, listen: false)
-                  .userVoteLocation(
-                context,
-                pollId,
-                location.name,
-                curUid,
-                newAvailability,
-              );
-              modifyVote(newAvailability);
             },
           ),
         ),
         onTap: () async {
-          /*
-          await showModalBottomSheet(
-            useRootNavigator: true,
-            isScrollControlled: true,
-            context: context,
-            builder: (context) => FractionallySizedBox(
-              heightFactor: 0.85,
-              child: LocationDetail(
-                pollId: pollId,
-                organizerUid: organizerUid,
-                invites: invites,
-                location: location,
-                modifyVote: modifyVote,
-              ),
-            ),
-          );
-          */
-          /*
-          */
           MyModal.show(
             context: context,
             child: LocationDetail(
@@ -275,24 +264,6 @@ class LocationTile extends StatelessWidget {
           /*
           */
           return;
-          Navigator.push(
-            context,
-            ScreenTransition(
-              builder: (context) => Scaffold(
-                appBar: MyAppBar(
-                  title: "location detail",
-                  upRightActions: [],
-                ),
-                body: LocationDetail(
-                  pollId: pollId,
-                  organizerUid: organizerUid,
-                  invites: invites,
-                  location: location,
-                  modifyVote: modifyVote,
-                ),
-              ),
-            ),
-          );
           // modifyVote(Availability.not);
         },
       ),

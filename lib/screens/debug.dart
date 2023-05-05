@@ -86,7 +86,7 @@ class _DebugScreenState extends State<DebugScreen> {
                       text: "delete a poll",
                       onPressed: () async {
                         await Provider.of<FirebasePoll>(context, listen: false)
-                            .deletePoll(
+                            .closePoll(
                                 context: context,
                                 pollId:
                                     "Event 2 of UsernameId16_FXLaBqT6DhQhPujaHMQE4AKFaXX2");

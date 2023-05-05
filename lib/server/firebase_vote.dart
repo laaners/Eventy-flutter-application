@@ -105,6 +105,31 @@ class FirebaseVote extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteUserVoteLocation({
+    required BuildContext context,
+    required String pollId,
+    required String locationName,
+    required String uid,
+  }) async {
+    try {
+      String voteId = "${pollId}_$locationName";
+      var document = await FirebaseCrud.readDoc(
+        voteLocationCollection,
+        voteId,
+      );
+      if (document!.exists) {
+        Map<String, dynamic> updatedDoc =
+            document.data() as Map<String, dynamic>;
+        updatedDoc["votes"].removeWhere((key, value) => key == uid);
+        await voteLocationCollection
+            .doc(voteId)
+            .update({"votes": updatedDoc["votes"]});
+      }
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+  }
+
   Stream<DocumentSnapshot<Object?>>? getVoteDateSnapshot(
     BuildContext context,
     String pollId,
@@ -237,6 +262,36 @@ class FirebaseVote extends ChangeNotifier {
       }
     } on FirebaseException catch (e) {
       // showSnackBar(context, e.message!);
+      print(e.message!);
+    }
+  }
+
+  Future<void> deleteUserVoteDate({
+    required BuildContext context,
+    required String pollId,
+    required String date,
+    required String start,
+    required String end,
+    required String uid,
+  }) async {
+    try {
+      Map<String, String> utcInfo =
+          VoteDateCollection.dateToUtc(date, start, end);
+      var voteId =
+          "${pollId}_${utcInfo["date"]}_${utcInfo["start"]}_${utcInfo["end"]}";
+      var document = await FirebaseCrud.readDoc(
+        voteDateCollection,
+        voteId,
+      );
+      if (document!.exists) {
+        Map<String, dynamic> updatedDoc =
+            document.data() as Map<String, dynamic>;
+        updatedDoc["votes"].removeWhere((key, value) => key == uid);
+        await voteDateCollection
+            .doc(voteId)
+            .update({"votes": updatedDoc["votes"]});
+      }
+    } on FirebaseException catch (e) {
       print(e.message!);
     }
   }

@@ -1,6 +1,8 @@
 import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/location_icons.dart';
+import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_button.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,41 +43,30 @@ class _SelectVirtualState extends State<SelectVirtual> {
     super.dispose();
   }
 
-  void checkFields() {
+  void checkFields() async {
     widget.removeLocation("Virtual meeting");
     if (locationAddrController.text.isEmpty) {
-      showCupertinoModalPopup(
+      bool ris = await MyAlertDialog.showAlertConfirmCancel(
         context: context,
-        builder: (BuildContext context) => CupertinoAlertDialog(
-          title: const Text("MISSING ROOM LINK"),
-          content: const Text("Leave the virtual room link empty?"),
-          actions: <CupertinoDialogAction>[
-            CupertinoDialogAction(
-              isDestructiveAction: true,
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('CANCEL'),
-            ),
-            CupertinoDialogAction(
-              isDefaultAction: true,
-              onPressed: () {
-                widget.addLocation(Location(
-                  "Virtual meeting",
-                  locationAddrController.text,
-                  0,
-                  0,
-                  "videocam",
-                ));
-                widget.setVirtualMeeting(true);
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              child: const Text('YES'),
-            ),
-          ],
-        ),
+        title: "Missing room link",
+        content: "Leave the virtual room link empty?",
+        trueButtonText: "Confirm",
       );
+
+      if (ris) {
+        // left empty
+        widget.addLocation(Location(
+          "Virtual meeting",
+          locationAddrController.text,
+          0,
+          0,
+          "videocam",
+        ));
+        widget.setVirtualMeeting(true);
+        Navigator.pop(context);
+      } else {
+        Navigator.pop(context);
+      }
       return;
     }
     widget.setVirtualMeeting(true);

@@ -1,3 +1,4 @@
+import 'package:dima_app/providers/preferences.dart';
 import 'package:dima_app/screens/poll_detail/date_detail.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/server/firebase_user.dart';
@@ -76,10 +77,11 @@ class _DatesViewGridState extends State<DatesViewGrid> {
                     ),
               ),
               Text(
-                "at ${DateFormat("hh:mm").format(deadlineDate)}",
+                "at${Preferences.getBool('is24Hour') ? ' ' : '\n'}${DateFormat(Preferences.getBool('is24Hour') ? "HH:mm" : "hh:mm a").format(deadlineDate)}",
                 style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onPrimary,
                     ),
+                textAlign: TextAlign.center,
               ),
               Text(
                 "DEADLINE",
@@ -135,6 +137,15 @@ class DateTile extends StatelessWidget {
 
     DateTime dateTime =
         DateFormatter.string2DateTime("${voteDate.date} 00:00:00");
+
+    var start = voteDate.start;
+    var end = voteDate.end;
+    if (!Preferences.getBool('is24Hour')) {
+      start = DateFormat("hh:mm a")
+          .format(DateFormatter.string2DateTime("2000-01-01 $start:00"));
+      end = DateFormat("hh:mm a")
+          .format(DateFormatter.string2DateTime("2000-01-01 $end:00"));
+    }
     return InkWell(
       onTap: () {
         MyModal.show(
@@ -175,8 +186,9 @@ class DateTile extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             Text(
-              "${voteDate.start}-${voteDate.end}",
+              "$start${Preferences.getBool('is24Hour') ? '-' : ' '}$end",
               style: Theme.of(context).textTheme.titleMedium,
+              textAlign: TextAlign.center,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -206,10 +218,12 @@ class DateTile extends StatelessWidget {
                   ),
                   onTap: () async {
                     if (MyAlertDialog.showAlertIfCondition(
-                        context,
-                        curUid == organizerUid,
-                        "YOU CANNOT VOTE",
-                        "You are the organizer, you must be present at the event!")) {
+                      context: context,
+                      condition: curUid == organizerUid,
+                      title: "You cannot vote",
+                      content:
+                          "You are the organizer, you must be present at the event!",
+                    )) {
                       return;
                     }
                     int newAvailability =
