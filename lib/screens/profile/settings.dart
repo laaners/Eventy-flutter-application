@@ -103,16 +103,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   .signOut(context);
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.delete_forever),
-            title: const Text("Delete Account"),
-            trailing: const Icon(Icons.navigate_next),
-            onTap: () {
-              showDialog<String>(
-                  context: context,
-                  builder: (BuildContext context) => DeleteDialog());
-            },
-          ),
+          // Delete account not implemented yet
+          // ListTile(
+          //   leading: const Icon(Icons.delete_forever),
+          //   title: const Text("Delete Account"),
+          //   trailing: const Icon(Icons.navigate_next),
+          //   onTap: () {
+          //     showDialog<String>(
+          //         context: context,
+          //         builder: (BuildContext context) => DeleteDialog());
+          //   },
+          // ),
         ],
       ),
     );
