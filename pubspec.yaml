@@ -66,6 +66,7 @@ dependencies:
   flutter_local_notifications: ^13.0.0
   shared_preferences: ^2.1.0
   flutter_launcher_icons: ^0.12.0
+  location: ^4.4.0
 
 dev_dependencies:
   flutter_test:
