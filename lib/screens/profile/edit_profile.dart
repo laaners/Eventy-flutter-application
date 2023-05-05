@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:dima_app/screens/profile/change_image.dart';
 import 'package:dima_app/themes/layout_constants.dart';
+import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
@@ -26,6 +29,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _surnameController = TextEditingController();
   final _emailController = TextEditingController();
 
+  File? _photo;
+  bool _initialRemoved = false;
   bool _usernameAlreadyExist = false;
 
   @override
@@ -66,7 +71,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const SizedBox(
                 height: 10,
               ),
-              const ChangeImage(),
+              ChangeImage(
+                  photo: _photo,
+                  changePhoto: (File? newPhoto) {
+                    setState(() {
+                      _photo = newPhoto;
+                    });
+                  },
+                  initialRemoved: _initialRemoved,
+                  changeInitialRemoved: (bool value) {
+                    setState(() {
+                      _initialRemoved = value;
+                    });
+                  }),
               const SizedBox(
                 height: 50,
               ),
@@ -164,22 +181,40 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               MyButton(
                 text: "SAVE",
                 onPressed: () async {
+                  LoadingOverlay.show(context);
                   if (_formkey.currentState!.validate()) {
                     // ignore: use_build_context_synchronously
                     if (await Provider.of<FirebaseUser>(context, listen: false)
-                            .updateUserData(
-                          context: context,
-                          username: _usernameController.text,
-                          name: _nameController.text,
-                          surname: _surnameController.text,
-                          email: _emailController.text,
-                        ) ==
-                        true) {
+                        .updateUserData(
+                      context: context,
+                      username: _usernameController.text,
+                      name: _nameController.text,
+                      surname: _surnameController.text,
+                      email: _emailController.text,
+                    )) {
+                      // update photo
+                      if (_initialRemoved) {
+                        // ignore: use_build_context_synchronously
+                        await Provider.of<FirebaseUser>(context, listen: false)
+                            .updateProfilePic(context: context, photo: _photo);
+                      }
+
+                      // ignore: use_build_context_synchronously
+                      LoadingOverlay.hide(context);
+
                       // ignore: use_build_context_synchronously
                       showSnackBar(
-                          context, "Your information has been updated!");
+                        context,
+                        "Your information has been updated!",
+                      );
+                      setState(() {
+                        _initialRemoved = false;
+                      });
+                      return;
                     }
                   }
+                  // ignore: use_build_context_synchronously
+                  LoadingOverlay.hide(context);
                 },
               )
             ],

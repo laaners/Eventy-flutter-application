@@ -1,11 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_poll.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'firebase_crud.dart';
@@ -199,9 +202,9 @@ class FirebaseUser extends ChangeNotifier {
           .getUserPolls(context, uid)
           .then((value) async {
         await Future.wait(value.map((pollData) {
-          String pollId = "${pollData.pollName}_$uid";
+          String pollId = "${pollData.pollEventName}_$uid";
           return Provider.of<FirebasePoll>(context, listen: false)
-              .deletePoll(context: context, pollId: pollId);
+              .closePoll(context: context, pollId: pollId);
         }).toList());
       });
       print("DONE: Deleting associated polls");
@@ -225,6 +228,22 @@ class FirebaseUser extends ChangeNotifier {
       return userDetails;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
+    }
+    return null;
+  }
+
+  Stream<DocumentSnapshot<Object?>>? getUserDataStream(
+    BuildContext context,
+    String uid,
+  ) {
+    try {
+      var document = FirebaseCrud.readSnapshot(
+        userCollection,
+        uid,
+      );
+      return document;
+    } on FirebaseException catch (e) {
+      print(e.message!);
     }
     return null;
   }
@@ -303,9 +322,19 @@ class FirebaseUser extends ChangeNotifier {
     return false;
   }
 
-  Future<void> updateProfilePic(BuildContext context, String profileUrl) async {
+  Future<void> updateProfilePic({
+    required BuildContext context,
+    required File? photo,
+  }) async {
     try {
-      var uid = _auth.currentUser!.uid;
+      String uid = _auth.currentUser!.uid;
+      final destination = 'profile_pics/$uid';
+      var ref = FirebaseStorage.instance.ref().child(destination);
+      String profileUrl = "default";
+      if (photo != null) {
+        await ref.putFile(photo);
+        profileUrl = await ref.getDownloadURL();
+      }
       await FirebaseCrud.updateDoc(
           userCollection, uid, "profilePic", profileUrl);
       var tmpMap = _userData!.toMap();

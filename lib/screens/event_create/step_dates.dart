@@ -1,9 +1,11 @@
+import 'package:dima_app/providers/preferences.dart';
 import 'package:dima_app/screens/event_create/select_day_slots.dart';
 import 'package:dima_app/screens/event_create/select_slot.dart';
 import 'package:dima_app/server/date_methods.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class StepDates extends StatefulWidget {
@@ -191,6 +193,13 @@ class _StepDatesState extends State<StepDates> {
           children: _timeSlots.map((slot) {
             var start = slot["start"];
             var end = slot["end"];
+
+            if (!Preferences.getBool('is24Hour')) {
+              start =
+                  "${DateFormat("hh:mm a").format(DateFormatter.string2DateTime("2000-01-01 $start:00"))} ";
+              end =
+                  " ${DateFormat("hh:mm a").format(DateFormatter.string2DateTime("2000-01-01 $end:00"))}";
+            }
             return Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
@@ -220,7 +229,8 @@ class _StepDatesState extends State<StepDates> {
                       widget.removeEmpty();
                       setState(() {
                         _timeSlots.removeWhere((item) =>
-                            item["start"] == start && item["end"] == end);
+                            item["start"] == slot["start"] &&
+                            item["end"] == slot["end"]);
                         _fixedTimeSlots = _timeSlots.isEmpty ? false : true;
                       });
                     },

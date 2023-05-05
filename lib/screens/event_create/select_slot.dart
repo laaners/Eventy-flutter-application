@@ -1,3 +1,4 @@
+import 'package:dima_app/providers/preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -89,7 +90,7 @@ class _SelectSlotState extends State<SelectSlot> {
                         mode: CupertinoDatePickerMode.time,
                         initialDateTime: _startDate,
                         minuteInterval: 5,
-                        use24hFormat: true,
+                        use24hFormat: Preferences.getBool("is24Hour"),
                         onDateTimeChanged: (pickedDate) {
                           setState(() {
                             _startDate = pickedDate;
@@ -115,7 +116,7 @@ class _SelectSlotState extends State<SelectSlot> {
                         mode: CupertinoDatePickerMode.time,
                         initialDateTime: _endDate,
                         minuteInterval: 5,
-                        use24hFormat: true,
+                        use24hFormat: Preferences.getBool("is24Hour"),
                         onDateTimeChanged: (pickedDate) {
                           setState(() {
                             _endDate = pickedDate;

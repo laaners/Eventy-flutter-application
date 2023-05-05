@@ -1,11 +1,9 @@
 import 'package:dima_app/screens/event_create/select_location_address.dart';
 import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/location_icons.dart';
-import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SelectLocation extends StatefulWidget {
@@ -60,46 +58,38 @@ class _SelectLocationState extends State<SelectLocation> {
 
   void checkFields() {
     widget.removeLocation(widget.defaultLocation.name);
-    if (locationNameController.text.isEmpty) {
-      showCupertinoModalPopup(
-        context: context,
-        builder: (BuildContext context) => const MyAlertDialog(
-          title: "MISSING NAME",
-          content: "You must give a name to the location",
-        ),
-      );
-      return;
-    }
-    if (locationNameController.text == "Virtual meeting") {
-      showCupertinoModalPopup(
-        context: context,
-        builder: (BuildContext context) => const MyAlertDialog(
-          title: "INVALID NAME",
-          content: "You must give a different name to the location",
-        ),
-      );
-      return;
-    }
-    if (locationAddrController.text.isEmpty) {
-      showCupertinoModalPopup(
-        context: context,
-        builder: (BuildContext context) => const MyAlertDialog(
-          title: "MISSING ADDRESS",
-          content: "You must give an address to the location",
-        ),
-      );
-      return;
-    }
-    if (lat == 0 && lon == 0) {
-      showCupertinoModalPopup(
-        context: context,
-        builder: (BuildContext context) => const MyAlertDialog(
-          title: "INVALID ADDRESS",
-          content: "You must give a valid address to the location",
-        ),
-      );
-      return;
-    }
+    bool ret = MyAlertDialog.showAlertIfCondition(
+      context: context,
+      condition: locationNameController.text.isEmpty,
+      title: "Missing name",
+      content: "You must give a name to the location",
+    );
+    if (ret) return;
+
+    ret = MyAlertDialog.showAlertIfCondition(
+      context: context,
+      condition: locationNameController.text == "Virtual meeting",
+      title: "Invalid name",
+      content: "You must give a different name to the location",
+    );
+    if (ret) return;
+
+    ret = MyAlertDialog.showAlertIfCondition(
+      context: context,
+      condition: locationAddrController.text.isEmpty,
+      title: "Missing address",
+      content: "You must give an address to the location",
+    );
+    if (ret) return;
+
+    ret = MyAlertDialog.showAlertIfCondition(
+      context: context,
+      condition: lat == 0 && lon == 0,
+      title: "Invalid address",
+      content: "You must give a valid address to the location",
+    );
+    if (ret) return;
+
     showMap = false;
     Navigator.pop(context);
     widget.addLocation(Location(
@@ -165,26 +155,27 @@ class _SelectLocationState extends State<SelectLocation> {
                 controller: locationNameController,
               ),
             ),
+            SelectLocationAddress(
+              defaultLocation: widget.defaultLocation,
+              controller: locationAddrController,
+              setAddress: (address) {
+                setState(() {
+                  locationAddrController.text = address;
+                });
+              },
+              setCoor: (coor) {
+                setState(() {
+                  lat = coor[0];
+                  lon = coor[1];
+                });
+              },
+              focusNode: focusNode,
+            ),
           ],
         ),
         const Padding(padding: EdgeInsets.only(top: 8)),
-        SelectLocationAddress(
-          defaultLocation: widget.defaultLocation,
-          controller: locationAddrController,
-          setAddress: (address) {
-            setState(() {
-              locationAddrController.text = address;
-            });
-          },
-          setCoor: (coor) {
-            setState(() {
-              lat = coor[0];
-              lon = coor[1];
-            });
-          },
-          focusNode: focusNode,
-        ),
         Container(
+          alignment: Alignment.bottomCenter,
           margin: const EdgeInsets.symmetric(horizontal: 15),
           child: MyButton(text: "Add location", onPressed: checkFields),
         ),

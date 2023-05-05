@@ -62,8 +62,7 @@ class _UserTileState extends State<UserTile> {
         }
         if (snapshot.hasError) {
           Future.microtask(() {
-            Navigator.of(context).pop();
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               ScreenTransition(
                 builder: (context) => ErrorScreen(

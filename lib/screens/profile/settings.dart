@@ -2,6 +2,7 @@ import 'package:dima_app/providers/preferences.dart';
 import 'package:dima_app/screens/profile/edit_profile.dart';
 import 'package:dima_app/screens/profile/delete_dialog.dart';
 import 'package:dima_app/themes/theme_manager.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,12 +19,13 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _pushNotificationEnabled = Preferences.getBool('isPush');
   bool _darkModeEnabled = Preferences.getBool('isDark');
+  bool _24HourEnabled = Preferences.getBool('is24Hour');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MyAppBar(title: "Settings", upRightActions: []),
-      body: Column(
+      body: ListView(
         children: [
           SwitchListTile(
             title: const Text(
@@ -52,15 +54,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
             secondary: const Icon(Icons.dark_mode),
           ),
+          SwitchListTile(
+            title: const Text(
+              "24-hour clock",
+            ),
+            value: _24HourEnabled,
+            onChanged: (bool value) {
+              setState(() {
+                _24HourEnabled = value;
+                Preferences.setBool('is24Hour', value);
+              });
+            },
+            secondary: const Icon(Icons.access_time),
+          ),
           ListTile(
             leading: const Icon(Icons.edit),
             title: const Text("Edit profile"),
             trailing: const Icon(Icons.navigate_next),
             onTap: () {
+              Widget newScreen = const EditProfileScreen();
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => const EditProfileScreen()),
+                ScreenTransition(
+                  builder: (context) => newScreen,
+                ),
               );
             },
           ),

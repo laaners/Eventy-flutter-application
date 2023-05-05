@@ -1,8 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
+import 'package:dima_app/server/tables/vote_location_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'firebase_crud.dart';
+import 'firebase_poll.dart';
+import 'firebase_vote.dart';
 
 class FirebasePollEventInvite extends ChangeNotifier {
   final FirebaseFirestore _firestore;
@@ -46,7 +51,47 @@ class FirebasePollEventInvite extends ChangeNotifier {
     try {
       String pollEventInviteId = "${pollEventId}_$inviteeId";
       await FirebaseCrud.deleteDoc(
-          pollEventInviteCollection, pollEventInviteId);
+        pollEventInviteCollection,
+        pollEventInviteId,
+      );
+
+      // remove invitee votes on locations and dates
+
+      PollEventCollection? pollData =
+          // ignore: use_build_context_synchronously
+          await Provider.of<FirebasePoll>(context, listen: false)
+              .getPollData(context, pollEventId);
+      if (pollData == null) return;
+
+      await Future.wait(pollData.locations.map((location) {
+        return Provider.of<FirebaseVote>(context, listen: false)
+            .deleteUserVoteLocation(
+          context: context,
+          pollId: pollEventId,
+          locationName: location["name"],
+          uid: inviteeId,
+        );
+      }).toList());
+
+      List<Future<void>> promises = pollData.dates.keys
+          .map((date) {
+            return pollData.dates[date].map((slot) {
+              return Provider.of<FirebaseVote>(context, listen: false)
+                  .deleteUserVoteDate(
+                context: context,
+                pollId: pollEventId,
+                date: date,
+                start: slot["start"],
+                end: slot["end"],
+                uid: inviteeId,
+              );
+            }).toList();
+          })
+          .toList()
+          .expand((x) => x)
+          .toList()
+          .cast();
+      await Future.wait(promises);
     } on FirebaseException catch (e) {
       // showSnackBar(context, e.message!);
       print(e.message!);

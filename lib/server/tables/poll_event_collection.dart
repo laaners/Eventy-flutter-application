@@ -2,28 +2,30 @@ import 'package:dima_app/server/date_methods.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
-class PollCollection {
-  final String pollName;
+class PollEventCollection {
+  final String pollEventName;
   final String organizerUid;
-  final String pollDesc;
+  final String pollEventDesc;
   final String deadline;
   final bool public;
   final bool canInvite;
   final Map<String, dynamic> dates;
   final List<Map<String, dynamic>> locations;
-  PollCollection({
-    required this.pollName,
+  final bool isClosed;
+  PollEventCollection({
+    required this.pollEventName,
     required this.organizerUid,
-    required this.pollDesc,
+    required this.pollEventDesc,
     required this.deadline,
     required this.dates,
     required this.locations,
     required this.public,
     required this.canInvite,
+    required this.isClosed,
   });
 
   // PK = pollName_organizerUid
-  static const collectionName = "poll";
+  static const collectionName = "poll_event";
 
   static Map<String, dynamic> datesToUtc(Map<String, dynamic> dates) {
     Map<String, dynamic> utcDates = {};
@@ -75,46 +77,49 @@ class PollCollection {
     return localDates;
   }
 
-  PollCollection copyWith({
-    String? pollName,
+  PollEventCollection copyWith({
+    String? pollEventName,
     String? organizerUid,
-    String? pollDesc,
+    String? pollEventDesc,
     String? deadline,
     Map<String, dynamic>? dates,
     List<Map<String, dynamic>>? locations,
     bool? public,
     bool? canInvite,
+    bool? isClosed,
   }) {
-    return PollCollection(
-      pollName: pollName ?? this.pollName,
+    return PollEventCollection(
+      pollEventName: pollEventName ?? this.pollEventName,
       organizerUid: organizerUid ?? this.organizerUid,
-      pollDesc: pollDesc ?? this.pollDesc,
+      pollEventDesc: pollEventDesc ?? this.pollEventDesc,
       deadline: deadline ?? this.deadline,
       dates: dates ?? this.dates,
       locations: locations ?? this.locations,
       public: public ?? this.public,
       canInvite: canInvite ?? this.canInvite,
+      isClosed: isClosed ?? this.isClosed,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'pollName': pollName,
+      'pollEventName': pollEventName,
       'organizerUid': organizerUid,
-      'pollDesc': pollDesc,
+      'pollEventDesc': pollEventDesc,
       'deadline': deadline,
       'dates': dates,
       'locations': locations,
       'public': public,
       'canInvite': canInvite,
+      'isClosed': isClosed,
     };
   }
 
-  factory PollCollection.fromMap(Map<String, dynamic> map) {
-    return PollCollection(
-      pollName: map['pollName'] as String,
+  factory PollEventCollection.fromMap(Map<String, dynamic> map) {
+    return PollEventCollection(
+      pollEventName: map['pollEventName'] as String,
       organizerUid: map['organizerUid'] as String,
-      pollDesc: map['pollDesc'] as String,
+      pollEventDesc: map['pollEventDesc'] as String,
       deadline: map['deadline'] as String,
       dates: Map<String, dynamic>.from((map['dates'] as Map<String, dynamic>)),
       locations: List<Map<String, dynamic>>.from(
@@ -123,37 +128,40 @@ class PollCollection {
       ),
       public: map['public'] as bool,
       canInvite: map['canInvite'] as bool,
+      isClosed: map['isClosed'] as bool,
     );
   }
 
   @override
   String toString() {
-    return 'PollCollection(pollName: $pollName, organizerUid: $organizerUid, pollDesc: $pollDesc, deadline: $deadline, dates: $dates, locations: $locations, public: $public, canInvite: $canInvite)';
+    return 'PollCollection(pollEventName: $pollEventName, organizerUid: $organizerUid, pollEventDesc: $pollEventDesc, deadline: $deadline, dates: $dates, locations: $locations, public: $public, canInvite: $canInvite, isClosed: $isClosed)';
   }
 
   @override
-  bool operator ==(covariant PollCollection other) {
+  bool operator ==(covariant PollEventCollection other) {
     if (identical(this, other)) return true;
 
-    return other.pollName == pollName &&
+    return other.pollEventName == pollEventName &&
         other.organizerUid == organizerUid &&
-        other.pollDesc == pollDesc &&
+        other.pollEventDesc == pollEventDesc &&
         other.deadline == deadline &&
         mapEquals(other.dates, dates) &&
         listEquals(other.locations, locations) &&
         other.public == public &&
-        other.canInvite == canInvite;
+        other.canInvite == canInvite &&
+        other.isClosed == isClosed;
   }
 
   @override
   int get hashCode {
-    return pollName.hashCode ^
+    return pollEventName.hashCode ^
         organizerUid.hashCode ^
-        pollDesc.hashCode ^
+        pollEventDesc.hashCode ^
         deadline.hashCode ^
         dates.hashCode ^
         locations.hashCode ^
         public.hashCode ^
-        canInvite.hashCode;
+        canInvite.hashCode ^
+        isClosed.hashCode;
   }
 }

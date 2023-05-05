@@ -89,8 +89,9 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           trailing: const Icon(Icons.navigate_next),
           onTap: () {
             showDialog<String>(
-                context: context,
-                builder: (BuildContext context) => DeleteDialog());
+              context: context,
+              builder: (BuildContext context) => DeleteDialog(),
+            );
           },
         ),
       ],

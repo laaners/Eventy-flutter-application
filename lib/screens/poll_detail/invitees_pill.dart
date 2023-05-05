@@ -1,16 +1,19 @@
-import 'package:dima_app/server/tables/poll_collection.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
+import 'package:dima_app/server/tables/vote_date_collection.dart';
+import 'package:dima_app/server/tables/vote_location_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
-import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:dima_app/widgets/profile_pics_stack.dart';
 import 'package:flutter/material.dart';
 import 'invitees_list.dart';
 
 class InviteesPill extends StatelessWidget {
-  final PollCollection pollData;
+  final PollEventCollection pollData;
   final String pollEventId;
   final List<PollEventInviteCollection> invites;
+  final List<VoteLocationCollection> votesLocations;
+  final List<VoteDateCollection> votesDates;
   final VoidCallback refreshPollDetail;
   const InviteesPill({
     super.key,
@@ -18,6 +21,8 @@ class InviteesPill extends StatelessWidget {
     required this.invites,
     required this.refreshPollDetail,
     required this.pollData,
+    required this.votesLocations,
+    required this.votesDates,
   });
 
   @override
@@ -56,6 +61,8 @@ class InviteesPill extends StatelessWidget {
                                   (e) => e.inviteeId != pollData.organizerUid)
                               .toList(),
                           refreshPollDetail: refreshPollDetail,
+                          votesLocations: votesLocations,
+                          votesDates: votesDates,
                         ),
                       ),
                     );

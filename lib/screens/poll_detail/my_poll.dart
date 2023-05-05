@@ -255,11 +255,12 @@ class MyPolls extends HookWidget {
                           // CUSTOM: change vote
                           onTap: () async {
                             if (MyAlertDialog.showAlertIfCondition(
-                                context,
-                                curUid == organizerUid &&
+                                context: context,
+                                condition: curUid == organizerUid &&
                                     pollOption.id != Availability.yes,
-                                "YOU CANNOT VOTE",
-                                "You are the organizer, you must be present at the event!")) {
+                                title: "You cannot vote",
+                                content:
+                                    "You are the organizer, you must be present at the event!")) {
                               return;
                             }
                             if (curUid == organizerUid) return;
