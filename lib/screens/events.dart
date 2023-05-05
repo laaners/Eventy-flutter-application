@@ -3,7 +3,7 @@ import 'package:dima_app/screens/event_create/step_invite.dart';
 import 'package:dima_app/screens/event_detail/index.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/screens/poll_event.dart';
-import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_event.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
@@ -48,7 +48,7 @@ class EventsScreen extends StatelessWidget {
                 );
                 if (ris == "delete_poll_$curUid") {
                   // ignore: use_build_context_synchronously
-                  await Provider.of<FirebasePoll>(context, listen: false)
+                  await Provider.of<FirebasePollEvent>(context, listen: false)
                       .deletePoll(
                     context: context,
                     pollId: pollId,
@@ -65,7 +65,7 @@ class EventsScreen extends StatelessWidget {
 
                 // the result from pop is the poll id
                 final pollId =
-                    await Navigator.of(context, rootNavigator: true).push(
+                    await Navigator.of(context, rootNavigator: false).push(
                   ScreenTransition(
                     builder: (context) => const EventCreateScreen(),
                   ),
@@ -81,7 +81,7 @@ class EventsScreen extends StatelessWidget {
                   );
                   if (ris == "delete_poll_$curUid") {
                     // ignore: use_build_context_synchronously
-                    await Provider.of<FirebasePoll>(context, listen: false)
+                    await Provider.of<FirebasePollEvent>(context, listen: false)
                         .closePoll(
                       context: context,
                       pollId: pollId,
@@ -108,7 +108,7 @@ class EventsScreen extends StatelessWidget {
                     Provider.of<FirebaseUser>(context, listen: false).user!.uid;
                 if (ris == "delete_poll_$curUid") {
                   // ignore: use_build_context_synchronously
-                  await Provider.of<FirebasePoll>(context, listen: false)
+                  await Provider.of<FirebasePollEvent>(context, listen: false)
                       .closePoll(
                     context: context,
                     pollId: pollId,

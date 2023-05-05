@@ -10,8 +10,9 @@ import 'package:dima_app/screens/poll_event.dart';
 import 'package:dima_app/screens/profile/settings.dart';
 import 'package:dima_app/screens/search.dart';
 import 'package:dima_app/server/firebase_event.dart';
+import 'package:dima_app/server/firebase_event_location.dart';
 import 'package:dima_app/server/firebase_follow.dart';
-import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_event.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
@@ -92,11 +93,14 @@ Future<void> main() async {
           update: (BuildContext context, value, FirebaseFollow? previous) =>
               FirebaseFollow(firestore, value.user),
         ),
-        ChangeNotifierProvider(create: (context) => FirebasePoll(firestore)),
+        ChangeNotifierProvider(
+            create: (context) => FirebasePollEvent(firestore)),
         ChangeNotifierProvider(create: (context) => FirebaseEvent(firestore)),
         ChangeNotifierProvider(
             create: (context) => FirebasePollEventInvite(firestore)),
         ChangeNotifierProvider(create: (context) => FirebaseVote(firestore)),
+        ChangeNotifierProvider(
+            create: (context) => FirebaseEventLocation(firestore)),
 
         // DARK/LIGHT THEME
         ChangeNotifierProvider(create: (context) => ThemeManager()),
@@ -122,6 +126,12 @@ Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 }
+
+final Map<String, Widget Function(BuildContext)> routes = {
+  '/events': (context) => const EventsScreen(),
+  '/main': (context) => const MainScreen(),
+  '/home': (context) => const HomeScreen(),
+};
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -159,11 +169,7 @@ class _MyAppState extends State<MyApp> {
       darkTheme: darkTheme,
       themeMode: Provider.of<ThemeManager>(context).themeMode,
       initialRoute: '/',
-      routes: {
-        // When navigating to the "/second" route, build the SecondScreen widget.
-        '/events': (context) => const EventsScreen(),
-        '/main': (context) => const MainScreen(),
-      },
+      routes: routes,
       home: isAuthenticated
           ? Builder(builder: (context) {
               bool hasUserData =
@@ -212,12 +218,6 @@ class _MainScreen extends State<MainScreen> {
   final GlobalKey<NavigatorState> fourthTabNavKey = GlobalKey<NavigatorState>();
   final GlobalKey<NavigatorState> fifthTabNavKey = GlobalKey<NavigatorState>();
 
-  final Map<String, Widget Function(BuildContext)> routes = {
-    '/events': (context) => const EventsScreen(),
-    '/main': (context) => const MainScreen(),
-    '/home': (context) => const HomeScreen(),
-  };
-
   @override
   void initState() {
     super.initState();
@@ -230,182 +230,188 @@ class _MainScreen extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoTabScaffold(
-      controller: Provider.of<CupertinoTabController>(context, listen: true),
-      tabBar: CupertinoTabBar(
-        onTap: (index) {
-          // back home only if not switching tab
-          if (currentIndex == index) {
-            switch (index) {
+    return WillPopScope(
+      onWillPop: () async {
+        print("ok");
+        return true;
+      },
+      child: CupertinoTabScaffold(
+        controller: Provider.of<CupertinoTabController>(context, listen: true),
+        tabBar: CupertinoTabBar(
+          onTap: (index) {
+            // back home only if not switching tab
+            if (currentIndex == index) {
+              switch (index) {
+                case 0:
+                  firstTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                  break;
+                case 1:
+                  secondTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                  break;
+                case 2:
+                  thirdTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                  break;
+                case 3:
+                  fourthTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                  break;
+                case 4:
+                  fifthTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                  break;
+              }
+            }
+            currentIndex = index;
+          },
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.map),
+              label: 'Map',
+            ),
+            // add a center docker notch floating action button to the tab bar here
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add_circle_outline),
+              label: 'Add',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'Search',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+        ),
+        tabBuilder: (context, index) {
+          PendingDynamicLinkData? dynamicLink =
+              Provider.of<DynamicLinksHandler>(context, listen: true)
+                  .dynamicLink;
+          bool pushed =
+              Provider.of<DynamicLinksHandler>(context, listen: false).pushed;
+          if (dynamicLink != null && !pushed) {
+            Map<String, dynamic> queryParams = dynamicLink.link.queryParameters;
+            String pollId = queryParams["pollId"];
+            var curUid =
+                // ignore: use_build_context_synchronously
+                Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+            Widget newScreen = PollEventScreen(pollEventId: pollId);
+            switch (currentIndex) {
               case 0:
-                firstTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                Future.delayed(Duration.zero, () async {
+                  // ignore: use_build_context_synchronously
+                  var ris = await firstTabNavKey.currentState?.push(
+                    ScreenTransition(
+                      builder: (context) => newScreen,
+                    ),
+                  );
+                  if (ris == "delete_poll_$curUid") {
+                    // ignore: use_build_context_synchronously
+                    await Provider.of<FirebasePollEvent>(context, listen: false)
+                        .closePoll(
+                      context: context,
+                      pollId: pollId,
+                    );
+                  }
+                });
                 break;
               case 1:
-                secondTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                Future.delayed(Duration.zero, () async {
+                  // ignore: use_build_context_synchronously
+                  var ris = await secondTabNavKey.currentState?.push(
+                    ScreenTransition(
+                      builder: (context) => newScreen,
+                    ),
+                  );
+                  if (ris == "delete_poll_$curUid") {
+                    // ignore: use_build_context_synchronously
+                    await Provider.of<FirebasePollEvent>(context, listen: false)
+                        .closePoll(
+                      context: context,
+                      pollId: pollId,
+                    );
+                  }
+                });
                 break;
               case 2:
-                thirdTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                Future.delayed(Duration.zero, () async {
+                  // ignore: use_build_context_synchronously
+                  var ris = await thirdTabNavKey.currentState?.push(
+                    ScreenTransition(
+                      builder: (context) => newScreen,
+                    ),
+                  );
+                  if (ris == "delete_poll_$curUid") {
+                    // ignore: use_build_context_synchronously
+                    await Provider.of<FirebasePollEvent>(context, listen: false)
+                        .closePoll(
+                      context: context,
+                      pollId: pollId,
+                    );
+                  }
+                });
                 break;
               case 3:
-                fourthTabNavKey.currentState?.popUntil((r) => r.isFirst);
-                break;
-              case 4:
-                fifthTabNavKey.currentState?.popUntil((r) => r.isFirst);
+                Future.delayed(Duration.zero, () async {
+                  // ignore: use_build_context_synchronously
+                  var ris = await fourthTabNavKey.currentState?.push(
+                    ScreenTransition(
+                      builder: (context) => newScreen,
+                    ),
+                  );
+                  if (ris == "delete_poll_$curUid") {
+                    // ignore: use_build_context_synchronously
+                    await Provider.of<FirebasePollEvent>(context, listen: false)
+                        .closePoll(
+                      context: context,
+                      pollId: pollId,
+                    );
+                  }
+                });
                 break;
             }
-          }
-          currentIndex = index;
-        },
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'Map',
-          ),
-          // add a center docker notch floating action button to the tab bar here
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline),
-            label: 'Add',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-      ),
-      tabBuilder: (context, index) {
-        PendingDynamicLinkData? dynamicLink =
-            Provider.of<DynamicLinksHandler>(context, listen: true).dynamicLink;
-        bool pushed =
-            Provider.of<DynamicLinksHandler>(context, listen: false).pushed;
-        if (dynamicLink != null && !pushed) {
-          Map<String, dynamic> queryParams = dynamicLink.link.queryParameters;
-          String pollId = queryParams["pollId"];
-          var curUid =
-              // ignore: use_build_context_synchronously
-              Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-          Widget newScreen = PollEventScreen(pollEventId: pollId);
-          switch (currentIndex) {
-            case 0:
-              Future.delayed(Duration.zero, () async {
-                // ignore: use_build_context_synchronously
-                var ris = await firstTabNavKey.currentState?.push(
-                  ScreenTransition(
-                    builder: (context) => newScreen,
-                  ),
-                );
-                if (ris == "delete_poll_$curUid") {
-                  // ignore: use_build_context_synchronously
-                  await Provider.of<FirebasePoll>(context, listen: false)
-                      .closePoll(
-                    context: context,
-                    pollId: pollId,
-                  );
-                }
-              });
-              break;
-            case 1:
-              Future.delayed(Duration.zero, () async {
-                // ignore: use_build_context_synchronously
-                var ris = await secondTabNavKey.currentState?.push(
-                  ScreenTransition(
-                    builder: (context) => newScreen,
-                  ),
-                );
-                if (ris == "delete_poll_$curUid") {
-                  // ignore: use_build_context_synchronously
-                  await Provider.of<FirebasePoll>(context, listen: false)
-                      .closePoll(
-                    context: context,
-                    pollId: pollId,
-                  );
-                }
-              });
-              break;
-            case 2:
-              Future.delayed(Duration.zero, () async {
-                // ignore: use_build_context_synchronously
-                var ris = await thirdTabNavKey.currentState?.push(
-                  ScreenTransition(
-                    builder: (context) => newScreen,
-                  ),
-                );
-                if (ris == "delete_poll_$curUid") {
-                  // ignore: use_build_context_synchronously
-                  await Provider.of<FirebasePoll>(context, listen: false)
-                      .closePoll(
-                    context: context,
-                    pollId: pollId,
-                  );
-                }
-              });
-              break;
-            case 3:
-              Future.delayed(Duration.zero, () async {
-                // ignore: use_build_context_synchronously
-                var ris = await fourthTabNavKey.currentState?.push(
-                  ScreenTransition(
-                    builder: (context) => newScreen,
-                  ),
-                );
-                if (ris == "delete_poll_$curUid") {
-                  // ignore: use_build_context_synchronously
-                  await Provider.of<FirebasePoll>(context, listen: false)
-                      .closePoll(
-                    context: context,
-                    pollId: pollId,
-                  );
-                }
-              });
-              break;
-          }
 
-          Provider.of<DynamicLinksHandler>(context, listen: false).pushed =
-              true;
-          // return const CupertinoPageScaffold(child: EventsScreen());
-        }
-        switch (index) {
-          case 0:
-            return CupertinoTabView(
-              navigatorKey: firstTabNavKey,
-              // routes: routes,
-              builder: (context) => const HomeScreen(),
-            );
-          case 1:
-            return CupertinoTabView(
-              navigatorKey: secondTabNavKey,
-              // routes: routes,
-              builder: (context) => const MapScreen(),
-            );
-          case 2:
-            return CupertinoTabView(
-              navigatorKey: thirdTabNavKey,
-              // routes: routes,
-              builder: (context) => const EventsScreen(),
-            );
-          case 3:
-            return CupertinoTabView(
-              navigatorKey: fourthTabNavKey,
-              // routes: routes,
-              builder: (context) => const SearchScreen(),
-            );
-          case 4:
-            return CupertinoTabView(
-              navigatorKey: fifthTabNavKey,
-              // routes: routes,
-              builder: (context) => const SettingsScreen(),
-            );
-          default:
-            return const CupertinoTabView();
-        }
-      },
+            Provider.of<DynamicLinksHandler>(context, listen: false).pushed =
+                true;
+            // return const CupertinoPageScaffold(child: EventsScreen());
+          }
+          switch (index) {
+            case 0:
+              return CupertinoTabView(
+                navigatorKey: firstTabNavKey,
+                routes: routes,
+                builder: (context) => const HomeScreen(),
+              );
+            case 1:
+              return CupertinoTabView(
+                navigatorKey: secondTabNavKey,
+                routes: routes,
+                builder: (context) => const MapScreen(),
+              );
+            case 2:
+              return CupertinoTabView(
+                navigatorKey: thirdTabNavKey,
+                routes: routes,
+                builder: (context) => const EventsScreen(),
+              );
+            case 3:
+              return CupertinoTabView(
+                navigatorKey: fourthTabNavKey,
+                routes: routes,
+                builder: (context) => const SearchScreen(),
+              );
+            case 4:
+              return CupertinoTabView(
+                  navigatorKey: fifthTabNavKey,
+                  routes: routes,
+                  builder: (context) => const SettingsScreen());
+            default:
+              return const CupertinoTabView();
+          }
+        },
+      ),
     );
   }
 }

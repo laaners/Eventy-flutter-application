@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/screens/error.dart';
-import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/screens/profile/settings.dart';
 import 'package:dima_app/server/date_methods.dart';
-import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_event.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
@@ -41,7 +40,7 @@ class _PollEventScreenState extends State<PollEventScreen>
       BuildContext context) async {
     try {
       PollEventCollection? pollData =
-          await Provider.of<FirebasePoll>(context, listen: false)
+          await Provider.of<FirebasePollEvent>(context, listen: false)
               .getPollData(context, widget.pollEventId);
       if (pollData == null) return null;
       List<PollEventInviteCollection> pollInvites =
@@ -169,7 +168,7 @@ class _PollEventScreenState extends State<PollEventScreen>
             Navigator.of(context, rootNavigator: false).pushReplacement(
               ScreenTransition(
                 builder: (context) => const ErrorScreen(
-                  errorMsg: "The organizer limited your acces to the event",
+                  errorMsg: "The organizer limited your access to the event",
                 ),
               ),
             );
@@ -178,7 +177,7 @@ class _PollEventScreenState extends State<PollEventScreen>
         }
 
         return StreamBuilder(
-            stream: Provider.of<FirebasePoll>(context, listen: false)
+            stream: Provider.of<FirebasePollEvent>(context, listen: false)
                 .getPollDataSnapshot(
               context,
               widget.pollEventId,
