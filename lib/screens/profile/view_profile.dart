@@ -61,7 +61,7 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
                 ProfilePic(
                   userData: widget.profileUserData,
                   loading: false,
-                  radius: LayoutConstants.kProfilePicRadius,
+                  radius: LayoutConstants.kProfilePicRadiusLarge,
                 ),
                 FutureBuilder<bool>(
                     future: Provider.of<FirebaseFollow>(context, listen: false)
