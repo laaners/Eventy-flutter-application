@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/profile/index.dart';
+import 'package:dima_app/screens/profile/settings.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
@@ -11,6 +12,7 @@ import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/pill_box.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -94,8 +96,7 @@ class _StepInviteState extends State<StepInvite>
                         ) {
                           if (snapshot.hasError) {
                             Future.microtask(() {
-                              Navigator.of(context).pop();
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 ScreenTransition(
                                   builder: (context) => ErrorScreen(
@@ -312,16 +313,14 @@ class _InviteProfilePicState extends State<InviteProfilePic> {
             Provider.of<FirebaseUser>(context, listen: false).user!.uid;
         if (curUid == widget.user.uid) {
           Widget newScreen = const ProfileScreen();
-          Navigator.push(
-            context,
+          Navigator.of(context, rootNavigator: false).push(
             ScreenTransition(
               builder: (context) => newScreen,
             ),
           );
         } else {
           Widget newScreen = ViewProfileScreen(profileUserData: widget.user);
-          Navigator.push(
-            context,
+          Navigator.of(context).push(
             ScreenTransition(
               builder: (context) => newScreen,
             ),

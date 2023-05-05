@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'package:dima_app/firebase_cruds_testing.dart';
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/server/firebase_crud.dart';
+import 'package:dima_app/server/firebase_event_location.dart';
 import 'package:dima_app/server/firebase_follow.dart';
-import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_event.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/messaging.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
@@ -55,6 +56,12 @@ class _DebugScreenState extends State<DebugScreen> {
                 controller: _scroll,
                 children: [
                   MyButton(
+                    text: "create events",
+                    onPressed: () async {
+                      FirebaseCrudsTesting.createExpiredPolls(context);
+                    },
+                  ),
+                  MyButton(
                     text: "Subscribe to topic",
                     onPressed: () {
                       FirebaseMessaging.instance.subscribeToTopic("finance");
@@ -85,7 +92,8 @@ class _DebugScreenState extends State<DebugScreen> {
                   MyButton(
                       text: "delete a poll",
                       onPressed: () async {
-                        await Provider.of<FirebasePoll>(context, listen: false)
+                        await Provider.of<FirebasePollEvent>(context,
+                                listen: false)
                             .closePoll(
                                 context: context,
                                 pollId:

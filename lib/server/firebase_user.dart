@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/server/firebase_follow.dart';
-import 'package:dima_app/server/firebase_poll.dart';
+import 'package:dima_app/server/firebase_poll_event.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -198,12 +198,12 @@ class FirebaseUser extends ChangeNotifier {
 
       // delete associated polls
       print("DOING: Deleting associated polls");
-      Provider.of<FirebasePoll>(context, listen: false)
+      Provider.of<FirebasePollEvent>(context, listen: false)
           .getUserPolls(context, uid)
           .then((value) async {
         await Future.wait(value.map((pollData) {
           String pollId = "${pollData.pollEventName}_$uid";
-          return Provider.of<FirebasePoll>(context, listen: false)
+          return Provider.of<FirebasePollEvent>(context, listen: false)
               .closePoll(context: context, pollId: pollId);
         }).toList());
       });
