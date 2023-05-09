@@ -1,5 +1,6 @@
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/event_detail/index.dart';
+import 'package:dima_app/screens/poll_event.dart';
 import 'package:dima_app/server/firebase_event.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
@@ -117,7 +118,7 @@ class EventTile extends StatelessWidget {
             refreshParent();
           }
 
-          Widget newScreen = EventDetailScreen(eventId: eventId);
+          Widget newScreen = PollEventScreen(pollEventId: eventId);
           // ignore: use_build_context_synchronously
           var ris = await Navigator.of(context, rootNavigator: false).push(
             ScreenTransition(

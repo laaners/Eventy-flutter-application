@@ -45,10 +45,15 @@ class MyModal extends StatelessWidget {
                     ),
                   ),
                   if (title.isNotEmpty)
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    )
+                    Container(
+                      margin:
+                          const EdgeInsets.only(bottom: 0, top: 8, left: 15),
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                    ),
                 ],
               ),
             ),

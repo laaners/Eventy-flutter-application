@@ -8,6 +8,7 @@ import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
+import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -108,6 +109,14 @@ class PollTile extends StatelessWidget {
               Provider.of<FirebaseUser>(context, listen: false).user!.uid;
           // if not invited and is a public event, add invite
           if (!invited && pollData.public) {
+            bool confirmJoin = await MyAlertDialog.showAlertConfirmCancel(
+              context: context,
+              title: "Join this poll?",
+              content:
+                  "\"${pollData.pollEventName}\" is public, you can join this poll",
+              trueButtonText: "Join",
+            );
+            if (!confirmJoin) return;
             await Provider.of<FirebasePollEventInvite>(context, listen: false)
                 .createPollEventInvite(
               context: context,

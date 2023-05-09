@@ -292,6 +292,7 @@ class FirebasePollEvent extends ChangeNotifier {
           eventId: pollId,
           locationName: eventLocation["name"],
           locationBanner: eventLocation["icon"],
+          public: pollData.public,
         );
 
         await FirebaseCrud.updateDoc(
