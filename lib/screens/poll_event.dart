@@ -189,7 +189,7 @@ class _PollEventScreenState extends State<PollEventScreen>
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const LoadingSpinner();
               }
-              if (snapshot.hasError) {
+              if (snapshot.hasError || !snapshot.data!.exists) {
                 Future.microtask(() {
                   Navigator.of(context, rootNavigator: false).pushReplacement(
                     ScreenTransition(
@@ -200,17 +200,6 @@ class _PollEventScreenState extends State<PollEventScreen>
                   );
                 });
                 return Container();
-              }
-              if (!snapshot.data!.exists) {
-                Future.microtask(() {
-                  Navigator.of(context, rootNavigator: false).pushReplacement(
-                    ScreenTransition(
-                      builder: (context) => ErrorScreen(
-                        errorMsg: snapshot.error.toString(),
-                      ),
-                    ),
-                  );
-                });
               }
 
               // check if it is closed or the deadline was reached, deadline already in local

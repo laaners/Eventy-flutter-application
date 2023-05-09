@@ -56,6 +56,10 @@ class _DebugScreenState extends State<DebugScreen> {
                 controller: _scroll,
                 children: [
                   MyButton(
+                    text: "permission",
+                    onPressed: () async {},
+                  ),
+                  MyButton(
                     text: "create events",
                     onPressed: () async {
                       FirebaseCrudsTesting.createExpiredPolls(context);

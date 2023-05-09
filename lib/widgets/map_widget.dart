@@ -42,6 +42,9 @@ class _MapFromCoorState extends State<MapFromCoor> {
           center: LatLng(widget.lat, widget.lon),
           zoom: 16.4746,
           maxZoom: 18,
+          interactiveFlags: InteractiveFlag.pinchZoom |
+              InteractiveFlag.doubleTapZoom |
+              InteractiveFlag.drag,
         ),
         children: [
           TileLayer(

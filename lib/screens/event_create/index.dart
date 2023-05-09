@@ -15,6 +15,7 @@ import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
+import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -363,6 +364,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
       ),
       body: ResponsiveWrapper(
         child: MyStepper(
+          elevation: 1,
           currentStep: _activeStepIndex,
           steps: stepList(),
           onStepTapped: (int index) {
@@ -376,13 +378,20 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
           },
         ),
       ),
-      /*
       bottomNavigationBar: Container(
-        margin: const EdgeInsets.only(
+        padding: const EdgeInsets.only(
           bottom: 10,
           top: 10,
           left: 10,
           right: 10,
+        ),
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              width: 1.0,
+              color: Theme.of(context).dividerColor,
+            ),
+          ),
         ),
         child: Row(
           children: [
@@ -414,7 +423,6 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
           ],
         ),
       ),
-      */
     );
   }
 }

@@ -82,6 +82,44 @@ class _StepBasicsState extends State<StepBasics> {
             controller: widget.eventDescController,
           ),
         ),
+        Container(
+          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
+          alignment: Alignment.topLeft,
+          child: Text(
+            "Visibility and Permissions",
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+        ),
+        Row(
+          children: [
+            IconButton(
+              onPressed: widget.changeVisibility,
+              icon: Icon(
+                widget.visibility ? Icons.visibility : Icons.visibility_off,
+              ),
+            ),
+            Text(
+              widget.visibility ? "Public event" : "Private event",
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            IconButton(
+              onPressed: widget.changeCanInvite,
+              icon: Icon(
+                widget.canInvite ? Icons.meeting_room : Icons.door_back_door,
+              ),
+            ),
+            Text(
+              widget.canInvite
+                  ? "Anyone can invite other users"
+                  : "Only you can invite other users",
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ),
         ListTile(
           title: Container(
             padding: const EdgeInsets.only(top: 8, bottom: 8),
@@ -201,44 +239,6 @@ class _StepBasicsState extends State<StepBasics> {
               ),
             );
           },
-        ),
-        Container(
-          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
-          alignment: Alignment.topLeft,
-          child: Text(
-            "Visibility and Permissions",
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-        ),
-        Row(
-          children: [
-            IconButton(
-              onPressed: widget.changeVisibility,
-              icon: Icon(
-                widget.visibility ? Icons.visibility : Icons.visibility_off,
-              ),
-            ),
-            Text(
-              widget.visibility ? "Public event" : "Private event",
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            IconButton(
-              onPressed: widget.changeCanInvite,
-              icon: Icon(
-                widget.canInvite ? Icons.meeting_room : Icons.door_back_door,
-              ),
-            ),
-            Text(
-              widget.canInvite
-                  ? "Anyone can invite other users"
-                  : "Only you can invite other users",
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ],
         ),
       ],
     );

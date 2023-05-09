@@ -202,7 +202,7 @@ class _StepInviteState extends State<StepInvite>
   }
 }
 
-class InviteProfilePic extends StatefulWidget {
+class InviteProfilePic extends StatelessWidget {
   final List<UserCollection> invitees;
   final List<UserCollection> originalInvitees;
   final ValueChanged<UserCollection> addInvitee;
@@ -221,22 +221,17 @@ class InviteProfilePic extends StatefulWidget {
     required this.organizerUid,
   });
 
-  @override
-  State<InviteProfilePic> createState() => _InviteProfilePicState();
-}
-
-class _InviteProfilePicState extends State<InviteProfilePic> {
-  Widget? getTopIcon() {
+  Widget? getTopIcon(context) {
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    bool isOrganizer = widget.organizerUid == curUid;
+    bool isOrganizer = organizerUid == curUid;
     bool isInOriginalInvitees =
-        widget.originalInvitees.map((e) => e.uid).contains(widget.user.uid);
+        originalInvitees.map((e) => e.uid).contains(user.uid);
     // show nothing if in cancelmode and organizer != curUid and user is in original invitees
-    if (!widget.addMode && !isOrganizer && isInOriginalInvitees) {
+    if (!addMode && !isOrganizer && isInOriginalInvitees) {
       return null;
     }
     // show cancel if in cancelmode, not organizer but newly added user isn't in original invitees
-    if (!widget.addMode && !isOrganizer && !isInOriginalInvitees) {
+    if (!addMode && !isOrganizer && !isInOriginalInvitees) {
       return Positioned(
         right: -10.0,
         top: -10.0,
@@ -245,15 +240,13 @@ class _InviteProfilePicState extends State<InviteProfilePic> {
           padding: const EdgeInsets.all(0),
           constraints: const BoxConstraints(),
           icon: Icon(
-            widget.addMode ? Icons.add_circle : Icons.cancel,
-            color: widget.addMode
+            addMode ? Icons.add_circle : Icons.cancel,
+            color: addMode
                 ? Theme.of(context).primaryColorLight
                 : Theme.of(context).colorScheme.error,
           ),
           onPressed: () {
-            widget.addMode
-                ? widget.addInvitee(widget.user)
-                : widget.removeInvitee(widget.user);
+            addMode ? addInvitee(user) : removeInvitee(user);
           },
         ),
       );
@@ -267,15 +260,13 @@ class _InviteProfilePicState extends State<InviteProfilePic> {
         padding: const EdgeInsets.all(0),
         constraints: const BoxConstraints(),
         icon: Icon(
-          widget.addMode ? Icons.add_circle : Icons.cancel,
-          color: widget.addMode
+          addMode ? Icons.add_circle : Icons.cancel,
+          color: addMode
               ? Theme.of(context).primaryColorLight
               : Theme.of(context).colorScheme.error,
         ),
         onPressed: () {
-          widget.addMode
-              ? widget.addInvitee(widget.user)
-              : widget.removeInvitee(widget.user);
+          addMode ? addInvitee(user) : removeInvitee(user);
         },
       ),
     );
@@ -292,26 +283,54 @@ class _InviteProfilePicState extends State<InviteProfilePic> {
             child: Column(
               children: [
                 ProfilePic(
-                  userData: widget.user,
+                  userData: user,
                   loading: false,
                   radius: 35,
                 ),
                 Container(padding: const EdgeInsets.symmetric(vertical: 2)),
                 Text(
-                  widget.user.username,
+                  user.username,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
           // show nothing if in cancelmode and organizer != curUid and user is in original invitees
-          getTopIcon() ?? Container()
+          getTopIcon(context) ?? Container()
         ],
       ),
       onTap: () {
+        showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: Text(user.username),
+            content: Row(
+              children: [
+                ProfilePic(userData: user, loading: false, radius: 45),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Text(
+                    "${user.name}\n${user.surname}",
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+        /*
         var curUid =
             Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-        if (curUid == widget.user.uid) {
+        if (curUid == user.uid) {
           Widget newScreen = const ProfileScreen();
           Navigator.of(context, rootNavigator: false).push(
             ScreenTransition(
@@ -319,13 +338,14 @@ class _InviteProfilePicState extends State<InviteProfilePic> {
             ),
           );
         } else {
-          Widget newScreen = ViewProfileScreen(profileUserData: widget.user);
+          Widget newScreen = ViewProfileScreen(profileUserData: user);
           Navigator.of(context).push(
             ScreenTransition(
               builder: (context) => newScreen,
             ),
           );
         }
+        */
       },
     );
   }
