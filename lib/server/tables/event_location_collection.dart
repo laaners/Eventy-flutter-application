@@ -3,11 +3,13 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
+import 'package:dima_app/server/tables/event_location_preview.dart';
+
 class EventLocationCollection {
   final String site;
   final double lat;
   final double lon;
-  final List<Map<String, dynamic>> events;
+  final List<EventLocationPreview> events;
   EventLocationCollection({
     required this.site,
     required this.lat,
@@ -17,24 +19,11 @@ class EventLocationCollection {
 
   static const collectionName = "event_location";
 
-  /*
-  events: [
-    {
-      eventId,
-      eventName,
-      locationName, // given by user
-      locationBanner,
-      public,
-      [invited] <- client side only
-    }
-  ]
-  */
-
   EventLocationCollection copyWith({
     String? site,
     double? lat,
     double? lon,
-    List<Map<String, dynamic>>? events,
+    List<EventLocationPreview>? events,
   }) {
     return EventLocationCollection(
       site: site ?? this.site,
@@ -49,7 +38,7 @@ class EventLocationCollection {
       'site': site,
       'lat': lat,
       'lon': lon,
-      'events': events,
+      'events': events.map((x) => x.toMap()).toList(),
     };
   }
 
@@ -58,9 +47,10 @@ class EventLocationCollection {
       site: map['site'] as String,
       lat: map['lat'] as double,
       lon: map['lon'] as double,
-      events: List<Map<String, dynamic>>.from(
-        (map['events'] as List<Map<String, dynamic>>)
-            .map<Map<String, dynamic>>((x) => x),
+      events: List<EventLocationPreview>.from(
+        (map['events'] as List<Map<String, dynamic>>).map<EventLocationPreview>(
+          (x) => EventLocationPreview.fromMap(x),
+        ),
       ),
     );
   }

@@ -39,11 +39,11 @@ class EventLocationMarker extends StatelessWidget {
                 ),
               ...eventLocationDetails.events.map((event) {
                 return EventLocationTile(
-                  eventId: event["eventId"],
-                  eventName: event["eventName"],
-                  invited: event["invited"] as bool,
-                  public: event["public"] as bool,
-                  locationBanner: event["locationBanner"],
+                  eventId: event.eventId,
+                  eventName: event.eventName,
+                  invited: event.invited,
+                  public: event.public,
+                  locationBanner: event.locationBanner,
                 );
               }).toList()
             ],
