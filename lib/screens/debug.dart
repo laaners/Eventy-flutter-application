@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dima_app/firebase_cruds_testing.dart';
 import 'package:dima_app/screens/error.dart';
-import 'package:dima_app/screens/map.dart';
+import 'package:dima_app/screens/map/index.dart';
 import 'package:dima_app/server/firebase_crud.dart';
 import 'package:dima_app/server/firebase_event_location.dart';
 import 'package:dima_app/server/firebase_follow.dart';

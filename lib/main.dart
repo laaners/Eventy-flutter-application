@@ -4,7 +4,7 @@ import 'package:dima_app/providers/preferences.dart';
 import 'package:dima_app/screens/events.dart';
 import 'package:dima_app/screens/home.dart';
 import 'package:dima_app/screens/login.dart';
-import 'package:dima_app/screens/map.dart';
+import 'package:dima_app/screens/map/index.dart';
 import 'package:dima_app/screens/poll_detail/index.dart';
 import 'package:dima_app/screens/poll_event.dart';
 import 'package:dima_app/screens/profile/settings.dart';

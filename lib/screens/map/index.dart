@@ -1,20 +1,12 @@
 import 'dart:async';
-
 import 'package:dima_app/screens/error.dart';
-import 'package:dima_app/screens/home.dart';
-import 'package:dima_app/screens/poll_event.dart';
-import 'package:dima_app/server/firebase_event.dart';
+import 'package:dima_app/screens/map/event_location_marker.dart';
 import 'package:dima_app/server/firebase_event_location.dart';
-import 'package:dima_app/server/firebase_poll_event_invite.dart';
-import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/event_location_collection.dart';
-import 'package:dima_app/server/tables/location_icons.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
-import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
-import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -103,10 +95,10 @@ class _MapScreenState extends State<MapScreen>
           _currentLocation = location;
 
           // If Live Update is enabled, move map center
-          if (_liveUpdate) {
-            _locationService.onLocationChanged.listen(
-              (LocationData result) async {
-                if (mounted) {
+          _locationService.onLocationChanged.listen(
+            (LocationData result) async {
+              if (mounted) {
+                if (_liveUpdate) {
                   setState(() {
                     _currentLocation = result;
                     _mapController.move(
@@ -118,9 +110,9 @@ class _MapScreenState extends State<MapScreen>
                     );
                   });
                 }
-              },
-            );
-          }
+              }
+            },
+          );
         }
       } else {
         serviceRequestResult = await _locationService.requestService();
@@ -183,6 +175,23 @@ class _MapScreenState extends State<MapScreen>
         currentMarker()
       ];
     });
+  }
+
+  Future<void> focusOnCurrentLocation() async {
+    if (_mapIsReady) {
+      LocationData locationData = await _locationService.getLocation();
+      setState(() {
+        _currentLocation = locationData;
+        currentLatLng = LatLng(
+          _currentLocation!.latitude!,
+          _currentLocation!.longitude!,
+        );
+      });
+      _mapController.move(
+        currentLatLng,
+        _mapController.zoom,
+      );
+    }
   }
 
   @override
@@ -277,6 +286,12 @@ class _MapScreenState extends State<MapScreen>
                             child: const Text('all'),
                           ),
                           Text("is live $_liveUpdate"),
+                          MaterialButton(
+                            onPressed: () async {
+                              await focusOnCurrentLocation();
+                            },
+                            child: const Text("test cur loc"),
+                          ),
                           MaterialButton(
                             onPressed: () {
                               setState(() {
@@ -381,173 +396,6 @@ class _MapScreenState extends State<MapScreen>
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class EventLocationMarker extends StatelessWidget {
-  final EventLocationCollection eventLocationDetails;
-  final VoidCallback findNearbyEvents;
-  const EventLocationMarker({
-    super.key,
-    required this.eventLocationDetails,
-    required this.findNearbyEvents,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    String subtitle = eventLocationDetails.site
-        .replaceFirst("${eventLocationDetails.site.split(", ")[0]}, ", "");
-    return GestureDetector(
-      onTap: () async {
-        var ris = await MyModal.show(
-          context: context,
-          child: Column(
-            children: [
-              if (subtitle != eventLocationDetails.site)
-                Container(
-                  margin: const EdgeInsets.only(bottom: 0, top: 0, left: 15),
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                ),
-              ...eventLocationDetails.events.map((event) {
-                return EventLocationTile(
-                  eventId: event["eventId"],
-                  eventName: event["eventName"],
-                  invited: event["invited"] as bool,
-                  public: event["public"] as bool,
-                  locationBanner: event["locationBanner"],
-                );
-              }).toList()
-            ],
-          ),
-          heightFactor: 0.85,
-          doneCancelMode: true,
-          onDone: () {},
-          title: eventLocationDetails.site.split(",")[0],
-        );
-        if (ris != null) {
-          String eventId = ris;
-          findNearbyEvents();
-          var curUid =
-              // ignore: use_build_context_synchronously
-              Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-          Widget newScreen = PollEventScreen(pollEventId: eventId);
-          // ignore: use_build_context_synchronously
-          ris = await Navigator.of(context, rootNavigator: false).push(
-            ScreenTransition(
-              builder: (context) => newScreen,
-            ),
-          );
-          if (ris == "delete_Event_$curUid") {
-            // ignore: use_build_context_synchronously
-            await Provider.of<FirebaseEvent>(context, listen: false)
-                .deleteEvent(
-              context: context,
-              eventId: eventId,
-              showOutcome: true,
-            );
-          }
-        }
-      },
-      child: const Icon(
-        Icons.location_pin,
-        color: Colors.blue,
-        size: 40,
-      ),
-    );
-  }
-}
-
-class EventLocationTile extends StatelessWidget {
-  final String eventId;
-  final String eventName;
-  final bool public;
-  final bool invited;
-  final String locationBanner;
-  const EventLocationTile({
-    super.key,
-    required this.eventId,
-    required this.eventName,
-    required this.public,
-    required this.invited,
-    required this.locationBanner,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80,
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.blue,
-          child: LocationIcons.icons[locationBanner] != null
-              ? Icon(LocationIcons.icons[locationBanner])
-              : ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: Image.network(
-                    "https://images.ygoprodeck.com/images/cards_cropped/42502956.jpg",
-                    fit: BoxFit.fill,
-                    loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress != null) {
-                        return const Icon(Icons.place);
-                      } else {
-                        return child;
-                      }
-                      /*
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        );
-                        */
-                    },
-                  ),
-                ),
-        ),
-        trailing:
-            invited ? Icon(Icons.arrow_forward_ios_rounded) : Icon(Icons.login),
-        /*
-        */
-
-        title: Text(
-          eventName,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Text(
-          "${public ? "Public" : "Private"} event, you are ${invited ? "partecipating" : "not partecipating"}",
-        ),
-        onTap: () async {
-          var curUid =
-              Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-          // if not invited and is a public event, add invite
-          if (!invited && public) {
-            bool confirmJoin = await MyAlertDialog.showAlertConfirmCancel(
-              context: context,
-              title: "Join this event?",
-              content: "\"$eventName\" is public, you can join this event",
-              trueButtonText: "Join",
-            );
-            if (!confirmJoin) return;
-            LoadingOverlay.show(context);
-            await Provider.of<FirebasePollEventInvite>(context, listen: false)
-                .createPollEventInvite(
-              context: context,
-              pollEventId: eventId,
-              inviteeId: curUid,
-            );
-            LoadingOverlay.hide(context);
-          }
-          Navigator.pop(context, eventId);
-        },
       ),
     );
   }
