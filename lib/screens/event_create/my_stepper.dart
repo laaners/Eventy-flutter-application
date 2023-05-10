@@ -853,7 +853,6 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
                   children: children,
                 ),
               ),
-              const Divider(height: 1, thickness: 1),
             ],
           ),
         ),

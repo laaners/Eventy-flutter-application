@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dima_app/firebase_cruds_testing.dart';
 import 'package:dima_app/screens/error.dart';
+import 'package:dima_app/screens/map/index.dart';
 import 'package:dima_app/server/firebase_crud.dart';
 import 'package:dima_app/server/firebase_event_location.dart';
 import 'package:dima_app/server/firebase_follow.dart';
@@ -9,6 +10,7 @@ import 'package:dima_app/server/firebase_poll_event.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/messaging.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
+import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
@@ -55,6 +57,16 @@ class _DebugScreenState extends State<DebugScreen> {
               child: ListView(
                 controller: _scroll,
                 children: [
+                  MyButton(
+                    text: "map",
+                    onPressed: () async {
+                      Navigator.of(context).push(
+                        ScreenTransition(
+                          builder: (context) => const MapScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   MyButton(
                     text: "create events",
                     onPressed: () async {

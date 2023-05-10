@@ -34,7 +34,7 @@ class EventsScreen extends StatelessWidget {
               onPressed: () async {
                 // ignore: use_build_context_synchronously
                 String pollId =
-                    "Event 1 of UsernameId14_0DmBO8Fw0ofrK9RbXIO4dYlEIg03";
+                    "Event 0 of UsernameId14_0DmBO8Fw0ofrK9RbXIO4dYlEIg03";
                 var curUid =
                     // ignore: use_build_context_synchronously
                     Provider.of<FirebaseUser>(context, listen: false).user!.uid;
@@ -65,7 +65,7 @@ class EventsScreen extends StatelessWidget {
 
                 // the result from pop is the poll id
                 final pollId =
-                    await Navigator.of(context, rootNavigator: false).push(
+                    await Navigator.of(context, rootNavigator: true).push(
                   ScreenTransition(
                     builder: (context) => const EventCreateScreen(),
                   ),

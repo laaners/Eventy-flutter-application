@@ -250,7 +250,6 @@ class LocationDetail extends StatelessWidget {
                       : location.site,
                   autofocus: false,
                   decoration: InputDecoration(
-                    hintText: "Paste the link here",
                     isDense: true,
                     suffixIcon: IconButton(
                       iconSize: 25,

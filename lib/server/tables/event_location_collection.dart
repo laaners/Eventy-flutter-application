@@ -24,6 +24,8 @@ class EventLocationCollection {
       eventName,
       locationName, // given by user
       locationBanner,
+      public,
+      [invited] <- client side only
     }
   ]
   */

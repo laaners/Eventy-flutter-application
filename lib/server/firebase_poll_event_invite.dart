@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
-import 'package:dima_app/server/tables/vote_location_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +15,22 @@ class FirebasePollEventInvite extends ChangeNotifier {
 
   CollectionReference get pollEventInviteCollection =>
       _firestore.collection(PollEventInviteCollection.collectionName);
+
+  Future<bool> isInvited({
+    required String uid,
+    required String pollEventId,
+  }) async {
+    try {
+      String id = "${pollEventId}_$uid";
+      var document = await FirebaseCrud.readDoc(pollEventInviteCollection, id);
+      if (document!.exists) {
+        return true;
+      }
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return false;
+  }
 
   Future<void> createPollEventInvite({
     required BuildContext context,
