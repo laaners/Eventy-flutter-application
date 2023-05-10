@@ -160,7 +160,7 @@ class _MapScreenState extends State<MapScreen>
       markers = [];
       markers = [
         ...locations.map((location) {
-          location.events.sort((a, b) => a["invited"] ? 1 : -1);
+          location.events.sort((a, b) => a.invited ? 1 : -1);
           return Marker(
             width: 80,
             height: 80,
