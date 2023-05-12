@@ -1,7 +1,7 @@
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/server/firebase_event.dart';
 import 'package:dima_app/server/firebase_user.dart';
-import 'package:dima_app/server/tables/event_collection.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
@@ -24,7 +24,7 @@ class EventDetailScreen extends StatefulWidget {
 
 class _EventDetailScreenState extends State<EventDetailScreen>
     with AutomaticKeepAliveClientMixin {
-  Future<EventCollection?>? _future;
+  Future<PollEventCollection?>? _future;
 
   @override
   bool get wantKeepAlive => true;
@@ -41,11 +41,11 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return FutureBuilder<EventCollection?>(
+    return FutureBuilder<PollEventCollection?>(
       future: _future,
       builder: (
         BuildContext context,
-        AsyncSnapshot<EventCollection?> snapshot,
+        AsyncSnapshot<PollEventCollection?> snapshot,
       ) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const LoadingSpinner();
@@ -62,7 +62,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
           });
           return Container();
         }
-        EventCollection eventData = snapshot.data!;
+        PollEventCollection eventData = snapshot.data!;
         print(eventData);
         var curUid =
             Provider.of<FirebaseUser>(context, listen: false).user!.uid;
@@ -85,7 +85,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
             body: ResponsiveWrapper(
               child: ListView(
                 children: [
-                  Text(eventData.eventName),
+                  Text(eventData.pollEventName),
                 ],
               ),
             ),

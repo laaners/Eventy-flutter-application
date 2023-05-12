@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dima_app/server/tables/event_collection.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,35 +19,39 @@ class FirebaseEvent extends ChangeNotifier {
   FirebaseEvent(this._firestore);
 
   CollectionReference get eventCollection =>
-      _firestore.collection(EventCollection.collectionName);
+      _firestore.collection(PollEventCollection.collectionName);
 
-  Future<EventCollection?> createEvent({
+  Future<PollEventCollection?> createEvent({
     required BuildContext context,
-    required String eventName,
+    required String pollEventName,
     required String organizerUid,
-    required String eventDesc,
-    required Map<String, dynamic> date,
-    required Map<String, dynamic> location,
+    required String pollEventDesc,
+    required String deadline,
     required bool public,
     required bool canInvite,
+    required Map<String, dynamic> dates,
+    required List<Map<String, dynamic>> locations,
+    required bool isClosed,
   }) async {
-    EventCollection event = EventCollection(
-      eventName: eventName,
+    PollEventCollection event = PollEventCollection(
+      pollEventName: pollEventName,
       organizerUid: organizerUid,
-      eventDesc: eventDesc,
-      date: date,
-      location: location,
+      pollEventDesc: pollEventDesc,
+      deadline: deadline,
       public: public,
       canInvite: canInvite,
+      dates: dates,
+      locations: locations,
+      isClosed: isClosed,
     );
     try {
-      String eventId = "${eventName}_$organizerUid";
+      String eventId = "${pollEventName}_$organizerUid";
       var eventExistence = await FirebaseCrud.readDoc(eventCollection, eventId);
       if (eventExistence!.exists) {
         return null;
       }
       var tmp = event.toMap();
-      tmp["eventName_lower"] = event.eventName.toLowerCase();
+      tmp["eventName_lower"] = event.pollEventName.toLowerCase();
       await eventCollection.doc(eventId).set(tmp);
     } on FirebaseAuthException catch (e) {
       // showSnackBar(context, e.message!);
@@ -56,7 +60,7 @@ class FirebaseEvent extends ChangeNotifier {
     return event;
   }
 
-  Future<EventCollection?> getEventData({
+  Future<PollEventCollection?> getEventData({
     required BuildContext context,
     required String id,
   }) async {
@@ -66,7 +70,7 @@ class FirebaseEvent extends ChangeNotifier {
         return null;
       }
       var tmp = eventDataDoc.data() as Map<String, dynamic>;
-      var eventDetails = EventCollection.fromMap(tmp);
+      var eventDetails = PollEventCollection.fromMap(tmp);
       return eventDetails;
     } on FirebaseException catch (e) {
       showSnackBar(context, e.message!);
@@ -74,7 +78,7 @@ class FirebaseEvent extends ChangeNotifier {
     return null;
   }
 
-  Future<List<EventCollection>> getUserEvents(
+  Future<List<PollEventCollection>> getUserEvents(
     BuildContext context,
     String userUid,
   ) async {
@@ -82,8 +86,8 @@ class FirebaseEvent extends ChangeNotifier {
       var documents =
           await eventCollection.where("inviteeId", isEqualTo: userUid).get();
       if (documents.docs.isNotEmpty) {
-        final List<EventCollection> events = documents.docs.map((doc) {
-          return EventCollection.fromMap(doc as Map<String, dynamic>);
+        final List<PollEventCollection> events = documents.docs.map((doc) {
+          return PollEventCollection.fromMap(doc as Map<String, dynamic>);
         }).toList();
         return events;
       }
@@ -115,7 +119,7 @@ class FirebaseEvent extends ChangeNotifier {
           return tmp["public"] == true || curUserInvitesIds.contains(doc.id);
         }).map((doc) {
           var tmp = doc.data() as Map<String, dynamic>;
-          var eventDetails = EventCollection.fromMap(tmp);
+          var eventDetails = PollEventCollection.fromMap(tmp);
           bool invited = curUserInvitesIds.contains(doc.id);
           return {
             "eventDetails": eventDetails,
@@ -126,12 +130,14 @@ class FirebaseEvent extends ChangeNotifier {
 
         // check if the date for one event was met, if true then update the database by deleting it (and creating corresponding an event)
         events = events.where((e) {
-          EventCollection eventData = e["eventDetails"] as EventCollection;
+          PollEventCollection eventData =
+              e["eventDetails"] as PollEventCollection;
           String nowDate =
               DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
 
-          String eventDate =
-              "${eventData.date["date"]} ${eventData.date["end"]}:00";
+          // TODO: change this
+          String eventDate = "";
+          // "${eventData.date["date"]} ${eventData.date["end"]}:00";
           DateFormat f = DateFormat("yyyy-MM-dd HH:mm:ss");
           DateTime eventDateTime =
               f.parse(eventDate).add(const Duration(days: 5));
