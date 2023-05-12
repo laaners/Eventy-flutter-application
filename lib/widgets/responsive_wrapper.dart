@@ -1,9 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:dima_app/screens/profile/profile_settings.dart';
-import 'package:dima_app/server/firebase_user.dart';
-import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/widgets/delay_widget.dart';
-import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,17 +12,9 @@ class ResponsiveWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isAuthenticated =
-        Provider.of<FirebaseUser>(context, listen: true).user != null;
-    UserCollection? userData =
-        Provider.of<FirebaseUser>(context, listen: true).userData;
-    bool hasUserData = userData != null;
     return SafeArea(
       child: DelayWidget(
-        child: isAuthenticated &&
-                hasUserData &&
-                MediaQuery.of(context).orientation == Orientation.landscape &&
-                true
+        child: MediaQuery.of(context).orientation == Orientation.landscape
             ? Stack(
                 children: [
                   Container(
@@ -41,6 +29,7 @@ class ResponsiveWrapper extends StatelessWidget {
                       ),
                     ),
                   ),
+                  /*
                   Container(
                     alignment: Alignment.topRight,
                     child: ConstrainedBox(
@@ -100,6 +89,7 @@ class ResponsiveWrapper extends StatelessWidget {
                       ),
                     ),
                   ),
+                  */
                 ],
               )
             : Container(
