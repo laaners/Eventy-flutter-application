@@ -1,5 +1,5 @@
 import 'dart:math';
-
+/*
 import 'package:dima_app/server/firebase_event.dart';
 import 'package:dima_app/server/firebase_follow.dart';
 import 'package:dima_app/server/firebase_poll_event.dart';
@@ -125,8 +125,8 @@ class FirebaseCrudsTesting {
             ? [
                 {
                   "name": "Virtual meeting",
-                  "lat": 0,
-                  "lon": 0,
+                  "lat": 0.0,
+                  "lon": 0.0,
                   "site": "",
                   "icon": "videocam",
                 }
@@ -384,3 +384,4 @@ class FirebaseCrudsTesting {
     print("Created all");
   }
 }
+*/

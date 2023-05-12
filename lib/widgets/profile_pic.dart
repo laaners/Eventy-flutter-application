@@ -1,8 +1,8 @@
-import 'package:dima_app/server/tables/user_collection.dart';
+import 'package:dima_app/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePic extends StatelessWidget {
-  final UserCollection? userData;
+  final UserModel? userData;
   final bool loading;
   final double radius;
   const ProfilePic({

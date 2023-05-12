@@ -1,14 +1,13 @@
+import 'package:dima_app/constants/layout_constants.dart';
+import 'package:dima_app/models/user_model.dart';
+import 'package:dima_app/screens/error/error.dart';
+import 'package:dima_app/screens/profile/profile.dart';
+import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
+import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../screens/error.dart';
-import '../screens/profile/index.dart';
-import 'profile_pic.dart';
-import '../screens/profile/view_profile.dart';
-import '../server/firebase_user.dart';
-import '../server/tables/user_collection.dart';
-import '../transitions/screen_transition.dart';
 import 'loading_spinner.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -52,7 +51,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class CustomDelegate extends SearchDelegate<String> {
-  List<UserCollection> usersData = [];
+  List<UserModel> usersData = [];
 
   @override
   List<Widget> buildActions(BuildContext context) =>
@@ -69,11 +68,12 @@ class CustomDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    print(query.isEmpty);
     return query.isEmpty
         ? Container()
         : FutureBuilder(
             future: Provider.of<FirebaseUser>(context, listen: false)
-                .getUsersData(context, query),
+                .getUsersData(pattern: query),
             builder: (
               context,
               snapshot,
@@ -83,8 +83,7 @@ class CustomDelegate extends SearchDelegate<String> {
               }
               if (snapshot.hasError) {
                 Future.microtask(() {
-                  Navigator.of(context).pop();
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     ScreenTransition(
                       builder: (context) => ErrorScreen(
@@ -101,8 +100,12 @@ class CustomDelegate extends SearchDelegate<String> {
               usersData = snapshot.data!;
               return ResponsiveWrapper(
                 child: ListView.builder(
-                  itemCount: usersData.length,
+                  itemCount: usersData.length + 1,
                   itemBuilder: (_, i) {
+                    if (i == usersData.length) {
+                      return Container(
+                          height: LayoutConstants.kPaddingFromCreate);
+                    }
                     var user = usersData[i];
                     return UserTileSearch(
                       userData: user,
@@ -116,7 +119,7 @@ class CustomDelegate extends SearchDelegate<String> {
 }
 
 class UserTileSearch extends StatelessWidget {
-  final UserCollection userData;
+  final UserModel userData;
   const UserTileSearch({super.key, required this.userData});
 
   @override
@@ -143,7 +146,8 @@ class UserTileSearch extends StatelessWidget {
               ),
             );
           } else {
-            Widget newScreen = ViewProfileScreen(profileUserData: userData);
+            // Widget newScreen = ViewProfileScreen(profileUserData: userData);
+            Widget newScreen = const ProfileScreen();
             Navigator.push(
               context,
               ScreenTransition(
