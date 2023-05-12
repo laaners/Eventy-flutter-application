@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:dima_app/screens/error.dart';
 import 'package:dima_app/screens/map/event_location_marker.dart';
+import 'package:dima_app/screens/map/event_search_by_name.dart';
 import 'package:dima_app/server/firebase_event_location.dart';
 import 'package:dima_app/server/tables/event_location_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
@@ -214,7 +215,7 @@ class _MapScreenState extends State<MapScreen>
     print("rebuild map");
     return Scaffold(
       appBar: const MyAppBar(
-        upRightActions: [],
+        upRightActions: [EventSearchByName()],
         title: 'Events Map',
       ),
       body: ResponsiveWrapper(

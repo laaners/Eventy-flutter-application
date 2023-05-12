@@ -56,8 +56,9 @@ class EventLocationTile extends StatelessWidget {
                   ),
                 ),
         ),
-        trailing:
-            invited ? Icon(Icons.arrow_forward_ios_rounded) : Icon(Icons.login),
+        trailing: invited
+            ? const Icon(Icons.arrow_forward_ios_rounded)
+            : const Icon(Icons.login),
         /*
         */
 

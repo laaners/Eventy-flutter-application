@@ -6,6 +6,7 @@ import 'package:dima_app/server/firebase_poll_event.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
+import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -179,7 +180,7 @@ class FirebaseCrudsTesting {
           pollEventDesc: j % 2 == 0 ? "" : "Some random desc for event $j",
           deadline: "2023-$deadlineM-$deadlineD 21:30:00",
           dates: localDates as Map<String, dynamic>,
-          locations: locations as List<Map<String, dynamic>>,
+          locations: locations.map((e) => Location.fromMap(e)).toList(),
           public: next(0, 2) % 2 == 0,
           canInvite: next(0, 2) % 2 == 0,
           isClosed: false,
@@ -309,7 +310,7 @@ class FirebaseCrudsTesting {
           pollEventDesc: j % 2 == 0 ? "" : "Some random desc for event $j",
           deadline: "2023-$deadlineM-$deadlineD 21:30:00",
           dates: localDates as Map<String, dynamic>,
-          locations: locations as List<Map<String, dynamic>>,
+          locations: locations.map((e) => Location.fromMap(e)).toList(),
           public: next(0, 2) % 2 == 0,
           canInvite: next(0, 2) % 2 == 0,
           isClosed: false,

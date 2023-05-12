@@ -264,16 +264,6 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
       return;
     }
 
-    var locationsMap = locations.map((location) {
-      return {
-        "name": location.name,
-        "site": location.site,
-        "lat": location.lat,
-        "lon": location.lon,
-        "icon": location.icon,
-      };
-    }).toList();
-
     /*
     // get event will return NOT NULL if the event ALREADY EXISTS
     var dbEvent =
@@ -305,7 +295,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
       pollEventDesc: eventDescController.text,
       deadline: deadlineController.text,
       dates: dates,
-      locations: locationsMap,
+      locations: locations,
       public: visibility,
       canInvite: canInvite,
       isClosed: false,

@@ -83,7 +83,7 @@ class FirebasePollEventInvite extends ChangeNotifier {
             .deleteUserVoteLocation(
           context: context,
           pollId: pollEventId,
-          locationName: location["name"],
+          locationName: location.name,
           uid: inviteeId,
         );
       }).toList());

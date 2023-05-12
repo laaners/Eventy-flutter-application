@@ -33,8 +33,7 @@ class EventsScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 // ignore: use_build_context_synchronously
-                String pollId =
-                    "Event 0 of UsernameId14_0DmBO8Fw0ofrK9RbXIO4dYlEIg03";
+                String pollId = "g_0DmBO8Fw0ofrK9RbXIO4dYlEIg03";
                 var curUid =
                     // ignore: use_build_context_synchronously
                     Provider.of<FirebaseUser>(context, listen: false).user!.uid;

@@ -43,6 +43,19 @@ class _PollEventScreenState extends State<PollEventScreen>
           await Provider.of<FirebasePollEvent>(context, listen: false)
               .getPollData(context, widget.pollEventId);
       if (pollData == null) return null;
+
+      // deadline reached, close poll
+      // check if it is closed or the deadline was reached, deadline already in local
+      String nowDate = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
+      String localDate = pollData.deadline;
+      localDate = DateFormatter.toLocalString(localDate);
+
+      if (!pollData.isClosed && localDate.compareTo(nowDate) <= 0) {
+        // ignore: use_build_context_synchronously
+        await Provider.of<FirebasePollEvent>(context, listen: false)
+            .closePoll(context: context, pollId: widget.pollEventId);
+      }
+
       List<PollEventInviteCollection> pollInvites =
           // ignore: use_build_context_synchronously
           await Provider.of<FirebasePollEventInvite>(context, listen: false)
@@ -52,14 +65,14 @@ class _PollEventScreenState extends State<PollEventScreen>
       List<VoteLocationCollection> votesLocations =
           await Future.wait(pollData.locations.map((location) {
         return Provider.of<FirebaseVote>(context, listen: false)
-            .getVotesLocation(context, widget.pollEventId, location["name"])
+            .getVotesLocation(context, widget.pollEventId, location.name)
             .then((value) {
           if (value != null) {
             value.votes[pollData.organizerUid] = Availability.yes;
             return value;
           } else {
             return VoteLocationCollection(
-              locationName: location["name"],
+              locationName: location.name,
               pollId: widget.pollEventId,
               votes: {
                 pollData.organizerUid: Availability.yes,
@@ -175,7 +188,6 @@ class _PollEventScreenState extends State<PollEventScreen>
           });
           return Container();
         }
-
         return StreamBuilder(
             stream: Provider.of<FirebasePollEvent>(context, listen: false)
                 .getPollDataSnapshot(
@@ -211,45 +223,44 @@ class _PollEventScreenState extends State<PollEventScreen>
                   (tmp["deadline"] as Timestamp).toDate());
               localDate = DateFormatter.toLocalString(localDate);
 
-              // today is below deadline and the poll was not closed early
-              if (localDate.compareTo(nowDate) > 0 && !tmp["isClosed"]) {
-                return FutureBuilder<Map<String, dynamic>?>(
-                  future: _future,
-                  builder: (
-                    BuildContext context,
-                    AsyncSnapshot<Map<String, dynamic>?> snapshot,
-                  ) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const LoadingSpinner();
-                    }
-                    if (snapshot.hasError || !snapshot.hasData) {
-                      Future.microtask(() {
-                        Navigator.of(context, rootNavigator: false)
-                            .pushReplacement(
-                          ScreenTransition(
-                            builder: (context) => ErrorScreen(
-                              errorMsg: snapshot.error.toString(),
-                            ),
+              return FutureBuilder<Map<String, dynamic>?>(
+                future: _future,
+                builder: (
+                  BuildContext context,
+                  AsyncSnapshot<Map<String, dynamic>?> snapshot,
+                ) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const LoadingSpinner();
+                  }
+                  if (snapshot.hasError || !snapshot.hasData) {
+                    Future.microtask(() {
+                      Navigator.of(context, rootNavigator: false)
+                          .pushReplacement(
+                        ScreenTransition(
+                          builder: (context) => ErrorScreen(
+                            errorMsg: snapshot.error.toString(),
                           ),
-                        );
-                      });
-                      return Container();
-                    }
-                    PollEventCollection pollData = snapshot.data!["data"];
+                        ),
+                      );
+                    });
+                    return Container();
+                  }
+                  PollEventCollection pollData = snapshot.data!["data"];
 
-                    List<PollEventInviteCollection> pollInvites =
-                        snapshot.data!["invites"];
-                    List<VoteLocationCollection> votesLocations =
-                        snapshot.data!["locations"];
-                    votesLocations.sort((a, b) =>
-                        b.getPositiveVotes().length -
-                        a.getPositiveVotes().length);
-                    List<VoteDateCollection> votesDates =
-                        snapshot.data!["dates"];
-                    votesDates.sort((a, b) =>
-                        b.getPositiveVotes().length -
-                        a.getPositiveVotes().length);
+                  List<PollEventInviteCollection> pollInvites =
+                      snapshot.data!["invites"];
+                  List<VoteLocationCollection> votesLocations =
+                      snapshot.data!["locations"];
+                  votesLocations.sort((a, b) =>
+                      b.getPositiveVotes().length -
+                      a.getPositiveVotes().length);
+                  List<VoteDateCollection> votesDates = snapshot.data!["dates"];
+                  votesDates.sort((a, b) =>
+                      b.getPositiveVotes().length -
+                      a.getPositiveVotes().length);
 
+                  // today is below deadline and the poll was not closed early
+                  if (localDate.compareTo(nowDate) > 0 && !tmp["isClosed"]) {
                     return PollDetailScreen(
                       pollId: widget.pollEventId,
                       pollData: pollData,
@@ -258,12 +269,11 @@ class _PollEventScreenState extends State<PollEventScreen>
                       votesDates: votesDates,
                       refreshPollDetail: refreshPollDetail,
                     );
-                  },
-                );
-              } else {
-                // deadline reached
-                return const SettingsScreen();
-              }
+                  } else {
+                    return const SettingsScreen();
+                  }
+                },
+              );
             });
       },
     );

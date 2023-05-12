@@ -2,12 +2,12 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/server/date_methods.dart';
-import 'package:dima_app/server/firebase_event.dart';
 import 'package:dima_app/server/firebase_event_location.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/firebase_vote.dart';
 import 'package:dima_app/server/tables/availability.dart';
+import 'package:dima_app/server/tables/location.dart';
 import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/server/tables/vote_date_collection.dart';
@@ -34,7 +34,7 @@ class FirebasePollEvent extends ChangeNotifier {
     required String pollEventDesc,
     required String deadline,
     required Map<String, dynamic> dates,
-    required List<Map<String, dynamic>> locations,
+    required List<Location> locations,
     required bool public,
     required bool canInvite,
     required bool isClosed,
@@ -258,14 +258,14 @@ class FirebasePollEvent extends ChangeNotifier {
         List<VoteLocationCollection> votesLocations =
             await Future.wait(pollData.locations.map((location) {
           return Provider.of<FirebaseVote>(context, listen: false)
-              .getVotesLocation(context, pollId, location["name"])
+              .getVotesLocation(context, pollId, location.name)
               .then((value) {
             if (value != null) {
               value.votes[pollData.organizerUid] = Availability.yes;
               return value;
             } else {
               return VoteLocationCollection(
-                locationName: location["name"],
+                locationName: location.name,
                 pollId: pollId,
                 votes: {
                   pollData.organizerUid: Availability.yes,
@@ -279,24 +279,79 @@ class FirebasePollEvent extends ChangeNotifier {
             b.getPositiveVotes().length - a.getPositiveVotes().length);
 
         VoteLocationCollection eventVoteLocation = votesLocations.first;
-        Map<String, dynamic> eventLocation = pollData.locations.firstWhere(
-            (element) => element["name"] == eventVoteLocation.locationName);
+        Location eventLocation = pollData.locations.firstWhere(
+          (element) => element.name == eventVoteLocation.locationName,
+        );
 
+        print(eventLocation);
+
+        // get most voted date
+        List<Future<VoteDateCollection>> promises = pollData.dates.keys
+            .map((date) {
+              return pollData.dates[date].map((slot) {
+                return Provider.of<FirebaseVote>(context, listen: false)
+                    .getVotesDate(
+                        context, pollId, date, slot["start"], slot["end"])
+                    .then((value) {
+                  if (value != null) {
+                    value.votes[pollData.organizerUid] = Availability.yes;
+                    return value;
+                  } else {
+                    return VoteDateCollection(
+                      pollId: pollId,
+                      date: date,
+                      start: slot["start"],
+                      end: slot["end"],
+                      votes: {
+                        pollData.organizerUid: Availability.yes,
+                      },
+                    );
+                  }
+                });
+              }).toList();
+            })
+            .toList()
+            .expand((x) => x)
+            .toList()
+            .cast();
+
+        List<VoteDateCollection> votesDates = await Future.wait(promises);
+        votesDates.sort((a, b) =>
+            b.getPositiveVotes().length - a.getPositiveVotes().length);
+        VoteDateCollection eventVoteDate = votesDates.first;
+        Map<String, String> utcInfo = VoteDateCollection.dateToUtc(
+          eventVoteDate.date,
+          eventVoteDate.start,
+          eventVoteDate.end,
+        );
+        print(utcInfo);
+
+        List<Future<void>> updatePromises = [
+          FirebaseCrud.updateDoc(pollEventCollection, pollId, "isClosed", true),
+          FirebaseCrud.updateDoc(pollEventCollection, pollId, "locations",
+              [eventLocation.toMap()]),
+          FirebaseCrud.updateDoc(pollEventCollection, pollId, "dates", {
+            utcInfo["date"]: [
+              {
+                "start": utcInfo["start"],
+                "end": utcInfo["end"],
+              }
+            ]
+          }),
+        ];
+        await Future.wait(updatePromises);
         await Provider.of<FirebaseEventLocation>(context, listen: false)
             .addEventToLocation(
           context: context,
-          site: eventLocation["site"],
-          lat: eventLocation["lat"],
-          lon: eventLocation["lon"],
+          site: eventLocation.site,
+          lat: eventLocation.lat,
+          lon: eventLocation.lon,
           eventName: pollData.pollEventName,
           eventId: pollId,
-          locationName: eventLocation["name"],
-          locationBanner: eventLocation["icon"],
+          locationName: eventLocation.name,
+          locationBanner: eventLocation.icon,
           public: pollData.public,
         );
-
-        await FirebaseCrud.updateDoc(
-            pollEventCollection, pollId, "isClosed", true);
       }
     } on FirebaseException catch (e) {
       print(e.message!);
@@ -324,18 +379,19 @@ class FirebasePollEvent extends ChangeNotifier {
 
         PollEventCollection pollData = PollEventCollection.fromMap(tmp);
 
+        /*
         // get most voted options
         List<VoteLocationCollection> votesLocations =
             await Future.wait(pollData.locations.map((location) {
           return Provider.of<FirebaseVote>(context, listen: false)
-              .getVotesLocation(context, pollId, location["name"])
+              .getVotesLocation(context, pollId, location.name)
               .then((value) {
             if (value != null) {
               value.votes[pollData.organizerUid] = Availability.yes;
               return value;
             } else {
               return VoteLocationCollection(
-                locationName: location["name"],
+                locationName: location.name,
                 pollId: pollId,
                 votes: {
                   pollData.organizerUid: Availability.yes,
@@ -376,15 +432,13 @@ class FirebasePollEvent extends ChangeNotifier {
 
         List<VoteDateCollection> votesDates = await Future.wait(promises);
 
-        List<PollEventInviteCollection> invites =
-            await Provider.of<FirebasePollEventInvite>(context, listen: false)
-                .getInvitesFromPollEventId(context, pollId);
-
         votesLocations.sort((a, b) =>
             b.getPositiveVotes().length - a.getPositiveVotes().length);
         VoteLocationCollection eventVoteLocation = votesLocations.first;
-        Map<String, dynamic> eventLocation = pollData.locations.firstWhere(
-            (element) => element["name"] == eventVoteLocation.locationName);
+        Location eventLocation = pollData.locations.firstWhere(
+          (element) => element.name == eventVoteLocation.locationName,
+        );
+
         eventLocation["invites"] = invites.map((invite) {
           return {
             "inviteeId": invite.inviteeId,
@@ -411,8 +465,13 @@ class FirebasePollEvent extends ChangeNotifier {
             };
           }).toList(),
         };
+        */
 
         // delete invites
+        List<PollEventInviteCollection> invites =
+            await Provider.of<FirebasePollEventInvite>(context, listen: false)
+                .getInvitesFromPollEventId(context, pollId);
+
         await Future.wait(invites
             .map((invite) =>
                 Provider.of<FirebasePollEventInvite>(context, listen: false)
@@ -429,7 +488,7 @@ class FirebasePollEvent extends ChangeNotifier {
                     .deleteVoteLocation(
                   context: context,
                   pollId: pollId,
-                  locationName: location["name"],
+                  locationName: location.name,
                 ))
             .toList());
 
@@ -461,5 +520,42 @@ class FirebasePollEvent extends ChangeNotifier {
       print(e.message);
       showSnackBar(context, "Error in poll deletion");
     }
+  }
+
+  // Return the data of user whose username matches a
+  Future<List<PollEventCollection>> searchEventsByName(
+    BuildContext context,
+    String pattern,
+  ) async {
+    try {
+      var events = await pollEventCollection
+          .orderBy('name_lower')
+          .where('name_lower', isGreaterThanOrEqualTo: pattern.toLowerCase())
+          .where('name_lower', isLessThan: '${pattern.toLowerCase()}z')
+          .limit(10)
+          .get();
+      if (events.docs.isNotEmpty) {
+        List<PollEventCollection> eventsData = events.docs.map((doc) {
+          var tmp = doc.data() as Map<String, dynamic>;
+          tmp["locations"] = (tmp["locations"] as List).map((e) {
+            e["lat"] = e["lat"].toDouble();
+            e["lon"] = e["lon"].toDouble();
+            return e as Map<String, dynamic>;
+          }).toList();
+          tmp["deadline"] =
+              DateFormatter.dateTime2String(tmp["deadline"].toDate());
+          tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
+          tmp["dates"] = PollEventCollection.datesToLocal(
+              tmp["dates"] as Map<String, dynamic>);
+          var pollDetails = PollEventCollection.fromMap(tmp);
+          return pollDetails;
+        }).toList();
+        return eventsData;
+      }
+    } on FirebaseException catch (e) {
+      //showSnackBar(context, e.message!);
+      print(e.message);
+    }
+    return [];
   }
 }

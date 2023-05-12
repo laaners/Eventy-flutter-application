@@ -16,7 +16,7 @@ class LocationsList extends StatefulWidget {
   final String organizerUid;
   final String votingUid;
   final String pollId;
-  final List<Map<String, dynamic>> locations;
+  final List<Location> locations;
   final List<PollEventInviteCollection> invites;
   final List<VoteLocationCollection> votesLocations;
   const LocationsList({
@@ -112,7 +112,7 @@ class _LocationsListState extends State<LocationsList>
                 child: ListView(
                   children: votesLocations.map((voteLocation) {
                     var location = widget.locations.firstWhere(
-                      (element) => element["name"] == voteLocation.locationName,
+                      (element) => element.name == voteLocation.locationName,
                     );
                     return LocationTile(
                       votingUid: widget.votingUid,
@@ -120,18 +120,18 @@ class _LocationsListState extends State<LocationsList>
                       organizerUid: widget.organizerUid,
                       invites: widget.invites,
                       location: Location(
-                        location["name"],
-                        location["site"],
-                        location["lat"],
-                        location["lon"],
-                        location["icon"],
+                        location.name,
+                        location.site,
+                        location.lat,
+                        location.lon,
+                        location.icon,
                       ),
                       voteLocation: voteLocation,
                       modifyVote: (int newAvailability) {
                         if (widget.votingUid == curUid) {
                           setState(() {
                             votesLocations[votesLocations.indexWhere(
-                                    (e) => e.locationName == location["name"])]
+                                    (e) => e.locationName == location.name)]
                                 .votes[curUid] = newAvailability;
                           });
                         }

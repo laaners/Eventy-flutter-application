@@ -1,10 +1,5 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
 import 'package:dima_app/server/date_methods.dart';
 import 'package:flutter/foundation.dart';
-
-import 'package:dima_app/server/tables/location.dart';
 import 'package:intl/intl.dart';
 
 class PollEventCollection {
@@ -15,17 +10,17 @@ class PollEventCollection {
   final bool public;
   final bool canInvite;
   final Map<String, dynamic> dates;
-  final List<Location> locations;
+  final List<Map<String, dynamic>> locations;
   final bool isClosed;
   PollEventCollection({
     required this.pollEventName,
     required this.organizerUid,
     required this.pollEventDesc,
     required this.deadline,
-    required this.public,
-    required this.canInvite,
     required this.dates,
     required this.locations,
+    required this.public,
+    required this.canInvite,
     required this.isClosed,
   });
 
@@ -87,10 +82,10 @@ class PollEventCollection {
     String? organizerUid,
     String? pollEventDesc,
     String? deadline,
+    Map<String, dynamic>? dates,
+    List<Map<String, dynamic>>? locations,
     bool? public,
     bool? canInvite,
-    Map<String, dynamic>? dates,
-    List<Location>? locations,
     bool? isClosed,
   }) {
     return PollEventCollection(
@@ -98,10 +93,10 @@ class PollEventCollection {
       organizerUid: organizerUid ?? this.organizerUid,
       pollEventDesc: pollEventDesc ?? this.pollEventDesc,
       deadline: deadline ?? this.deadline,
-      public: public ?? this.public,
-      canInvite: canInvite ?? this.canInvite,
       dates: dates ?? this.dates,
       locations: locations ?? this.locations,
+      public: public ?? this.public,
+      canInvite: canInvite ?? this.canInvite,
       isClosed: isClosed ?? this.isClosed,
     );
   }
@@ -112,10 +107,10 @@ class PollEventCollection {
       'organizerUid': organizerUid,
       'pollEventDesc': pollEventDesc,
       'deadline': deadline,
+      'dates': dates,
+      'locations': locations,
       'public': public,
       'canInvite': canInvite,
-      'dates': dates,
-      'locations': locations.map((x) => x.toMap()).toList(),
       'isClosed': isClosed,
     };
   }
@@ -126,26 +121,20 @@ class PollEventCollection {
       organizerUid: map['organizerUid'] as String,
       pollEventDesc: map['pollEventDesc'] as String,
       deadline: map['deadline'] as String,
+      dates: Map<String, dynamic>.from((map['dates'] as Map<String, dynamic>)),
+      locations: List<Map<String, dynamic>>.from(
+        (map['locations'] as List<Map<String, dynamic>>)
+            .map<Map<String, dynamic>>((x) => x),
+      ),
       public: map['public'] as bool,
       canInvite: map['canInvite'] as bool,
-      dates: Map<String, dynamic>.from((map['dates'] as Map<String, dynamic>)),
-      locations: List<Location>.from(
-        (map['locations'] as List<Map<String, dynamic>>).map<Location>(
-          (x) => Location.fromMap(x),
-        ),
-      ),
       isClosed: map['isClosed'] as bool,
     );
   }
 
-  String toJson() => json.encode(toMap());
-
-  factory PollEventCollection.fromJson(String source) =>
-      PollEventCollection.fromMap(json.decode(source) as Map<String, dynamic>);
-
   @override
   String toString() {
-    return 'PollEventCollection(pollEventName: $pollEventName, organizerUid: $organizerUid, pollEventDesc: $pollEventDesc, deadline: $deadline, public: $public, canInvite: $canInvite, dates: $dates, locations: $locations, isClosed: $isClosed)';
+    return 'PollCollection(pollEventName: $pollEventName, organizerUid: $organizerUid, pollEventDesc: $pollEventDesc, deadline: $deadline, dates: $dates, locations: $locations, public: $public, canInvite: $canInvite, isClosed: $isClosed)';
   }
 
   @override
@@ -156,10 +145,10 @@ class PollEventCollection {
         other.organizerUid == organizerUid &&
         other.pollEventDesc == pollEventDesc &&
         other.deadline == deadline &&
-        other.public == public &&
-        other.canInvite == canInvite &&
         mapEquals(other.dates, dates) &&
         listEquals(other.locations, locations) &&
+        other.public == public &&
+        other.canInvite == canInvite &&
         other.isClosed == isClosed;
   }
 
@@ -169,10 +158,10 @@ class PollEventCollection {
         organizerUid.hashCode ^
         pollEventDesc.hashCode ^
         deadline.hashCode ^
-        public.hashCode ^
-        canInvite.hashCode ^
         dates.hashCode ^
         locations.hashCode ^
+        public.hashCode ^
+        canInvite.hashCode ^
         isClosed.hashCode;
   }
 }
