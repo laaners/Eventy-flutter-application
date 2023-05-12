@@ -2,7 +2,9 @@ import 'package:dima_app/screens/debug.dart';
 import 'package:dima_app/screens/event_detail/index.dart';
 import 'package:dima_app/screens/poll_event.dart';
 import 'package:dima_app/screens/profile/follow_buttons.dart';
+import 'package:dima_app/server/firebase_event.dart';
 import 'package:dima_app/server/firebase_user.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/user_collection.dart';
 import 'package:dima_app/themes/layout_constants.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
@@ -79,37 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-/// ListTile that takes an Event object displays its info
-class EventTile extends StatelessWidget {
-  const EventTile({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.event),
-      title: const Text("Event Name"),
-      subtitle: const Text("Event Location"),
-      // visibility on/off
-      trailing: const Icon(Icons.visibility),
-      onTap: () {
-        Widget newScreen = const PollEventScreen(pollEventId: '');
-        Navigator.of(context).push(
-          ScreenTransition(
-            builder: (context) => newScreen,
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// Generate a list of Event object based on ad hoc query
-List<EventTile> generateEvents(int numberOfEvents) {
-  return List<EventTile>.generate(numberOfEvents, (int index) {
-    return const EventTile();
-  });
-}
-
 // get event based on ad hoc query
 List<String> generateItems(int numberOfItems) {
   return List<String>.generate(numberOfItems, (int index) {
@@ -125,25 +96,30 @@ class EventPanel extends StatefulWidget {
 }
 
 class _EventPanelState extends State<EventPanel> {
-  // main
-  //final List<Item> _sections = generateItems(20);
-  final List<int> _items = List<int>.generate(50, (int index) => index);
+  // even sections
+  final List<String> _sections = ["Invited", "My Events", "My Followers"];
 
   @override
   Widget build(BuildContext context) {
+    // events here
+    final userUid = Provider.of<FirebaseUser>(listen: false, context).user?.uid;
+    final Future<List<PollEventCollection>> myEvents =
+        Provider.of<FirebaseEvent>(context, listen: false)
+            .getUserEvents(context, userUid!);
+
     return ReorderableListView.builder(
       shrinkWrap: true,
-      itemCount: _items.length,
+      itemCount: _sections.length,
       itemBuilder: (BuildContext context, int index) => ExpansionTile(
         leading: const Icon(Icons.drag_indicator),
         key: Key('$index'),
         title: Text(
-          'Item ${_items[index]}',
+          _sections[index],
           style: Theme.of(context).textTheme.headlineLarge,
         ),
         children: [
-          ListTile(title: Text('EventTile ${_items[index]}')),
-          ListTile(title: Text('EventTile ${_items[index]}')),
+          ListTile(title: Text('EventTile ${_sections[index]}')),
+          ListTile(title: Text('EventTile ${_sections[index]}')),
         ],
       ),
       onReorder: (int oldIndex, int newIndex) {
@@ -151,10 +127,41 @@ class _EventPanelState extends State<EventPanel> {
           if (oldIndex < newIndex) {
             newIndex -= 1;
           }
-          final int item = _items.removeAt(oldIndex);
-          _items.insert(newIndex, item);
+          final String section = _sections.removeAt(oldIndex);
+          _sections.insert(newIndex, section);
         });
       },
     );
+  }
+}
+
+class EventTile extends StatefulWidget {
+  final PollEventCollection event;
+
+  const EventTile({super.key, required this.event});
+
+  @override
+  State<EventTile> createState() => _EventTileState();
+}
+
+class _EventTileState extends State<EventTile> {
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.event),
+      title: Text(widget.event.pollEventName),
+      subtitle: const Text("Location"),
+      // visibility on/off
+      trailing: const Icon(Icons.visibility),
+      onTap: () {
+        Widget newScreen = const PollEventScreen(pollEventId: '');
+        Navigator.of(context).push(
+          ScreenTransition(
+            builder: (context) => newScreen,
+          ),
+        );
+      },
+    );
+    ;
   }
 }

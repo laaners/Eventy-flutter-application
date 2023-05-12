@@ -4,12 +4,11 @@ import 'package:dima_app/screens/poll_event.dart';
 import 'package:dima_app/server/firebase_event.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
+import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/transitions/screen_transition.dart';
 import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../server/tables/event_collection.dart';
 
 class EventList extends StatefulWidget {
   final String userUid;
@@ -61,7 +60,7 @@ class _EventListState extends State<EventList> {
           children: eventsData
               .map(
                 (e) => EventTile(
-                  eventData: e["eventDetails"] as EventCollection,
+                  eventData: e["eventDetails"] as PollEventCollection,
                   invited: e["invited"] as bool,
                   refreshParent: () {
                     setState(() {
@@ -78,7 +77,7 @@ class _EventListState extends State<EventList> {
 }
 
 class EventTile extends StatelessWidget {
-  final EventCollection eventData;
+  final PollEventCollection eventData;
   final bool invited;
   final VoidCallback refreshParent;
   const EventTile({
@@ -90,7 +89,7 @@ class EventTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String eventId = "${eventData.eventName}_${eventData.organizerUid}";
+    String eventId = "${eventData.pollEventName}_${eventData.organizerUid}";
     return SizedBox(
       height: 80,
       child: ListTile(
@@ -102,7 +101,7 @@ class EventTile extends StatelessWidget {
           backgroundColor: Colors.blue,
           child: Icon(Icons.place),
         ),
-        title: Text(eventData.eventName),
+        title: Text(eventData.pollEventName),
         subtitle: Text(eventData.organizerUid),
         onTap: () async {
           var curUid =
