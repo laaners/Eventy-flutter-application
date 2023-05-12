@@ -6,6 +6,7 @@ import 'package:dima_app/server/firebase_poll_event.dart';
 import 'package:dima_app/server/firebase_poll_event_invite.dart';
 import 'package:dima_app/server/firebase_user.dart';
 import 'package:dima_app/server/tables/event_location_collection.dart';
+import 'package:dima_app/server/tables/event_location_preview.dart';
 import 'package:dima_app/server/tables/poll_event_collection.dart';
 import 'package:dima_app/server/tables/poll_event_invite_collection.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
@@ -94,13 +95,13 @@ class FirebaseEventLocation extends ChangeNotifier {
         EventLocationCollection eventLocationDetails =
             EventLocationCollection.fromMap(tmp);
 
-        Map<String, dynamic>? dbEvent = eventLocationDetails.events
+        EventLocationPreview? dbEvent = eventLocationDetails.events
             .firstWhereOrNull((element) =>
-                element["eventId"] == eventId &&
-                element["eventName"] == eventName &&
-                element["locationName"] == locationName &&
-                element["locationBanner"] == locationBanner &&
-                element["public"] == public);
+                element.eventId == eventId &&
+                element.eventName == eventName &&
+                element.locationName == locationName &&
+                element.locationBanner == locationBanner &&
+                element.public == public);
 
         if (eventLocationDetails.events.isNotEmpty &&
             dbEvent != null &&
