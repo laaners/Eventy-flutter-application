@@ -3,14 +3,20 @@ import 'package:dima_app/debug.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/home/home.dart';
 import 'package:dima_app/screens/login/login.dart';
+import 'package:dima_app/screens/map/map.dart';
 import 'package:dima_app/screens/poll_create/poll_create.dart';
+import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/screens/settings/settings.dart';
 import 'package:dima_app/services/dynamic_links_handler.dart';
+import 'package:dima_app/services/firebase_event_location.dart';
+import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
-import 'package:dima_app/services/firebse_poll_event.dart';
+import 'package:dima_app/services/firebase_poll_event.dart';
+import 'package:dima_app/services/firebase_vote.dart';
 import 'package:dima_app/services/theme_manager.dart';
-import 'package:dima_app/widgets/loading_spinner.dart';
+import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
+import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -54,6 +60,9 @@ Future<void> main() async {
         ChangeNotifierProvider(
             create: (context) => FirebaseUser(auth, firestore)),
         Provider(create: (context) => FirebasePollEvent(firestore)),
+        Provider(create: (context) => FirebaseVote(firestore)),
+        Provider(create: (context) => FirebasePollEventInvite(firestore)),
+        Provider(create: (context) => FirebaseEventLocation(firestore)),
       ],
       child: const MyApp(),
     ),
@@ -104,7 +113,7 @@ class _MyAppState extends State<MyApp> {
                 AsyncSnapshot<UserModel> snapshot,
               ) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const LoadingSpinner();
+                  return const LoadingLogo();
                 }
                 if (snapshot.hasError || !snapshot.hasData) {
                   return const LogInScreen();
@@ -302,7 +311,7 @@ class _MainScreen extends State<MainScreen> {
               case 1:
                 return CupertinoTabView(
                   navigatorKey: secondTabNavKey,
-                  builder: (context) => DebugScreen(), // const MapScreen(),
+                  builder: (context) => const MapScreen(),
                 );
               case 3:
                 return CupertinoTabView(
@@ -346,15 +355,17 @@ class CreatePollEventButton extends StatelessWidget {
                 // the result from pop is the poll id
                 final pollId =
                     await Navigator.of(context, rootNavigator: true).push(
-                  MaterialPageRoute(
+                  ScreenTransition(
                     builder: (context) => const PollCreateScreen(),
                   ),
                 );
                 if (pollId != null) {
-                  Widget newScreen =
-                      DebugScreen(); //PollEventScreen(pollEventId: pollId);
                   // ignore: use_build_context_synchronously
+                  showSnackBar(context, "Successfully created event!");
+                  /*
+                  Widget newScreen = PollEventScreen(pollEventId: pollId);
                   var ris =
+                      // ignore: use_build_context_synchronously
                       await Navigator.of(context, rootNavigator: false).push(
                     ScreenTransition(
                       builder: (context) => newScreen,
@@ -370,6 +381,7 @@ class CreatePollEventButton extends StatelessWidget {
                     );
                     */
                   }
+                  */
                 }
               },
               color: Theme.of(context).primaryColor,

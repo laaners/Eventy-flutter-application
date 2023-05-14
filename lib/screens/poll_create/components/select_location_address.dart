@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:dima_app/models/location.dart';
-import 'package:dima_app/widgets/loading_spinner.dart';
+import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/map_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -173,7 +173,7 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
           MapFromCoor(lat: lat, lon: lon, address: widget.controller.text)
         else
           loadingLocations
-              ? const LoadingSpinner()
+              ? const LoadingLogo()
               : Column(
                   children: [
                     for (var i = 0; i < locationSuggestions.length; i++)

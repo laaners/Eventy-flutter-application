@@ -4,7 +4,7 @@ import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/widgets/profile_info.dart';
 import 'package:dima_app/screens/login/login.dart';
 import 'package:dima_app/services/firebase_user.dart';
-import 'package:dima_app/widgets/loading_spinner.dart';
+import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
@@ -19,8 +19,12 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with AutomaticKeepAliveClientMixin {
   late Stream<UserModel> _stream;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -31,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: const MyAppBar(
         title: 'Home',
@@ -43,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
             AsyncSnapshot<UserModel> snapshot,
           ) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const LoadingSpinner();
+              return const LoadingLogo();
             }
             if (snapshot.hasError || !snapshot.hasData) {
               return const LogInScreen();

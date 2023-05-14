@@ -11,7 +11,7 @@ import 'package:dima_app/screens/poll_create/components/step_places.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
-import 'package:dima_app/services/firebse_poll_event.dart';
+import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
@@ -224,6 +224,8 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
   }
 
   Future checkAndCreatePoll() async {
+    Navigator.pop(context, "1");
+    return;
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     bool ret = MyAlertDialog.showAlertIfCondition(
       context: context,
@@ -264,28 +266,6 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
       return;
     }
 
-    /*
-    // get event will return NOT NULL if the event ALREADY EXISTS
-    var dbEvent =
-        await Provider.of<FirebaseEvent>(context, listen: false).getEventData(
-      context: context,
-      id: "${eventTitleController.text}_$curUid",
-    );
-    ret = MyAlertDialog.showAlertIfCondition(
-      context: context,
-      condition: dbEvent != null,
-      title: "Duplicate Event",
-      content: "An event with this name already exists",
-    );
-    if (ret) {
-      LoadingOverlay.hide(context);
-      setState(() {
-        _activeStepIndex = 0;
-      });
-      return;
-    }
-    */
-
     LoadingOverlay.show(context);
     var dbPoll =
         await Provider.of<FirebasePollEvent>(context, listen: false).createPoll(
@@ -304,7 +284,7 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
     ret = MyAlertDialog.showAlertIfCondition(
       context: context,
       condition: dbPoll == null,
-      title: "Duplicate Poll",
+      title: "Duplicate Poll/Event",
       content: "A poll or event with this name already exists",
     );
     if (ret) {

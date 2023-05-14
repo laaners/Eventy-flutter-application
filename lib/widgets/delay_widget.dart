@@ -1,6 +1,7 @@
+import 'package:dima_app/widgets/logo.dart';
 import 'package:flutter/material.dart';
 
-import 'loading_spinner.dart';
+import 'loading_logo.dart';
 
 class DelayWidget extends StatefulWidget {
   final Widget child;
@@ -19,7 +20,7 @@ class _DelayWidgetState extends State<DelayWidget> {
       future: _future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LoadingSpinner();
+          return const LoadingLogo();
         }
         return widget.child;
       },

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/services/firebase_user.dart';
-import 'package:dima_app/widgets/loading_spinner.dart';
+import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -27,12 +27,21 @@ class ChangeImage extends StatefulWidget {
 class _ChangeImageState extends State<ChangeImage> {
   bool loading = false;
   final ImagePicker _picker = ImagePicker();
+  late final _stream;
+
+  @override
+  void initState() {
+    super.initState();
+    _stream = Provider.of<FirebaseUser>(context, listen: false)
+        .getCurrentUserStream();
+  }
 
   Future imgFromGallery(BuildContext context) async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
       if (pickedFile != null) {
         widget.changePhoto(File(pickedFile.path));
+        widget.changeInitialRemoved(true);
         // uploadFile(context);
       } else {
         print('No image selected.');
@@ -49,6 +58,7 @@ class _ChangeImageState extends State<ChangeImage> {
     setState(() {
       if (pickedFile != null) {
         widget.changePhoto(File(pickedFile.path));
+        widget.changeInitialRemoved(true);
         // uploadFile(context);
       } else {
         print('No image selected.');
@@ -63,14 +73,13 @@ class _ChangeImageState extends State<ChangeImage> {
         alignment: Alignment.center,
         children: [
           StreamBuilder(
-            stream: Provider.of<FirebaseUser>(context, listen: false)
-                .getCurrentUserStream(),
+            stream: _stream,
             builder: (
               BuildContext context,
               AsyncSnapshot<UserModel> snapshot,
             ) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const LoadingSpinner();
+                return const LoadingLogo();
               }
               return ProfilePicTemporary(
                 userData: snapshot.data!,
@@ -125,7 +134,8 @@ class _ChangeImageState extends State<ChangeImage> {
   void _showPicker(context) {
     showModalBottomSheet(
       context: context,
-      builder: (BuildContext bc) {
+      useRootNavigator: true,
+      builder: (BuildContext context) {
         return SafeArea(
           child: Wrap(
             children: [

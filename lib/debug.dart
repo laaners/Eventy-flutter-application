@@ -2,10 +2,13 @@ import 'dart:convert';
 
 import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/firebase_cruds_testing.dart';
+import 'package:dima_app/screens/poll_event/poll_event.dart';
+import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
+import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +45,30 @@ class _DebugScreenState extends State<DebugScreen>
       body: ResponsiveWrapper(
         child: Column(
           children: [
+            ElevatedButton(
+              onPressed: () async {
+                // ignore: use_build_context_synchronously
+                String pollId =
+                    "Event 1 of UsernameId14_0DmBO8Fw0ofrK9RbXIO4dYlEIg03";
+                var curUid =
+                    // ignore: use_build_context_synchronously
+                    Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+                Widget newScreen = PollEventScreen(pollEventId: pollId);
+                // ignore: use_build_context_synchronously
+                var ris =
+                    await Navigator.of(context, rootNavigator: false).push(
+                  ScreenTransition(
+                    builder: (context) => newScreen,
+                  ),
+                );
+                if (ris == "delete_poll_$curUid") {
+                  // ignore: use_build_context_synchronously
+                  await Provider.of<FirebasePollEvent>(context, listen: false)
+                      .deletePoll(context: context, pollId: pollId);
+                }
+              },
+              child: const Text("TO POLL DETAIL (WITH TABBAR)"),
+            ),
             Text(
               _locationAddrController.text + "ok",
               style: Theme.of(context).textTheme.headlineSmall,

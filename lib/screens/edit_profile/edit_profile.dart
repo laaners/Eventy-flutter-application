@@ -5,7 +5,6 @@ import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/edit_profile/components/change_image.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
-import 'package:dima_app/widgets/loading_spinner.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
@@ -15,7 +14,8 @@ import 'package:provider/provider.dart';
 import '../../widgets/my_button.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+  final UserModel userData;
+  const EditProfileScreen({super.key, required this.userData});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -23,7 +23,6 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formkey = GlobalKey<FormState>();
-
   final _usernameController = TextEditingController();
   final _nameController = TextEditingController();
   final _surnameController = TextEditingController();
@@ -32,6 +31,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   File? _photo;
   bool _initialRemoved = false;
   bool _usernameAlreadyExist = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _usernameController.text = widget.userData.username;
+    _nameController.text = widget.userData.name;
+    _surnameController.text = widget.userData.surname;
+    _emailController.text = widget.userData.email;
+  }
 
   @override
   void dispose() {
@@ -49,17 +57,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         title: "Edit Profile",
         upRightActions: [MyAppBar.SearchAction(context)],
       ),
-      body: StreamBuilder(
-        stream: Provider.of<FirebaseUser>(context, listen: false)
-            .getCurrentUserStream(),
-        builder: (
-          BuildContext context,
-          AsyncSnapshot<UserModel> snapshot,
-        ) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LoadingSpinner();
-          }
-          UserModel userData = snapshot.data!;
+      body: Builder(
+        builder: (BuildContext context) {
           return ResponsiveWrapper(
             child: Form(
               key: _formkey,
@@ -91,7 +90,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.face),
                       border: const OutlineInputBorder(),
-                      hintText: userData.username,
+                      hintText: widget.userData.username,
                       labelStyle: const TextStyle(fontStyle: FontStyle.italic),
                     ),
                     onChanged: (username) async {
@@ -107,21 +106,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Username cannot be empty';
                       } else if (_usernameAlreadyExist &&
-                          userData.username != value) {
+                          widget.userData.username != value) {
                         return 'Username already exists';
                       }
                       return null;
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: _nameController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.perm_identity),
                       border: const OutlineInputBorder(),
-                      hintText: userData.name,
+                      hintText: widget.userData.name,
                       labelStyle: const TextStyle(fontStyle: FontStyle.italic),
                     ),
                     validator: (value) {
@@ -131,15 +128,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: _surnameController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.perm_identity),
                       //border: const OutlineInputBorder(),
-                      hintText: userData.surname,
+                      hintText: widget.userData.surname,
                       //labelStyle: const TextStyle(fontStyle: FontStyle.italic),
                     ),
                     validator: (value) {
@@ -149,15 +144,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  /*
+                  const SizedBox(height: 20),
                   TextFormField(
+                    initialValue: widget.userData.email,
                     controller: _emailController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.mail),
                       border: const OutlineInputBorder(),
-                      hintText: userData.email,
+                      hintText: widget.userData.email,
                       labelStyle: const TextStyle(fontStyle: FontStyle.italic),
                     ),
                     validator: (value) {
@@ -172,9 +167,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(
-                    height: 50,
-                  ),
+                  */
+                  const SizedBox(height: 50),
                   MyButton(
                     text: "SAVE",
                     onPressed: () async {
@@ -184,29 +178,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         if (await Provider.of<FirebaseUser>(context,
                                 listen: false)
                             .updateUserData(
-                          context: context,
                           username: _usernameController.text,
                           name: _nameController.text,
                           surname: _surnameController.text,
                           email: _emailController.text,
-                          profilePic: userData.profilePic,
+                          profilePic: widget.userData.profilePic,
+                          updateProfilePic: _initialRemoved,
+                          photo: _photo,
                         )) {
-                          // update photo
-                          if (_initialRemoved) {
-                            // ignore: use_build_context_synchronously
-                            await Provider.of<FirebaseUser>(context,
-                                    listen: false)
-                                .updateProfilePic(photo: _photo);
-                          }
-
                           // ignore: use_build_context_synchronously
                           LoadingOverlay.hide(context);
 
                           // ignore: use_build_context_synchronously
                           showSnackBar(
-                            context,
-                            "Your information has been updated!",
-                          );
+                              context, "Your information has been updated!");
                           setState(() {
                             _initialRemoved = false;
                           });

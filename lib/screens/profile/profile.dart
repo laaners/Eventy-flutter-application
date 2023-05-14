@@ -4,7 +4,7 @@ import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/widgets/profile_info.dart';
 import 'package:dima_app/services/firebase_user.dart';
-import 'package:dima_app/widgets/loading_spinner.dart';
+import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
@@ -45,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             AsyncSnapshot<UserModel> snapshot,
           ) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const LoadingSpinner();
+              return const LoadingLogo();
             }
             if (snapshot.hasError || !snapshot.hasData) {
               Future.microtask(() {

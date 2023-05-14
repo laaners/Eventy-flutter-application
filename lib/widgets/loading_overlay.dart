@@ -1,4 +1,5 @@
 import 'package:dima_app/screens/error/error.dart';
+import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
 
@@ -50,6 +51,10 @@ class FullScreenLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.outline),
+      child: const LoadingLogo(),
+    );
     return Container(
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.outline),
       child: const Center(
