@@ -149,12 +149,13 @@ class FirebaseUser extends ChangeNotifier {
   }
 
   Future<bool> updateUserData({
-    required BuildContext context,
     required String username,
     required String name,
     required String surname,
     required String email,
     required String profilePic,
+    required bool updateProfilePic,
+    required File? photo,
   }) async {
     try {
       var uid = _auth.currentUser!.uid;
@@ -170,34 +171,24 @@ class FirebaseUser extends ChangeNotifier {
 
       Map<String, dynamic> userMap = userEntity.toMap();
       userMap["username_lower"] = username.toLowerCase();
+      if (updateProfilePic) {
+        String uid = _auth.currentUser!.uid;
+        final destination = 'profile_pics/$uid';
+        var ref = FirebaseStorage.instance.ref().child(destination);
+        String profileUrl = "default";
+        if (photo != null) {
+          await ref.putFile(photo);
+          profileUrl = await ref.getDownloadURL();
+        }
+        userMap["profilePic"] = profileUrl;
+      }
       await userCollection.doc(uid).set(userMap);
       notifyListeners();
       return true;
     } on FirebaseException catch (e) {
-      showSnackBar(context, e.message!);
+      print(e.message!);
     }
     return false;
-  }
-
-  Future<void> updateProfilePic({
-    required File? photo,
-  }) async {
-    try {
-      String uid = _auth.currentUser!.uid;
-      final destination = 'profile_pics/$uid';
-      var ref = FirebaseStorage.instance.ref().child(destination);
-      String profileUrl = "default";
-      if (photo != null) {
-        await ref.putFile(photo);
-        profileUrl = await ref.getDownloadURL();
-      }
-      await FirebaseCrud.updateDoc(
-          userCollection, uid, "profilePic", profileUrl);
-      notifyListeners();
-    } on FirebaseException catch (e) {
-      print(e.message!);
-      // showSnackBar(context, e.message!);
-    }
   }
 
   Future<bool> reauthenticationCurrentUser({
@@ -227,6 +218,19 @@ class FirebaseUser extends ChangeNotifier {
   }
 
   // search
+  Future<UserModel?> getUserData({required String uid}) async {
+    try {
+      var userDataDoc = await FirebaseCrud.readDoc(userCollection, uid);
+      UserModel userDetails = UserModel.fromMap(
+        userDataDoc?.data() as Map<String, dynamic>,
+      );
+      return userDetails;
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return null;
+  }
+
   Future<List<UserModel>> getUsersData({required String pattern}) async {
     try {
       var users = await userCollection
@@ -247,5 +251,19 @@ class FirebaseUser extends ChangeNotifier {
       print(e.message);
     }
     return [];
+  }
+
+  Future<List<UserModel>> getUsersDataFromList({
+    required List<String> uids,
+  }) async {
+    List<UserModel> usersData = [];
+    await Future.wait(uids.map((uid) {
+      return getUserData(uid: uid).then((value) {
+        if (value != null) {
+          return usersData.add(value);
+        }
+      });
+    }));
+    return usersData;
   }
 }

@@ -8,7 +8,7 @@ import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'loading_spinner.dart';
+import 'loading_logo.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
@@ -79,7 +79,7 @@ class CustomDelegate extends SearchDelegate<String> {
               snapshot,
             ) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const LoadingSpinner();
+                return const LoadingLogo();
               }
               if (snapshot.hasError) {
                 Future.microtask(() {

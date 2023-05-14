@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/services/firebase_user.dart';
-import 'package:dima_app/widgets/loading_spinner.dart';
+import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
+import 'package:dima_app/widgets/show_user_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -57,7 +58,7 @@ class _StepInviteState extends State<StepInvite>
         children: [
           Container(padding: const EdgeInsets.only(bottom: 8, top: 8)),
           Container(
-            margin: const EdgeInsets.only(bottom: 8, top: 20),
+            margin: const EdgeInsets.only(bottom: 8, top: 0),
             child: HorizontalScroller(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -69,7 +70,7 @@ class _StepInviteState extends State<StepInvite>
                     AsyncSnapshot<UserModel> snapshot,
                   ) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const LoadingSpinner();
+                      return const LoadingLogo();
                     }
                     if (snapshot.hasError || !snapshot.hasData) {
                       Future.microtask(() {
@@ -223,32 +224,7 @@ class InviteProfilePic extends StatelessWidget {
         ],
       ),
       onTap: () {
-        showDialog<String>(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-            title: Text(user.username),
-            content: Row(
-              children: [
-                ProfilePic(userData: user, loading: false, radius: 45),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Text(
-                    "${user.name}\n${user.surname}",
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
+        showUserDialog(context: context, user: user);
         return;
       },
     );

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:dima_app/models/location.dart';
-import 'package:dima_app/widgets/loading_spinner.dart';
+import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/map_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -59,6 +59,7 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
     return Column(
       children: [
         ListTile(
+          contentPadding: const EdgeInsets.all(0),
           title: Container(
             margin: const EdgeInsets.only(bottom: 8, top: 8),
             alignment: Alignment.topLeft,
@@ -173,14 +174,15 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
           MapFromCoor(lat: lat, lon: lon, address: widget.controller.text)
         else
           loadingLocations
-              ? const LoadingSpinner()
+              ? const LoadingLogo()
               : Column(
                   children: [
                     for (var i = 0; i < locationSuggestions.length; i++)
                       Container(
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
+                              color: Theme.of(context).dividerColor,
                               width: 1.0,
                             ),
                           ),

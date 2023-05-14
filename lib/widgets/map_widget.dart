@@ -33,10 +33,8 @@ class _MapFromCoorState extends State<MapFromCoor> {
 
   @override
   Widget build(BuildContext context) {
-    print("ok");
     return Container(
       height: 300,
-      margin: const EdgeInsets.all(15),
       child: FlutterMap(
         options: MapOptions(
           center: LatLng(widget.lat, widget.lon),

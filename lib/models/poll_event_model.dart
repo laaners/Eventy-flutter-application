@@ -82,6 +82,21 @@ class PollEventModel {
     return localDates;
   }
 
+  static PollEventModel firebaseDocToObj(Map<String, dynamic> doc) {
+    doc["locations"] = (doc["locations"] as List).map((e) {
+      e["lat"] = e["lat"].toDouble();
+      e["lon"] = e["lon"].toDouble();
+      return e as Map<String, dynamic>;
+    }).toList();
+    // utc string
+    doc["deadline"] = DateFormatter.dateTime2String(doc["deadline"].toDate());
+    doc["deadline"] = DateFormatter.toLocalString(doc["deadline"]);
+    doc["dates"] =
+        PollEventModel.datesToLocal(doc["dates"] as Map<String, dynamic>);
+    PollEventModel pollDetails = PollEventModel.fromMap(doc);
+    return pollDetails;
+  }
+
   PollEventModel copyWith({
     String? pollEventName,
     String? organizerUid,

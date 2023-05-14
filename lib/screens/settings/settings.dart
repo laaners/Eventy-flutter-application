@@ -1,5 +1,6 @@
 import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/constants/preferences.dart';
+import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/change_password/change_password.dart';
 import 'package:dima_app/screens/edit_profile/edit_profile.dart';
 import 'package:dima_app/services/firebase_user.dart';
@@ -52,8 +53,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               leading: const Icon(Icons.edit),
               title: const Text("Edit profile"),
               trailing: const Icon(Icons.navigate_next),
-              onTap: () {
-                Widget newScreen = const EditProfileScreen();
+              onTap: () async {
+                Stream<UserModel> stream =
+                    Provider.of<FirebaseUser>(context, listen: false)
+                        .getCurrentUserStream();
+                UserModel userData = await stream.first;
+                Widget newScreen = EditProfileScreen(userData: userData);
+                // ignore: use_build_context_synchronously
                 Navigator.push(
                   context,
                   ScreenTransition(

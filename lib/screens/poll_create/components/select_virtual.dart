@@ -102,6 +102,9 @@ class _SelectVirtualState extends State<SelectVirtual> {
           ),
         ),
         ListTile(
+          contentPadding: const EdgeInsets.all(0),
+          minLeadingWidth: 0,
+          horizontalTitleGap: 0,
           title: Container(
             padding: const EdgeInsets.only(top: 8, bottom: 8),
             child: Text(
@@ -128,7 +131,7 @@ class _SelectVirtualState extends State<SelectVirtual> {
           ),
         ),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+          margin: const EdgeInsets.symmetric(vertical: 5),
           child: MyButton(
             text: "Add virtual room",
             onPressed: checkFields,
