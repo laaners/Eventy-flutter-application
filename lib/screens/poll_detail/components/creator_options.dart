@@ -33,13 +33,14 @@ class CreatorOptions extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ListTile(
+          contentPadding: const EdgeInsets.all(0),
           title: Text(
             "Share the poll",
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           leading: Container(
-            padding: const EdgeInsets.all(5),
+            padding: const EdgeInsets.symmetric(vertical: 5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
             ),
@@ -75,13 +76,14 @@ class CreatorOptions extends StatelessWidget {
           },
         ),
         ListTile(
+          contentPadding: const EdgeInsets.all(0),
           title: Text(
             "Manage invited users",
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           leading: Container(
-            padding: const EdgeInsets.all(5),
+            padding: const EdgeInsets.symmetric(vertical: 5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
             ),
@@ -108,13 +110,14 @@ class CreatorOptions extends StatelessWidget {
           },
         ),
         ListTile(
+          contentPadding: const EdgeInsets.all(0),
           title: Text(
             "Create the event",
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           leading: Container(
-            padding: const EdgeInsets.all(5),
+            padding: const EdgeInsets.symmetric(vertical: 5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
             ),
@@ -137,13 +140,14 @@ class CreatorOptions extends StatelessWidget {
           },
         ),
         ListTile(
+          contentPadding: const EdgeInsets.all(0),
           title: Text(
             "Delete the poll",
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           leading: Container(
-            padding: const EdgeInsets.all(5),
+            padding: const EdgeInsets.symmetric(vertical: 5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
             ),

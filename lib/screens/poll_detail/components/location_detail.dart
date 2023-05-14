@@ -114,7 +114,7 @@ class LocationDetail extends StatelessWidget {
     return Column(
       children: [
         Container(
-          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
+          margin: const EdgeInsets.only(bottom: 8, top: 8),
           alignment: Alignment.topLeft,
           child: Text(
             location.name,
@@ -139,7 +139,7 @@ class LocationDetail extends StatelessWidget {
           ),
         ),
         Container(
-          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
+          margin: const EdgeInsets.only(bottom: 8, top: 8),
           alignment: Alignment.topLeft,
           child: Text(
             "Votes",
@@ -184,58 +184,54 @@ class LocationDetail extends StatelessWidget {
             }
             userVotedOptionId =
                 organizerUid == curUid ? Availability.yes : userVotedOptionId;
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 15),
-              child: MyPolls(
-                curUid: curUid,
-                organizerUid: organizerUid,
-                votedAnimationDuration: 0,
-                votesText: "",
-                hasVoted: true,
-                userVotedOptionId: userVotedOptionId,
-                heightBetweenTitleAndOptions: 0,
-                pollId: '1',
-                onVoted: (MyPollOption pollOption, int newTotalVotes) async {
-                  int newAvailability = pollOption.id!;
-                  await Provider.of<FirebaseVote>(context, listen: false)
-                      .userVoteLocation(
-                    pollId: pollId,
-                    locationName: location.name,
-                    uid: curUid,
-                    availability: newAvailability,
-                  );
-                  modifyVote(newAvailability);
-                  return true;
-                },
-                pollOptionsSplashColor: Colors.white,
-                votedProgressColor: Colors.grey.withOpacity(0.3),
-                votedBackgroundColor: Colors.grey.withOpacity(0.2),
-                votedCheckmark: const Icon(
-                  Icons.check,
-                ),
-                pollTitle: Container(),
-                pollOptions: getOptions(locationModel),
-                metaWidget: Row(
-                  children: const [
-                    Text(
-                      '•',
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
+            return MyPolls(
+              curUid: curUid,
+              organizerUid: organizerUid,
+              votedAnimationDuration: 0,
+              votesText: "",
+              hasVoted: true,
+              userVotedOptionId: userVotedOptionId,
+              heightBetweenTitleAndOptions: 0,
+              pollId: '1',
+              onVoted: (MyPollOption pollOption, int newTotalVotes) async {
+                int newAvailability = pollOption.id!;
+                await Provider.of<FirebaseVote>(context, listen: false)
+                    .userVoteLocation(
+                  pollId: pollId,
+                  locationName: location.name,
+                  uid: curUid,
+                  availability: newAvailability,
+                );
+                modifyVote(newAvailability);
+                return true;
+              },
+              pollOptionsSplashColor: Colors.white,
+              votedProgressColor: Colors.grey.withOpacity(0.3),
+              votedBackgroundColor: Colors.grey.withOpacity(0.2),
+              votedCheckmark: const Icon(
+                Icons.check,
+              ),
+              pollTitle: Container(),
+              pollOptions: getOptions(locationModel),
+              metaWidget: Row(
+                children: const [
+                  Text(
+                    '•',
+                    style: TextStyle(
+                      fontSize: 20,
                     ),
-                    Text(
-                      '2 weeks left',
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
+                  ),
+                  Text(
+                    '2 weeks left',
+                    style: TextStyle(
+                      fontSize: 20,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },
         ),
-        const Padding(padding: EdgeInsets.only(top: 8)),
         location.name == "Virtual meeting"
             ? ListTile(
                 title: Container(
@@ -267,31 +263,36 @@ class LocationDetail extends StatelessWidget {
               )
             : Column(
                 children: [
-                  const Padding(padding: EdgeInsets.only(top: 0)),
                   ListTile(
-                    title: const Text(
-                      "Address",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                    contentPadding: const EdgeInsets.all(0),
+                    minLeadingWidth: 0,
+                    horizontalTitleGap: 0,
+                    title: Container(
+                      padding: const EdgeInsets.only(top: 8, bottom: 8),
+                      child: Text(
+                        "Address",
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
-                    horizontalTitleGap: 0,
-                    trailing: IconButton(
-                      iconSize: 25,
-                      onPressed: () async {
-                        await Clipboard.setData(
-                          ClipboardData(text: location.site),
-                        );
-                      },
-                      icon: const Icon(Icons.copy),
-                    ),
                     subtitle: TextFormField(
-                      initialValue: location.site,
                       autofocus: false,
-                      enabled: false,
+                      initialValue: location.site,
+                      // enabled: false,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        suffixIcon: IconButton(
+                          iconSize: 25,
+                          onPressed: () async {
+                            await Clipboard.setData(
+                                ClipboardData(text: location.site));
+                          },
+                          icon: const Icon(Icons.copy),
+                        ),
+                        border: InputBorder.none,
+                      ),
                     ),
                   ),
+                  const Padding(padding: EdgeInsets.only(top: 15)),
                   MapFromCoor(
                     lat: location.lat,
                     lon: location.lon,

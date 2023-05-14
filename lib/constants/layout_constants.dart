@@ -1,6 +1,9 @@
 /* Constants class for layout description */
 
 class LayoutConstants {
+  /// Modal left-right padding
+  static const double kModalHorizontalPadding = 15.0;
+
   /// Vertical padding of the screen from the create button
   static const double kPaddingFromCreate = 40.0;
 

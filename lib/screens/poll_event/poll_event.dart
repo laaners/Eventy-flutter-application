@@ -36,108 +36,27 @@ class _PollEventScreenState extends State<PollEventScreen>
   Future<Map<String, dynamic>?>? _future;
   bool _refresh = true;
 
-  Future<Map<String, dynamic>?> getPollDataAndInvites(
-      BuildContext context) async {
-    try {
-      PollEventModel? pollData =
-          await Provider.of<FirebasePollEvent>(context, listen: false)
-              .getPollData(id: widget.pollEventId);
-      if (pollData == null) return null;
-
-      // deadline reached, close poll
-      // check if it is closed or the deadline was reached, deadline already in local
-      String nowDate = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
-      String localDate = pollData.deadline;
-      localDate = DateFormatter.toLocalString(localDate);
-
-      if (!pollData.isClosed && localDate.compareTo(nowDate) <= 0) {
-        // ignore: use_build_context_synchronously
-        await Provider.of<FirebasePollEvent>(context, listen: false)
-            .closePoll(context: context, pollId: widget.pollEventId);
-      }
-
-      List<PollEventInviteModel> pollInvites =
-          // ignore: use_build_context_synchronously
-          await Provider.of<FirebasePollEventInvite>(context, listen: false)
-              .getInvitesFromPollEventId(pollEventId: widget.pollEventId);
-      if (pollInvites.isEmpty) return null;
-
-      List<VoteLocationModel> votesLocations =
-          await Future.wait(pollData.locations.map((location) {
-        return Provider.of<FirebaseVote>(context, listen: false)
-            .getVotesLocation(
-                pollId: widget.pollEventId, locationName: location.name)
-            .then((value) {
-          if (value != null) {
-            value.votes[pollData.organizerUid] = Availability.yes;
-            return value;
-          } else {
-            return VoteLocationModel(
-              locationName: location.name,
-              pollId: widget.pollEventId,
-              votes: {pollData.organizerUid: Availability.yes},
-            );
-          }
-        });
-      }).toList());
-
-      List<Future<VoteDateModel>> promises = pollData.dates.keys
-          .map((date) {
-            return pollData.dates[date].map((slot) {
-              return Provider.of<FirebaseVote>(context, listen: false)
-                  .getVotesDate(
-                pollId: widget.pollEventId,
-                date: date,
-                start: slot["start"],
-                end: slot["end"],
-              )
-                  .then((value) {
-                if (value != null) {
-                  value.votes[pollData.organizerUid] = Availability.yes;
-                  return value;
-                } else {
-                  return VoteDateModel(
-                    pollId: widget.pollEventId,
-                    date: date,
-                    start: slot["start"],
-                    end: slot["end"],
-                    votes: {pollData.organizerUid: Availability.yes},
-                  );
-                }
-              });
-            }).toList();
-          })
-          .toList()
-          .expand((x) => x)
-          .toList()
-          .cast();
-
-      List<VoteDateModel> votesDates = await Future.wait(promises);
-      return {
-        "data": pollData,
-        "invites": pollInvites,
-        "locations": votesLocations,
-        "dates": votesDates,
-      };
-    } catch (e) {
-      print(e.toString());
-      return null;
-    }
-  }
-
   @override
   bool get wantKeepAlive => true;
 
   @override
   initState() {
     super.initState();
-    _future = getPollDataAndInvites(context);
+    _future = Provider.of<FirebasePollEvent>(context, listen: false)
+        .getPollDataAndInvites(
+      context: context,
+      pollEventId: widget.pollEventId,
+    );
   }
 
   void refreshPollDetail() {
     setState(() {
       _future = null;
-      _future = getPollDataAndInvites(context);
+      _future = Provider.of<FirebasePollEvent>(context, listen: false)
+          .getPollDataAndInvites(
+        context: context,
+        pollEventId: widget.pollEventId,
+      );
       _refresh = !_refresh;
     });
   }

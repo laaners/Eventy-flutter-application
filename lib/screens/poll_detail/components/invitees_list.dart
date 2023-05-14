@@ -246,12 +246,15 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
                     addInvitee: addInvitee,
                     removeInvitee: removeInvitee,
                   ),
-                  MyButton(
-                    text: "INVITE",
-                    onPressed: () {
-                      widget
-                          .updateInvitees(usersData.map((e) => e.uid).toList());
-                    },
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    child: MyButton(
+                      text: "INVITE",
+                      onPressed: () {
+                        widget.updateInvitees(
+                            usersData.map((e) => e.uid).toList());
+                      },
+                    ),
                   )
                 ],
               )

@@ -224,8 +224,6 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
   }
 
   Future checkAndCreatePoll() async {
-    Navigator.pop(context, "1");
-    return;
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     bool ret = MyAlertDialog.showAlertIfCondition(
       context: context,

@@ -64,7 +64,7 @@ class _DebugScreenState extends State<DebugScreen>
                 if (ris == "delete_poll_$curUid") {
                   // ignore: use_build_context_synchronously
                   await Provider.of<FirebasePollEvent>(context, listen: false)
-                      .deletePoll(context: context, pollId: pollId);
+                      .deletePollEvent(context: context, pollId: pollId);
                 }
               },
               child: const Text("TO POLL DETAIL (WITH TABBAR)"),

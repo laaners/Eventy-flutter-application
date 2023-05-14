@@ -58,7 +58,7 @@ class _StepInviteState extends State<StepInvite>
         children: [
           Container(padding: const EdgeInsets.only(bottom: 8, top: 8)),
           Container(
-            margin: const EdgeInsets.only(bottom: 8, top: 20),
+            margin: const EdgeInsets.only(bottom: 8, top: 0),
             child: HorizontalScroller(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,

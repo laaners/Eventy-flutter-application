@@ -109,8 +109,10 @@ class _LocationsListState extends State<LocationsList>
           child: Column(
             children: [
               Expanded(
-                child: ListView(
-                  children: votesLocations.map((voteLocation) {
+                child: ListView.builder(
+                  itemCount: votesLocations.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    VoteLocationModel voteLocation = votesLocations[index];
                     var location = widget.locations.firstWhere(
                       (element) => element.name == voteLocation.locationName,
                     );
@@ -137,7 +139,7 @@ class _LocationsListState extends State<LocationsList>
                         }
                       },
                     );
-                  }).toList(),
+                  },
                 ),
               ),
             ],

@@ -13,6 +13,7 @@ import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_vote.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/availability.dart';
@@ -69,25 +70,12 @@ class FirebasePollEvent {
     return poll;
   }
 
-  Future<PollEventModel?> getPollData({required String id}) async {
+  Future<PollEventModel?> getPollEventData({required String id}) async {
     try {
       var pollDataDoc = await FirebaseCrud.readDoc(pollEventCollection, id);
-      if (!pollDataDoc!.exists) {
-        return null;
-      }
-      var tmp = pollDataDoc.data() as Map<String, dynamic>;
-      tmp["locations"] = (tmp["locations"] as List).map((e) {
-        e["lat"] = e["lat"].toDouble();
-        e["lon"] = e["lon"].toDouble();
-        return e as Map<String, dynamic>;
-      }).toList();
-      // utc string
-      tmp["deadline"] = DateFormatter.dateTime2String(tmp["deadline"].toDate());
-      tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
-      tmp["dates"] =
-          PollEventModel.datesToLocal(tmp["dates"] as Map<String, dynamic>);
-      PollEventModel pollDetails = PollEventModel.fromMap(tmp);
-      return pollDetails;
+      if (!pollDataDoc!.exists) return null;
+      return PollEventModel.firebaseDocToObj(
+          pollDataDoc.data() as Map<String, dynamic>);
     } on FirebaseException catch (e) {
       print(e.message!);
     }
@@ -107,6 +95,94 @@ class FirebasePollEvent {
       print(e.message!);
     }
     return null;
+  }
+
+  Future<Map<String, dynamic>?> getPollDataAndInvites({
+    required BuildContext context,
+    required String pollEventId,
+  }) async {
+    try {
+      PollEventModel? pollData =
+          await Provider.of<FirebasePollEvent>(context, listen: false)
+              .getPollEventData(id: pollEventId);
+      if (pollData == null) return null;
+
+      // deadline reached, close poll
+      // check if it is closed or the deadline was reached, deadline already in local
+      String nowDate = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
+      String localDate = pollData.deadline;
+      localDate = DateFormatter.toLocalString(localDate);
+
+      if (!pollData.isClosed && localDate.compareTo(nowDate) <= 0) {
+        await Provider.of<FirebasePollEvent>(context, listen: false)
+            .closePoll(context: context, pollId: pollEventId);
+      }
+
+      List<PollEventInviteModel> pollInvites =
+          await Provider.of<FirebasePollEventInvite>(context, listen: false)
+              .getInvitesFromPollEventId(pollEventId: pollEventId);
+      if (pollInvites.isEmpty) return null;
+
+      List<VoteLocationModel> votesLocations =
+          await Future.wait(pollData.locations.map((location) {
+        return Provider.of<FirebaseVote>(context, listen: false)
+            .getVotesLocation(pollId: pollEventId, locationName: location.name)
+            .then((value) {
+          if (value != null) {
+            value.votes[pollData.organizerUid] = Availability.yes;
+            return value;
+          } else {
+            return VoteLocationModel(
+              locationName: location.name,
+              pollId: pollEventId,
+              votes: {pollData.organizerUid: Availability.yes},
+            );
+          }
+        });
+      }).toList());
+
+      List<Future<VoteDateModel>> promises = pollData.dates.keys
+          .map((date) {
+            return pollData.dates[date].map((slot) {
+              return Provider.of<FirebaseVote>(context, listen: false)
+                  .getVotesDate(
+                pollId: pollEventId,
+                date: date,
+                start: slot["start"],
+                end: slot["end"],
+              )
+                  .then((value) {
+                if (value != null) {
+                  value.votes[pollData.organizerUid] = Availability.yes;
+                  return value;
+                } else {
+                  return VoteDateModel(
+                    pollId: pollEventId,
+                    date: date,
+                    start: slot["start"],
+                    end: slot["end"],
+                    votes: {pollData.organizerUid: Availability.yes},
+                  );
+                }
+              });
+            }).toList();
+          })
+          .toList()
+          .expand((x) => x)
+          .toList()
+          .cast();
+
+      List<VoteDateModel> votesDates = await Future.wait(promises);
+      return {
+        "data": pollData,
+        "invites": pollInvites,
+        "locations": votesLocations,
+        "dates": votesDates,
+      };
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
   }
 
   Future<void> closePoll({
@@ -235,7 +311,7 @@ class FirebasePollEvent {
     }
   }
 
-  Future<void> deletePoll({
+  Future<void> deletePollEvent({
     required BuildContext context,
     required String pollId,
   }) async {
@@ -309,7 +385,6 @@ class FirebasePollEvent {
     }
   }
 
-  // Return the data of user whose username matches a
   Future<List<PollEventModel>> searchEventsByName({
     required String pattern,
   }) async {
@@ -341,6 +416,26 @@ class FirebasePollEvent {
     } on FirebaseException catch (e) {
       //showSnackBar(context, e.message!);
       print(e.message);
+    }
+    return [];
+  }
+
+  Future<List<PollEventModel>> getUserOrganizedEvents({
+    required String uid,
+  }) async {
+    try {
+      var documents =
+          await pollEventCollection.where("organizerUid", isEqualTo: uid).get();
+      if (documents.docs.isNotEmpty) {
+        final List<PollEventModel> events = documents.docs.map((doc) {
+          return PollEventModel.firebaseDocToObj(
+              doc.data() as Map<String, dynamic>);
+        }).toList();
+        return events.where((event) => event.isClosed).toList();
+      }
+      return [];
+    } on FirebaseException catch (e) {
+      print(e.message!);
     }
     return [];
   }

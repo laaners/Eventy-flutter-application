@@ -122,7 +122,7 @@ class DateDetail extends StatelessWidget {
     return Column(
       children: [
         Container(
-          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
+          margin: const EdgeInsets.only(bottom: 8, top: 8),
           alignment: Alignment.topLeft,
           child: Text(
             DateFormat("MMMM dd yyyy, EEEE").format(dateTime),
@@ -130,7 +130,7 @@ class DateDetail extends StatelessWidget {
           ),
         ),
         Container(
-          margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
+          margin: const EdgeInsets.only(bottom: 8, top: 8),
           alignment: Alignment.topLeft,
           child: Text(
             "From $start to $end",
@@ -178,54 +178,51 @@ class DateDetail extends StatelessWidget {
             }
             userVotedOptionId =
                 organizerUid == curUid ? Availability.yes : userVotedOptionId;
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 15),
-              child: MyPolls(
-                curUid: curUid,
-                organizerUid: organizerUid,
-                votedAnimationDuration: 0,
-                votesText: "",
-                hasVoted: true,
-                userVotedOptionId: userVotedOptionId,
-                heightBetweenTitleAndOptions: 0,
-                pollId: '1',
-                onVoted: (MyPollOption pollOption, int newTotalVotes) async {
-                  int newAvailability = pollOption.id!;
-                  await Provider.of<FirebaseVote>(context, listen: false)
-                      .userVoteDate(
-                          pollId: pollId,
-                          date: voteDate.date,
-                          start: voteDate.start,
-                          end: voteDate.end,
-                          uid: curUid,
-                          availability: newAvailability);
-                  modifyVote(newAvailability);
-                  return true;
-                },
-                pollOptionsSplashColor: Colors.white,
-                votedProgressColor: Colors.grey.withOpacity(0.3),
-                votedBackgroundColor: Colors.grey.withOpacity(0.2),
-                votedCheckmark: const Icon(
-                  Icons.check,
-                ),
-                pollTitle: Container(),
-                pollOptions: getOptions(voteDateModel),
-                metaWidget: Row(
-                  children: const [
-                    Text(
-                      '•',
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
+            return MyPolls(
+              curUid: curUid,
+              organizerUid: organizerUid,
+              votedAnimationDuration: 0,
+              votesText: "",
+              hasVoted: true,
+              userVotedOptionId: userVotedOptionId,
+              heightBetweenTitleAndOptions: 0,
+              pollId: '1',
+              onVoted: (MyPollOption pollOption, int newTotalVotes) async {
+                int newAvailability = pollOption.id!;
+                await Provider.of<FirebaseVote>(context, listen: false)
+                    .userVoteDate(
+                        pollId: pollId,
+                        date: voteDate.date,
+                        start: voteDate.start,
+                        end: voteDate.end,
+                        uid: curUid,
+                        availability: newAvailability);
+                modifyVote(newAvailability);
+                return true;
+              },
+              pollOptionsSplashColor: Colors.white,
+              votedProgressColor: Colors.grey.withOpacity(0.3),
+              votedBackgroundColor: Colors.grey.withOpacity(0.2),
+              votedCheckmark: const Icon(
+                Icons.check,
+              ),
+              pollTitle: Container(),
+              pollOptions: getOptions(voteDateModel),
+              metaWidget: Row(
+                children: const [
+                  Text(
+                    '•',
+                    style: TextStyle(
+                      fontSize: 20,
                     ),
-                    Text(
-                      '2 weeks left',
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
+                  ),
+                  Text(
+                    '2 weeks left',
+                    style: TextStyle(
+                      fontSize: 20,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },

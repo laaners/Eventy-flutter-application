@@ -139,21 +139,18 @@ class _SelectLocationState extends State<SelectLocation> {
               }).toList(),
             ),
             Container(
-              margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
+              margin: const EdgeInsets.only(bottom: 8, top: 8),
               alignment: Alignment.topLeft,
               child: Text(
                 "Name",
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
             ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 15),
-              child: MyTextField(
-                maxLength: 40,
-                maxLines: 1,
-                hintText: "Name of the Location",
-                controller: locationNameController,
-              ),
+            MyTextField(
+              maxLength: 40,
+              maxLines: 1,
+              hintText: "Name of the Location",
+              controller: locationNameController,
             ),
             SelectLocationAddress(
               defaultLocation: widget.defaultLocation,
@@ -176,7 +173,6 @@ class _SelectLocationState extends State<SelectLocation> {
         const Padding(padding: EdgeInsets.only(top: 8)),
         Container(
           alignment: Alignment.bottomCenter,
-          margin: const EdgeInsets.symmetric(horizontal: 15),
           child: MyButton(text: "Add location", onPressed: checkFields),
         ),
       ],

@@ -56,6 +56,14 @@ class _DatesViewHorizontalState extends State<DatesViewHorizontal> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             color: Theme.of(context).primaryColorDark,
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).shadowColor.withOpacity(0.2),
+                spreadRadius: 1,
+                blurRadius: 1,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
           child: Column(
             children: [
@@ -170,7 +178,15 @@ class DateTile extends StatelessWidget {
         width: 110,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          color: Theme.of(context).focusColor,
+          color: Theme.of(context).scaffoldBackgroundColor,
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).shadowColor.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 1,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Column(
           children: [

@@ -59,7 +59,7 @@ class FirebasePollEventInvite {
       PollEventModel? pollData =
           // ignore: use_build_context_synchronously
           await Provider.of<FirebasePollEvent>(context, listen: false)
-              .getPollData(id: pollEventId);
+              .getPollEventData(id: pollEventId);
       if (pollData == null) return;
 
       await Future.wait(pollData.locations.map((location) {

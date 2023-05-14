@@ -59,6 +59,7 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
     return Column(
       children: [
         ListTile(
+          contentPadding: const EdgeInsets.all(0),
           title: Container(
             margin: const EdgeInsets.only(bottom: 8, top: 8),
             alignment: Alignment.topLeft,
@@ -178,9 +179,10 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
                   children: [
                     for (var i = 0; i < locationSuggestions.length; i++)
                       Container(
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
+                              color: Theme.of(context).dividerColor,
                               width: 1.0,
                             ),
                           ),
