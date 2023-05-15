@@ -1,3 +1,4 @@
+/// UserModel class for storing user data
 class UserModel {
   final String uid;
   final String email;
@@ -8,6 +9,7 @@ class UserModel {
 
   static const collectionName = "user";
 
+  /// UserModel constructor
   UserModel({
     required this.uid,
     required this.email,
@@ -17,6 +19,7 @@ class UserModel {
     required this.profilePic,
   });
 
+  /// UserModel copyWith method for copying a UserModel object
   UserModel copyWith({
     String? uid,
     String? email,
@@ -36,6 +39,7 @@ class UserModel {
     );
   }
 
+  /// UserModel toMap method for converting a UserModel object to a Map<String, dynamic>
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'uid': uid,
@@ -47,6 +51,7 @@ class UserModel {
     };
   }
 
+  /// UserModel fromMap method for converting a Map<String, dynamic> to a UserModel object
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       uid: map['uid'] as String,
@@ -58,11 +63,13 @@ class UserModel {
     );
   }
 
+  /// UserModel toString method for printing a UserModel object
   @override
   String toString() {
     return 'UserModel(uid: $uid, email: $email, username: $username, name: $name, surname: $surname, profilePic: $profilePic)';
   }
 
+  /// UserModel operator == method for comparing two UserModel objects, returns true if they have the same values
   @override
   bool operator ==(covariant UserModel other) {
     if (identical(this, other)) return true;
@@ -75,6 +82,7 @@ class UserModel {
         other.profilePic == profilePic;
   }
 
+  /// UserModel hashCode getter for generating a hash code for a UserModel object
   @override
   int get hashCode {
     return uid.hashCode ^
