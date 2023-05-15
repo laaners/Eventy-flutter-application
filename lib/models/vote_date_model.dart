@@ -4,12 +4,15 @@ import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'availability.dart';
 
+/// VoteDateModel class for storing poll event votes for a specific date.
 class VoteDateModel {
   final String pollId;
   final String date;
   final String start;
   final String end;
   final Map<String, dynamic> votes;
+
+  /// VoteDateModel constructor
   VoteDateModel({
     required this.pollId,
     required this.date,
@@ -19,6 +22,7 @@ class VoteDateModel {
   });
   static const collectionName = "vote_date";
 
+  /// This method converts the dates from local to utc
   static Map<String, String> dateToUtc(date, start, end) {
     var startDateString = "$date $start:00";
     var endDateString = "$date $end:00";
@@ -32,6 +36,7 @@ class VoteDateModel {
     return {"date": utcDay, "start": startUtc, "end": endUtc};
   }
 
+  /// This method converts the dates from utc to local
   static Map<String, String> dateToLocal(date, start, end) {
     var startDateString = "$date $start:00";
     var endDateString = "$date $end:00";
@@ -45,6 +50,7 @@ class VoteDateModel {
     return {"date": localDay, "start": startLocal, "end": endLocal};
   }
 
+  /// This method converts the dates from utc to local
   Map<String, dynamic> getVotesKind(
     int kind,
     List<PollEventInviteModel> invites,
@@ -67,6 +73,7 @@ class VoteDateModel {
     return votesKind;
   }
 
+  /// This method retrieves the votes that are positive
   Map<String, dynamic> getPositiveVotes() {
     Map<String, dynamic> votesKind = {};
     votes.forEach((key, value) {
@@ -77,6 +84,7 @@ class VoteDateModel {
     return votesKind;
   }
 
+  /// VoteDateModel copyWith method for copying the object
   VoteDateModel copyWith({
     String? pollId,
     String? date,
@@ -93,6 +101,7 @@ class VoteDateModel {
     );
   }
 
+  /// VoteDateModel toMap method for converting the object to a Map<String, dynamic>
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'pollId': pollId,
@@ -103,6 +112,7 @@ class VoteDateModel {
     };
   }
 
+  /// VoteDateModel fromMap method for converting a Map<String, dynamic> to a VoteDateModel object
   factory VoteDateModel.fromMap(Map<String, dynamic> map) {
     return VoteDateModel(
       pollId: map['pollId'] as String,
@@ -113,11 +123,13 @@ class VoteDateModel {
     );
   }
 
+  /// VoteDateModel toString method for printing the object
   @override
   String toString() {
     return 'VoteDateCollection(pollId: $pollId, date: $date, start: $start, end: $end, votes: $votes)';
   }
 
+  /// VoteDateModel operator == method for comparing two VoteDateModel objects and returns true if they have the same values
   @override
   bool operator ==(covariant VoteDateModel other) {
     if (identical(this, other)) return true;
@@ -129,6 +141,7 @@ class VoteDateModel {
         mapEquals(other.votes, votes);
   }
 
+  /// VoteDateModel hashCode method for hashing the object
   @override
   int get hashCode {
     return pollId.hashCode ^
