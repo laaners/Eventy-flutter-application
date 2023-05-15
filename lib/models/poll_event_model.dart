@@ -5,8 +5,6 @@ import 'package:dima_app/services/date_methods.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
-// create documentation
-
 /// PollEventModel class for storing poll event data.
 class PollEventModel {
   final String pollEventName;
