@@ -1,12 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
-
 import 'package:dima_app/models/location.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:flutter/foundation.dart';
-
 import 'package:intl/intl.dart';
 
+// create documentation
+
+/// PollEventModel class for storing poll event data.
 class PollEventModel {
   final String pollEventName;
   final String organizerUid;
@@ -17,6 +18,8 @@ class PollEventModel {
   final Map<String, dynamic> dates;
   final List<Location> locations;
   final bool isClosed;
+
+  /// PollEventModel constructor
   PollEventModel({
     required this.pollEventName,
     required this.organizerUid,
@@ -29,9 +32,10 @@ class PollEventModel {
     required this.isClosed,
   });
 
-  // PK = pollName_organizerUid
+  /// Collection name for firestore
   static const collectionName = "poll_event";
 
+  /// This method converts the dates from local to utc
   static Map<String, dynamic> datesToUtc(Map<String, dynamic> dates) {
     Map<String, dynamic> utcDates = {};
     dates.forEach((day, slots) {
@@ -57,6 +61,7 @@ class PollEventModel {
     return utcDates;
   }
 
+  // This method converts the dates from utc to local
   static Map<String, dynamic> datesToLocal(Map<String, dynamic> dates) {
     Map<String, dynamic> localDates = {};
     dates.forEach((day, slots) {
@@ -82,6 +87,7 @@ class PollEventModel {
     return localDates;
   }
 
+  /// This method converts a firestore document to a PollEventModel object
   static PollEventModel firebaseDocToObj(Map<String, dynamic> doc) {
     doc["locations"] = (doc["locations"] as List).map((e) {
       e["lat"] = e["lat"].toDouble();
@@ -97,6 +103,7 @@ class PollEventModel {
     return pollDetails;
   }
 
+  /// This method performs a deep copy of a PollEventModel object
   PollEventModel copyWith({
     String? pollEventName,
     String? organizerUid,
@@ -121,6 +128,7 @@ class PollEventModel {
     );
   }
 
+  /// This method converts a PollEventModel object to a Map<String, dynamic>
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'pollEventName': pollEventName,
@@ -135,6 +143,7 @@ class PollEventModel {
     };
   }
 
+  /// This method converts a Map<String, dynamic> to a PollEventModel object
   factory PollEventModel.fromMap(Map<String, dynamic> map) {
     return PollEventModel(
       pollEventName: map['pollEventName'] as String,
@@ -153,16 +162,20 @@ class PollEventModel {
     );
   }
 
+  /// This method converts a PollEventModel object to a json string
   String toJson() => json.encode(toMap());
 
+  /// This method converts a json string to a PollEventModel object
   factory PollEventModel.fromJson(String source) =>
       PollEventModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
+  /// This method prints a PollEventModel object
   @override
   String toString() {
     return 'PollEventCollection(pollEventName: $pollEventName, organizerUid: $organizerUid, pollEventDesc: $pollEventDesc, deadline: $deadline, public: $public, canInvite: $canInvite, dates: $dates, locations: $locations, isClosed: $isClosed)';
   }
 
+  /// This method compares two PollEventModel objects
   @override
   bool operator ==(covariant PollEventModel other) {
     if (identical(this, other)) return true;
@@ -178,6 +191,7 @@ class PollEventModel {
         other.isClosed == isClosed;
   }
 
+  /// This method returns the hashcode of a PollEventModel object
   @override
   int get hashCode {
     return pollEventName.hashCode ^
