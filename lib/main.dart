@@ -312,7 +312,7 @@ class _MainScreen extends State<MainScreen> {
                 case 1:
                   return CupertinoTabView(
                     navigatorKey: secondTabNavKey,
-                    builder: (context) => const MapScreen(),
+                    builder: (context) => const DebugScreen(), // MapScreen(),
                   );
                 case 3:
                   return CupertinoTabView(
@@ -350,10 +350,6 @@ class CreatePollEventButton extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 18),
             child: MaterialButton(
               onPressed: () async {
-                var curUid =
-                    // ignore: use_build_context_synchronously
-                    Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-
                 // the result from pop is the poll id
                 final pollId =
                     await Navigator.of(context, rootNavigator: true).push(

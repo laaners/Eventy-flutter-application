@@ -157,16 +157,15 @@ class _StepDatesState extends State<StepDates> {
           ),
         if (_fixedTimeSlots)
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 2.0),
+            margin: const EdgeInsets.only(top: 15.0),
             child: ListTile(
-              title: const Text(
+              title: Text(
                 "Add another time slot",
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               leading: Container(
+                height: double.infinity,
                 padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                ),
                 child: const Icon(
                   Icons.add_circle_outline,
                 ),
@@ -187,58 +186,61 @@ class _StepDatesState extends State<StepDates> {
               },
             ),
           ),
-        HorizontalScroller(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: _timeSlots.map((slot) {
-            var start = slot["start"];
-            var end = slot["end"];
+        Container(
+          margin: const EdgeInsets.only(left: 8),
+          child: HorizontalScroller(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _timeSlots.map((slot) {
+              var start = slot["start"];
+              var end = slot["end"];
 
-            if (!Preferences.getBool('is24Hour')) {
-              start =
-                  "${DateFormat("hh:mm a").format(DateFormatter.string2DateTime("2000-01-01 $start:00"))} ";
-              end =
-                  " ${DateFormat("hh:mm a").format(DateFormatter.string2DateTime("2000-01-01 $end:00"))}";
-            }
-            return Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Theme.of(context).primaryColor,
-              ),
-              margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "$start-$end",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+              if (!Preferences.getBool('is24Hour')) {
+                start =
+                    "${DateFormat("hh:mm a").format(DateFormatter.string2DateTime("2000-01-01 $start:00"))} ";
+                end =
+                    " ${DateFormat("hh:mm a").format(DateFormatter.string2DateTime("2000-01-01 $end:00"))}";
+              }
+              return Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Theme.of(context).primaryColor,
+                ),
+                margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "$start-$end",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Container(width: 5),
-                  InkWell(
-                    child: const Icon(
-                      Icons.cancel,
+                    Container(width: 5),
+                    InkWell(
+                      child: const Icon(
+                        Icons.cancel,
+                      ),
+                      onTap: () {
+                        widget.dates.forEach((k, v) {
+                          widget.removeDate([k, "$start-$end"]);
+                        });
+                        widget.removeEmpty();
+                        setState(() {
+                          _timeSlots.removeWhere((item) =>
+                              item["start"] == slot["start"] &&
+                              item["end"] == slot["end"]);
+                          _fixedTimeSlots = _timeSlots.isEmpty ? false : true;
+                        });
+                      },
                     ),
-                    onTap: () {
-                      widget.dates.forEach((k, v) {
-                        widget.removeDate([k, "$start-$end"]);
-                      });
-                      widget.removeEmpty();
-                      setState(() {
-                        _timeSlots.removeWhere((item) =>
-                            item["start"] == slot["start"] &&
-                            item["end"] == slot["end"]);
-                        _fixedTimeSlots = _timeSlots.isEmpty ? false : true;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
         ),
         Container(
           margin: const EdgeInsets.only(top: 10, left: 15, right: 15),

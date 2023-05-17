@@ -14,6 +14,7 @@ import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
+import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -41,6 +42,72 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    return TabbarSwitcher(
+        labels: ["By you", "Invited"],
+        listSticky: StreamBuilder(
+          stream: _stream,
+          builder: (
+            BuildContext context,
+            AsyncSnapshot<UserModel> snapshot,
+          ) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const LoadingLogo();
+            }
+            if (snapshot.hasError || !snapshot.hasData) {
+              return const LogInScreen();
+            }
+            UserModel userData = snapshot.data!;
+            return ResponsiveWrapper(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: LayoutConstants.kHorizontalPadding,
+                ),
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        ScreenTransition(
+                          builder: (context) => const DebugScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text("Debug page"),
+                  ),
+                  Row(
+                    children: [
+                      ProfilePic(
+                        userData: userData,
+                        loading: false,
+                        radius: LayoutConstants.kProfilePicRadius,
+                      ),
+                      const SizedBox(width: 20),
+                      Column(
+                        children: [
+                          const SizedBox(height: LayoutConstants.kHeight),
+                          // ProfileInfo(userData: userData),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: LayoutConstants.kHeightSmall),
+                  Divider(
+                    height: LayoutConstants.kDividerHeight,
+                    color: Theme.of(context).dividerColor,
+                  ),
+                  const EventPanel(),
+                  Container(height: LayoutConstants.kPaddingFromCreate),
+                ],
+              ),
+            );
+          },
+        ),
+        stickyHeight: 200,
+        appBarTitle: "appBarTitle",
+        upRightActions: [],
+        tabbars: [
+          Text("ok"),
+          Text("ok"),
+        ]);
     return Scaffold(
       appBar: const MyAppBar(
         title: 'Home',
@@ -175,7 +242,34 @@ class _EventPanelState extends State<EventPanel> {
                 return PollEventTile(
                   locationBanner: event.locations[0].icon,
                   descTop: event.dates.toString(),
-                  onTap: () {},
+                  onTap: () async {
+                    // ignore: use_build_context_synchronously
+                    String pollEventId =
+                        "${event.pollEventName}_${event.organizerUid}";
+                    var curUid =
+                        // ignore: use_build_context_synchronously
+                        Provider.of<FirebaseUser>(context, listen: false)
+                            .user!
+                            .uid;
+                    Widget newScreen =
+                        PollEventScreen(pollEventId: pollEventId);
+                    // ignore: use_build_context_synchronously
+                    var ris =
+                        await Navigator.of(context, rootNavigator: false).push(
+                      ScreenTransition(
+                        builder: (context) => newScreen,
+                      ),
+                    );
+                    if (ris == "delete_poll_$curUid") {
+                      // ignore: use_build_context_synchronously
+                      await Provider.of<FirebasePollEvent>(context,
+                              listen: false)
+                          .deletePollEvent(
+                        context: context,
+                        pollId: pollEventId,
+                      );
+                    }
+                  },
                   descMiddle: event.pollEventName,
                   descBottom: event.locations[0].site.isEmpty
                       ? "No link provided"
@@ -193,36 +287,6 @@ class _EventPanelState extends State<EventPanel> {
               _sections.insert(newIndex, section);
             });
           },
-        );
-      },
-    );
-  }
-}
-
-class EventTile extends StatefulWidget {
-  final PollEventModel event;
-
-  const EventTile({super.key, required this.event});
-
-  @override
-  State<EventTile> createState() => _EventTileState();
-}
-
-class _EventTileState extends State<EventTile> {
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.event),
-      title: Text(widget.event.pollEventName),
-      subtitle: const Text("Location"),
-      // visibility on/off
-      trailing: const Icon(Icons.visibility),
-      onTap: () {
-        Widget newScreen = const PollEventScreen(pollEventId: '');
-        Navigator.of(context).push(
-          ScreenTransition(
-            builder: (context) => newScreen,
-          ),
         );
       },
     );

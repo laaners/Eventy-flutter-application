@@ -17,6 +17,7 @@ import 'package:provider/provider.dart';
 class DateDetail extends StatelessWidget {
   final String pollId;
   final String organizerUid;
+  final bool isClosed;
   final List<PollEventInviteModel> invites;
   final VoteDateModel voteDate;
   final ValueChanged<int> modifyVote;
@@ -27,6 +28,7 @@ class DateDetail extends StatelessWidget {
     required this.invites,
     required this.modifyVote,
     required this.voteDate,
+    required this.isClosed,
   });
 
   List<MyPollOption> getOptions(VoteDateModel? voteDateModel) {
@@ -179,6 +181,7 @@ class DateDetail extends StatelessWidget {
             userVotedOptionId =
                 organizerUid == curUid ? Availability.yes : userVotedOptionId;
             return MyPolls(
+              isClosed: isClosed,
               curUid: curUid,
               organizerUid: organizerUid,
               votedAnimationDuration: 0,
@@ -188,6 +191,7 @@ class DateDetail extends StatelessWidget {
               heightBetweenTitleAndOptions: 0,
               pollId: '1',
               onVoted: (MyPollOption pollOption, int newTotalVotes) async {
+                if (isClosed) return true;
                 int newAvailability = pollOption.id!;
                 await Provider.of<FirebaseVote>(context, listen: false)
                     .userVoteDate(

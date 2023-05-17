@@ -170,6 +170,7 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
             },
           ),
         ),
+        Container(padding: const EdgeInsets.only(bottom: 8)),
         if (showMap)
           MapFromCoor(lat: lat, lon: lon, address: widget.controller.text)
         else

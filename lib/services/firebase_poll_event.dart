@@ -192,6 +192,9 @@ class FirebasePollEvent {
     try {
       var document = await FirebaseCrud.readDoc(pollEventCollection, pollId);
       if (document!.exists) {
+        await FirebaseCrud.updateDoc(
+            pollEventCollection, pollId, "isClosed", true);
+        /*
         var tmp = document.data() as Map<String, dynamic>;
         tmp["locations"] = (tmp["locations"] as List).map((e) {
           e["lat"] = e["lat"].toDouble();
@@ -305,6 +308,7 @@ class FirebasePollEvent {
             false, // invited field useless
           ),
         );
+        */
       }
     } on FirebaseException catch (e) {
       print(e.message!);
@@ -415,7 +419,7 @@ class FirebasePollEvent {
       }
     } on FirebaseException catch (e) {
       //showSnackBar(context, e.message!);
-      print(e.message);
+      print(e.message!);
     }
     return [];
   }
@@ -431,7 +435,8 @@ class FirebasePollEvent {
           return PollEventModel.firebaseDocToObj(
               doc.data() as Map<String, dynamic>);
         }).toList();
-        return events.where((event) => event.isClosed).toList();
+        return events;
+        // return events.where((event) => event.isClosed).toList();
       }
       return [];
     } on FirebaseException catch (e) {

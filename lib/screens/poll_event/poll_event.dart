@@ -115,6 +115,7 @@ class _PollEventScreenState extends State<PollEventScreen>
               BuildContext context,
               AsyncSnapshot<DocumentSnapshot<Object?>> snapshot,
             ) {
+              print("snapshot rebuild");
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const LoadingLogo();
               }
@@ -131,17 +132,21 @@ class _PollEventScreenState extends State<PollEventScreen>
                 return Container();
               }
 
+              /*
               // check if it is closed or the deadline was reached, deadline already in local
               Map<String, dynamic> tmp =
                   snapshot.data!.data() as Map<String, dynamic>;
-              String nowDate =
-                  DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
               String localDate = DateFormatter.dateTime2String(
                   (tmp["deadline"] as Timestamp).toDate());
               localDate = DateFormatter.toLocalString(localDate);
+              */
 
               return FutureBuilder<Map<String, dynamic>?>(
-                future: _future,
+                future: Provider.of<FirebasePollEvent>(context, listen: false)
+                    .getPollDataAndInvites(
+                  context: context,
+                  pollEventId: widget.pollEventId,
+                ),
                 builder: (
                   BuildContext context,
                   AsyncSnapshot<Map<String, dynamic>?> snapshot,
@@ -176,19 +181,15 @@ class _PollEventScreenState extends State<PollEventScreen>
                       b.getPositiveVotes().length -
                       a.getPositiveVotes().length);
 
-                  // today is below deadline and the poll was not closed early
-                  if (localDate.compareTo(nowDate) > 0 && !tmp["isClosed"]) {
-                    return PollDetailScreen(
-                      pollId: widget.pollEventId,
-                      pollData: pollData,
-                      pollInvites: pollInvites,
-                      votesLocations: votesLocations,
-                      votesDates: votesDates,
-                      refreshPollDetail: refreshPollDetail,
-                    );
-                  } else {
-                    return const SettingsScreen();
-                  }
+                  return PollDetailScreen(
+                    pollId: widget.pollEventId,
+                    pollData: pollData,
+                    pollInvites: pollInvites,
+                    votesLocations: votesLocations,
+                    votesDates: votesDates,
+                    refreshPollDetail: refreshPollDetail,
+                  );
+                  // return const SettingsScreen();
                 },
               );
             });

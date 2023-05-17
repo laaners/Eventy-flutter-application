@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'dart:math' as math;
 
 class LocationsList extends StatefulWidget {
+  final bool isClosed;
   final String organizerUid;
   final String votingUid;
   final String pollId;
@@ -27,6 +28,7 @@ class LocationsList extends StatefulWidget {
     required this.invites,
     required this.votesLocations,
     required this.votingUid,
+    required this.isClosed,
   });
 
   @override
@@ -117,6 +119,7 @@ class _LocationsListState extends State<LocationsList>
                       (element) => element.name == voteLocation.locationName,
                     );
                     return LocationTile(
+                      isClosed: widget.isClosed,
                       votingUid: widget.votingUid,
                       pollId: widget.pollId,
                       organizerUid: widget.organizerUid,
@@ -151,6 +154,7 @@ class _LocationsListState extends State<LocationsList>
 }
 
 class LocationTile extends StatelessWidget {
+  final bool isClosed;
   final String votingUid;
   final String pollId;
   final String organizerUid;
@@ -167,6 +171,7 @@ class LocationTile extends StatelessWidget {
     required this.voteLocation,
     required this.modifyVote,
     required this.votingUid,
+    required this.isClosed,
   });
 
   @override
@@ -223,6 +228,7 @@ class LocationTile extends StatelessWidget {
               child: Icon(Availability.icons[curVote]),
             ),
             onTap: () async {
+              if (isClosed) return;
               if (votingUid == curUid) {
                 if (MyAlertDialog.showAlertIfCondition(
                   context: context,
@@ -251,6 +257,7 @@ class LocationTile extends StatelessWidget {
           MyModal.show(
             context: context,
             child: LocationDetail(
+              isClosed: isClosed,
               pollId: pollId,
               organizerUid: organizerUid,
               invites: invites,
@@ -262,10 +269,6 @@ class LocationTile extends StatelessWidget {
             onDone: () {},
             title: "",
           );
-          /*
-          */
-          return;
-          // modifyVote(Availability.not);
         },
       ),
     );
