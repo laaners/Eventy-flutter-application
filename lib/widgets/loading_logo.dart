@@ -12,7 +12,7 @@ class LoadingLogo extends StatelessWidget {
         child: SizedBox(
           height: 100,
           width: 100,
-          child: Column(
+          child: ListView(
             children: [
               const EventyLogo(extWidth: 80),
               Container(height: 20),

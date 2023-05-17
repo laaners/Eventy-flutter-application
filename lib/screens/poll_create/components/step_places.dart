@@ -6,6 +6,7 @@ import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/location_icons.dart';
+import '../../../widgets/location_tile.dart';
 
 class StepPlaces extends StatefulWidget {
   final List<Location> locations;
@@ -82,77 +83,55 @@ class _StepPlacesState extends State<StepPlaces> {
         ),
         Container(
           padding: const EdgeInsets.symmetric(vertical: 5.0),
-          child: Column(children: [
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: InkWell(
-                onTap: () {
-                  MyModal.show(
-                    context: context,
-                    child: SelectLocation(
-                      locations: widget.locations,
-                      addLocation: widget.addLocation,
-                      removeLocation: widget.removeLocation,
-                      defaultLocation:
-                          Location("", "", 0, 0, "location_on_outlined"),
-                    ),
-                    heightFactor: 0.85,
-                    doneCancelMode: false,
-                    onDone: () {},
-                    title: "",
-                  );
-                },
-                child: const Icon(
-                  Icons.add_location_alt,
-                  size: 60,
-                ),
-              ),
-            ),
-            Text(
-              "Add a location",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          ]),
-        ),
-        if (widget.locations
-            .map((x) => x.name)
-            .contains("Virtual meeting")) //(virtualMeeting)
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 1.0),
-            child: ListTile(
-              title: Text(
-                widget.locations
-                    .firstWhere((_) => _.name == "Virtual meeting")
-                    .name,
-                overflow: TextOverflow.ellipsis,
-              ),
-              subtitle: Text(
-                widget.locations
-                        .firstWhere((_) => _.name == "Virtual meeting")
-                        .site
-                        .isEmpty
-                    ? "No link given"
-                    : widget.locations
-                        .firstWhere((_) => _.name == "Virtual meeting")
-                        .site,
-                overflow: TextOverflow.ellipsis,
-              ),
-              leading: Container(
+          child: Column(
+            children: [
+              Container(
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(50),
                 ),
-                child: const Icon(
-                  Icons.videocam,
+                child: InkWell(
+                  onTap: () {
+                    MyModal.show(
+                      context: context,
+                      child: SelectLocation(
+                        locations: widget.locations,
+                        addLocation: widget.addLocation,
+                        removeLocation: widget.removeLocation,
+                        defaultLocation:
+                            Location("", "", 0, 0, "location_on_outlined"),
+                      ),
+                      heightFactor: 0.85,
+                      doneCancelMode: false,
+                      onDone: () {},
+                      title: "",
+                    );
+                  },
+                  child: const Icon(Icons.add_location_alt, size: 60),
                 ),
               ),
-              trailing: IconButton(
-                icon: const Icon(
-                  Icons.cancel,
+              Text(
+                "Add a location",
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ],
+          ),
+        ),
+        if (widget.locations
+            .map((x) => x.name)
+            .contains("Virtual meeting")) //(virtualMeeting)
+          Builder(builder: (context) {
+            return LocationTile(
+              leading: Container(
+                height: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
                 ),
+                child: const FittedBox(child: Icon(Icons.videocam)),
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.cancel),
                 onPressed: () {
                   widget.removeLocation("Virtual meeting");
                   setState(() {
@@ -160,6 +139,15 @@ class _StepPlacesState extends State<StepPlaces> {
                   });
                 },
               ),
+              title: "Virtual meeting",
+              subtitle: widget.locations
+                      .firstWhere((_) => _.name == "Virtual meeting")
+                      .site
+                      .isEmpty
+                  ? "No link given"
+                  : widget.locations
+                      .firstWhere((_) => _.name == "Virtual meeting")
+                      .site,
               onTap: () {
                 MyModal.show(
                   context: context,
@@ -181,74 +169,41 @@ class _StepPlacesState extends State<StepPlaces> {
                   title: "",
                 );
               },
-            ),
-          ),
+            );
+          }),
         ...widget.locations
             .where((_) => _.name != "Virtual meeting")
             .toList()
             .map((location) {
-          return Container(
-            padding: const EdgeInsets.symmetric(vertical: 1.0),
-            child: ListTile(
-              title: Text(
-                location.name,
-                overflow: TextOverflow.ellipsis,
+          return LocationTile(
+            leading: Container(
+              height: double.infinity,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
               ),
-              subtitle: Text(
-                location.site,
-                overflow: TextOverflow.ellipsis,
-              ),
-              leading: Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
+              child: FittedBox(child: Icon(LocationIcons.icons[location.icon])),
+            ),
+            title: location.name,
+            subtitle: location.site,
+            onTap: () {
+              MyModal.show(
+                context: context,
+                child: SelectLocation(
+                  locations: widget.locations,
+                  addLocation: widget.addLocation,
+                  removeLocation: widget.removeLocation,
+                  defaultLocation: location,
                 ),
-                child: Icon(
-                  LocationIcons.icons[location.icon],
-                ),
-              ),
-              trailing: IconButton(
-                icon: const Icon(
-                  Icons.cancel,
-                ),
-                onPressed: () {
-                  widget.removeLocation(location.name);
-                },
-              ),
-              onTap: () {
-                /*
-                showModalBottomSheet(
-                  useRootNavigator: true,
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (context) => FractionallySizedBox(
-                    heightFactor: 0.85,
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 15, bottom: 15),
-                      child: SelectLocation(
-                        locations: widget.locations,
-                        addLocation: widget.addLocation,
-                        removeLocation: widget.removeLocation,
-                        defaultLocation: location,
-                      ),
-                    ),
-                  ),
-                );
-                */
-                MyModal.show(
-                  context: context,
-                  child: SelectLocation(
-                    locations: widget.locations,
-                    addLocation: widget.addLocation,
-                    removeLocation: widget.removeLocation,
-                    defaultLocation: location,
-                  ),
-                  heightFactor: 0.85,
-                  doneCancelMode: false,
-                  onDone: () {},
-                  title: "",
-                );
-              },
+                heightFactor: 0.85,
+                doneCancelMode: false,
+                onDone: () {},
+                title: "",
+              );
+            },
+            trailing: IconButton(
+              icon: const Icon(Icons.cancel),
+              onPressed: () => widget.removeLocation(location.name),
             ),
           );
         }).toList(),

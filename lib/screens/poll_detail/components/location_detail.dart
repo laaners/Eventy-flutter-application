@@ -22,6 +22,7 @@ class LocationDetail extends StatelessWidget {
   final List<PollEventInviteModel> invites;
   final Location location;
   final ValueChanged<int> modifyVote;
+  final bool isClosed;
   const LocationDetail({
     super.key,
     required this.pollId,
@@ -29,6 +30,7 @@ class LocationDetail extends StatelessWidget {
     required this.invites,
     required this.location,
     required this.modifyVote,
+    required this.isClosed,
   });
 
   List<MyPollOption> getOptions(VoteLocationModel? locationModel) {
@@ -185,6 +187,7 @@ class LocationDetail extends StatelessWidget {
             userVotedOptionId =
                 organizerUid == curUid ? Availability.yes : userVotedOptionId;
             return MyPolls(
+              isClosed: isClosed,
               curUid: curUid,
               organizerUid: organizerUid,
               votedAnimationDuration: 0,
@@ -194,6 +197,7 @@ class LocationDetail extends StatelessWidget {
               heightBetweenTitleAndOptions: 0,
               pollId: '1',
               onVoted: (MyPollOption pollOption, int newTotalVotes) async {
+                if (isClosed) return true;
                 int newAvailability = pollOption.id!;
                 await Provider.of<FirebaseVote>(context, listen: false)
                     .userVoteLocation(
@@ -234,6 +238,9 @@ class LocationDetail extends StatelessWidget {
         ),
         location.name == "Virtual meeting"
             ? ListTile(
+                contentPadding: const EdgeInsets.all(0),
+                minLeadingWidth: 0,
+                horizontalTitleGap: 0,
                 title: Container(
                   padding: const EdgeInsets.only(top: 8, bottom: 8),
                   child: Text(

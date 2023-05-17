@@ -184,7 +184,10 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
             ),
             startingDayOfWeek: StartingDayOfWeek.monday,
             // firstDay: DateFormatter.string2DateTime(widget.deadline).add(const Duration(days: 1)),
-            firstDay: DateTime.now(),
+            firstDay: DateFormatter.string2DateTime(widget.deadline)
+                    .isBefore(DateTime.now())
+                ? DateFormatter.string2DateTime(widget.deadline)
+                : DateTime.now(),
             // lastDay: DateFormatter.string2DateTime(votesDates.last.date),
             // lastDay: DateTime(DateTime.now().year + 50),
             lastDay: DateFormatter.string2DateTime(

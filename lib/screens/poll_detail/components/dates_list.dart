@@ -7,6 +7,7 @@ import 'dart:math' as math;
 import 'dates_view_calendar.dart';
 
 class DatesList extends StatefulWidget {
+  final bool isClosed;
   final String organizerUid;
   final String pollId;
   final String deadline;
@@ -22,6 +23,7 @@ class DatesList extends StatefulWidget {
     required this.invites,
     required this.votesDates,
     required this.deadline,
+    required this.isClosed,
   });
 
   @override
@@ -109,6 +111,7 @@ class _DatesListState extends State<DatesList>
                 child: ListView(
                   children: [
                     DatesViewHorizontal(
+                      isClosed: widget.isClosed,
                       organizerUid: widget.organizerUid,
                       pollId: widget.pollId,
                       deadline: widget.deadline,
