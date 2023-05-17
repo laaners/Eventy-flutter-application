@@ -50,7 +50,7 @@ class VoteDateModel {
     return {"date": localDay, "start": startLocal, "end": endLocal};
   }
 
-  /// This method converts the dates from utc to local
+  /// This method gets the votes of a specific kind, e.g. Availability.yes or Availability.no .
   Map<String, dynamic> getVotesKind(
     int kind,
     List<PollEventInviteModel> invites,
@@ -73,7 +73,7 @@ class VoteDateModel {
     return votesKind;
   }
 
-  /// This method retrieves the votes that are positive
+  /// This method retrieves the votes that are positive, e.g. Availability.yes or Availability.iff .
   Map<String, dynamic> getPositiveVotes() {
     Map<String, dynamic> votesKind = {};
     votes.forEach((key, value) {
