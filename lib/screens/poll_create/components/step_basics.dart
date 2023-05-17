@@ -82,6 +82,7 @@ class _StepBasicsState extends State<StepBasics> {
             controller: widget.eventDescController,
           ),
         ),
+        /*
         Container(
           margin: const EdgeInsets.only(bottom: 8, top: 8, left: 15),
           alignment: Alignment.topLeft,
@@ -120,6 +121,7 @@ class _StepBasicsState extends State<StepBasics> {
             ),
           ],
         ),
+        */
         ListTile(
           title: Container(
             padding: const EdgeInsets.only(top: 8, bottom: 8),

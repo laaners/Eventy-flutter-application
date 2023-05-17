@@ -213,16 +213,6 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
         ),
       ];
 
-  Future onStepContinue() async {
-    if (_activeStepIndex < (stepList().length - 1)) {
-      setState(() {
-        _activeStepIndex += 1;
-      });
-    } else {
-      await checkAndCreatePoll();
-    }
-  }
-
   Future checkAndCreatePoll() async {
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     bool ret = MyAlertDialog.showAlertIfCondition(
@@ -315,7 +305,7 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
-        title: "New Event",
+        title: "New Poll",
         upRightActions: [
           TextButton(
             onPressed: () async {
@@ -379,7 +369,15 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
             ),
             Expanded(
               child: MyButton(
-                onPressed: onStepContinue,
+                onPressed: () async {
+                  if (_activeStepIndex < (stepList().length - 1)) {
+                    setState(() {
+                      _activeStepIndex += 1;
+                    });
+                  } else {
+                    await checkAndCreatePoll();
+                  }
+                },
                 text: (_activeStepIndex == stepList().length - 1)
                     ? 'Create'
                     : 'Next',

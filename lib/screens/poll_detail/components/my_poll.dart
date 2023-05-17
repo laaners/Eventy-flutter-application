@@ -13,11 +13,13 @@ class MyPolls extends HookWidget {
   // CUSTOM: organizer and curUid
   final String organizerUid;
   final String curUid;
+  final bool isClosed;
   const MyPolls({
     super.key,
     required this.organizerUid,
     required this.curUid,
     required this.pollId,
+    required this.isClosed,
     this.hasVoted = false,
     this.userVotedOptionId,
     required this.onVoted,
@@ -254,6 +256,7 @@ class MyPolls extends HookWidget {
                       ? InkWell(
                           // CUSTOM: change vote
                           onTap: () async {
+                            if (isClosed) return;
                             if (MyAlertDialog.showAlertIfCondition(
                                 context: context,
                                 condition: curUid == organizerUid &&

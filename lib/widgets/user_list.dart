@@ -79,6 +79,7 @@ class _UserTileState extends State<UserTile> {
         return SizedBox(
           height: 80,
           child: ListTile(
+            contentPadding: const EdgeInsets.all(0),
             leading: ProfilePic(
               loading: false,
               userData: userData,

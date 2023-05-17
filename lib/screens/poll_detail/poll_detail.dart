@@ -1,17 +1,22 @@
 import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/constants/preferences.dart';
+import 'package:dima_app/models/location.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/models/vote_location_model.dart';
 import 'package:dima_app/screens/poll_detail/components/creator_options.dart';
 import 'package:dima_app/screens/poll_detail/components/locations_list.dart';
+import 'package:dima_app/screens/poll_detail/components/most_voted_date_tile.dart';
+import 'package:dima_app/screens/poll_detail/components/most_voted_location_tile.dart';
 import 'package:dima_app/services/date_methods.dart';
+import 'package:dima_app/services/dynamic_links_handler.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/delay_widget.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_modal.dart';
+import 'package:dima_app/widgets/poll_event_tile.dart';
 import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:dima_app/widgets/user_list.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -73,6 +78,11 @@ class PollDetailScreen extends StatelessWidget {
     lines += 1;
     double titlePadding =
         lines * Theme.of(context).textTheme.headlineMedium!.fontSize!;
+
+    bool isClosed = pollData.isClosed ||
+        DateFormatter.string2DateTime(pollData.deadline)
+            .isBefore(DateTime.now());
+
     return TabbarSwitcher(
       listSticky: Container(
         margin: const EdgeInsets.symmetric(horizontal: 15),
@@ -117,27 +127,44 @@ class PollDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 5),
             ),
             Text(
-              "Last day to vote",
+              isClosed ? "The poll has been closed" : "Last day to vote",
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-            ),
-            Flexible(
-              child: Text(
-                DateFormat(Preferences.getBool('is24Hour')
-                        ? "MMMM dd yyyy, EEEE 'at' HH:mm"
-                        : "MMMM dd yyyy, EEEE 'at' hh:mm a")
-                    .format(
-                  DateFormatter.string2DateTime(pollData.deadline),
-                ),
-                style: Theme.of(context).textTheme.bodyLarge,
+            Container(padding: const EdgeInsets.symmetric(vertical: 5)),
+            isClosed
+                ? Text(
+                    "The most voted options are:",
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  )
+                : Flexible(
+                    child: Text(
+                      DateFormat(Preferences.getBool('is24Hour')
+                              ? "MMMM dd yyyy, EEEE 'at' HH:mm"
+                              : "MMMM dd yyyy, EEEE 'at' hh:mm a")
+                          .format(
+                        DateFormatter.string2DateTime(pollData.deadline),
+                      ),
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+            if (isClosed)
+              MostVotedLocationTile(
+                votesLocations: votesLocations,
+                pollData: pollData,
+                pollId: pollId,
+                invites: pollInvites,
               ),
-            ),
+            if (isClosed)
+              MostVotedDateTile(
+                votesDates: votesDates,
+                pollData: pollData,
+                pollId: pollId,
+                invites: pollInvites,
+              ),
           ],
         ),
       ),
-      stickyHeight: 350 + descPadding + titlePadding,
+      stickyHeight: 350 + titlePadding + descPadding + (isClosed ? 145 : 0),
       labels: const ["Locations", "Dates"],
       appBarTitle: pollData.pollEventName,
       upRightActions: pollData.organizerUid != curUid && !pollData.canInvite
@@ -198,17 +225,6 @@ class PollDetailScreen extends StatelessWidget {
                           context: context,
                           pollId: pollId,
                         );
-                        /*
-                        Widget newScreen = EventDetailCreate(
-                          eventId: pollId,
-                        );
-                        // ignore: use_build_context_synchronously
-                        Navigator.of(context).pushReplacement(
-                          ScreenTransition(
-                            builder: (context) => newScreen,
-                          ),
-                        );
-                        */
                       } else if (ris == "delete_poll_$curUid") {
                         // ignore: use_build_context_synchronously
                         Navigator.pop(
@@ -232,29 +248,10 @@ class PollDetailScreen extends StatelessWidget {
                     ),
                   ),
                   onTap: () async {
-                    LoadingOverlay.show(context);
-                    String url =
-                        "https://eventy.page.link?pollId=${pollData.pollEventName}_${pollData.organizerUid}";
-                    final dynamicLinkParams = DynamicLinkParameters(
-                      link: Uri.parse(url),
-                      uriPrefix: "https://eventy.page.link",
-                      androidParameters: const AndroidParameters(
-                        packageName: "com.example.dima_app",
-                      ),
-                      iosParameters: const IOSParameters(
-                        bundleId: "com.example.dima_app",
-                      ),
+                    await DynamicLinksHandler.pollEventLinkSharing(
+                      context: context,
+                      pollData: pollData,
                     );
-                    final dynamicLongLink = await FirebaseDynamicLinks.instance
-                        .buildLink(dynamicLinkParams);
-                    final ShortDynamicLink dynamicShortLink =
-                        await FirebaseDynamicLinks.instance
-                            .buildShortLink(dynamicLinkParams);
-                    Uri finalUrl = dynamicShortLink.shortUrl;
-                    print(finalUrl);
-                    print(dynamicLongLink);
-                    await Share.share(finalUrl.toString());
-                    LoadingOverlay.hide(context);
                   },
                 ),
               ),
@@ -278,6 +275,7 @@ class PollDetailScreen extends StatelessWidget {
             ],
       tabbars: [
         LocationsList(
+          isClosed: isClosed,
           votingUid: curUid,
           organizerUid: pollData.organizerUid,
           pollId: pollId,
@@ -287,6 +285,7 @@ class PollDetailScreen extends StatelessWidget {
         ),
         DelayWidget(
           child: DatesList(
+            isClosed: isClosed,
             organizerUid: pollData.organizerUid,
             pollId: pollId,
             deadline: pollData.deadline,

@@ -1,8 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/models/vote_location_model.dart';
 import 'package:dima_app/screens/poll_detail/components/invitees_list.dart';
+import 'package:dima_app/services/dynamic_links_handler.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
@@ -49,30 +52,10 @@ class CreatorOptions extends StatelessWidget {
             ),
           ),
           onTap: () async {
-            LoadingOverlay.show(context);
-            String url =
-                "https://eventy.page.link?pollId=${pollData.pollEventName}_${pollData.organizerUid}";
-            final dynamicLinkParams = DynamicLinkParameters(
-              link: Uri.parse(url),
-              uriPrefix: "https://eventy.page.link",
-              androidParameters: const AndroidParameters(
-                packageName: "com.example.dima_app",
-              ),
-              iosParameters: const IOSParameters(
-                bundleId: "com.example.dima_app",
-              ),
+            await DynamicLinksHandler.pollEventLinkSharing(
+              context: context,
+              pollData: pollData,
             );
-            final dynamicLongLink = await FirebaseDynamicLinks.instance
-                .buildLink(dynamicLinkParams);
-            final ShortDynamicLink dynamicShortLink = await FirebaseDynamicLinks
-                .instance
-                .buildShortLink(dynamicLinkParams);
-            Uri finalUrl = dynamicShortLink.shortUrl;
-            print(finalUrl);
-            print(dynamicLongLink);
-            await Share.share(finalUrl.toString());
-            Navigator.of(context).pop();
-            LoadingOverlay.hide(context);
           },
         ),
         ListTile(
@@ -112,7 +95,7 @@ class CreatorOptions extends StatelessWidget {
         ListTile(
           contentPadding: const EdgeInsets.all(0),
           title: Text(
-            "Create the event",
+            "Close the poll",
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleLarge,
           ),
