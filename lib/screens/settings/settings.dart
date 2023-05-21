@@ -32,8 +32,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               value: Preferences.getBool('isDark'),
               onChanged: (newValue) {
-                Provider.of<ThemeManager>(context, listen: false)
-                    .toggleTheme(newValue);
+                setState(() {
+                  Provider.of<ThemeManager>(context, listen: false)
+                      .toggleTheme(newValue);
+                });
               },
               secondary: const Icon(Icons.dark_mode),
             ),

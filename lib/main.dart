@@ -105,6 +105,8 @@ class _MyAppState extends State<MyApp> {
       home: Consumer<FirebaseUser>(
         builder: (context, value, child) {
           if (value.user != null) {
+            return const MainScreen();
+            /*
             return StreamBuilder(
               stream: Provider.of<FirebaseUser>(context, listen: false)
                   .getCurrentUserStream(),
@@ -121,6 +123,7 @@ class _MyAppState extends State<MyApp> {
                 return const MainScreen();
               },
             );
+            */
           }
           return const LogInScreen();
         },

@@ -12,6 +12,7 @@ import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/firebase_vote.dart';
+import 'package:dima_app/widgets/delay_widget.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';

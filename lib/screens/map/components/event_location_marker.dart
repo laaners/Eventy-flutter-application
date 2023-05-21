@@ -50,6 +50,8 @@ class EventLocationMarker extends StatelessWidget {
                     .format(DateFormatter.string2DateTime(
                         "${event.date} ${event.end}:00"));
                 return Builder(builder: (context) {
+                  return Container();
+                  /*
                   return PollEventTile(
                     locationBanner: event.locationBanner,
                     descTop: "${event.date}: $startInfo - $endInfo",
@@ -87,6 +89,7 @@ class EventLocationMarker extends StatelessWidget {
                       Navigator.pop(context, event.eventId);
                     },
                   );
+                  */
                 });
               }).toList()
             ],

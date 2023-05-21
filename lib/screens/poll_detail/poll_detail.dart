@@ -164,7 +164,7 @@ class PollDetailScreen extends StatelessWidget {
           ],
         ),
       ),
-      stickyHeight: 350 + titlePadding + descPadding + (isClosed ? 145 : 0),
+      stickyHeight: 350 + titlePadding + descPadding + (isClosed ? 155 : 0),
       labels: const ["Locations", "Dates"],
       appBarTitle: pollData.pollEventName,
       upRightActions: pollData.organizerUid != curUid && !pollData.canInvite

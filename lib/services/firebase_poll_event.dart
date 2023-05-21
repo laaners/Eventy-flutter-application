@@ -424,7 +424,7 @@ class FirebasePollEvent {
     return [];
   }
 
-  Future<List<PollEventModel>> getUserOrganizedEvents({
+  Future<List<PollEventModel>> getUserOrganizedPollsEvents({
     required String uid,
   }) async {
     try {
@@ -439,6 +439,23 @@ class FirebasePollEvent {
         // return events.where((event) => event.isClosed).toList();
       }
       return [];
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return [];
+  }
+
+  Future<List<PollEventModel>> getUserOrganizedPollsEventsSnapshot({
+    required String uid,
+  }) async {
+    try {
+      var documents =
+          pollEventCollection.where("organizerUid", isEqualTo: uid).snapshots();
+      //.map((e) => UserModel.fromMap(e.data() as Map<String, dynamic>));
+      var ris = await documents.first;
+      var riss = ris.docs.map((e) =>
+          PollEventModel.firebaseDocToObj(e.data() as Map<String, dynamic>));
+      return riss.toList();
     } on FirebaseException catch (e) {
       print(e.message!);
     }
