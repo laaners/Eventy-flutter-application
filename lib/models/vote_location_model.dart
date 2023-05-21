@@ -2,10 +2,13 @@ import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:flutter/foundation.dart';
 import 'availability.dart';
 
+/// VoteLocationModel class for storing poll event votes for a specific location.
 class VoteLocationModel {
   final String pollId;
   final String locationName;
   final Map<String, dynamic> votes;
+
+  /// VoteLocationModel constructor
   VoteLocationModel({
     required this.pollId,
     required this.locationName,
@@ -13,6 +16,7 @@ class VoteLocationModel {
   });
   static const collectionName = "vote_location";
 
+  /// This method gets the votes of a specific kind, e.g. Availability.yes or Availability.no .
   Map<String, dynamic> getVotesKind(
     int kind,
     List<PollEventInviteModel> invites,
@@ -35,6 +39,7 @@ class VoteLocationModel {
     return votesKind;
   }
 
+  /// This method gets the positive votes, i.e. Availability.yes or Availability.iff .
   Map<String, dynamic> getPositiveVotes() {
     Map<String, dynamic> votesKind = {};
     votes.forEach((key, value) {
@@ -45,6 +50,7 @@ class VoteLocationModel {
     return votesKind;
   }
 
+  /// This method performs a deep copy of a VoteLocationModel object.
   VoteLocationModel copyWith({
     String? pollId,
     String? locationName,
@@ -57,6 +63,7 @@ class VoteLocationModel {
     );
   }
 
+  /// This method converts a VoteLocationModel object to a Map<String, dynamic>.
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'pollId': pollId,
@@ -65,6 +72,7 @@ class VoteLocationModel {
     };
   }
 
+  /// This method converts a Map<String, dynamic> to a VoteLocationModel object.
   factory VoteLocationModel.fromMap(Map<String, dynamic> map) {
     return VoteLocationModel(
       pollId: map['pollId'] as String,
@@ -73,10 +81,12 @@ class VoteLocationModel {
     );
   }
 
+  /// This method converts a VoteLocationModel object to a JSON object.
   @override
   String toString() =>
       'VoteLocationCollection(pollId: $pollId, locationName: $locationName, votes: $votes)';
 
+  /// This method overrides the == operator for the VoteLocationModel class, so that two VoteLocationModel objects are equal if they have the same pollId, locationName and votes.
   @override
   bool operator ==(covariant VoteLocationModel other) {
     if (identical(this, other)) return true;
@@ -86,6 +96,7 @@ class VoteLocationModel {
         mapEquals(other.votes, votes);
   }
 
+  /// This method creates a hash code for a VoteLocationModel object.
   @override
   int get hashCode => pollId.hashCode ^ locationName.hashCode ^ votes.hashCode;
 }
