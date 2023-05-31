@@ -1,58 +1,35 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/constants/layout_constants.dart';
-import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/widgets/empty_list.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/poll_event_tile.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PollEventList extends StatefulWidget {
+class PollEventList extends StatelessWidget {
   const PollEventList({super.key});
 
   @override
-  State<PollEventList> createState() => _PollEventListState();
-}
-
-class _PollEventListState extends State<PollEventList>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
-  // even sections
-  late Future<List<PollEventModel>> _future;
-
-  @override
-  void initState() {
-    super.initState();
-    final userUid = Provider.of<FirebaseUser>(listen: false, context).user!.uid;
-    _future = Provider.of<FirebasePollEvent>(context, listen: false)
-        .getUserOrganizedPollsEventsSnapshot(uid: userUid);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    super.build(context);
     final userUid = Provider.of<FirebaseUser>(listen: false, context).user!.uid;
-    Provider.of<FirebasePollEvent>(context, listen: false)
-        .getUserOrganizedPollsEventsSnapshot(uid: userUid);
-    // events here
-    return FutureBuilder(
-      future: Provider.of<FirebasePollEvent>(context, listen: false)
+    return StreamBuilder(
+      stream: Provider.of<FirebasePollEvent>(context, listen: false)
           .getUserOrganizedPollsEventsSnapshot(uid: userUid),
       builder: (
         BuildContext context,
-        AsyncSnapshot<List<PollEventModel>> snapshot,
+        AsyncSnapshot<QuerySnapshot<Object?>> snapshot,
       ) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const LoadingLogo();
         }
-        if (snapshot.hasError || !snapshot.hasData) {
+        if (snapshot.hasError) {
           Future.microtask(() {
             Navigator.of(context, rootNavigator: false).pushReplacement(
               ScreenTransition(
@@ -64,7 +41,13 @@ class _PollEventListState extends State<PollEventList>
           });
           return Container();
         }
-        List<PollEventModel> events = snapshot.data!;
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const EmptyList(emptyMsg: "No polls or events");
+        }
+        List<PollEventModel> events = snapshot.data!.docs
+            .map((e) => PollEventModel.firebaseDocToObj(
+                e.data() as Map<String, dynamic>))
+            .toList();
         return ListView.builder(
           itemCount: events.length + 1,
           itemBuilder: (BuildContext context, int index) {

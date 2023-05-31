@@ -213,7 +213,7 @@ class PollDetailScreen extends StatelessWidget {
                           votesDates: votesDates,
                         ),
                         heightFactor: 0.4,
-                        doneCancelMode: true,
+                        doneCancelMode: false,
                         onDone: () {},
                         title: "",
                       );

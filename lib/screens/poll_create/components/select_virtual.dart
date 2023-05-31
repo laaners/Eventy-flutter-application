@@ -2,6 +2,7 @@ import 'package:dima_app/models/location.dart';
 import 'package:dima_app/models/location_icons.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_button.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -61,10 +62,11 @@ class _SelectVirtualState extends State<SelectVirtual> {
           "videocam",
         ));
         widget.setVirtualMeeting(true);
-        Navigator.pop(context);
       } else {
-        Navigator.pop(context);
+        return;
       }
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
       return;
     }
     widget.setVirtualMeeting(true);
@@ -82,62 +84,61 @@ class _SelectVirtualState extends State<SelectVirtual> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Center(
-          child: Container(
-            padding: const EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50 + 5),
-            ),
-            child: IconButton(
-              iconSize: 100.0,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              onPressed: () {},
-              icon: Icon(
-                LocationIcons.videocam,
+    return MyModal(
+      doneCancelMode: true,
+      onDone: checkFields,
+      heightFactor: 0.85,
+      title: "",
+      child: Column(
+        children: [
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50 + 5),
+              ),
+              child: IconButton(
+                iconSize: 100.0,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () {},
+                icon: Icon(
+                  LocationIcons.videocam,
+                ),
               ),
             ),
           ),
-        ),
-        ListTile(
-          contentPadding: const EdgeInsets.all(0),
-          minLeadingWidth: 0,
-          horizontalTitleGap: 0,
-          title: Container(
-            padding: const EdgeInsets.only(top: 8, bottom: 8),
-            child: Text(
-              "Virtual room link (optional)",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          ),
-          subtitle: TextFormField(
-            autofocus: false,
-            controller: locationAddrController,
-            decoration: InputDecoration(
-              hintText: "Paste the link here",
-              isDense: true,
-              suffixIcon: IconButton(
-                iconSize: 25,
-                onPressed: () async {
-                  await Clipboard.setData(
-                      ClipboardData(text: locationAddrController.text));
-                },
-                icon: const Icon(Icons.link),
+          ListTile(
+            contentPadding: const EdgeInsets.all(0),
+            minLeadingWidth: 0,
+            horizontalTitleGap: 0,
+            title: Container(
+              padding: const EdgeInsets.only(top: 8, bottom: 8),
+              child: Text(
+                "Virtual room link (optional)",
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
-              border: InputBorder.none,
+            ),
+            subtitle: TextFormField(
+              autofocus: false,
+              controller: locationAddrController,
+              decoration: InputDecoration(
+                hintText: "Paste the link here",
+                isDense: true,
+                suffixIcon: IconButton(
+                  iconSize: 25,
+                  onPressed: () async {
+                    await Clipboard.setData(
+                        ClipboardData(text: locationAddrController.text));
+                  },
+                  icon: const Icon(Icons.link),
+                ),
+                border: InputBorder.none,
+              ),
             ),
           ),
-        ),
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 5),
-          child: MyButton(
-            text: "Add virtual room",
-            onPressed: checkFields,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

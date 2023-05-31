@@ -4,6 +4,7 @@ import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/screens/home/components/poll_event_list.dart';
+import 'package:dima_app/screens/home/components/profile_data.dart';
 import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/widgets/poll_event_tile.dart';
@@ -43,61 +44,14 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return TabbarSwitcher(
+    return const TabbarSwitcher(
       labels: ["By you", "Invited"],
-      listSticky: StreamBuilder(
-        stream: _stream,
-        builder: (
-          BuildContext context,
-          AsyncSnapshot<UserModel> snapshot,
-        ) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LoadingLogo();
-          }
-          if (snapshot.hasError || !snapshot.hasData) {
-            return const LogInScreen();
-          }
-          UserModel userData = snapshot.data!;
-          return ListView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: LayoutConstants.kHorizontalPadding,
-            ),
-            children: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    ScreenTransition(
-                      builder: (context) => const DebugScreen(),
-                    ),
-                  );
-                },
-                child: const Text("Debug page"),
-              ),
-              Row(
-                children: [
-                  ProfilePic(
-                    userData: userData,
-                    loading: false,
-                    radius: LayoutConstants.kProfilePicRadius,
-                  ),
-                  const SizedBox(width: 20),
-                  Column(
-                    children: [
-                      const SizedBox(height: LayoutConstants.kHeight),
-                      // ProfileInfo(userData: userData),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
+      listSticky: ProfileData(),
       stickyHeight: 250,
-      appBarTitle: "appBarTitle",
+      appBarTitle: "Home",
       upRightActions: [],
       tabbars: [
-        const PollEventList(),
+        PollEventList(),
         Text("ok"),
       ],
     );

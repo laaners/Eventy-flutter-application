@@ -8,6 +8,7 @@ import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/screens/poll_create/components/step_invite.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/widgets/empty_list.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
@@ -86,14 +87,16 @@ class _InviteesListState extends State<InviteesList> {
             oldId != widget.pollData.organizerUid &&
             oldId != curUid)
         .toList();
-    await Future.wait(toRemove.map((uid) {
-      return Provider.of<FirebasePollEventInvite>(context, listen: false)
-          .deletePollEventInvite(
-        context: context,
-        pollEventId: widget.pollEventId,
-        inviteeId: uid,
-      );
-    }));
+    await Future.wait(
+      toRemove.map((uid) {
+        return Provider.of<FirebasePollEventInvite>(context, listen: false)
+            .deletePollEventInvite(
+          context: context,
+          pollEventId: widget.pollEventId,
+          inviteeId: uid,
+        );
+      }),
+    );
     widget.refreshPollDetail();
     // ignore: use_build_context_synchronously
     LoadingOverlay.hide(context);
@@ -114,8 +117,7 @@ class _InviteesListState extends State<InviteesList> {
         }
         if (snapshot.hasError) {
           Future.microtask(() {
-            Navigator.of(context).pop();
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               ScreenTransition(
                 builder: (context) => ErrorScreen(
@@ -127,7 +129,7 @@ class _InviteesListState extends State<InviteesList> {
           return Container();
         }
         if (!snapshot.hasData) {
-          return Container();
+          return const EmptyList(emptyMsg: "No partecipants");
         }
         List<UserModel> usersData = snapshot.data!;
         return InviteesListIntermediate(
@@ -240,11 +242,14 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
                     ),
               ListView(
                 children: [
-                  StepInvite(
-                    organizerUid: widget.pollData.organizerUid,
-                    invitees: usersData,
-                    addInvitee: addInvitee,
-                    removeInvitee: removeInvitee,
+                  Container(
+                    margin: const EdgeInsets.all(15),
+                    child: StepInvite(
+                      organizerUid: widget.pollData.organizerUid,
+                      invitees: usersData,
+                      addInvitee: addInvitee,
+                      removeInvitee: removeInvitee,
+                    ),
                   ),
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 8),

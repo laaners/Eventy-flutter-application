@@ -192,23 +192,26 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
           label: const Text(
             "Invite",
           ),
-          content: StepInvite(
-            organizerUid:
-                Provider.of<FirebaseUser>(context, listen: false).user!.uid,
-            invitees: invitees,
-            addInvitee: (UserModel user) {
-              setState(() {
-                if (!invitees.map((_) => _.uid).toList().contains(user.uid)) {
-                  // inviteeIds.add(uid);
-                  invitees.insert(0, user);
-                }
-              });
-            },
-            removeInvitee: (UserModel user) {
-              setState(() {
-                invitees.removeWhere((item) => item.uid == user.uid);
-              });
-            },
+          content: Container(
+            margin: const EdgeInsets.all(15),
+            child: StepInvite(
+              organizerUid:
+                  Provider.of<FirebaseUser>(context, listen: false).user!.uid,
+              invitees: invitees,
+              addInvitee: (UserModel user) {
+                setState(() {
+                  if (!invitees.map((_) => _.uid).toList().contains(user.uid)) {
+                    // inviteeIds.add(uid);
+                    invitees.insert(0, user);
+                  }
+                });
+              },
+              removeInvitee: (UserModel user) {
+                setState(() {
+                  invitees.removeWhere((item) => item.uid == user.uid);
+                });
+              },
+            ),
           ),
         ),
       ];
