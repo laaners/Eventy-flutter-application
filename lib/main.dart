@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/debug.dart';
 import 'package:dima_app/models/user_model.dart';
+import 'package:dima_app/screens/groups/groups.dart';
 import 'package:dima_app/screens/home/home.dart';
 import 'package:dima_app/screens/login/login.dart';
 import 'package:dima_app/screens/map/map.dart';
@@ -27,6 +28,7 @@ import 'package:provider/provider.dart';
 import 'constants/preferences.dart';
 import 'constants/theme_constants.dart';
 import 'firebase_options.dart';
+import 'services/firebase_groups.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,6 +65,7 @@ Future<void> main() async {
         Provider(create: (context) => FirebaseVote(firestore)),
         Provider(create: (context) => FirebasePollEventInvite(firestore)),
         Provider(create: (context) => FirebaseEventLocation(firestore)),
+        Provider(create: (context) => FirebaseGroups(firestore)),
       ],
       child: const MyApp(),
     ),
@@ -104,24 +107,7 @@ class _MyAppState extends State<MyApp> {
       initialRoute: '/',
       home: Consumer<FirebaseUser>(
         builder: (context, value, child) {
-          if (value.user != null) {
-            return StreamBuilder(
-              stream: Provider.of<FirebaseUser>(context, listen: false)
-                  .getCurrentUserStream(),
-              builder: (
-                BuildContext context,
-                AsyncSnapshot<UserModel> snapshot,
-              ) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const LoadingLogo();
-                }
-                if (snapshot.hasError || !snapshot.hasData) {
-                  return const LogInScreen();
-                }
-                return const MainScreen();
-              },
-            );
-          }
+          if (value.user != null) return const MainScreen();
           return const LogInScreen();
         },
       ),
@@ -149,6 +135,8 @@ class _MainScreen extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // to avoid sticky keyboard when editing text
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           CupertinoTabScaffold(
@@ -191,8 +179,8 @@ class _MainScreen extends State<MainScreen> {
                   label: 'Home',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.map),
-                  label: 'Map',
+                  icon: Icon(Icons.group),
+                  label: 'Groups',
                 ),
                 // add a center docker notch floating action button to the tab bar here
                 BottomNavigationBarItem(
@@ -210,99 +198,53 @@ class _MainScreen extends State<MainScreen> {
               ],
             ),
             tabBuilder: (context, index) {
-              /*
               PendingDynamicLinkData? dynamicLink =
                   Provider.of<DynamicLinksHandler>(context, listen: true)
                       .dynamicLink;
               bool pushed =
-                  Provider.of<DynamicLinksHandler>(context, listen: false).pushed;
+                  Provider.of<DynamicLinksHandler>(context, listen: false)
+                      .pushed;
               if (dynamicLink != null && !pushed) {
-                Map<String, dynamic> queryParams = dynamicLink.link.queryParameters;
-                String pollId = queryParams["pollId"];
+                Map<String, dynamic> queryParams =
+                    dynamicLink.link.queryParameters;
+                String pollEventId = queryParams["pollId"];
                 var curUid =
-                    // ignore: use_build_context_synchronously
                     Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-                Widget newScreen = PollEventScreen(pollEventId: pollId);
-                switch (currentIndex) {
-                  case 0:
-                    Future.delayed(Duration.zero, () async {
-                      // ignore: use_build_context_synchronously
-                      var ris = await firstTabNavKey.currentState?.push(
-                        ScreenTransition(
-                          builder: (context) => newScreen,
-                        ),
-                      );
-                      if (ris == "delete_poll_$curUid") {
-                        // ignore: use_build_context_synchronously
-                        await Provider.of<FirebasePollEvent>(context, listen: false)
-                            .closePoll(
-                          context: context,
-                          pollId: pollId,
-                        );
-                      }
-                    });
-                    break;
-                  case 1:
-                    Future.delayed(Duration.zero, () async {
-                      // ignore: use_build_context_synchronously
-                      var ris = await secondTabNavKey.currentState?.push(
-                        ScreenTransition(
-                          builder: (context) => newScreen,
-                        ),
-                      );
-                      if (ris == "delete_poll_$curUid") {
-                        // ignore: use_build_context_synchronously
-                        await Provider.of<FirebasePollEvent>(context, listen: false)
-                            .closePoll(
-                          context: context,
-                          pollId: pollId,
-                        );
-                      }
-                    });
-                    break;
-                  case 2:
-                    Future.delayed(Duration.zero, () async {
-                      // ignore: use_build_context_synchronously
-                      var ris = await thirdTabNavKey.currentState?.push(
-                        ScreenTransition(
-                          builder: (context) => newScreen,
-                        ),
-                      );
-                      if (ris == "delete_poll_$curUid") {
-                        // ignore: use_build_context_synchronously
-                        await Provider.of<FirebasePollEvent>(context, listen: false)
-                            .closePoll(
-                          context: context,
-                          pollId: pollId,
-                        );
-                      }
-                    });
-                    break;
-                  case 3:
-                    Future.delayed(Duration.zero, () async {
-                      // ignore: use_build_context_synchronously
-                      var ris = await fourthTabNavKey.currentState?.push(
-                        ScreenTransition(
-                          builder: (context) => newScreen,
-                        ),
-                      );
-                      if (ris == "delete_poll_$curUid") {
-                        // ignore: use_build_context_synchronously
-                        await Provider.of<FirebasePollEvent>(context, listen: false)
-                            .closePoll(
-                          context: context,
-                          pollId: pollId,
-                        );
-                      }
-                    });
-                    break;
-                }
-          
-                Provider.of<DynamicLinksHandler>(context, listen: false).pushed =
-                    true;
+                Widget newScreen = PollEventScreen(pollEventId: pollEventId);
+                Provider.of<CupertinoTabController>(context, listen: false)
+                    .index = 0;
+                Future.delayed(Duration.zero, () async {
+                  setState(() {
+                    currentIndex = 0;
+                  });
+
+                  // create invite
+                  await Provider.of<FirebasePollEventInvite>(context,
+                          listen: false)
+                      .createPollEventInvite(
+                    pollEventId: pollEventId,
+                    inviteeId: curUid,
+                  );
+
+                  var ris = await firstTabNavKey.currentState?.push(
+                    ScreenTransition(
+                      builder: (context) => newScreen,
+                    ),
+                  );
+                  if (ris == "delete_poll_$curUid") {
+                    // ignore: use_build_context_synchronously
+                    await Provider.of<FirebasePollEvent>(context, listen: false)
+                        .deletePollEvent(
+                      context: context,
+                      pollId: pollEventId,
+                    );
+                  }
+                });
+
+                Provider.of<DynamicLinksHandler>(context, listen: false)
+                    .pushed = true;
                 // return const CupertinoPageScaffold(child: EventsScreen());
               }
-              */
               switch (index) {
                 case 0:
                   return CupertinoTabView(
@@ -312,7 +254,7 @@ class _MainScreen extends State<MainScreen> {
                 case 1:
                   return CupertinoTabView(
                     navigatorKey: secondTabNavKey,
-                    builder: (context) => const DebugScreen(), // MapScreen(),
+                    builder: (context) => const GroupsScreen(), // MapScreen(),
                   );
                 case 3:
                   return CupertinoTabView(

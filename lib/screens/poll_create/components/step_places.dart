@@ -64,7 +64,7 @@ class _StepPlacesState extends State<StepPlaces> {
                             },
                           ),
                           heightFactor: 0.85,
-                          doneCancelMode: false,
+                          doneCancelMode: true,
                           onDone: () {},
                           title: "",
                         );
@@ -102,7 +102,7 @@ class _StepPlacesState extends State<StepPlaces> {
                             Location("", "", 0, 0, "location_on_outlined"),
                       ),
                       heightFactor: 0.85,
-                      doneCancelMode: false,
+                      doneCancelMode: true,
                       onDone: () {},
                       title: "",
                     );
@@ -196,7 +196,7 @@ class _StepPlacesState extends State<StepPlaces> {
                   defaultLocation: location,
                 ),
                 heightFactor: 0.85,
-                doneCancelMode: false,
+                doneCancelMode: true,
                 onDone: () {},
                 title: "",
               );

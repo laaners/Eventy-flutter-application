@@ -424,7 +424,7 @@ class FirebasePollEvent {
     return [];
   }
 
-  Future<List<PollEventModel>> getUserOrganizedEvents({
+  Future<List<PollEventModel>> getUserOrganizedPollsEvents({
     required String uid,
   }) async {
     try {
@@ -443,5 +443,13 @@ class FirebasePollEvent {
       print(e.message!);
     }
     return [];
+  }
+
+  Stream<QuerySnapshot<Object?>>? getUserOrganizedPollsEventsSnapshot({
+    required String uid,
+  }) {
+    var documents =
+        pollEventCollection.where("organizerUid", isEqualTo: uid).snapshots();
+    return documents;
   }
 }

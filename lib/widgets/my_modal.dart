@@ -23,6 +23,7 @@ class MyModal extends StatelessWidget {
     required bool doneCancelMode,
     required VoidCallback onDone,
     required String title,
+    bool? shrinkWrap,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(
@@ -37,17 +38,60 @@ class MyModal extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 10, top: 10),
-                      alignment: Alignment.center,
-                      width: 80,
-                      height: 3,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.outline,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(20)),
-                      ),
-                    ),
+                    doneCancelMode
+                        ? Stack(
+                            children: [
+                              Align(
+                                alignment: const Alignment(-1, 0),
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(
+                                    "Cancel",
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.error,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Align(
+                                alignment: const Alignment(0, 0),
+                                child: Container(
+                                  margin: const EdgeInsets.only(
+                                      bottom: 10, top: 10),
+                                  alignment: Alignment.center,
+                                  width: 80,
+                                  height: 3,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(20)),
+                                  ),
+                                ),
+                              ),
+                              Align(
+                                alignment: const Alignment(1, 0),
+                                child: TextButton(
+                                  onPressed: onDone,
+                                  child: const Text("Confirm"),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Container(
+                            margin: const EdgeInsets.only(bottom: 10, top: 10),
+                            alignment: Alignment.center,
+                            width: 80,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.outline,
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(20)),
+                            ),
+                          ),
                     if (title.isNotEmpty)
                       Container(
                         margin: const EdgeInsets.only(bottom: 0, top: 8),
@@ -71,7 +115,7 @@ class MyModal extends StatelessWidget {
                   margin: EdgeInsets.only(
                       bottom: MediaQuery.of(context).viewInsets.bottom),
                   child: ListView(
-                    shrinkWrap: true,
+                    shrinkWrap: shrinkWrap ?? true,
                     physics: const ClampingScrollPhysics(),
                     children: [
                       Container(
@@ -129,6 +173,7 @@ class MyModal extends StatelessWidget {
     required bool doneCancelMode,
     required VoidCallback onDone,
     required String title,
+    bool? shrinkWrap,
   }) async {
     var ris = await showModalBottomSheet(
       useRootNavigator: true,
@@ -137,14 +182,17 @@ class MyModal extends StatelessWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       builder: (context) => FractionallySizedBox(
         heightFactor: heightFactor,
-        child: modalWidget(
-          context: context,
-          child: child,
-          heightFactor: heightFactor,
-          doneCancelMode: doneCancelMode,
-          onDone: onDone,
-          title: title,
-        ),
+        child: doneCancelMode
+            ? child
+            : modalWidget(
+                context: context,
+                child: child,
+                heightFactor: heightFactor,
+                doneCancelMode: doneCancelMode,
+                onDone: onDone,
+                title: title,
+                shrinkWrap: shrinkWrap,
+              ),
       ),
     );
     return ris;

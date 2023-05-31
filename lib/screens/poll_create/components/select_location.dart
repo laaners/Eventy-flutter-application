@@ -3,6 +3,7 @@ import 'package:dima_app/models/location_icons.dart';
 import 'package:dima_app/screens/poll_create/components/select_location_address.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_button.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
 import 'package:flutter/material.dart';
 
@@ -103,79 +104,76 @@ class _SelectLocationState extends State<SelectLocation> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: LocationIcons.icons.entries
-                  .where((entry) => entry.value != LocationIcons.videocam)
-                  .map((entry) {
-                return Container(
-                  padding: const EdgeInsets.all(5),
-                  margin: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50 + 5),
-                    color: LocationIcons.icons[locationIcon] == entry.value
-                        ? Theme.of(context).focusColor
-                        : Colors.transparent,
+    return MyModal(
+      doneCancelMode: true,
+      onDone: checkFields,
+      heightFactor: 0.85,
+      title: "",
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: LocationIcons.icons.entries
+                .where((entry) => entry.value != LocationIcons.videocam)
+                .map((entry) {
+              return Container(
+                padding: const EdgeInsets.all(5),
+                margin: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50 + 5),
+                  color: LocationIcons.icons[locationIcon] == entry.value
+                      ? Theme.of(context).focusColor
+                      : Colors.transparent,
+                ),
+                child: IconButton(
+                  iconSize: 50.0,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () {
+                    setState(() {
+                      locationIcon = entry.key;
+                    });
+                  },
+                  icon: Icon(
+                    entry.value,
                   ),
-                  child: IconButton(
-                    iconSize: 50.0,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    onPressed: () {
-                      setState(() {
-                        locationIcon = entry.key;
-                      });
-                    },
-                    icon: Icon(
-                      entry.value,
-                    ),
-                  ),
-                );
-              }).toList(),
+                ),
+              );
+            }).toList(),
+          ),
+          Container(
+            margin: const EdgeInsets.only(bottom: 8, top: 8),
+            alignment: Alignment.topLeft,
+            child: Text(
+              "Name",
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
-            Container(
-              margin: const EdgeInsets.only(bottom: 8, top: 8),
-              alignment: Alignment.topLeft,
-              child: Text(
-                "Name",
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-            ),
-            MyTextField(
-              maxLength: 40,
-              maxLines: 1,
-              hintText: "Name of the Location",
-              controller: locationNameController,
-            ),
-            SelectLocationAddress(
-              defaultLocation: widget.defaultLocation,
-              controller: locationAddrController,
-              setAddress: (address) {
-                setState(() {
-                  locationAddrController.text = address;
-                });
-              },
-              setCoor: (coor) {
-                setState(() {
-                  lat = coor[0];
-                  lon = coor[1];
-                });
-              },
-              focusNode: focusNode,
-            ),
-          ],
-        ),
-        const Padding(padding: EdgeInsets.only(top: 8)),
-        Container(
-          alignment: Alignment.bottomCenter,
-          child: MyButton(text: "Add location", onPressed: checkFields),
-        ),
-      ],
+          ),
+          MyTextField(
+            maxLength: 40,
+            maxLines: 1,
+            hintText: "Name of the Location",
+            controller: locationNameController,
+          ),
+          SelectLocationAddress(
+            defaultLocation: widget.defaultLocation,
+            controller: locationAddrController,
+            setAddress: (address) {
+              setState(() {
+                locationAddrController.text = address;
+              });
+            },
+            setCoor: (coor) {
+              setState(() {
+                lat = coor[0];
+                lon = coor[1];
+              });
+            },
+            focusNode: focusNode,
+          ),
+        ],
+      ),
     );
   }
 }

@@ -3,6 +3,8 @@ import 'package:dima_app/debug.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/error/error.dart';
+import 'package:dima_app/screens/home/components/poll_event_list.dart';
+import 'package:dima_app/screens/home/components/profile_data.dart';
 import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/widgets/poll_event_tile.dart';
@@ -42,72 +44,17 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return TabbarSwitcher(
-        labels: ["By you", "Invited"],
-        listSticky: StreamBuilder(
-          stream: _stream,
-          builder: (
-            BuildContext context,
-            AsyncSnapshot<UserModel> snapshot,
-          ) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const LoadingLogo();
-            }
-            if (snapshot.hasError || !snapshot.hasData) {
-              return const LogInScreen();
-            }
-            UserModel userData = snapshot.data!;
-            return ResponsiveWrapper(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: LayoutConstants.kHorizontalPadding,
-                ),
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        ScreenTransition(
-                          builder: (context) => const DebugScreen(),
-                        ),
-                      );
-                    },
-                    child: const Text("Debug page"),
-                  ),
-                  Row(
-                    children: [
-                      ProfilePic(
-                        userData: userData,
-                        loading: false,
-                        radius: LayoutConstants.kProfilePicRadius,
-                      ),
-                      const SizedBox(width: 20),
-                      Column(
-                        children: [
-                          const SizedBox(height: LayoutConstants.kHeight),
-                          // ProfileInfo(userData: userData),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: LayoutConstants.kHeightSmall),
-                  Divider(
-                    height: LayoutConstants.kDividerHeight,
-                    color: Theme.of(context).dividerColor,
-                  ),
-                  const EventPanel(),
-                  Container(height: LayoutConstants.kPaddingFromCreate),
-                ],
-              ),
-            );
-          },
-        ),
-        stickyHeight: 200,
-        appBarTitle: "appBarTitle",
-        upRightActions: [],
-        tabbars: [
-          Text("ok"),
-          Text("ok"),
-        ]);
+    return const TabbarSwitcher(
+      labels: ["By you", "Invited"],
+      listSticky: ProfileData(),
+      stickyHeight: 250,
+      appBarTitle: "Home",
+      upRightActions: [],
+      tabbars: [
+        PollEventList(),
+        Text("ok"),
+      ],
+    );
     return Scaffold(
       appBar: const MyAppBar(
         title: 'Home',
@@ -163,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen>
                   height: LayoutConstants.kDividerHeight,
                   color: Theme.of(context).dividerColor,
                 ),
-                const EventPanel(),
+                // const EventPanel(),
                 Container(height: LayoutConstants.kPaddingFromCreate),
               ],
             ),
@@ -174,6 +121,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 }
 
+/*
 // get event based on ad hoc query
 List<String> generateItems(int numberOfItems) {
   return List<String>.generate(numberOfItems, (int index) {
@@ -198,7 +146,7 @@ class _EventPanelState extends State<EventPanel> {
     final userUid = Provider.of<FirebaseUser>(listen: false, context).user!.uid;
 
     _future = Provider.of<FirebasePollEvent>(context, listen: false)
-        .getUserOrganizedEvents(uid: userUid);
+        .getUserOrganizedPollsEvents(uid: userUid);
   }
 
   @override
@@ -292,3 +240,4 @@ class _EventPanelState extends State<EventPanel> {
     );
   }
 }
+*/

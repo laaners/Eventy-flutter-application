@@ -147,7 +147,6 @@ class CreatorOptions extends StatelessWidget {
               trueButtonText: "Confirm",
             );
             if (ris) {
-              // ignore: use_build_context_synchronously
               Navigator.pop(context, "delete_poll_${pollData.organizerUid}");
             }
           },

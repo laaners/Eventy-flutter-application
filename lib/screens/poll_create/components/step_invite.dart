@@ -7,6 +7,7 @@ import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
+import 'package:dima_app/widgets/search_tile.dart';
 import 'package:dima_app/widgets/show_user_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -48,15 +49,9 @@ class _StepInviteState extends State<StepInvite>
   Widget build(BuildContext context) {
     super.build(context);
     return Container(
-      margin: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-        top: 5,
-        right: 15,
-        left: 15,
-      ),
+      margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Column(
         children: [
-          Container(padding: const EdgeInsets.only(bottom: 8, top: 8)),
           Container(
             margin: const EdgeInsets.only(bottom: 8, top: 0),
             child: HorizontalScroller(
@@ -97,8 +92,8 @@ class _StepInviteState extends State<StepInvite>
                     );
                   },
                 ),
-                ...widget.invitees.map((user) {
-                  return InviteProfilePic(
+                for (UserModel user in widget.invitees)
+                  InviteProfilePic(
                     user: user,
                     invitees: widget.invitees,
                     originalInvitees: originalInvitees,
@@ -106,8 +101,7 @@ class _StepInviteState extends State<StepInvite>
                     removeInvitee: widget.removeInvitee,
                     addInvitee: widget.addInvitee,
                     organizerUid: widget.organizerUid,
-                  );
-                }).toList()
+                  ),
               ],
             ),
           ),
@@ -263,56 +257,41 @@ class _SearchUsersState extends State<SearchUsers> {
       margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Column(
         children: [
-          ListTile(
-            contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
-            horizontalTitleGap: 0,
-            subtitle: TextFormField(
-              autofocus: false,
-              controller: _controller,
-              focusNode: _focus,
-              decoration: InputDecoration(
-                hintText: "Search here",
-                isDense: true,
-                suffixIcon: IconButton(
-                  iconSize: 25,
-                  onPressed: () {
-                    if (_controller.text.isNotEmpty) {
-                      setState(() {
-                        _controller.text = "";
-                      });
-                    }
-                  },
-                  icon: Icon(
-                    _controller.text.isEmpty ? Icons.search : Icons.cancel,
-                  ),
-                ),
-                border: InputBorder.none,
-              ),
-              onChanged: (text) async {
-                if (text.isEmpty) {
-                  setState(() {
-                    usersMatching = [];
-                    loadingUsers = false;
-                  });
-                  return;
-                } else {
-                  loadingUsers = true;
-                  List<UserModel> tmp =
-                      await Provider.of<FirebaseUser>(context, listen: false)
-                          .getUsersData(pattern: text);
-                  setState(() {
-                    // filter out organizer and current user
-                    usersMatching = tmp.where((element) {
-                      return !widget.invitees
-                              .map((e) => e.uid)
-                              .contains(element.uid) &&
-                          element.uid != curUid &&
-                          element.uid != widget.organizerUid;
-                    }).toList();
-                  });
-                }
-              },
-            ),
+          SearchTile(
+            controller: _controller,
+            focusNode: _focus,
+            hintText: "Search for username",
+            emptySearch: () {
+              if (_controller.text.isNotEmpty) {
+                setState(() {
+                  _controller.text = "";
+                });
+              }
+            },
+            onChanged: (text) async {
+              if (text.isEmpty) {
+                setState(() {
+                  usersMatching = [];
+                  loadingUsers = false;
+                });
+                return;
+              } else {
+                loadingUsers = true;
+                List<UserModel> tmp =
+                    await Provider.of<FirebaseUser>(context, listen: false)
+                        .getUsersData(pattern: text);
+                setState(() {
+                  // filter out organizer and current user
+                  usersMatching = tmp.where((element) {
+                    return !widget.invitees
+                            .map((e) => e.uid)
+                            .contains(element.uid) &&
+                        element.uid != curUid &&
+                        element.uid != widget.organizerUid;
+                  }).toList();
+                });
+              }
+            },
           ),
           Container(padding: const EdgeInsets.only(bottom: 8, top: 8)),
           SizedBox(

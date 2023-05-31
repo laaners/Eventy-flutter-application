@@ -6,7 +6,6 @@ import 'package:dima_app/models/event_location_model.dart';
 import 'package:dima_app/models/event_location_preview.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';
-import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
