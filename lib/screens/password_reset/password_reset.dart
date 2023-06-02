@@ -26,39 +26,35 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar(title: "", upRightActions: []),
+      appBar: const MyAppBar(title: "Password rest", upRightActions: []),
       body: ResponsiveWrapper(
         child: Form(
           key: _formKey,
           child: ListView(
-            children: <Widget>[
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.mail),
-                    border: OutlineInputBorder(),
-                    labelText: 'E-mail',
-                    labelStyle: TextStyle(fontStyle: FontStyle.italic),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter an e-mail address';
-                    }
-                    final emailRegex =
-                        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                    if (!emailRegex.hasMatch(value)) {
-                      return 'Please enter a valid e-mail address';
-                    }
-                    return null;
-                  },
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            children: [
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.mail),
+                  border: OutlineInputBorder(),
+                  labelText: 'E-mail',
+                  labelStyle: TextStyle(fontStyle: FontStyle.italic),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter an e-mail address';
+                  }
+                  final emailRegex =
+                      RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                  if (!emailRegex.hasMatch(value)) {
+                    return 'Please enter a valid e-mail address';
+                  }
+                  return null;
+                },
               ),
-              const SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
               MyButton(
                 text: "Send Email",
                 onPressed: () async {
@@ -69,8 +65,6 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                   }
                 },
               ),
-              const Spacer(),
-              Container(height: LayoutConstants.kPaddingFromCreate),
             ],
           ),
         ),

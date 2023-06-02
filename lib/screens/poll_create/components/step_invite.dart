@@ -219,7 +219,6 @@ class InviteProfilePic extends StatelessWidget {
       ),
       onTap: () {
         showUserDialog(context: context, user: user);
-        return;
       },
     );
   }

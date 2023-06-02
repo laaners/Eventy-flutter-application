@@ -857,31 +857,35 @@ class _MyStepperState extends State<MyStepper> with TickerProviderStateMixin {
           ),
         ),
         Expanded(
-          child: ListView(
-            physics: widget.physics,
-            // CUSTOM: Step margins!!!
-            padding: const EdgeInsets.only(
-              bottom: 10,
-              right: 0,
-              left: 0,
-            ),
-            children: <Widget>[
-              // CUSTOM: controls on top
-              // _buildVerticalControls(widget.currentStep),
-              // CUSTOM: remove strange scroll behavior
-              /*
-              AnimatedSize(
-                curve: Curves.fastOutSlowIn,
-                duration: kThemeAnimationDuration,
-                child: Column(
+          // CUSTOM: scroll bar and scroll controller, no strange scroll behavior
+          child: Scrollbar(
+            child: ListView(
+              controller: ScrollController(),
+              physics: widget.physics,
+              // CUSTOM: Step margins!!!
+              padding: const EdgeInsets.only(
+                bottom: 10,
+                right: 0,
+                left: 0,
+              ),
+              children: <Widget>[
+                // CUSTOM: controls on top
+                // _buildVerticalControls(widget.currentStep),
+                // CUSTOM: remove strange scroll behavior
+                /*
+                AnimatedSize(
+                  curve: Curves.fastOutSlowIn,
+                  duration: kThemeAnimationDuration,
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: stepPanels),
+                ),
+                */
+                Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: stepPanels),
-              ),
-              */
-              Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: stepPanels),
-            ],
+              ],
+            ),
           ),
         ),
         // CUSTOM: controls on navbar

@@ -109,6 +109,7 @@ class _DatesListState extends State<DatesList>
             children: [
               Expanded(
                 child: ListView(
+                  controller: ScrollController(),
                   children: [
                     DatesViewHorizontal(
                       isClosed: widget.isClosed,

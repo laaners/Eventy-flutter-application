@@ -151,17 +151,20 @@ class _SelectDaySlotsState extends State<SelectDaySlots> {
           child: Container(
             margin: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: ListView(
-              children: [
-                if (!widget.dates.containsKey(dayString))
-                  const Center(
-                    child: Text(
-                      "No time slots selected for this day",
-                      style: TextStyle(fontSize: 20),
+            child: Scrollbar(
+              child: ListView(
+                controller: ScrollController(),
+                children: [
+                  if (!widget.dates.containsKey(dayString))
+                    const Center(
+                      child: Text(
+                        "No time slots selected for this day",
+                        style: TextStyle(fontSize: 20),
+                      ),
                     ),
-                  ),
-                if (widget.dates.containsKey(dayString)) ...slotList,
-              ],
+                  if (widget.dates.containsKey(dayString)) ...slotList,
+                ],
+              ),
             ),
           ),
         ),

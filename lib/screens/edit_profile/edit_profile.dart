@@ -62,148 +62,153 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           return ResponsiveWrapper(
             child: Form(
               key: _formkey,
-              child: ListView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: LayoutConstants.kHorizontalPadding,
-                ),
-                children: [
-                  const SizedBox(
-                    height: 10,
+              child: Scrollbar(
+                child: ListView(
+                  controller: ScrollController(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: LayoutConstants.kHorizontalPadding,
                   ),
-                  ChangeImage(
-                      photo: _photo,
-                      changePhoto: (File? newPhoto) {
+                  children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ChangeImage(
+                        photo: _photo,
+                        changePhoto: (File? newPhoto) {
+                          setState(() {
+                            _photo = newPhoto;
+                          });
+                        },
+                        initialRemoved: _initialRemoved,
+                        changeInitialRemoved: (bool value) {
+                          setState(() {
+                            _initialRemoved = value;
+                          });
+                        }),
+                    const SizedBox(height: 50),
+                    TextFormField(
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.face),
+                        border: const OutlineInputBorder(),
+                        hintText: widget.userData.username,
+                        labelStyle:
+                            const TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                      onChanged: (username) async {
+                        bool tmp = await Provider.of<FirebaseUser>(context,
+                                listen: false)
+                            .usernameAlreadyExists(username: username);
                         setState(() {
-                          _photo = newPhoto;
+                          _usernameAlreadyExist = tmp;
+                          print(_usernameAlreadyExist);
                         });
                       },
-                      initialRemoved: _initialRemoved,
-                      changeInitialRemoved: (bool value) {
-                        setState(() {
-                          _initialRemoved = value;
-                        });
-                      }),
-                  const SizedBox(height: 50),
-                  TextFormField(
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.face),
-                      border: const OutlineInputBorder(),
-                      hintText: widget.userData.username,
-                      labelStyle: const TextStyle(fontStyle: FontStyle.italic),
-                    ),
-                    onChanged: (username) async {
-                      bool tmp = await Provider.of<FirebaseUser>(context,
-                              listen: false)
-                          .usernameAlreadyExists(username: username);
-                      setState(() {
-                        _usernameAlreadyExist = tmp;
-                        print(_usernameAlreadyExist);
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Username cannot be empty';
-                      } else if (_usernameAlreadyExist &&
-                          widget.userData.username != value) {
-                        return 'Username already exists';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.perm_identity),
-                      border: const OutlineInputBorder(),
-                      hintText: widget.userData.name,
-                      labelStyle: const TextStyle(fontStyle: FontStyle.italic),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Name cannot be empty';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _surnameController,
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.perm_identity),
-                      //border: const OutlineInputBorder(),
-                      hintText: widget.userData.surname,
-                      //labelStyle: const TextStyle(fontStyle: FontStyle.italic),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Surname cannot be empty';
-                      }
-                      return null;
-                    },
-                  ),
-                  /*
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    initialValue: widget.userData.email,
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.mail),
-                      border: const OutlineInputBorder(),
-                      hintText: widget.userData.email,
-                      labelStyle: const TextStyle(fontStyle: FontStyle.italic),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter an e-mail address';
-                      }
-                      final emailRegex =
-                          RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                      if (!emailRegex.hasMatch(value)) {
-                        return 'Please enter a valid e-mail address';
-                      }
-                      return null;
-                    },
-                  ),
-                  */
-                  const SizedBox(height: 50),
-                  MyButton(
-                    text: "SAVE",
-                    onPressed: () async {
-                      LoadingOverlay.show(context);
-                      if (_formkey.currentState!.validate()) {
-                        // ignore: use_build_context_synchronously
-                        if (await Provider.of<FirebaseUser>(context,
-                                listen: false)
-                            .updateUserData(
-                          username: _usernameController.text,
-                          name: _nameController.text,
-                          surname: _surnameController.text,
-                          email: _emailController.text,
-                          profilePic: widget.userData.profilePic,
-                          updateProfilePic: _initialRemoved,
-                          photo: _photo,
-                        )) {
-                          // ignore: use_build_context_synchronously
-                          LoadingOverlay.hide(context);
-
-                          // ignore: use_build_context_synchronously
-                          showSnackBar(
-                              context, "Your information has been updated!");
-                          setState(() {
-                            _initialRemoved = false;
-                          });
-                          return;
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Username cannot be empty';
+                        } else if (_usernameAlreadyExist &&
+                            widget.userData.username != value) {
+                          return 'Username already exists';
                         }
-                      }
-                      // ignore: use_build_context_synchronously
-                      LoadingOverlay.hide(context);
-                    },
-                  ),
-                  Container(height: LayoutConstants.kPaddingFromCreate),
-                ],
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.perm_identity),
+                        border: const OutlineInputBorder(),
+                        hintText: widget.userData.name,
+                        labelStyle:
+                            const TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Name cannot be empty';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: _surnameController,
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.perm_identity),
+                        //border: const OutlineInputBorder(),
+                        hintText: widget.userData.surname,
+                        //labelStyle: const TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Surname cannot be empty';
+                        }
+                        return null;
+                      },
+                    ),
+                    /*
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      initialValue: widget.userData.email,
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.mail),
+                        border: const OutlineInputBorder(),
+                        hintText: widget.userData.email,
+                        labelStyle: const TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter an e-mail address';
+                        }
+                        final emailRegex =
+                            RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                        if (!emailRegex.hasMatch(value)) {
+                          return 'Please enter a valid e-mail address';
+                        }
+                        return null;
+                      },
+                    ),
+                    */
+                    const SizedBox(height: 50),
+                    MyButton(
+                      text: "SAVE",
+                      onPressed: () async {
+                        LoadingOverlay.show(context);
+                        if (_formkey.currentState!.validate()) {
+                          // ignore: use_build_context_synchronously
+                          if (await Provider.of<FirebaseUser>(context,
+                                  listen: false)
+                              .updateUserData(
+                            username: _usernameController.text,
+                            name: _nameController.text,
+                            surname: _surnameController.text,
+                            email: _emailController.text,
+                            profilePic: widget.userData.profilePic,
+                            updateProfilePic: _initialRemoved,
+                            photo: _photo,
+                          )) {
+                            // ignore: use_build_context_synchronously
+                            LoadingOverlay.hide(context);
+
+                            // ignore: use_build_context_synchronously
+                            showSnackBar(
+                                context, "Your information has been updated!");
+                            setState(() {
+                              _initialRemoved = false;
+                            });
+                            return;
+                          }
+                        }
+                        // ignore: use_build_context_synchronously
+                        LoadingOverlay.hide(context);
+                      },
+                    ),
+                    Container(height: LayoutConstants.kPaddingFromCreate),
+                  ],
+                ),
               ),
             ),
           );

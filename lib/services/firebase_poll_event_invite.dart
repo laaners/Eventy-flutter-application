@@ -50,10 +50,12 @@ class FirebasePollEventInvite {
   }) async {
     try {
       String pollEventInviteId = "${pollEventId}_$inviteeId";
+      /*
       await FirebaseCrud.deleteDoc(
         pollEventInviteCollection,
         pollEventInviteId,
       );
+      */
 
       // remove invitee votes on locations and dates
       PollEventModel? pollData =
@@ -89,6 +91,11 @@ class FirebasePollEventInvite {
           .toList()
           .cast();
       await Future.wait(promises);
+      await Future.delayed(const Duration(seconds: 1));
+      await FirebaseCrud.deleteDoc(
+        pollEventInviteCollection,
+        pollEventInviteId,
+      );
     } on FirebaseException catch (e) {
       // showSnackBar(context, e.message!);
       print(e.message!);
@@ -156,5 +163,14 @@ class FirebasePollEventInvite {
       print(e.message!);
     }
     return null;
+  }
+
+  Stream<QuerySnapshot<Object?>>? getAllPollEventInviteSnapshot({
+    required String uid,
+  }) {
+    var documents = pollEventInviteCollection
+        .where("inviteeId", isEqualTo: uid)
+        .snapshots();
+    return documents;
   }
 }

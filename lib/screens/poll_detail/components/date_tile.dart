@@ -33,7 +33,7 @@ class DateTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    int curVote = voteDate.votes[curUid];
+    int curVote = voteDate.votes[curUid] ?? Availability.empty;
 
     DateTime dateTime =
         DateFormatter.string2DateTime("${voteDate.date} 00:00:00");

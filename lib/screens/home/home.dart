@@ -1,14 +1,9 @@
 import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/debug.dart';
-import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/models/user_model.dart';
-import 'package:dima_app/screens/error/error.dart';
-import 'package:dima_app/screens/home/components/poll_event_list.dart';
+import 'package:dima_app/screens/home/components/poll_event_list_by_you.dart';
+import 'package:dima_app/screens/home/components/poll_event_list_invited.dart';
 import 'package:dima_app/screens/home/components/profile_data.dart';
-import 'package:dima_app/screens/poll_event/poll_event.dart';
-import 'package:dima_app/services/firebase_poll_event.dart';
-import 'package:dima_app/widgets/poll_event_tile.dart';
-import 'package:dima_app/widgets/profile_info.dart';
 import 'package:dima_app/screens/login/login.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
@@ -51,8 +46,8 @@ class _HomeScreenState extends State<HomeScreen>
       appBarTitle: "Home",
       upRightActions: [],
       tabbars: [
-        PollEventList(),
-        Text("ok"),
+        PollEventListByYou(),
+        PollEventListInvited(),
       ],
     );
     return Scaffold(

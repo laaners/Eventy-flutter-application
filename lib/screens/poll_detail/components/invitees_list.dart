@@ -202,45 +202,47 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
   @override
   Widget build(BuildContext context) {
     var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+    Widget userListOrEmpty = usersData.isNotEmpty
+        ? Scrollbar(
+            child: ListView.builder(
+              controller: ScrollController(),
+              itemCount: usersData.length + 1,
+              itemBuilder: (BuildContext context, int index) {
+                if (index == usersData.length) {
+                  return Container(height: LayoutConstants.kPaddingFromCreate);
+                }
+                UserModel user = usersData[index];
+                return InviteeTile(
+                  pollData: widget.pollData,
+                  userData: user,
+                  refreshPollDetail: widget.refreshPollDetail,
+                  votesLocations: widget.votesLocations,
+                  votesDates: widget.votesDates,
+                  invites: widget.invites,
+                  pollEventId: widget.pollEventId,
+                );
+              },
+            ),
+          )
+        : const Center(child: Text("No other partecipants"));
     return widget.pollData.organizerUid == curUid || widget.pollData.canInvite
         ? TabbarSwitcher(
             appBarTitle: widget.pollData.pollEventName,
-            upRightActions: widget.pollData.organizerUid == curUid ||
-                    widget.pollData.canInvite
-                ? [
-                    TextButton(
-                      onPressed: () {
-                        widget.updateInvitees(
-                            usersData.map((e) => e.uid).toList());
-                      },
-                      child: const Icon(
-                        Icons.done,
-                      ),
-                    )
-                  ]
-                : [],
+            upRightActions: [
+              TextButton(
+                onPressed: () {
+                  widget.updateInvitees(usersData.map((e) => e.uid).toList());
+                },
+                child: const Icon(Icons.done),
+              )
+            ],
             stickyHeight: 0,
             listSticky: null,
             labels: const ["Partecipants", "Invite"],
             tabbars: [
-              usersData.isNotEmpty
-                  ? ListView(
-                      children: usersData
-                          .map((user) => InviteeTile(
-                                pollData: widget.pollData,
-                                userData: user,
-                                refreshPollDetail: widget.refreshPollDetail,
-                                votesLocations: widget.votesLocations,
-                                votesDates: widget.votesDates,
-                                invites: widget.invites,
-                                pollEventId: widget.pollEventId,
-                              ))
-                          .toList(),
-                    )
-                  : const Center(
-                      child: Text("No other partecipants"),
-                    ),
+              userListOrEmpty,
               ListView(
+                controller: ScrollController(),
                 children: [
                   Container(
                     margin: const EdgeInsets.all(15),
@@ -262,7 +264,7 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
                     ),
                   )
                 ],
-              )
+              ),
             ],
           )
         : Scaffold(
@@ -270,25 +272,7 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
               title: widget.pollData.pollEventName,
               upRightActions: [],
             ),
-            body: ResponsiveWrapper(
-              child: usersData.isNotEmpty
-                  ? ListView(
-                      children: usersData
-                          .map((user) => InviteeTile(
-                                pollData: widget.pollData,
-                                userData: user,
-                                refreshPollDetail: widget.refreshPollDetail,
-                                votesLocations: widget.votesLocations,
-                                votesDates: widget.votesDates,
-                                invites: widget.invites,
-                                pollEventId: widget.pollEventId,
-                              ))
-                          .toList(),
-                    )
-                  : const Center(
-                      child: Text("No other partecipants"),
-                    ),
-            ),
+            body: ResponsiveWrapper(child: userListOrEmpty),
           );
   }
 }
