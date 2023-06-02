@@ -114,10 +114,13 @@ class _EditGroupState extends State<EditGroup> {
             alignment: Alignment.topLeft,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Editing \"${widget.groupName}\"",
-                  style: Theme.of(context).textTheme.headlineMedium,
+                Flexible(
+                  child: Text(
+                    "Editing \"${widget.groupName}\"",
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
                 ),
                 InkWell(
                   customBorder: const CircleBorder(),

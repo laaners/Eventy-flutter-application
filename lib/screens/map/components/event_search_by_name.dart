@@ -75,14 +75,17 @@ class CustomDelegate extends SearchDelegate<String> {
               }
               eventsData = snapshot.data!;
               return ResponsiveWrapper(
-                child: ListView.builder(
-                  itemCount: eventsData.length,
-                  itemBuilder: (_, i) {
-                    var event = eventsData[i];
-                    return EventTileSearch(
-                      eventData: event,
-                    );
-                  },
+                child: Scrollbar(
+                  child: ListView.builder(
+                    controller: ScrollController(),
+                    itemCount: eventsData.length,
+                    itemBuilder: (_, i) {
+                      var event = eventsData[i];
+                      return EventTileSearch(
+                        eventData: event,
+                      );
+                    },
+                  ),
                 ),
               );
             },

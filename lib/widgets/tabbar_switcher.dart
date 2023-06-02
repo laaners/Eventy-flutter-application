@@ -68,6 +68,7 @@ class _TabbarSwitcher extends State<TabbarSwitcher>
       */
       appBar: AppBar(
         // toolbarHeight: 50,
+        centerTitle: true,
         title: _isShrink || widget.stickyHeight == 0
             ? Text(
                 widget.appBarTitle,

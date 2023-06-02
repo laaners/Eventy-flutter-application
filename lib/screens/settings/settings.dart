@@ -25,6 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: const MyAppBar(title: "Settings", upRightActions: []),
       body: ResponsiveWrapper(
         child: ListView(
+          controller: ScrollController(),
           children: [
             SwitchListTile(
               title: const Text(

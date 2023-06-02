@@ -16,13 +16,16 @@ class UserList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return users.isNotEmpty
-        ? ListView.builder(
-            itemBuilder: (context, index) {
-              return UserTile(
-                userUid: users[index],
-              );
-            },
-            itemCount: users.length,
+        ? Scrollbar(
+            child: ListView.builder(
+              controller: ScrollController(),
+              itemCount: users.length,
+              itemBuilder: (context, index) {
+                return UserTile(
+                  userUid: users[index],
+                );
+              },
+            ),
           )
         : const Center(
             child: Text("empty"),
@@ -88,27 +91,6 @@ class _UserTileState extends State<UserTile> {
             title: Text("${userData.name} ${userData.surname}"),
             subtitle: Text(userData.username),
             onTap: () {
-              /*
-              var curUid =
-                  Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-              if (curUid == userData.uid) {
-                Widget newScreen = const ProfileScreen();
-                Navigator.push(
-                  context,
-                  ScreenTransition(
-                    builder: (context) => newScreen,
-                  ),
-                );
-              } else {
-                Widget newScreen = ViewProfileScreen(profileUserData: userData);
-                Navigator.push(
-                  context,
-                  ScreenTransition(
-                    builder: (context) => newScreen,
-                  ),
-                );
-              }
-              */
               showUserDialog(context: context, user: userData);
             },
           ),

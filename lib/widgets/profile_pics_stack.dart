@@ -10,7 +10,7 @@ import 'package:collection/collection.dart';
 
 import '../screens/error/error.dart';
 
-class ProfilePicsStack extends StatefulWidget {
+class ProfilePicsStack extends StatelessWidget {
   final double radius;
   final double offset;
   final List<String> uids;
@@ -22,23 +22,10 @@ class ProfilePicsStack extends StatefulWidget {
   });
 
   @override
-  State<ProfilePicsStack> createState() => _ProfilePicsStackState();
-}
-
-class _ProfilePicsStackState extends State<ProfilePicsStack> {
-  Future<List<UserModel>>? _future;
-
-  @override
-  initState() {
-    super.initState();
-    _future = Provider.of<FirebaseUser>(context, listen: false)
-        .getUsersDataFromList(uids: widget.uids);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<UserModel>>(
-      future: _future,
+      future: Provider.of<FirebaseUser>(context, listen: false)
+          .getUsersDataFromList(uids: uids),
       builder: (
         BuildContext context,
         AsyncSnapshot<List<UserModel>> snapshot,
@@ -62,17 +49,17 @@ class _ProfilePicsStackState extends State<ProfilePicsStack> {
         }
         List<UserModel> users = snapshot.data!;
         return SizedBox(
-          height: widget.radius * 2,
-          width: (widget.radius * 2 - widget.offset) * 3 + widget.offset,
+          height: radius * 2,
+          width: (radius * 2 - offset) * 3 + offset,
           child: Stack(
             children: [
               ...users.mapIndexed((index, user) {
                 return Positioned(
-                  left: (widget.radius * 2 - widget.offset) * index,
+                  left: (radius * 2 - offset) * index,
                   child: ProfilePic(
                     userData: user,
                     loading: false,
-                    radius: widget.radius,
+                    radius: radius,
                   ),
                 );
               }).toList(),
@@ -85,7 +72,7 @@ class _ProfilePicsStackState extends State<ProfilePicsStack> {
                     AsyncSnapshot<UserModel> snapshot,
                   ) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const LoadingLogo();
+                      return const LoadingLogo(extWidth: 30);
                     }
                     if (snapshot.hasError || !snapshot.hasData) {
                       return const LogInScreen();
@@ -96,15 +83,15 @@ class _ProfilePicsStackState extends State<ProfilePicsStack> {
                       child: ProfilePic(
                         userData: userData,
                         loading: false,
-                        radius: widget.radius,
+                        radius: radius,
                       ),
                     );
                   },
                 ),
               for (var index = users.length; index < 2; index++)
                 Positioned(
-                  left: (widget.radius * 2 - widget.offset) * index,
-                  child: Container(width: widget.radius * 2),
+                  left: (radius * 2 - offset) * index,
+                  child: Container(width: radius * 2),
                 )
             ],
           ),

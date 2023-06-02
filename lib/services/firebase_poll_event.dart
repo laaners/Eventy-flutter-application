@@ -424,7 +424,49 @@ class FirebasePollEvent {
     return [];
   }
 
-  Future<List<PollEventModel>> getUserOrganizedPollsEvents({
+  Stream<QuerySnapshot<Object?>>? getUserOrganizedPollsEventsSnapshot({
+    required String uid,
+  }) {
+    var documents =
+        pollEventCollection.where("organizerUid", isEqualTo: uid).snapshots();
+    return documents;
+  }
+
+  Future<List<PollEventModel>> getUserInvitedPollsEvents({
+    required List<String> pollEventIds,
+  }) async {
+    try {
+      /*
+      var documents = await pollEventCollection
+          .where(FieldPath.documentId, whereIn: pollEventIds)
+          .get();
+      if (documents.docs.isNotEmpty) {
+        final List<PollEventModel> events = documents.docs.map((doc) {
+          return PollEventModel.firebaseDocToObj(
+              doc.data() as Map<String, dynamic>);
+        }).toList();
+        return events;
+        // return events.where((event) => event.isClosed).toList();
+      }
+      */
+      List<PollEventModel?> tmp = await Future.wait(
+        pollEventIds.map((e) => getPollEventData(id: e)).toList(),
+      );
+      List<PollEventModel> pollEvents = [];
+      for (var event in tmp) {
+        if (event != null) {
+          pollEvents.add(event);
+        }
+      }
+      return pollEvents;
+    } on FirebaseException catch (e) {
+      print(e.message!);
+    }
+    return [];
+  }
+
+  /*
+    Future<List<PollEventModel>> getUserOrganizedPollsEvents({
     required String uid,
   }) async {
     try {
@@ -444,12 +486,5 @@ class FirebasePollEvent {
     }
     return [];
   }
-
-  Stream<QuerySnapshot<Object?>>? getUserOrganizedPollsEventsSnapshot({
-    required String uid,
-  }) {
-    var documents =
-        pollEventCollection.where("organizerUid", isEqualTo: uid).snapshots();
-    return documents;
-  }
+  */
 }

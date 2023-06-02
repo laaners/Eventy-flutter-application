@@ -5,13 +5,14 @@ import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/models/vote_location_model.dart';
-import 'package:dima_app/screens/poll_detail/components/creator_options.dart';
+import 'package:dima_app/screens/poll_detail/components/poll_event_options.dart';
 import 'package:dima_app/screens/poll_detail/components/locations_list.dart';
 import 'package:dima_app/screens/poll_detail/components/most_voted_date_tile.dart';
 import 'package:dima_app/screens/poll_detail/components/most_voted_location_tile.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/dynamic_links_handler.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
+import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/delay_widget.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
@@ -167,112 +168,80 @@ class PollDetailScreen extends StatelessWidget {
       stickyHeight: 350 + titlePadding + descPadding + (isClosed ? 155 : 0),
       labels: const ["Locations", "Dates"],
       appBarTitle: pollData.pollEventName,
-      upRightActions: pollData.organizerUid != curUid && !pollData.canInvite
-          ? [
-              Container(
-                margin: const EdgeInsets.only(
-                  right: LayoutConstants.kHorizontalPadding,
-                ),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  child: Ink(
-                    decoration: const BoxDecoration(shape: BoxShape.circle),
-                    child: const Icon(
-                      Icons.refresh,
-                    ),
-                  ),
-                  onTap: () async {
-                    refreshPollDetail();
-                  },
-                ),
+      upRightActions: [
+        Container(
+          margin: const EdgeInsets.only(
+            right: LayoutConstants.kHorizontalPadding,
+          ),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            child: Ink(
+              decoration: const BoxDecoration(shape: BoxShape.circle),
+              child: const Icon(
+                Icons.more_vert,
               ),
-            ]
-          : [
-              if (pollData.organizerUid == curUid)
-                Container(
-                  margin: const EdgeInsets.only(
-                    right: LayoutConstants.kHorizontalPadding,
-                  ),
-                  child: InkWell(
-                    customBorder: const CircleBorder(),
-                    child: Ink(
-                      decoration: const BoxDecoration(shape: BoxShape.circle),
-                      child: const Icon(
-                        Icons.more_horiz,
-                      ),
-                    ),
-                    onTap: () async {
-                      var ris = await MyModal.show(
-                        context: context,
-                        child: CreatorOptions(
-                          pollData: pollData,
-                          pollEventId: pollId,
-                          invites: pollInvites,
-                          refreshPollDetail: refreshPollDetail,
-                          votesLocations: votesLocations,
-                          votesDates: votesDates,
-                        ),
-                        heightFactor: 0.4,
-                        doneCancelMode: false,
-                        onDone: () {},
-                        title: "",
-                      );
-                      if (ris == "create_event_$curUid") {
-                        // ignore: use_build_context_synchronously
-                        await Provider.of<FirebasePollEvent>(context,
-                                listen: false)
-                            .closePoll(
-                          context: context,
-                          pollId: pollId,
-                        );
-                      } else if (ris == "delete_poll_$curUid") {
-                        // ignore: use_build_context_synchronously
-                        Navigator.pop(
-                          context,
-                          "delete_poll_${pollData.organizerUid}",
-                        );
-                      }
-                    },
-                  ),
+            ),
+            onTap: () async {
+              var ris = await MyModal.show(
+                context: context,
+                child: PollEventOptions(
+                  pollData: pollData,
+                  pollEventId: pollId,
+                  invites: pollInvites,
+                  refreshPollDetail: refreshPollDetail,
+                  votesLocations: votesLocations,
+                  votesDates: votesDates,
                 ),
-              Container(
-                margin: const EdgeInsets.only(
-                  right: LayoutConstants.kHorizontalPadding,
-                ),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  child: Ink(
-                    decoration: const BoxDecoration(shape: BoxShape.circle),
-                    child: const Icon(
-                      Icons.share_outlined,
-                    ),
-                  ),
-                  onTap: () async {
-                    await DynamicLinksHandler.pollEventLinkSharing(
-                      context: context,
-                      pollData: pollData,
-                    );
-                  },
-                ),
+                heightFactor: 0.4,
+                doneCancelMode: false,
+                onDone: () {},
+                title: "",
+              );
+              if (ris == "create_event_$curUid") {
+                // ignore: use_build_context_synchronously
+                LoadingOverlay.show(context);
+                // ignore: use_build_context_synchronously
+                await Provider.of<FirebasePollEvent>(context, listen: false)
+                    .closePoll(
+                  context: context,
+                  pollId: pollId,
+                );
+                // ignore: use_build_context_synchronously
+                LoadingOverlay.hide(context);
+              } else if (ris == "delete_poll_$curUid") {
+                // ignore: use_build_context_synchronously
+                Navigator.pop(
+                  context,
+                  "delete_poll_${pollData.organizerUid}",
+                );
+              } else if (ris == "exit_poll") {
+                // ignore: use_build_context_synchronously
+                Navigator.pop(
+                  context,
+                  "exit_poll",
+                );
+              }
+            },
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.only(
+            right: LayoutConstants.kHorizontalPadding,
+          ),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            child: Ink(
+              decoration: const BoxDecoration(shape: BoxShape.circle),
+              child: const Icon(
+                Icons.refresh,
               ),
-              Container(
-                margin: const EdgeInsets.only(
-                  right: LayoutConstants.kHorizontalPadding,
-                ),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  child: Ink(
-                    decoration: const BoxDecoration(shape: BoxShape.circle),
-                    child: const Icon(
-                      Icons.refresh,
-                    ),
-                  ),
-                  onTap: () async {
-                    refreshPollDetail();
-                  },
-                ),
-              ),
-            ],
+            ),
+            onTap: () async {
+              refreshPollDetail();
+            },
+          ),
+        ),
+      ],
       tabbars: [
         LocationsList(
           isClosed: isClosed,

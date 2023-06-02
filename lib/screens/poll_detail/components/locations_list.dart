@@ -111,38 +111,40 @@ class _LocationsListState extends State<LocationsList>
           child: Column(
             children: [
               Expanded(
-                child: ListView.builder(
-                  itemCount: votesLocations.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    VoteLocationModel voteLocation = votesLocations[index];
-                    var location = widget.locations.firstWhere(
-                      (element) => element.name == voteLocation.locationName,
-                    );
-                    return LocationTile(
-                      isClosed: widget.isClosed,
-                      votingUid: widget.votingUid,
-                      pollId: widget.pollId,
-                      organizerUid: widget.organizerUid,
-                      invites: widget.invites,
-                      location: Location(
-                        location.name,
-                        location.site,
-                        location.lat,
-                        location.lon,
-                        location.icon,
-                      ),
-                      voteLocation: voteLocation,
-                      modifyVote: (int newAvailability) {
-                        if (widget.votingUid == curUid) {
-                          setState(() {
-                            votesLocations[votesLocations.indexWhere(
-                                    (e) => e.locationName == location.name)]
-                                .votes[curUid] = newAvailability;
-                          });
-                        }
-                      },
-                    );
-                  },
+                child: Scrollbar(
+                  child: ListView.builder(
+                    itemCount: votesLocations.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      VoteLocationModel voteLocation = votesLocations[index];
+                      var location = widget.locations.firstWhere(
+                        (element) => element.name == voteLocation.locationName,
+                      );
+                      return LocationTile(
+                        isClosed: widget.isClosed,
+                        votingUid: widget.votingUid,
+                        pollId: widget.pollId,
+                        organizerUid: widget.organizerUid,
+                        invites: widget.invites,
+                        location: Location(
+                          location.name,
+                          location.site,
+                          location.lat,
+                          location.lon,
+                          location.icon,
+                        ),
+                        voteLocation: voteLocation,
+                        modifyVote: (int newAvailability) {
+                          if (widget.votingUid == curUid) {
+                            setState(() {
+                              votesLocations[votesLocations.indexWhere(
+                                      (e) => e.locationName == location.name)]
+                                  .votes[curUid] = newAvailability;
+                            });
+                          }
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
             ],

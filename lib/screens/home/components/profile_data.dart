@@ -4,6 +4,7 @@ import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/login/login.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
+import 'package:dima_app/widgets/profile_info.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class ProfileData extends StatelessWidget {
         }
         UserModel userData = snapshot.data!;
         return ListView(
+          controller: ScrollController(),
           padding: const EdgeInsets.symmetric(
             horizontal: LayoutConstants.kHorizontalPadding,
           ),
@@ -51,11 +53,13 @@ class ProfileData extends StatelessWidget {
                   radius: LayoutConstants.kProfilePicRadius,
                 ),
                 const SizedBox(width: 20),
-                Column(
-                  children: [
-                    const SizedBox(height: LayoutConstants.kHeight),
-                    // ProfileInfo(userData: userData),
-                  ],
+                Expanded(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: LayoutConstants.kHeight),
+                      ProfileInfo(userData: userData),
+                    ],
+                  ),
                 ),
               ],
             ),

@@ -2,7 +2,8 @@ import 'package:dima_app/widgets/logo.dart';
 import 'package:flutter/material.dart';
 
 class LoadingLogo extends StatelessWidget {
-  const LoadingLogo({super.key});
+  final double? extWidth;
+  const LoadingLogo({super.key, this.extWidth});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +15,7 @@ class LoadingLogo extends StatelessWidget {
           width: 100,
           child: Column(
             children: [
-              const EventyLogo(extWidth: 80),
+              EventyLogo(extWidth: extWidth ?? 80),
               Container(height: 20),
               const LinearProgressIndicator(),
             ],

@@ -9,6 +9,7 @@ import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'loading_logo.dart';
+import 'show_user_dialog.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
@@ -64,11 +65,7 @@ class CustomDelegate extends SearchDelegate<String> {
       );
 
   @override
-  Widget buildResults(BuildContext context) => Container();
-
-  @override
   Widget buildSuggestions(BuildContext context) {
-    print(query.isEmpty);
     return query.isEmpty
         ? Container()
         : FutureBuilder(
@@ -97,24 +94,33 @@ class CustomDelegate extends SearchDelegate<String> {
               if (!snapshot.hasData) {
                 return Container();
               }
+              if (snapshot.data!.isEmpty) {
+                return const Center(child: Text("No results found"));
+              }
               usersData = snapshot.data!;
               return ResponsiveWrapper(
-                child: ListView.builder(
-                  itemCount: usersData.length + 1,
-                  itemBuilder: (_, i) {
-                    if (i == usersData.length) {
-                      return Container(
-                          height: LayoutConstants.kPaddingFromCreate);
-                    }
-                    var user = usersData[i];
-                    return UserTileSearch(
-                      userData: user,
-                    );
-                  },
+                child: Scrollbar(
+                  child: ListView.builder(
+                    controller: ScrollController(),
+                    itemCount: usersData.length + 1,
+                    itemBuilder: (_, i) {
+                      if (i == usersData.length) {
+                        return Container(
+                            height: LayoutConstants.kPaddingFromCreate);
+                      }
+                      var user = usersData[i];
+                      return UserTileSearch(userData: user);
+                    },
+                  ),
                 ),
               );
             },
           );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return buildSuggestions(context);
   }
 }
 
@@ -135,26 +141,7 @@ class UserTileSearch extends StatelessWidget {
         title: Text("${userData.name} ${userData.surname}"),
         subtitle: Text(userData.username),
         onTap: () {
-          var curUid =
-              Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-          if (curUid == userData.uid) {
-            Widget newScreen = const ProfileScreen();
-            Navigator.push(
-              context,
-              ScreenTransition(
-                builder: (context) => newScreen,
-              ),
-            );
-          } else {
-            // Widget newScreen = ViewProfileScreen(profileUserData: userData);
-            Widget newScreen = const ProfileScreen();
-            Navigator.push(
-              context,
-              ScreenTransition(
-                builder: (context) => newScreen,
-              ),
-            );
-          }
+          showUserDialog(context: context, user: userData);
         },
       ),
     );
