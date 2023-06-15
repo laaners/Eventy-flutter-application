@@ -116,32 +116,7 @@ class LocationDetail extends StatelessWidget {
     return Column(
       children: [
         Container(
-          margin: const EdgeInsets.only(bottom: 8, top: 8),
-          alignment: Alignment.topLeft,
-          child: Text(
-            location.name,
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-        ),
-        Center(
-          child: Container(
-            padding: const EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50 + 5),
-            ),
-            child: IconButton(
-              iconSize: 100.0,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              onPressed: () {},
-              icon: Icon(
-                LocationIcons.icons[location.icon],
-              ),
-            ),
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.only(bottom: 8, top: 8),
+          margin: const EdgeInsets.only(bottom: 8),
           alignment: Alignment.topLeft,
           child: Text(
             "Votes",

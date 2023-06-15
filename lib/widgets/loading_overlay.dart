@@ -3,6 +3,8 @@ import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
 
+import 'logo.dart';
+
 class LoadingOverlay {
   static OverlayEntry? overlay;
 
@@ -22,7 +24,7 @@ class LoadingOverlay {
             context,
             ScreenTransition(
               builder: (context) => const ErrorScreen(
-                errorMsg: "snapshot.error.toString()",
+                errorMsg: "",
               ),
             ),
           );
@@ -52,7 +54,22 @@ class FullScreenLoader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.outline),
-      child: const LoadingLogo(),
+      child: Center(
+        child: Container(
+          margin: const EdgeInsets.only(top: 8),
+          child: SizedBox(
+            height: 120,
+            width: 100,
+            child: ListView(
+              children: [
+                const EventyLogo(extWidth: 80),
+                Container(height: 20),
+                const LinearProgressIndicator(),
+              ],
+            ), // CircularProgressIndicator(),
+          ),
+        ),
+      ),
     );
     return Container(
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.outline),

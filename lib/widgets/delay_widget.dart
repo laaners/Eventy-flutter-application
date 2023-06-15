@@ -1,4 +1,3 @@
-import 'package:dima_app/widgets/logo.dart';
 import 'package:flutter/material.dart';
 
 import 'loading_logo.dart';

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class HorizontalScroller extends StatelessWidget {
   final List<Widget> children;
-  final MainAxisAlignment mainAxisAlignment;
-  final CrossAxisAlignment crossAxisAlignment;
+  final MainAxisAlignment? mainAxisAlignment;
+  final CrossAxisAlignment? crossAxisAlignment;
   const HorizontalScroller({
     super.key,
     required this.children,
-    required this.mainAxisAlignment,
-    required this.crossAxisAlignment,
+    this.mainAxisAlignment,
+    this.crossAxisAlignment,
   });
 
   @override
@@ -18,8 +18,8 @@ class HorizontalScroller extends StatelessWidget {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          mainAxisAlignment: mainAxisAlignment,
-          crossAxisAlignment: crossAxisAlignment,
+          mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.center,
+          crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.center,
           children: children,
         ),
       ),

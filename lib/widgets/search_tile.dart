@@ -18,6 +18,28 @@ class SearchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return TextFormField(
+      autofocus: false,
+      controller: controller,
+      focusNode: focusNode,
+      decoration: InputDecoration(
+        hintText: hintText,
+        isDense: true,
+        suffixIcon: IconButton(
+          iconSize: 25,
+          onPressed: emptySearch,
+          icon: Icon(
+            controller.text.isEmpty ? Icons.search : Icons.cancel,
+          ),
+        ),
+        border: const OutlineInputBorder(
+          // width: 0.0 produces a thin "hairline" border
+          borderRadius: BorderRadius.all(Radius.circular(90.0)),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      onChanged: onChanged,
+    );
     return ListTile(
       contentPadding: const EdgeInsets.only(left: 0.0, right: 0.0),
       horizontalTitleGap: 0,
@@ -35,7 +57,11 @@ class SearchTile extends StatelessWidget {
               controller.text.isEmpty ? Icons.search : Icons.cancel,
             ),
           ),
-          border: InputBorder.none,
+          border: const OutlineInputBorder(
+            // width: 0.0 produces a thin "hairline" border
+            borderRadius: BorderRadius.all(Radius.circular(90.0)),
+            borderSide: BorderSide.none,
+          ),
         ),
         onChanged: onChanged,
       ),

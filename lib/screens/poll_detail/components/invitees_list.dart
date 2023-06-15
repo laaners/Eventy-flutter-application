@@ -115,7 +115,7 @@ class _InviteesListState extends State<InviteesList> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const LoadingLogo();
         }
-        if (snapshot.hasError) {
+        if (snapshot.hasError || !snapshot.hasData) {
           Future.microtask(() {
             Navigator.pushReplacement(
               context,
@@ -127,9 +127,6 @@ class _InviteesListState extends State<InviteesList> {
             );
           });
           return Container();
-        }
-        if (!snapshot.hasData) {
-          return const EmptyList(emptyMsg: "No partecipants");
         }
         List<UserModel> usersData = snapshot.data!;
         return InviteesListIntermediate(
@@ -224,7 +221,7 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
               },
             ),
           )
-        : const Center(child: Text("No other partecipants"));
+        : const EmptyList(emptyMsg: "No other partecipants");
     return widget.pollData.organizerUid == curUid || widget.pollData.canInvite
         ? TabbarSwitcher(
             appBarTitle: widget.pollData.pollEventName,

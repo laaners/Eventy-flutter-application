@@ -302,26 +302,6 @@ class CreatePollEventButton extends StatelessWidget {
                 if (pollId != null) {
                   // ignore: use_build_context_synchronously
                   showSnackBar(context, "Successfully created event!");
-                  /*
-                  Widget newScreen = PollEventScreen(pollEventId: pollId);
-                  var ris =
-                      // ignore: use_build_context_synchronously
-                      await Navigator.of(context, rootNavigator: false).push(
-                    ScreenTransition(
-                      builder: (context) => newScreen,
-                    ),
-                  );
-                  if (ris == "delete_poll_$curUid") {
-                    // ignore: use_build_context_synchronously
-                    /*
-                    await Provider.of<FirebasePollEvent>(context, listen: false)
-                        .closePoll(
-                      context: context,
-                      pollId: pollId,
-                    );
-                    */
-                  }
-                  */
                 }
               },
               color: Theme.of(context).primaryColor,

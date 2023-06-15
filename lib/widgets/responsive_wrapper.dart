@@ -11,22 +11,23 @@ class ResponsiveWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: DelayWidget(
-        child: MediaQuery.of(context).orientation == Orientation.landscape
-            ? Stack(
-                children: [
-                  Container(
-                    alignment: Alignment.topLeft,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width / 4 * 3,
+        child:
+            MediaQuery.of(context).orientation == Orientation.landscape && false
+                ? Stack(
+                    children: [
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width / 4 * 3,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: child,
+                          ),
+                        ),
                       ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: child,
-                      ),
-                    ),
-                  ),
-                  /*
+                      /*
                   Container(
                     alignment: Alignment.topRight,
                     child: ConstrainedBox(
@@ -87,17 +88,17 @@ class ResponsiveWrapper extends StatelessWidget {
                     ),
                   ),
                   */
-                ],
-              )
-            : Container(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 6000),
-                  child: Container(
-                    child: child,
+                    ],
+                  )
+                : Container(
+                    alignment: Alignment.topCenter,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 600),
+                      child: Container(
+                        child: child,
+                      ),
+                    ),
                   ),
-                ),
-              ),
       ),
     );
   }

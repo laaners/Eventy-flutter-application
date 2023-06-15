@@ -53,10 +53,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar(
-        title: "Edit Profile",
-        upRightActions: [MyAppBar.SearchAction(context)],
-      ),
+      appBar: const MyAppBar(title: "Edit Profile"),
       body: Builder(
         builder: (BuildContext context) {
           return ResponsiveWrapper(
@@ -69,9 +66,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     horizontal: LayoutConstants.kHorizontalPadding,
                   ),
                   children: [
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    const SizedBox(height: 20),
                     ChangeImage(
                         photo: _photo,
                         changePhoto: (File? newPhoto) {
@@ -85,7 +80,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             _initialRemoved = value;
                           });
                         }),
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 40),
                     TextFormField(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       controller: _usernameController,

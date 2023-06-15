@@ -3,7 +3,7 @@ import 'package:dima_app/models/location_icons.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/models/vote_location_model.dart';
-import 'package:dima_app/widgets/location_tile.dart';
+import 'package:dima_app/widgets/my_list_tile.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +30,7 @@ class MostVotedLocationTile extends StatelessWidget {
     Location mostVotedLocation = pollData.locations.firstWhere(
       (element) => element.name == mostVotedLocationVotes.locationName,
     );
-    return LocationTile(
+    return MyListTile(
       horizontalTitleGap: 25,
       leading: SizedBox(
         height: double.infinity,
@@ -39,10 +39,11 @@ class MostVotedLocationTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             FittedBox(
-                child: Icon(
-              LocationIcons.icons[mostVotedLocation.icon],
-              size: 35,
-            )),
+              child: Icon(
+                LocationIcons.icons[mostVotedLocation.icon],
+                size: 35,
+              ),
+            ),
             Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

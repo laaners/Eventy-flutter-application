@@ -1,13 +1,12 @@
+import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/models/availability.dart';
 import 'package:dima_app/models/location.dart';
-import 'package:dima_app/models/location_icons.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/vote_location_model.dart';
-import 'package:dima_app/screens/poll_detail/components/location_detail.dart';
+import 'package:dima_app/screens/poll_detail/components/availability_legend.dart';
+import 'package:dima_app/screens/poll_detail/components/location_tile.dart';
 import 'package:dima_app/services/firebase_user.dart';
-import 'package:dima_app/services/firebase_vote.dart';
-import 'package:dima_app/widgets/my_alert_dialog.dart';
-import 'package:dima_app/widgets/my_modal.dart';
+import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' as math;
@@ -39,6 +38,7 @@ class _LocationsListState extends State<LocationsList>
     with AutomaticKeepAliveClientMixin {
   bool votesDesc = true;
   bool alphabeticAsc = true;
+  int filterAvailability = -2;
   late List<VoteLocationModel> votesLocations;
 
   @override
@@ -54,6 +54,26 @@ class _LocationsListState extends State<LocationsList>
   @override
   bool get wantKeepAlive => true;
 
+  updateFilterAfterVote() {
+    if (filterAvailability == -2) return;
+    setState(() {
+      filterAvailability = -2;
+      votesLocations = widget.votesLocations;
+      alphabeticAsc
+          ? votesLocations.sort((a, b) => a.locationName
+              .toLowerCase()
+              .compareTo(b.locationName.toLowerCase()))
+          : votesLocations.sort((a, b) => b.locationName
+              .toLowerCase()
+              .compareTo(a.locationName.toLowerCase()));
+      votesDesc
+          ? votesLocations.sort((a, b) =>
+              b.getPositiveVotes().length - a.getPositiveVotes().length)
+          : votesLocations.sort((a, b) =>
+              a.getPositiveVotes().length - b.getPositiveVotes().length);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -63,12 +83,28 @@ class _LocationsListState extends State<LocationsList>
         Container(
           alignment: Alignment.topRight,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              IconButton(
-                onPressed: () {
+              AvailabilityLegend(
+                filterAvailability: filterAvailability,
+                changeFilterAvailability: (int value) {
                   setState(() {
-                    alphabeticAsc = !alphabeticAsc;
+                    filterAvailability = value;
+                    if (value == -2) {
+                      votesLocations = widget.votesLocations;
+                    } else if (value == Availability.empty) {
+                      votesLocations = widget.votesLocations
+                          .where((voteLocation) =>
+                              voteLocation.votes[widget.votingUid] == null ||
+                              voteLocation.votes[widget.votingUid] == value)
+                          .toList();
+                    } else {
+                      votesLocations = widget.votesLocations
+                          .where((voteLocation) =>
+                              voteLocation.votes[widget.votingUid] == value)
+                          .toList();
+                    }
                     alphabeticAsc
                         ? votesLocations.sort((a, b) => a.locationName
                             .toLowerCase()
@@ -76,16 +112,6 @@ class _LocationsListState extends State<LocationsList>
                         : votesLocations.sort((a, b) => b.locationName
                             .toLowerCase()
                             .compareTo(a.locationName.toLowerCase()));
-                  });
-                },
-                icon: const Icon(
-                  Icons.sort_by_alpha,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    votesDesc = !votesDesc;
                     votesDesc
                         ? votesLocations.sort((a, b) =>
                             b.getPositiveVotes().length -
@@ -95,13 +121,49 @@ class _LocationsListState extends State<LocationsList>
                             b.getPositiveVotes().length);
                   });
                 },
-                icon: Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.rotationX(votesDesc ? 0 : math.pi),
-                  child: const Icon(
-                    Icons.sort,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  MyIconButton(
+                    onTap: () {
+                      setState(() {
+                        alphabeticAsc = !alphabeticAsc;
+                        alphabeticAsc
+                            ? votesLocations.sort((a, b) => a.locationName
+                                .toLowerCase()
+                                .compareTo(b.locationName.toLowerCase()))
+                            : votesLocations.sort((a, b) => b.locationName
+                                .toLowerCase()
+                                .compareTo(a.locationName.toLowerCase()));
+                      });
+                    },
+                    icon: const Icon(Icons.sort_by_alpha),
                   ),
-                ),
+                  MyIconButton(
+                    margin: const EdgeInsets.only(
+                        right: LayoutConstants.kHorizontalPadding),
+                    onTap: () {
+                      setState(() {
+                        votesDesc = !votesDesc;
+                        votesDesc
+                            ? votesLocations.sort((a, b) =>
+                                b.getPositiveVotes().length -
+                                a.getPositiveVotes().length)
+                            : votesLocations.sort((a, b) =>
+                                a.getPositiveVotes().length -
+                                b.getPositiveVotes().length);
+                      });
+                    },
+                    icon: Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.rotationX(votesDesc ? 0 : math.pi),
+                      child: const Icon(
+                        Icons.sort,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -111,168 +173,41 @@ class _LocationsListState extends State<LocationsList>
           child: Column(
             children: [
               Expanded(
-                child: Scrollbar(
-                  child: ListView.builder(
-                    itemCount: votesLocations.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      VoteLocationModel voteLocation = votesLocations[index];
-                      var location = widget.locations.firstWhere(
-                        (element) => element.name == voteLocation.locationName,
-                      );
-                      return LocationTile(
-                        isClosed: widget.isClosed,
-                        votingUid: widget.votingUid,
-                        pollId: widget.pollId,
-                        organizerUid: widget.organizerUid,
-                        invites: widget.invites,
-                        location: Location(
-                          location.name,
-                          location.site,
-                          location.lat,
-                          location.lon,
-                          location.icon,
-                        ),
-                        voteLocation: voteLocation,
-                        modifyVote: (int newAvailability) {
-                          if (widget.votingUid == curUid) {
-                            setState(() {
-                              votesLocations[votesLocations.indexWhere(
-                                      (e) => e.locationName == location.name)]
-                                  .votes[curUid] = newAvailability;
-                            });
-                          }
-                        },
-                      );
-                    },
-                  ),
+                child: ListView.builder(
+                  itemCount: votesLocations.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    VoteLocationModel voteLocation = votesLocations[index];
+                    Location location = widget.locations.firstWhere(
+                      (element) => element.name == voteLocation.locationName,
+                    );
+                    int curVote = voteLocation.votes[widget.votingUid] ??
+                        Availability.empty;
+                    return LocationTile(
+                      location: location,
+                      voteLocation: voteLocation,
+                      isClosed: widget.isClosed,
+                      organizerUid: widget.organizerUid,
+                      votingUid: widget.votingUid,
+                      pollId: widget.pollId,
+                      invites: widget.invites,
+                      modifyVote: (int newAvailability) {
+                        if (widget.votingUid == curUid) {
+                          setState(() {
+                            votesLocations[votesLocations.indexWhere(
+                                    (e) => e.locationName == location.name)]
+                                .votes[curUid] = newAvailability;
+                          });
+                          updateFilterAfterVote();
+                        }
+                      },
+                    );
+                  },
                 ),
               ),
             ],
           ),
         ),
       ],
-    );
-  }
-}
-
-class LocationTile extends StatelessWidget {
-  final bool isClosed;
-  final String votingUid;
-  final String pollId;
-  final String organizerUid;
-  final List<PollEventInviteModel> invites;
-  final Location location;
-  final VoteLocationModel voteLocation;
-  final ValueChanged<int> modifyVote;
-  const LocationTile({
-    super.key,
-    required this.pollId,
-    required this.organizerUid,
-    required this.invites,
-    required this.location,
-    required this.voteLocation,
-    required this.modifyVote,
-    required this.votingUid,
-    required this.isClosed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    int curVote = voteLocation.votes[votingUid] ?? Availability.empty;
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 1.0),
-      margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ListTile(
-        minLeadingWidth: 0,
-        minVerticalPadding: 0,
-        title: Text(
-          location.name,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Text(
-          location.site,
-          overflow: TextOverflow.ellipsis,
-        ),
-        leading: SizedBox(
-          height: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(LocationIcons.icons[location.icon]),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text((voteLocation.getPositiveVotes().length).toString()),
-                  Container(width: 2),
-                  const Icon(
-                    Icons.check,
-                    color: Colors.green,
-                    size: 18,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        trailing: SizedBox(
-          height: double.infinity,
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            child: Ink(
-              decoration: const BoxDecoration(shape: BoxShape.circle),
-              child: Icon(Availability.icons[curVote]),
-            ),
-            onTap: () async {
-              if (isClosed) return;
-              if (votingUid == curUid) {
-                if (MyAlertDialog.showAlertIfCondition(
-                  context: context,
-                  condition: votingUid == organizerUid,
-                  title: "You cannot vote",
-                  content:
-                      "You are the organizer, you must be present at the event!",
-                )) {
-                  return;
-                }
-                int newAvailability =
-                    curVote + 1 > 2 ? Availability.empty : curVote + 1;
-                await Provider.of<FirebaseVote>(context, listen: false)
-                    .userVoteLocation(
-                  pollId: pollId,
-                  locationName: location.name,
-                  uid: votingUid,
-                  availability: newAvailability,
-                );
-                modifyVote(newAvailability);
-              }
-            },
-          ),
-        ),
-        onTap: () async {
-          MyModal.show(
-            context: context,
-            child: LocationDetail(
-              isClosed: isClosed,
-              pollId: pollId,
-              organizerUid: organizerUid,
-              invites: invites,
-              location: location,
-              modifyVote: modifyVote,
-            ),
-            heightFactor: 0.85,
-            doneCancelMode: false,
-            onDone: () {},
-            title: "",
-          );
-        },
-      ),
     );
   }
 }

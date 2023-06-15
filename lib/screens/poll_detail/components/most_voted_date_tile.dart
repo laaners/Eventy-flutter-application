@@ -7,7 +7,7 @@ import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/models/vote_location_model.dart';
 import 'package:dima_app/screens/poll_detail/components/date_detail.dart';
 import 'package:dima_app/services/date_methods.dart';
-import 'package:dima_app/widgets/location_tile.dart';
+import 'package:dima_app/widgets/my_list_tile.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -42,7 +42,7 @@ class MostVotedDateTile extends StatelessWidget {
           .format(DateFormatter.string2DateTime("2000-01-01 $end:00"));
     }
 
-    return LocationTile(
+    return MyListTile(
       horizontalTitleGap: 25,
       leading: SizedBox(
         height: double.infinity,

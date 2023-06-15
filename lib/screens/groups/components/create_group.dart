@@ -37,7 +37,7 @@ class _CreateGroupState extends State<CreateGroup> {
     if (ret) return;
 
     final userUid = Provider.of<FirebaseUser>(listen: false, context).user!.uid;
-    await Provider.of<FirebaseGroups>(context, listen: false).editGroup(
+    await Provider.of<FirebaseGroups>(context, listen: false).createGroup(
       uid: userUid,
       groupName: groupNameController.text,
       membersUids: members.map((e) => e.uid).toList(),

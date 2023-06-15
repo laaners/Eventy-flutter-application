@@ -8,16 +8,19 @@ class EmptyList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.only(top: 30),
-        child: ListView(
-          children: [
-            const EventyLogo(extWidth: 80),
-            Container(height: 20),
-            Text(emptyMsg, textAlign: TextAlign.center),
-          ],
-        ),
+    return Container(
+      margin: const EdgeInsets.only(top: 30),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const EventyLogo(extWidth: 80),
+          Container(height: 20),
+          Text(
+            emptyMsg,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ],
       ),
     );
   }

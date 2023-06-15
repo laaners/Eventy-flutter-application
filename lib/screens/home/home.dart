@@ -1,117 +1,24 @@
-import 'package:dima_app/constants/layout_constants.dart';
-import 'package:dima_app/debug.dart';
-import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/home/components/poll_event_list_by_you.dart';
 import 'package:dima_app/screens/home/components/poll_event_list_invited.dart';
-import 'package:dima_app/screens/home/components/profile_data.dart';
-import 'package:dima_app/screens/login/login.dart';
-import 'package:dima_app/services/firebase_user.dart';
-import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
-import 'package:dima_app/widgets/profile_pic.dart';
-import 'package:dima_app/widgets/responsive_wrapper.dart';
-import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen>
-    with AutomaticKeepAliveClientMixin {
-  late Stream<UserModel> _stream;
-
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    _stream = Provider.of<FirebaseUser>(context, listen: false)
-        .getCurrentUserStream();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    super.build(context);
-    return const TabbarSwitcher(
-      labels: ["By you", "Invited"],
-      listSticky: ProfileData(),
-      stickyHeight: 250,
+    return TabbarSwitcher(
+      labels: const ["By you", "Invited"],
+      stickyHeight: 0,
       appBarTitle: "Home",
-      upRightActions: [],
-      tabbars: [
+      alwaysShowTitle: true,
+      upRightActions: [MyAppBar.createEvent(context)],
+      tabbars: const [
         PollEventListByYou(),
         PollEventListInvited(),
       ],
-    );
-    return Scaffold(
-      appBar: const MyAppBar(
-        title: 'Home',
-        upRightActions: [],
-      ),
-      body: StreamBuilder(
-        stream: _stream,
-        builder: (
-          BuildContext context,
-          AsyncSnapshot<UserModel> snapshot,
-        ) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LoadingLogo();
-          }
-          if (snapshot.hasError || !snapshot.hasData) {
-            return const LogInScreen();
-          }
-          UserModel userData = snapshot.data!;
-          return ResponsiveWrapper(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: LayoutConstants.kHorizontalPadding,
-              ),
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      ScreenTransition(
-                        builder: (context) => const DebugScreen(),
-                      ),
-                    );
-                  },
-                  child: const Text("Debug page"),
-                ),
-                Row(
-                  children: [
-                    ProfilePic(
-                      userData: userData,
-                      loading: false,
-                      radius: LayoutConstants.kProfilePicRadius,
-                    ),
-                    const SizedBox(width: 20),
-                    Column(
-                      children: [
-                        const SizedBox(height: LayoutConstants.kHeight),
-                        // ProfileInfo(userData: userData),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: LayoutConstants.kHeightSmall),
-                Divider(
-                  height: LayoutConstants.kDividerHeight,
-                  color: Theme.of(context).dividerColor,
-                ),
-                // const EventPanel(),
-                Container(height: LayoutConstants.kPaddingFromCreate),
-              ],
-            ),
-          );
-        },
-      ),
     );
   }
 }

@@ -2,7 +2,7 @@ import 'package:dima_app/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePic extends StatelessWidget {
-  final UserModel? userData;
+  final UserModel userData;
   final bool loading;
   final double radius;
   const ProfilePic({
@@ -18,7 +18,7 @@ class ProfilePic extends StatelessWidget {
       child: FittedBox(
         fit: BoxFit.scaleDown,
         child: Text(
-          "${userData?.name[0].toUpperCase()}${userData?.surname[0].toUpperCase()}",
+          "${userData.name[0].toUpperCase()}${userData.surname[0].toUpperCase()}",
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.displayLarge,
         ),
@@ -31,13 +31,13 @@ class ProfilePic extends StatelessWidget {
     return CircleAvatar(
       radius: radius,
       backgroundColor: Theme.of(context).primaryColor,
-      child: userData?.profilePic != "default"
+      child: userData.profilePic != "default"
           ? (loading
               ? capitalNameSurnameAvatar(context)
               : ClipRRect(
                   borderRadius: BorderRadius.circular(radius),
                   child: Image.network(
-                    userData!.profilePic,
+                    userData.profilePic,
                     width: radius * 2,
                     height: radius * 2,
                     fit: BoxFit.fill,
