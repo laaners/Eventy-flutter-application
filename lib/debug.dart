@@ -6,6 +6,7 @@ import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
+import 'package:dima_app/widgets/logo.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
@@ -40,7 +41,7 @@ class _DebugScreenState extends State<DebugScreen>
     return Scaffold(
       appBar: MyAppBar(
         title: "Debug",
-        upRightActions: [MyAppBar.SearchAction(context)],
+        upRightActions: [MyAppBar.searchAction(context)],
       ),
       body: ResponsiveWrapper(
         child: Column(

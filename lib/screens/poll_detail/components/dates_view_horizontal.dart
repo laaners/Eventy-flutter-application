@@ -3,6 +3,7 @@ import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/widgets/container_shadow.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +18,7 @@ class DatesViewHorizontal extends StatefulWidget {
   final Map<String, dynamic> dates;
   final List<PollEventInviteModel> invites;
   final List<VoteDateModel> votesDates;
+  final VoidCallback updateFilterAfterVote;
   const DatesViewHorizontal({
     super.key,
     required this.organizerUid,
@@ -26,6 +28,7 @@ class DatesViewHorizontal extends StatefulWidget {
     required this.invites,
     required this.votesDates,
     required this.isClosed,
+    required this.updateFilterAfterVote,
   });
 
   @override
@@ -41,27 +44,11 @@ class _DatesViewHorizontalState extends State<DatesViewHorizontal> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
+        ContainerShadow(
           margin: const EdgeInsets.all(5),
-          padding: const EdgeInsets.only(
-            top: 10,
-            right: 10,
-            left: 10,
-            bottom: 10,
-          ),
+          padding: const EdgeInsets.all(10),
           width: 110,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: Theme.of(context).primaryColorDark,
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).shadowColor.withOpacity(0.2),
-                spreadRadius: 1,
-                blurRadius: 1,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
+          color: Theme.of(context).primaryColorDark,
           child: Column(
             children: [
               Text(
@@ -114,6 +101,7 @@ class _DatesViewHorizontalState extends State<DatesViewHorizontal> {
                         e.end == voteDate.end)]
                     .votes[curUid] = newAvailability;
               });
+              widget.updateFilterAfterVote();
             },
           );
         }).toList()

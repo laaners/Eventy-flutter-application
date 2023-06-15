@@ -9,11 +9,11 @@ class LoadingLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        margin: const EdgeInsets.only(top: 8),
+        margin: const EdgeInsets.only(top: 16),
         child: SizedBox(
           height: 100,
           width: 100,
-          child: Column(
+          child: ListView(
             children: [
               EventyLogo(extWidth: extWidth ?? 80),
               Container(height: 20),

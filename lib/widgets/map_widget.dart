@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+import 'container_shadow.dart';
+
 class MapFromCoor extends StatefulWidget {
   final String address;
   final double lat;
@@ -33,8 +35,8 @@ class _MapFromCoorState extends State<MapFromCoor> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
+    return SizedBox(
+      height: 350,
       child: FlutterMap(
         options: MapOptions(
           center: LatLng(widget.lat, widget.lon),

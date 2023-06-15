@@ -9,25 +9,11 @@ import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
-
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  late User userData;
-
-  @override
-  void initState() {
-    userData = Provider.of<FirebaseUser>(context, listen: false).user!;
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -5,7 +5,9 @@ import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/firebase_vote.dart';
+import 'package:dima_app/widgets/container_shadow.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
+import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -64,22 +66,10 @@ class DateTile extends StatelessWidget {
           title: "",
         );
       },
-      child: Container(
+      child: ContainerShadow(
         margin: const EdgeInsets.all(5),
         padding: const EdgeInsets.all(10),
         width: 110,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: Theme.of(context).scaffoldBackgroundColor,
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).shadowColor.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 1,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
         child: Column(
           children: [
             Text(
@@ -119,12 +109,9 @@ class DateTile extends StatelessWidget {
                     ),
                   ],
                 ),
-                InkWell(
-                  customBorder: const CircleBorder(),
-                  child: Ink(
-                    decoration: const BoxDecoration(shape: BoxShape.circle),
-                    child: Icon(Availability.icons[curVote]),
-                  ),
+                MyIconButton(
+                  padding: EdgeInsets.zero,
+                  icon: Icon(Availability.icons[curVote]),
                   onTap: () async {
                     if (isClosed) return;
                     if (MyAlertDialog.showAlertIfCondition(

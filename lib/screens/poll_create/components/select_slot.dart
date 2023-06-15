@@ -1,4 +1,5 @@
 import 'package:dima_app/constants/preferences.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -32,105 +33,74 @@ class _SelectSlotState extends State<SelectSlot> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
+    return MyModal.modalWidget(
+      context: context,
+      heightFactor: 0.5,
+      doneCancelMode: true,
+      onDone: () {
+        DateFormat f = DateFormat("HH:mm");
+        widget.setSlot(
+            [f.format(_startDate), f.format(_endDate), widget.dayString]);
+        Navigator.of(context).pop();
+      },
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Start Time',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                Container(
+                  transform: Matrix4.translationValues(0.0, -50.0, 0.0),
+                  height: 380,
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.time,
+                    initialDateTime: _startDate,
+                    minuteInterval: 5,
+                    use24hFormat: Preferences.getBool("is24Hour"),
+                    onDateTimeChanged: (pickedDate) {
+                      setState(() {
+                        _startDate = pickedDate;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(
-                  Icons.clear,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'End Time',
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
-              ),
-              const Text(
-                'Add a time slot',
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 22,
+                Container(
+                  transform: Matrix4.translationValues(0.0, -50.0, 0.0),
+                  height: 380,
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.time,
+                    initialDateTime: _endDate,
+                    minuteInterval: 5,
+                    use24hFormat: Preferences.getBool("is24Hour"),
+                    onDateTimeChanged: (pickedDate) {
+                      setState(() {
+                        _endDate = pickedDate;
+                      });
+                    },
+                  ),
                 ),
-              ),
-              IconButton(
-                onPressed: () {
-                  DateFormat f = DateFormat("HH:mm");
-                  widget.setSlot([
-                    f.format(_startDate),
-                    f.format(_endDate),
-                    widget.dayString
-                  ]);
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(
-                  Icons.done,
-                ),
-              )
-            ],
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                child: Column(
-                  children: [
-                    const Text(
-                      'Select start time',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 20,
-                      ),
-                    ),
-                    Expanded(
-                      child: CupertinoDatePicker(
-                        mode: CupertinoDatePickerMode.time,
-                        initialDateTime: _startDate,
-                        minuteInterval: 5,
-                        use24hFormat: Preferences.getBool("is24Hour"),
-                        onDateTimeChanged: (pickedDate) {
-                          setState(() {
-                            _startDate = pickedDate;
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  children: [
-                    const Text(
-                      'Select end time',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 20,
-                      ),
-                    ),
-                    Expanded(
-                      child: CupertinoDatePicker(
-                        mode: CupertinoDatePickerMode.time,
-                        initialDateTime: _endDate,
-                        minuteInterval: 5,
-                        use24hFormat: Preferences.getBool("is24Hour"),
-                        onDateTimeChanged: (pickedDate) {
-                          setState(() {
-                            _endDate = pickedDate;
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

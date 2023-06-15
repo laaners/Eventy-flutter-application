@@ -1,10 +1,12 @@
 import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/screens/groups/components/create_group.dart';
 import 'package:dima_app/screens/groups/components/groups_list.dart';
+import 'package:dima_app/widgets/my_icon_button.dart';
+import 'package:dima_app/widgets/my_list_tile.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
+import 'package:dima_app/widgets/search_tile.dart';
 import 'package:flutter/material.dart';
-
 import 'package:dima_app/widgets/my_app_bar.dart';
 
 class GroupsScreen extends StatefulWidget {
@@ -19,50 +21,60 @@ class _GroupsScreenState extends State<GroupsScreen>
   @override
   bool get wantKeepAlive => true;
 
+  final TextEditingController _controller = TextEditingController();
+  final FocusNode _focus = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
       appBar: MyAppBar(
         title: "Groups",
-        upRightActions: [MyAppBar.SearchAction(context)],
+        upRightActions: [
+          MyIconButton(
+            margin: const EdgeInsets.only(
+                right: LayoutConstants.kModalHorizontalPadding),
+            icon: Icon(Icons.group_add,
+                color: Theme.of(context).primaryColorLight),
+            onTap: () async {
+              MyModal.show(
+                context: context,
+                child: const CreateGroup(),
+                heightFactor: 0.85,
+                doneCancelMode: true,
+                onDone: () {},
+                title: "New Group",
+                shrinkWrap: false,
+              );
+            },
+          ),
+        ],
       ),
       body: ResponsiveWrapper(
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 5.0),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        MyModal.show(
-                          context: context,
-                          child: const CreateGroup(),
-                          heightFactor: 0.85,
-                          doneCancelMode: true,
-                          onDone: () {},
-                          title: "New Group",
-                          shrinkWrap: false,
-                        );
-                      },
-                      child: const Icon(Icons.group_add, size: 60),
-                    ),
-                  ),
-                  Text(
-                    "Create a new group",
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                ],
+              margin: const EdgeInsets.symmetric(
+                horizontal: LayoutConstants.kHorizontalPadding,
+                vertical: 10,
+              ),
+              child: SearchTile(
+                controller: _controller,
+                focusNode: _focus,
+                hintText: "Search for group name",
+                emptySearch: () {
+                  if (_controller.text.isNotEmpty) {
+                    setState(() {
+                      _controller.text = "";
+                    });
+                  }
+                },
+                onChanged: (text) {
+                  setState(() {});
+                },
               ),
             ),
-            const GroupsList(),
-            Container(height: LayoutConstants.kPaddingFromCreate),
+            GroupsList(searchController: _controller),
           ],
         ),
       ),

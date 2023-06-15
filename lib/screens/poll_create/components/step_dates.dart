@@ -2,7 +2,11 @@ import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/screens/poll_create/components/select_day_slots.dart';
 import 'package:dima_app/screens/poll_create/components/select_slot.dart';
 import 'package:dima_app/services/date_methods.dart';
+import 'package:dima_app/widgets/container_shadow.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
+import 'package:dima_app/widgets/my_icon_button.dart';
+import 'package:dima_app/widgets/my_list_tile.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -89,16 +93,14 @@ class _StepDatesState extends State<StepDates> {
                         setState(() {
                           _fixedTimeSlots = false;
                         });
-                        await showModalBottomSheet(
-                          useRootNavigator: true,
-                          isScrollControlled: true,
+                        await MyModal.show(
                           context: context,
-                          builder: (context) => FractionallySizedBox(
-                            heightFactor: 0.4,
-                            child: SelectSlot(
-                              dayString: "all",
-                              setSlot: setSlot,
-                            ),
+                          heightFactor: 0.5,
+                          doneCancelMode: true,
+                          onDone: () {},
+                          child: SelectSlot(
+                            dayString: "all",
+                            setSlot: setSlot,
                           ),
                         );
                       } else {
@@ -158,29 +160,23 @@ class _StepDatesState extends State<StepDates> {
         if (_fixedTimeSlots)
           Container(
             margin: const EdgeInsets.only(top: 15.0),
-            child: ListTile(
-              title: Text(
-                "Add another time slot",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              leading: Container(
-                height: double.infinity,
-                padding: const EdgeInsets.all(5),
-                child: const Icon(
-                  Icons.add_circle_outline,
+            child: MyListTile(
+              leading: MyListTile.leadingIcon(
+                icon: Icon(
+                  Icons.add_circle,
+                  color: Theme.of(context).primaryColorLight,
                 ),
               ),
+              title: "Add another time slot",
               onTap: () async {
-                await showModalBottomSheet(
-                  useRootNavigator: true,
-                  isScrollControlled: true,
+                await MyModal.show(
                   context: context,
-                  builder: (context) => FractionallySizedBox(
-                    heightFactor: 0.4,
-                    child: SelectSlot(
-                      dayString: "all",
-                      setSlot: setSlot,
-                    ),
+                  heightFactor: 0.5,
+                  doneCancelMode: true,
+                  onDone: () {},
+                  child: SelectSlot(
+                    dayString: "all",
+                    setSlot: setSlot,
                   ),
                 );
               },
@@ -195,11 +191,14 @@ class _StepDatesState extends State<StepDates> {
               var start = slot["start"];
               var end = slot["end"];
 
+              String slotString = "$start - $end";
+
               if (!Preferences.getBool('is24Hour')) {
-                start =
-                    "${DateFormat("hh:mm a").format(DateFormatter.string2DateTime("2000-01-01 $start:00"))} ";
-                end =
-                    " ${DateFormat("hh:mm a").format(DateFormatter.string2DateTime("2000-01-01 $end:00"))}";
+                slotString = DateFormat("hh:mm a").format(
+                    DateFormatter.string2DateTime("2000-01-01 $start:00"));
+                slotString += " - ";
+                slotString += DateFormat("hh:mm a").format(
+                    DateFormatter.string2DateTime("2000-01-01 $end:00"));
               }
               return Container(
                 decoration: BoxDecoration(
@@ -207,21 +206,22 @@ class _StepDatesState extends State<StepDates> {
                   color: Theme.of(context).primaryColor,
                 ),
                 margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
+                padding:
+                    const EdgeInsets.only(top: 3, bottom: 3, left: 8, right: 3),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      "$start-$end",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      slotString,
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.onPrimary),
                     ),
                     Container(width: 5),
-                    InkWell(
-                      child: const Icon(
+                    MyIconButton(
+                      padding: EdgeInsets.zero,
+                      icon: Icon(
                         Icons.cancel,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                       onTap: () {
                         widget.dates.forEach((k, v) {
@@ -263,8 +263,8 @@ class _StepDatesState extends State<StepDates> {
             ),
           ),
         ),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 10),
+        ContainerShadow(
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           padding: EdgeInsets.only(bottom: _fixedTimeSlots ? 0 : 0),
           child: TableCalendar(
             headerStyle: const HeaderStyle(
@@ -410,22 +410,19 @@ class _StepDatesState extends State<StepDates> {
             availableCalendarFormats: const {CalendarFormat.month: 'month'},
             calendarFormat: CalendarFormat.month,
             onDayLongPressed: (selectedDay, focusedDay) {
-              showModalBottomSheet(
-                useRootNavigator: true,
-                isScrollControlled: true,
+              MyModal.show(
                 context: context,
-                builder: (context) => FractionallySizedBox(
-                  heightFactor: 0.5,
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 15, bottom: 15),
-                    child: SelectDaySlots(
-                      day: selectedDay,
-                      dates: widget.dates,
-                      addDate: widget.addDate,
-                      removeDate: widget.removeDate,
-                      setSlot: setSlot,
-                    ),
-                  ),
+                heightFactor: 0.85,
+                doneCancelMode: false,
+                onDone: () {},
+                title: DateFormat("MMMM dd, yyyy").format(selectedDay),
+                child: SelectDaySlots(
+                  day: selectedDay,
+                  dates: widget.dates,
+                  addDate: widget.addDate,
+                  removeDate: widget.removeDate,
+                  removeEmpty: widget.removeEmpty,
+                  setSlot: setSlot,
                 ),
               );
             },
@@ -449,22 +446,19 @@ class _StepDatesState extends State<StepDates> {
                     widget.addDate([selectedDayString, "$start-$end"]);
                   }
                 } else {
-                  showModalBottomSheet(
-                    useRootNavigator: true,
-                    isScrollControlled: true,
+                  MyModal.show(
                     context: context,
-                    builder: (context) => FractionallySizedBox(
-                      heightFactor: 0.5,
-                      child: Container(
-                        margin: const EdgeInsets.only(top: 15, bottom: 15),
-                        child: SelectDaySlots(
-                          day: selectedDay,
-                          dates: widget.dates,
-                          addDate: widget.addDate,
-                          removeDate: widget.removeDate,
-                          setSlot: setSlot,
-                        ),
-                      ),
+                    heightFactor: 0.85,
+                    doneCancelMode: false,
+                    onDone: () {},
+                    title: DateFormat("MMMM dd, yyyy").format(selectedDay),
+                    child: SelectDaySlots(
+                      day: selectedDay,
+                      dates: widget.dates,
+                      addDate: widget.addDate,
+                      removeDate: widget.removeDate,
+                      removeEmpty: widget.removeEmpty,
+                      setSlot: setSlot,
                     ),
                   );
                 }

@@ -1,16 +1,18 @@
 import 'dart:async';
-
+import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
-import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
-import 'package:dima_app/widgets/search_tile.dart';
-import 'package:dima_app/widgets/show_user_dialog.dart';
+import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'invite_groups.dart';
+import 'invite_profile_pic.dart';
+import 'invite_users.dart';
 
 class StepInvite extends StatefulWidget {
   final List<UserModel> invitees;
@@ -30,17 +32,22 @@ class StepInvite extends StatefulWidget {
 }
 
 class _StepInviteState extends State<StepInvite>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   late List<UserModel> originalInvitees;
   late Stream<UserModel> _stream;
 
   @override
   bool get wantKeepAlive => true;
 
+  bool searchForUsers = true;
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
     originalInvitees = [...widget.invitees];
+    _tabController = TabController(length: 2, vsync: this);
+
     _stream = Provider.of<FirebaseUser>(context, listen: false)
         .getCurrentUserStream();
   }
@@ -105,243 +112,72 @@ class _StepInviteState extends State<StepInvite>
               ],
             ),
           ),
-          SearchUsers(
-            invitees: widget.invitees,
-            addInvitee: widget.addInvitee,
-            removeInvitee: widget.removeInvitee,
-            organizerUid: widget.organizerUid,
+          TabBar(
+            tabs: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  SizedBox(height: LayoutConstants.kIconPadding),
+                  Icon(Icons.person_add_alt_1),
+                  Text(
+                    "Add user",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  SizedBox(height: LayoutConstants.kIconPadding),
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  SizedBox(height: LayoutConstants.kIconPadding),
+                  Icon(Icons.group_add),
+                  Text(
+                    "Add group",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  SizedBox(height: LayoutConstants.kIconPadding),
+                ],
+              ),
+            ],
+            controller: _tabController,
+            onTap: (index) {
+              setState(() {});
+            },
+            indicatorSize: TabBarIndicatorSize.tab,
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class InviteProfilePic extends StatelessWidget {
-  final List<UserModel> invitees;
-  final List<UserModel> originalInvitees;
-  final ValueChanged<UserModel> addInvitee;
-  final ValueChanged<UserModel> removeInvitee;
-  final UserModel user;
-  final bool addMode;
-  final String organizerUid;
-  const InviteProfilePic({
-    super.key,
-    required this.addInvitee,
-    required this.removeInvitee,
-    required this.addMode,
-    required this.invitees,
-    required this.user,
-    required this.originalInvitees,
-    required this.organizerUid,
-  });
-
-  Widget? getTopIcon(context) {
-    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    bool isOrganizer = organizerUid == curUid;
-    bool isInOriginalInvitees =
-        originalInvitees.map((e) => e.uid).contains(user.uid);
-    // show nothing if in cancelmode and organizer != curUid and user is in original invitees
-    // or user is curuid
-    if ((!addMode && !isOrganizer && isInOriginalInvitees) ||
-        curUid == user.uid) {
-      return null;
-    }
-    // show cancel if in cancelmode, not organizer but newly added user isn't in original invitees
-    if (!addMode && !isOrganizer && !isInOriginalInvitees) {
-      return Positioned(
-        right: -10.0,
-        top: -10.0,
-        child: IconButton(
-          iconSize: 25,
-          padding: const EdgeInsets.all(0),
-          constraints: const BoxConstraints(),
-          icon: Icon(
-            addMode ? Icons.add_circle : Icons.cancel,
-            color: addMode
-                ? Theme.of(context).primaryColorLight
-                : Theme.of(context).colorScheme.error,
-          ),
-          onPressed: () {
-            addMode ? addInvitee(user) : removeInvitee(user);
-          },
-        ),
-      );
-    }
-    // show anything if organizer or in add mode (default)
-    return Positioned(
-      right: -10,
-      top: -10,
-      child: IconButton(
-        iconSize: 25,
-        padding: const EdgeInsets.all(0),
-        constraints: const BoxConstraints(),
-        icon: Icon(
-          addMode ? Icons.add_circle : Icons.cancel,
-          color: addMode
-              ? Theme.of(context).primaryColorLight
-              : Theme.of(context).colorScheme.error,
-        ),
-        onPressed: () {
-          addMode ? addInvitee(user) : removeInvitee(user);
-        },
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    return InkWell(
-      child: Stack(
-        children: [
-          Container(
-            margin: const EdgeInsets.all(5),
-            width: 75,
-            child: Column(
-              children: [
-                ProfilePic(
-                  userData: user,
-                  loading: false,
-                  radius: 35,
-                ),
-                Container(padding: const EdgeInsets.symmetric(vertical: 2)),
-                Text(
-                  curUid == user.uid ? "You" : user.username,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+          const SizedBox(height: LayoutConstants.kHeight),
+          Visibility(
+            visible: _tabController.index == 0,
+            maintainState: true,
+            maintainAnimation: true,
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.fastOutSlowIn,
+              opacity: _tabController.index == 0 ? 1 : 0,
+              child: InviteUsers(
+                invitees: widget.invitees,
+                addInvitee: widget.addInvitee,
+                removeInvitee: widget.removeInvitee,
+                organizerUid: widget.organizerUid,
+              ),
             ),
           ),
-          // show nothing if in cancelmode and organizer != curUid and user is in original invitees
-          getTopIcon(context) ?? Container()
-        ],
-      ),
-      onTap: () {
-        showUserDialog(context: context, user: user);
-      },
-    );
-  }
-}
-
-class SearchUsers extends StatefulWidget {
-  final List<UserModel> invitees;
-  final ValueChanged<UserModel> addInvitee;
-  final ValueChanged<UserModel> removeInvitee;
-  final String organizerUid;
-
-  const SearchUsers({
-    super.key,
-    required this.addInvitee,
-    required this.removeInvitee,
-    required this.invitees,
-    required this.organizerUid,
-  });
-
-  @override
-  State<SearchUsers> createState() => _SearchUsersState();
-}
-
-class _SearchUsersState extends State<SearchUsers> {
-  List<UserModel> usersMatching = [];
-  // true after next query, false when input text is empty
-  bool loadingUsers = false;
-  final FocusNode _focus = FocusNode();
-  final TextEditingController _controller = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    String curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    return Container(
-      margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: Column(
-        children: [
-          SearchTile(
-            controller: _controller,
-            focusNode: _focus,
-            hintText: "Search for username",
-            emptySearch: () {
-              if (_controller.text.isNotEmpty) {
-                setState(() {
-                  _controller.text = "";
-                });
-              }
-            },
-            onChanged: (text) async {
-              if (text.isEmpty) {
-                setState(() {
-                  usersMatching = [];
-                  loadingUsers = false;
-                });
-                return;
-              } else {
-                loadingUsers = true;
-                List<UserModel> tmp =
-                    await Provider.of<FirebaseUser>(context, listen: false)
-                        .getUsersData(pattern: text);
-                setState(() {
-                  // filter out organizer and current user
-                  usersMatching = tmp.where((element) {
-                    return !widget.invitees
-                            .map((e) => e.uid)
-                            .contains(element.uid) &&
-                        element.uid != curUid &&
-                        element.uid != widget.organizerUid;
-                  }).toList();
-                });
-              }
-            },
-          ),
-          Container(padding: const EdgeInsets.only(bottom: 8, top: 8)),
-          SizedBox(
-            height: (!_focus.hasFocus && usersMatching.isEmpty) ||
-                    _controller.text.isEmpty
-                ? 0
-                : 110,
-            child: usersMatching
-                    .where((element) {
-                      return !widget.invitees
-                              .map((e) => e.uid)
-                              .contains(element.uid) &&
-                          element.uid != curUid &&
-                          element.uid != widget.organizerUid;
-                    })
-                    .toList()
-                    .isNotEmpty
-                ? HorizontalScroller(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: usersMatching
-                        .where((element) {
-                          return !widget.invitees
-                                  .map((e) => e.uid)
-                                  .contains(element.uid) &&
-                              element.uid != curUid &&
-                              element.uid != widget.organizerUid;
-                        })
-                        .toList()
-                        .map(
-                          (e) => InviteProfilePic(
-                            invitees: widget.invitees,
-                            originalInvitees: [],
-                            organizerUid: "",
-                            user: e,
-                            addInvitee: widget.addInvitee,
-                            removeInvitee: widget.removeInvitee,
-                            addMode: widget.invitees
-                                    .map((e) => e.uid)
-                                    .contains(e.uid)
-                                ? false
-                                : true,
-                          ),
-                        )
-                        .toList(),
-                  )
-                : (_controller.text.isEmpty
-                    ? Container()
-                    : const Center(
-                        child: Text("No results found."),
-                      )),
+          Visibility(
+            visible: _tabController.index == 1,
+            maintainState: true,
+            maintainAnimation: true,
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.fastOutSlowIn,
+              opacity: _tabController.index == 1 ? 1 : 0,
+              child: InviteGroups(
+                invitees: widget.invitees,
+                addInvitee: widget.addInvitee,
+                removeInvitee: widget.removeInvitee,
+              ),
+            ),
           ),
         ],
       ),

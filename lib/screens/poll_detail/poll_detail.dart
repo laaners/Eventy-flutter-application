@@ -1,6 +1,5 @@
 import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/constants/preferences.dart';
-import 'package:dima_app/models/location.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
@@ -10,23 +9,18 @@ import 'package:dima_app/screens/poll_detail/components/locations_list.dart';
 import 'package:dima_app/screens/poll_detail/components/most_voted_date_tile.dart';
 import 'package:dima_app/screens/poll_detail/components/most_voted_location_tile.dart';
 import 'package:dima_app/services/date_methods.dart';
-import 'package:dima_app/services/dynamic_links_handler.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
-import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/delay_widget.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
+import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/my_modal.dart';
-import 'package:dima_app/widgets/poll_event_tile.dart';
 import 'package:dima_app/widgets/tabbar_switcher.dart';
-import 'package:dima_app/widgets/user_list.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:dima_app/widgets/user_tile.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
-
 import 'components/dates_list.dart';
 import 'components/invitees_pill.dart';
 
@@ -94,7 +88,7 @@ class PollDetailScreen extends StatelessWidget {
               pollData.pollEventName,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            Container(height: 10),
+            const SizedBox(height: 10),
             Center(
               child: InviteesPill(
                 pollData: pollData,
@@ -105,12 +99,12 @@ class PollDetailScreen extends StatelessWidget {
                 refreshPollDetail: refreshPollDetail,
               ),
             ),
-            Container(padding: const EdgeInsets.symmetric(vertical: 5)),
+            const SizedBox(height: 10),
             Text(
               "Organized by",
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            UserTile(userUid: pollData.organizerUid),
+            UserTileFromUid(userUid: pollData.organizerUid),
             Text(
               "About this event",
               style: Theme.of(context).textTheme.headlineSmall,
@@ -131,7 +125,7 @@ class PollDetailScreen extends StatelessWidget {
               isClosed ? "The poll has been closed" : "Last day to vote",
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            Container(padding: const EdgeInsets.symmetric(vertical: 5)),
+            const SizedBox(height: 10),
             isClosed
                 ? Text(
                     "The most voted options are:",
@@ -169,77 +163,57 @@ class PollDetailScreen extends StatelessWidget {
       labels: const ["Locations", "Dates"],
       appBarTitle: pollData.pollEventName,
       upRightActions: [
-        Container(
-          margin: const EdgeInsets.only(
-            right: LayoutConstants.kHorizontalPadding,
+        MyIconButton(
+          icon: const Icon(
+            Icons.more_vert,
           ),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            child: Ink(
-              decoration: const BoxDecoration(shape: BoxShape.circle),
-              child: const Icon(
-                Icons.more_vert,
+          onTap: () async {
+            var ris = await MyModal.show(
+              context: context,
+              child: PollEventOptions(
+                pollData: pollData,
+                pollEventId: pollId,
+                invites: pollInvites,
+                refreshPollDetail: refreshPollDetail,
+                votesLocations: votesLocations,
+                votesDates: votesDates,
               ),
-            ),
-            onTap: () async {
-              var ris = await MyModal.show(
+              heightFactor: 0.4,
+              doneCancelMode: false,
+              onDone: () {},
+              title: "",
+            );
+            if (ris == "create_event_$curUid") {
+              // ignore: use_build_context_synchronously
+              LoadingOverlay.show(context);
+              // ignore: use_build_context_synchronously
+              await Provider.of<FirebasePollEvent>(context, listen: false)
+                  .closePoll(
                 context: context,
-                child: PollEventOptions(
-                  pollData: pollData,
-                  pollEventId: pollId,
-                  invites: pollInvites,
-                  refreshPollDetail: refreshPollDetail,
-                  votesLocations: votesLocations,
-                  votesDates: votesDates,
-                ),
-                heightFactor: 0.4,
-                doneCancelMode: false,
-                onDone: () {},
-                title: "",
+                pollId: pollId,
               );
-              if (ris == "create_event_$curUid") {
-                // ignore: use_build_context_synchronously
-                LoadingOverlay.show(context);
-                // ignore: use_build_context_synchronously
-                await Provider.of<FirebasePollEvent>(context, listen: false)
-                    .closePoll(
-                  context: context,
-                  pollId: pollId,
-                );
-                // ignore: use_build_context_synchronously
-                LoadingOverlay.hide(context);
-              } else if (ris == "delete_poll_$curUid") {
-                // ignore: use_build_context_synchronously
-                Navigator.pop(
-                  context,
-                  "delete_poll_${pollData.organizerUid}",
-                );
-              } else if (ris == "exit_poll") {
-                // ignore: use_build_context_synchronously
-                Navigator.pop(
-                  context,
-                  "exit_poll",
-                );
-              }
-            },
-          ),
+              // ignore: use_build_context_synchronously
+              LoadingOverlay.hide(context);
+            } else if (ris == "delete_poll_$curUid") {
+              // ignore: use_build_context_synchronously
+              Navigator.pop(
+                context,
+                "delete_poll_${pollData.organizerUid}",
+              );
+            } else if (ris == "exit_poll") {
+              // ignore: use_build_context_synchronously
+              Navigator.pop(
+                context,
+                "exit_poll",
+              );
+            }
+          },
         ),
-        Container(
+        MyIconButton(
           margin: const EdgeInsets.only(
-            right: LayoutConstants.kHorizontalPadding,
-          ),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            child: Ink(
-              decoration: const BoxDecoration(shape: BoxShape.circle),
-              child: const Icon(
-                Icons.refresh,
-              ),
-            ),
-            onTap: () async {
-              refreshPollDetail();
-            },
-          ),
+              right: LayoutConstants.kModalHorizontalPadding),
+          icon: const Icon(Icons.refresh),
+          onTap: refreshPollDetail,
         ),
       ],
       tabbars: [

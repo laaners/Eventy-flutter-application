@@ -74,12 +74,8 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
         MyStep(
           isActive: _activeStepIndex >= 0,
           title: const Text(""),
-          label: const Text(
-            "Basics",
-          ),
-          content: Container(
-            margin: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
+          label: const Text("Basics"),
+          content: ResponsiveWrapper(
             child: StepBasics(
               eventTitleController: eventTitleController,
               eventDescController: eventDescController,
@@ -119,98 +115,101 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
         MyStep(
           isActive: _activeStepIndex >= 1,
           title: const Text(""),
-          label: const Text(
-            "Places",
-          ),
-          content: StepPlaces(
-            locations: locations,
-            addLocation: (location) {
-              setState(() {
-                locations.add(location);
-                locations.sort((a, b) => a.name.compareTo(b.name));
-              });
-            },
-            removeLocation: (locationName) {
-              setState(() {
-                locations.removeWhere((item) => item.name == locationName);
-              });
-            },
+          label: const Text("Places"),
+          content: ResponsiveWrapper(
+            child: StepPlaces(
+              locations: locations,
+              addLocation: (location) {
+                setState(() {
+                  locations.add(location);
+                  locations.sort((a, b) => a.name.compareTo(b.name));
+                });
+              },
+              removeLocation: (locationName) {
+                setState(() {
+                  locations.removeWhere((item) => item.name == locationName);
+                });
+              },
+            ),
           ),
         ),
         MyStep(
           isActive: _activeStepIndex >= 2,
           title: const Text(""),
-          label: const Text(
-            "Dates",
-          ),
-          content: StepDates(
-            dates: dates,
-            addDate: (value) {
-              setState(() {
-                String day = value[0];
-                String slot = value[1];
-                // dates.add(value);
-                if (!dates.containsKey(day)) {
-                  dates[day] = {};
-                }
-                dates[day][slot] = 1;
-              });
-            },
-            removeDate: (value) {
-              setState(() {
-                String day = value[0];
-                String slot = value[1];
-                // dates.add(value);
-                if (dates.containsKey(day)) {
-                  if (slot == "all") {
-                    dates.removeWhere((key, value) => key == day);
-                  } else {
-                    if (dates[day].containsKey(slot)) {
-                      dates[day].removeWhere((key, value) => key == slot);
+          label: const Text("Dates"),
+          content: ResponsiveWrapper(
+            child: StepDates(
+              dates: dates,
+              addDate: (value) {
+                setState(() {
+                  String day = value[0];
+                  String slot = value[1];
+                  // dates.add(value);
+                  if (!dates.containsKey(day)) {
+                    dates[day] = {};
+                  }
+                  dates[day][slot] = 1;
+                });
+              },
+              removeDate: (value) {
+                setState(() {
+                  String day = value[0];
+                  String slot = value[1];
+                  // dates.add(value);
+                  if (dates.containsKey(day)) {
+                    if (slot == "all") {
+                      dates.removeWhere((key, value) => key == day);
+                    } else {
+                      if (dates[day].containsKey(slot)) {
+                        dates[day].removeWhere((key, value) => key == slot);
+                      }
                     }
                   }
-                }
-              });
-            },
-            removeEmpty: () {
-              setState(() {
-                List<String> toRemove = [];
-                dates.forEach((day, slots) {
-                  if (slots.isEmpty) {
-                    toRemove.add(day);
-                  }
                 });
-                dates.removeWhere((key, value) => toRemove.contains(key));
-              });
-            },
-            deadlineController: deadlineController,
+              },
+              removeEmpty: () {
+                setState(() {
+                  List<String> toRemove = [];
+                  dates.forEach((day, slots) {
+                    if (slots.isEmpty) {
+                      toRemove.add(day);
+                    }
+                  });
+                  dates.removeWhere((key, value) => toRemove.contains(key));
+                });
+              },
+              deadlineController: deadlineController,
+            ),
           ),
         ),
         MyStep(
           isActive: _activeStepIndex >= 3,
           title: const Text(""),
-          label: const Text(
-            "Invite",
-          ),
-          content: Container(
-            margin: const EdgeInsets.all(15),
-            child: StepInvite(
-              organizerUid:
-                  Provider.of<FirebaseUser>(context, listen: false).user!.uid,
-              invitees: invitees,
-              addInvitee: (UserModel user) {
-                setState(() {
-                  if (!invitees.map((_) => _.uid).toList().contains(user.uid)) {
-                    // inviteeIds.add(uid);
-                    invitees.insert(0, user);
-                  }
-                });
-              },
-              removeInvitee: (UserModel user) {
-                setState(() {
-                  invitees.removeWhere((item) => item.uid == user.uid);
-                });
-              },
+          label: const Text("Invite"),
+          content: ResponsiveWrapper(
+            child: Container(
+              margin: const EdgeInsets.all(15),
+              child: StepInvite(
+                organizerUid:
+                    Provider.of<FirebaseUser>(context, listen: false).user!.uid,
+                invitees: invitees,
+                addInvitee: (UserModel user) {
+                  setState(() {
+                    if (!invitees
+                        .map((_) => _.uid)
+                        .toList()
+                        .contains(user.uid)) {
+                      // inviteeIds.add(uid);
+                      invitees.insert(0, user);
+                    }
+                  });
+                },
+                removeInvitee: (UserModel user) {
+                  setState(() {
+                    invitees.removeWhere((item) => item.uid == user.uid);
+                  });
+                },
+              ),
             ),
           ),
         ),
@@ -309,6 +308,7 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
     return Scaffold(
       appBar: MyAppBar(
         title: "New Poll",
+        shape: const Border(),
         upRightActions: [
           TextButton(
             onPressed: () async {
@@ -320,21 +320,19 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
           )
         ],
       ),
-      body: ResponsiveWrapper(
-        child: MyStepper(
-          elevation: 1,
-          currentStep: _activeStepIndex,
-          steps: stepList(),
-          onStepTapped: (int index) {
-            setState(() {
-              _activeStepIndex = index;
-            });
-          },
-          // override continue cancel of stepper
-          controlsBuilder: (context, controls) {
-            return Container();
-          },
-        ),
+      body: MyStepper(
+        elevation: 1,
+        currentStep: _activeStepIndex,
+        steps: stepList(),
+        onStepTapped: (int index) {
+          setState(() {
+            _activeStepIndex = index;
+          });
+        },
+        // override continue cancel of stepper
+        controlsBuilder: (context, controls) {
+          return Container();
+        },
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.only(
@@ -367,9 +365,7 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
                   },
                 ),
               ),
-            SizedBox(
-              width: _activeStepIndex > 0 ? 10 : 0,
-            ),
+            SizedBox(width: _activeStepIndex > 0 ? 10 : 0),
             Expanded(
               child: MyButton(
                 onPressed: () async {

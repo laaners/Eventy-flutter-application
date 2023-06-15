@@ -1,9 +1,13 @@
+import 'package:dima_app/models/availability.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/screens/poll_detail/components/dates_view_horizontal.dart';
+import 'package:dima_app/services/firebase_user.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:math' as math;
 
+import 'availability_legend.dart';
 import 'dates_view_calendar.dart';
 
 class DatesList extends StatefulWidget {
@@ -39,6 +43,7 @@ class _DatesListState extends State<DatesList>
   bool chronoAsc = true;
   bool votesDesc = true;
 
+  int filterAvailability = -2;
   bool Function(VoteDateModel voteDate) filter =
       (VoteDateModel voteDate) => true;
 
@@ -52,20 +57,57 @@ class _DatesListState extends State<DatesList>
         .compareTo("${b.date} ${b.start}-${b.end}"));
   }
 
+  updateFilterAfterVote() {
+    if (filterAvailability == -2) return;
+    setState(() {
+      filterAvailability = -2;
+      votesDates = List.from(widget.votesDates);
+      chronoAsc
+          ? votesDates.sort((a, b) => "${a.date} ${a.start}-${a.end}"
+              .compareTo("${b.date} ${b.start}-${b.end}"))
+          : votesDates.sort((a, b) => "${b.date} ${b.start}-${b.end}"
+              .compareTo("${a.date} ${a.start}-${a.end}"));
+      votesDesc
+          ? votesDates.sort((a, b) =>
+              b.getPositiveVotes().length - a.getPositiveVotes().length)
+          : votesDates.sort((a, b) =>
+              a.getPositiveVotes().length - b.getPositiveVotes().length);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     return Stack(
       children: [
         Container(
           alignment: Alignment.topRight,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              IconButton(
-                onPressed: () {
+              AvailabilityLegend(
+                filterAvailability: filterAvailability,
+                changeFilterAvailability: (int value) {
                   setState(() {
-                    chronoAsc = !chronoAsc;
+                    filterAvailability = value;
+                    if (value == -2) {
+                      votesDates = List.from(widget.votesDates);
+                    } else if (value == Availability.empty) {
+                      votesDates = List.from(widget.votesDates);
+                      votesDates = votesDates
+                          .where((voteLocation) =>
+                              voteLocation.votes[curUid] == null ||
+                              voteLocation.votes[curUid] == value)
+                          .toList();
+                    } else {
+                      votesDates = List.from(widget.votesDates);
+                      votesDates = votesDates
+                          .where((voteLocation) =>
+                              voteLocation.votes[curUid] == value)
+                          .toList();
+                    }
                     chronoAsc
                         ? votesDates.sort((a, b) =>
                             "${a.date} ${a.start}-${a.end}"
@@ -73,16 +115,6 @@ class _DatesListState extends State<DatesList>
                         : votesDates.sort((a, b) =>
                             "${b.date} ${b.start}-${b.end}"
                                 .compareTo("${a.date} ${a.start}-${a.end}"));
-                  });
-                },
-                icon: const Icon(
-                  Icons.access_time_outlined,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    votesDesc = !votesDesc;
                     votesDesc
                         ? votesDates.sort((a, b) =>
                             b.getPositiveVotes().length -
@@ -92,13 +124,49 @@ class _DatesListState extends State<DatesList>
                             b.getPositiveVotes().length);
                   });
                 },
-                icon: Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.rotationX(votesDesc ? 0 : math.pi),
-                  child: const Icon(
-                    Icons.sort,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        chronoAsc = !chronoAsc;
+                        chronoAsc
+                            ? votesDates.sort((a, b) =>
+                                "${a.date} ${a.start}-${a.end}"
+                                    .compareTo("${b.date} ${b.start}-${b.end}"))
+                            : votesDates.sort((a, b) =>
+                                "${b.date} ${b.start}-${b.end}".compareTo(
+                                    "${a.date} ${a.start}-${a.end}"));
+                      });
+                    },
+                    icon: const Icon(
+                      Icons.access_time_outlined,
+                    ),
                   ),
-                ),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        votesDesc = !votesDesc;
+                        votesDesc
+                            ? votesDates.sort((a, b) =>
+                                b.getPositiveVotes().length -
+                                a.getPositiveVotes().length)
+                            : votesDates.sort((a, b) =>
+                                a.getPositiveVotes().length -
+                                b.getPositiveVotes().length);
+                      });
+                    },
+                    icon: Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.rotationX(votesDesc ? 0 : math.pi),
+                      child: const Icon(
+                        Icons.sort,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -109,7 +177,6 @@ class _DatesListState extends State<DatesList>
             children: [
               Expanded(
                 child: ListView(
-                  controller: ScrollController(),
                   children: [
                     DatesViewHorizontal(
                       isClosed: widget.isClosed,
@@ -119,27 +186,29 @@ class _DatesListState extends State<DatesList>
                       dates: widget.dates,
                       invites: widget.invites,
                       votesDates: votesDates.where(filter).toList(),
+                      updateFilterAfterVote: updateFilterAfterVote,
                     ),
                     DatesViewCalendar(
-                        organizerUid: widget.organizerUid,
-                        pollId: widget.pollId,
-                        deadline: widget.deadline,
-                        dates: widget.dates,
-                        invites: widget.invites,
-                        votesDates: widget.votesDates,
-                        filterDates: (selectedDateString) {
-                          setState(() {
-                            if (selectedDateString == "all") {
-                              filter = (VoteDateModel voteDate) {
-                                return true;
-                              };
-                            } else {
-                              filter = (VoteDateModel voteDate) {
-                                return voteDate.date == selectedDateString;
-                              };
-                            }
-                          });
-                        }),
+                      organizerUid: widget.organizerUid,
+                      pollId: widget.pollId,
+                      deadline: widget.deadline,
+                      dates: widget.dates,
+                      invites: widget.invites,
+                      votesDates: widget.votesDates,
+                      filterDates: (selectedDateString) {
+                        setState(() {
+                          if (selectedDateString == "all") {
+                            filter = (VoteDateModel voteDate) {
+                              return true;
+                            };
+                          } else {
+                            filter = (VoteDateModel voteDate) {
+                              return voteDate.date == selectedDateString;
+                            };
+                          }
+                        });
+                      },
+                    ),
                   ],
                 ),
               ),

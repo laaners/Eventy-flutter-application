@@ -6,14 +6,17 @@ class MyModal extends StatelessWidget {
   final double heightFactor;
   final bool doneCancelMode;
   final VoidCallback onDone;
-  final String title;
+  final Widget? titleWidget;
+  final String? title;
+
   const MyModal({
     super.key,
     required this.child,
     required this.doneCancelMode,
     required this.onDone,
     required this.heightFactor,
-    required this.title,
+    this.titleWidget,
+    this.title,
   });
 
   static Widget modalWidget({
@@ -22,7 +25,8 @@ class MyModal extends StatelessWidget {
     required double heightFactor,
     required bool doneCancelMode,
     required VoidCallback onDone,
-    required String title,
+    Widget? titleWidget,
+    String? title,
     bool? shrinkWrap,
   }) {
     return Scrollbar(
@@ -94,7 +98,8 @@ class MyModal extends StatelessWidget {
                                     const BorderRadius.all(Radius.circular(20)),
                               ),
                             ),
-                      if (title.isNotEmpty)
+                      if (titleWidget != null) titleWidget,
+                      if (title != null && title.isNotEmpty)
                         Container(
                           margin: const EdgeInsets.only(bottom: 0, top: 8),
                           alignment: Alignment.topLeft,
@@ -122,7 +127,7 @@ class MyModal extends StatelessWidget {
                       physics: const ClampingScrollPhysics(),
                       children: [
                         Container(
-                          margin: const EdgeInsets.only(top: 15),
+                          margin: const EdgeInsets.only(top: 8),
                           child: child,
                         ),
                       ],
@@ -131,39 +136,6 @@ class MyModal extends StatelessWidget {
                 ),
               ),
             ),
-            /*
-            Container(
-              margin: const EdgeInsets.all(15),
-              child: doneCancelMode
-                  ? Row(
-                      children: [
-                        Expanded(
-                          child: MyButton(
-                            text: "CLOSE",
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: MyButton(
-                            text: "CLOSE",
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ),
-                      ],
-                    )
-                  : MyButton(
-                      text: "CLOSE",
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-            )
-            */
           ],
         ),
       ),
@@ -176,7 +148,8 @@ class MyModal extends StatelessWidget {
     required double heightFactor,
     required bool doneCancelMode,
     required VoidCallback onDone,
-    required String title,
+    Widget? titleWidget,
+    String? title,
     bool? shrinkWrap,
   }) async {
     var ris = await showModalBottomSheet(
@@ -194,6 +167,7 @@ class MyModal extends StatelessWidget {
                 heightFactor: heightFactor,
                 doneCancelMode: doneCancelMode,
                 onDone: onDone,
+                titleWidget: titleWidget,
                 title: title,
                 shrinkWrap: shrinkWrap,
               ),
@@ -210,7 +184,7 @@ class MyModal extends StatelessWidget {
       heightFactor: heightFactor,
       doneCancelMode: doneCancelMode,
       onDone: onDone,
-      title: title,
+      titleWidget: titleWidget,
     );
   }
 }

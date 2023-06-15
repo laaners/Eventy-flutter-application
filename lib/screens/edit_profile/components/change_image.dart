@@ -106,7 +106,11 @@ class _ChangeImageState extends State<ChangeImage> {
                 padding: const EdgeInsets.all(LayoutConstants.kIconPadding),
                 shape: const CircleBorder(),
               ),
-              child: const Icon(Icons.close, size: LayoutConstants.kIconSize),
+              child: Icon(
+                Icons.close,
+                size: LayoutConstants.kIconSize,
+                color: Theme.of(context).colorScheme.error,
+              ),
             ),
           ),
           Container(
@@ -122,8 +126,11 @@ class _ChangeImageState extends State<ChangeImage> {
                 padding: const EdgeInsets.all(LayoutConstants.kIconPadding),
                 shape: const CircleBorder(),
               ),
-              child: const Icon(Icons.photo_camera,
-                  size: LayoutConstants.kIconSize),
+              child: Icon(
+                Icons.photo_camera,
+                size: LayoutConstants.kIconSize,
+                color: Theme.of(context).primaryColorLight,
+              ),
             ),
           ),
         ],

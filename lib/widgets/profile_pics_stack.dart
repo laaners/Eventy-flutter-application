@@ -10,33 +10,69 @@ import 'package:collection/collection.dart';
 
 import '../screens/error/error.dart';
 
-class ProfilePicsStack extends StatelessWidget {
+class ProfilePicsStack extends StatefulWidget {
   final double radius;
   final double offset;
   final List<String> uids;
+  final bool? rl;
+  final bool? maintainState;
   const ProfilePicsStack({
     super.key,
     required this.radius,
     required this.offset,
     required this.uids,
+    this.rl,
+    this.maintainState,
   });
+
+  @override
+  State<ProfilePicsStack> createState() => _ProfilePicsStackState();
+}
+
+class _ProfilePicsStackState extends State<ProfilePicsStack> {
+  late var _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = Provider.of<FirebaseUser>(context, listen: false)
+        .getUsersDataFromList(uids: widget.uids);
+  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<UserModel>>(
-      future: Provider.of<FirebaseUser>(context, listen: false)
-          .getUsersDataFromList(uids: uids),
+      future: widget.maintainState != null && widget.maintainState!
+          ? _future
+          : Provider.of<FirebaseUser>(context, listen: false)
+              .getUsersDataFromList(uids: widget.uids),
       builder: (
         BuildContext context,
         AsyncSnapshot<List<UserModel>> snapshot,
       ) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LoadingLogo();
+          return SizedBox(
+            height: widget.radius * 2,
+            width: (widget.radius * 2 - widget.offset) * 3 + widget.offset,
+            child: Stack(
+              children: [
+                for (var index = 0; index < 3; index++)
+                  Positioned(
+                    left: widget.rl != null
+                        ? null
+                        : (widget.radius * 2 - widget.offset) * index,
+                    right: widget.rl != null
+                        ? (widget.radius * 2 - widget.offset) * index
+                        : null,
+                    child: Container(width: widget.radius * 2),
+                  )
+              ],
+            ),
+          );
         }
         if (snapshot.hasError || !snapshot.hasData) {
           Future.microtask(() {
-            Navigator.of(context).pop();
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               ScreenTransition(
                 builder: (context) => ErrorScreen(
@@ -49,17 +85,22 @@ class ProfilePicsStack extends StatelessWidget {
         }
         List<UserModel> users = snapshot.data!;
         return SizedBox(
-          height: radius * 2,
-          width: (radius * 2 - offset) * 3 + offset,
+          height: widget.radius * 2,
+          width: (widget.radius * 2 - widget.offset) * 3 + widget.offset,
           child: Stack(
             children: [
               ...users.mapIndexed((index, user) {
                 return Positioned(
-                  left: (radius * 2 - offset) * index,
+                  left: widget.rl != null
+                      ? null
+                      : (widget.radius * 2 - widget.offset) * index,
+                  right: widget.rl != null
+                      ? (widget.radius * 2 - widget.offset) * index
+                      : null,
                   child: ProfilePic(
                     userData: user,
                     loading: false,
-                    radius: radius,
+                    radius: widget.radius,
                   ),
                 );
               }).toList(),
@@ -79,19 +120,25 @@ class ProfilePicsStack extends StatelessWidget {
                     }
                     UserModel userData = snapshot.data!;
                     return Positioned(
-                      left: 0,
+                      left: widget.rl != null ? null : 0,
+                      right: widget.rl != null ? 0 : null,
                       child: ProfilePic(
                         userData: userData,
                         loading: false,
-                        radius: radius,
+                        radius: widget.radius,
                       ),
                     );
                   },
                 ),
               for (var index = users.length; index < 2; index++)
                 Positioned(
-                  left: (radius * 2 - offset) * index,
-                  child: Container(width: radius * 2),
+                  left: widget.rl != null
+                      ? null
+                      : (widget.radius * 2 - widget.offset) * index,
+                  right: widget.rl != null
+                      ? (widget.radius * 2 - widget.offset) * index
+                      : null,
+                  child: Container(width: widget.radius * 2),
                 )
             ],
           ),

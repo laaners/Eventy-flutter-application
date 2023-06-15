@@ -1,12 +1,13 @@
 import 'package:dima_app/models/location.dart';
 import 'package:dima_app/screens/poll_create/components/select_location.dart';
 import 'package:dima_app/screens/poll_create/components/select_virtual.dart';
+import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/location_icons.dart';
-import '../../../widgets/location_tile.dart';
+import '../../../widgets/my_list_tile.dart';
 
 class StepPlaces extends StatefulWidget {
   final List<Location> locations;
@@ -82,57 +83,43 @@ class _StepPlacesState extends State<StepPlaces> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 5.0),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    MyModal.show(
-                      context: context,
-                      child: SelectLocation(
-                        locations: widget.locations,
-                        addLocation: widget.addLocation,
-                        removeLocation: widget.removeLocation,
-                        defaultLocation:
-                            Location("", "", 0, 0, "location_on_outlined"),
-                      ),
-                      heightFactor: 0.85,
-                      doneCancelMode: true,
-                      onDone: () {},
-                      title: "",
-                    );
-                  },
-                  child: const Icon(Icons.add_location_alt, size: 60),
-                ),
+          margin: const EdgeInsets.only(top: 15.0),
+          child: MyListTile(
+            leading: MyListTile.leadingIcon(
+              icon: Icon(
+                Icons.add_location_alt,
+                color: Theme.of(context).primaryColorLight,
               ),
-              Text(
-                "Add a location",
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-            ],
+            ),
+            title: "Add a Location",
+            onTap: () async {
+              await MyModal.show(
+                context: context,
+                child: SelectLocation(
+                  locations: widget.locations,
+                  addLocation: widget.addLocation,
+                  removeLocation: widget.removeLocation,
+                  defaultLocation:
+                      Location("", "", 0, 0, "location_on_outlined"),
+                ),
+                heightFactor: 0.85,
+                doneCancelMode: true,
+                onDone: () {},
+                title: "",
+              );
+            },
           ),
         ),
         if (widget.locations
             .map((x) => x.name)
             .contains("Virtual meeting")) //(virtualMeeting)
           Builder(builder: (context) {
-            return LocationTile(
-              leading: Container(
-                height: double.infinity,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: const FittedBox(child: Icon(Icons.videocam)),
-              ),
-              trailing: IconButton(
-                icon: const Icon(Icons.cancel),
-                onPressed: () {
+            return MyListTile(
+              leading: MyListTile.leadingIcon(icon: const Icon(Icons.videocam)),
+              trailing: MyIconButton(
+                icon: Icon(Icons.cancel,
+                    color: Theme.of(context).colorScheme.error),
+                onTap: () {
                   widget.removeLocation("Virtual meeting");
                   setState(() {
                     virtualMeeting = false;
@@ -175,7 +162,7 @@ class _StepPlacesState extends State<StepPlaces> {
             .where((_) => _.name != "Virtual meeting")
             .toList()
             .map((location) {
-          return LocationTile(
+          return MyListTile(
             leading: Container(
               height: double.infinity,
               padding: const EdgeInsets.all(10),
@@ -201,9 +188,10 @@ class _StepPlacesState extends State<StepPlaces> {
                 title: "",
               );
             },
-            trailing: IconButton(
-              icon: const Icon(Icons.cancel),
-              onPressed: () => widget.removeLocation(location.name),
+            trailing: MyIconButton(
+              icon: Icon(Icons.cancel,
+                  color: Theme.of(context).colorScheme.error),
+              onTap: () => widget.removeLocation(location.name),
             ),
           );
         }).toList(),

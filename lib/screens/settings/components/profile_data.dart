@@ -3,6 +3,7 @@ import 'package:dima_app/debug.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/login/login.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/widgets/container_shadow.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/profile_info.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
@@ -29,40 +30,15 @@ class ProfileData extends StatelessWidget {
           return const LogInScreen();
         }
         UserModel userData = snapshot.data!;
-        return ListView(
-          controller: ScrollController(),
-          padding: const EdgeInsets.symmetric(
-            horizontal: LayoutConstants.kHorizontalPadding,
-          ),
+        return Column(
           children: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  ScreenTransition(
-                    builder: (context) => const DebugScreen(),
-                  ),
-                );
-              },
-              child: const Text("Debug page"),
+            ProfilePic(
+              userData: userData,
+              loading: false,
+              radius: LayoutConstants.kProfilePicRadius,
             ),
-            Row(
-              children: [
-                ProfilePic(
-                  userData: userData,
-                  loading: false,
-                  radius: LayoutConstants.kProfilePicRadius,
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: LayoutConstants.kHeight),
-                      ProfileInfo(userData: userData),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            const SizedBox(height: LayoutConstants.kHeight),
+            ProfileInfo(userData: userData),
           ],
         );
       },

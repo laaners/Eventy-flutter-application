@@ -1,6 +1,8 @@
+import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/services/date_methods.dart';
+import 'package:dima_app/widgets/container_shadow.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -42,8 +44,14 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 10),
+        ContainerShadow(
+          margin: const EdgeInsets.only(
+            top: 10,
+            right: 5,
+            left: 5,
+            bottom: LayoutConstants.kPaddingFromCreate,
+          ),
+          padding: const EdgeInsets.all(5),
           child: TableCalendar(
             headerStyle: const HeaderStyle(
               titleCentered: true,
