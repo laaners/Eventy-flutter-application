@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/models/group_model.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/error/error.dart';
@@ -77,6 +78,7 @@ class _InviteGroupsState extends State<InviteGroups> {
               });
             },
           ),
+          const SizedBox(height: 10),
           StreamBuilder(
             stream: _stream,
             builder: (
@@ -131,6 +133,7 @@ class _InviteGroupsState extends State<InviteGroups> {
                           icon: MyIconButton(
                             icon: Icon(
                               addMode ? Icons.add_circle : Icons.cancel,
+                              size: LayoutConstants.kIconSize,
                               color: addMode
                                   ? Theme.of(context).primaryColorLight
                                   : Theme.of(context).colorScheme.error,

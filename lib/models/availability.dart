@@ -27,4 +27,26 @@ class Availability {
         return Theme.of(context).focusColor;
     }
   }
+
+  static String description(int availability) {
+    String description = "";
+    switch (availability) {
+      case Availability.yes:
+        description = "Attending";
+        break;
+      case Availability.iff:
+        description = "If need be";
+        break;
+      case Availability.not:
+        description = "Not attending";
+        break;
+      case Availability.empty:
+        description = "Pending";
+        break;
+      default:
+        description = "All";
+        break;
+    }
+    return description;
+  }
 }

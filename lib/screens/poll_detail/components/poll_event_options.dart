@@ -19,6 +19,7 @@ class PollEventOptions extends StatelessWidget {
   final VoidCallback refreshPollDetail;
   final List<VoteLocationModel> votesLocations;
   final List<VoteDateModel> votesDates;
+  final bool isClosed;
   const PollEventOptions({
     super.key,
     required this.pollData,
@@ -27,37 +28,40 @@ class PollEventOptions extends StatelessWidget {
     required this.refreshPollDetail,
     required this.votesLocations,
     required this.votesDates,
+    required this.isClosed,
   });
 
   @override
   Widget build(BuildContext context) {
     String curUid = Provider.of<FirebaseUser>(listen: false, context).user!.uid;
+    String pollOrEvent = isClosed ? "event" : "poll";
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListTile(
-          contentPadding: const EdgeInsets.all(0),
-          title: Text(
-            "Share the poll",
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          leading: Container(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50),
+        if (curUid == pollData.organizerUid)
+          ListTile(
+            contentPadding: const EdgeInsets.all(0),
+            title: Text(
+              "Share the $pollOrEvent",
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-            child: const Icon(
-              Icons.share_outlined,
+            leading: Container(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: const Icon(
+                Icons.share_outlined,
+              ),
             ),
+            onTap: () async {
+              await DynamicLinksHandler.pollEventLinkSharing(
+                context: context,
+                pollData: pollData,
+              );
+            },
           ),
-          onTap: () async {
-            await DynamicLinksHandler.pollEventLinkSharing(
-              context: context,
-              pollData: pollData,
-            );
-          },
-        ),
         if (invites.isNotEmpty)
           ListTile(
             contentPadding: const EdgeInsets.all(0),
@@ -82,6 +86,7 @@ class PollEventOptions extends StatelessWidget {
                 context,
                 ScreenTransition(
                   builder: (context) => InviteesList(
+                    isClosed: isClosed,
                     pollEventId: pollEventId,
                     pollData: pollData,
                     invites: invites
@@ -95,7 +100,7 @@ class PollEventOptions extends StatelessWidget {
               );
             },
           ),
-        if (curUid == pollData.organizerUid && !pollData.isClosed)
+        if (curUid == pollData.organizerUid && !isClosed)
           ListTile(
             contentPadding: const EdgeInsets.all(0),
             title: Text(
@@ -129,7 +134,7 @@ class PollEventOptions extends StatelessWidget {
           ListTile(
             contentPadding: const EdgeInsets.all(0),
             title: Text(
-              "Delete the poll",
+              "Delete the $pollOrEvent",
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.titleLarge,
             ),
@@ -159,7 +164,7 @@ class PollEventOptions extends StatelessWidget {
           ListTile(
             contentPadding: const EdgeInsets.all(0),
             title: Text(
-              "Exit the poll",
+              "Exit the $pollOrEvent",
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.titleLarge,
             ),

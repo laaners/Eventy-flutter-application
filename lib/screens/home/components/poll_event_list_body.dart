@@ -3,15 +3,19 @@ import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/screens/poll_detail/components/poll_event_options.dart';
 import 'package:dima_app/screens/poll_event/poll_event.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/services/poll_event_methods.dart';
+import 'package:dima_app/widgets/empty_list.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/poll_event_tile.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
+import 'package:dima_app/widgets/search_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -28,8 +32,10 @@ class _PollEventListBodyState extends State<PollEventListBody> {
   late List<PollEventModel> events;
   bool alphabeticAsc = true;
   bool chronoAsc = true;
-
   String filter = "All";
+
+  final TextEditingController _controller = TextEditingController();
+  final FocusNode _focus = FocusNode();
 
   @override
   void initState() {
@@ -44,7 +50,27 @@ class _PollEventListBodyState extends State<PollEventListBody> {
   @override
   void didUpdateWidget(PollEventListBody oldWidget) {
     setState(() {
-      events = widget.events;
+      switch (filter) {
+        case "All":
+          events = widget.events;
+          break;
+        case "Open":
+          events = widget.events.where((event) {
+            bool isClosed = event.isClosed ||
+                DateFormatter.string2DateTime(event.deadline)
+                    .isBefore(DateTime.now());
+            return !isClosed;
+          }).toList();
+          break;
+        case "Closed":
+          events = widget.events.where((event) {
+            bool isClosed = event.isClosed ||
+                DateFormatter.string2DateTime(event.deadline)
+                    .isBefore(DateTime.now());
+            return isClosed;
+          }).toList();
+          break;
+      }
       alphabeticAsc
           ? events.sort((a, b) => a.pollEventName
               .toLowerCase()
@@ -61,11 +87,32 @@ class _PollEventListBodyState extends State<PollEventListBody> {
 
   @override
   Widget build(BuildContext context) {
-    String curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     return Stack(
       children: [
         Container(
+          margin: const EdgeInsets.symmetric(
+            vertical: LayoutConstants.kHorizontalPadding,
+            horizontal: 5,
+          ),
+          child: SearchTile(
+            controller: _controller,
+            focusNode: _focus,
+            hintText: "Search for poll/event name",
+            emptySearch: () {
+              if (_controller.text.isNotEmpty) {
+                setState(() {
+                  _controller.text = "";
+                });
+              }
+            },
+            onChanged: (text) {
+              setState(() {});
+            },
+          ),
+        ),
+        Container(
           alignment: Alignment.topRight,
+          margin: const EdgeInsets.only(top: 65),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -79,46 +126,51 @@ class _PollEventListBodyState extends State<PollEventListBody> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: ["All", "Open", "Closed"].map((label) {
-                        return Container(
-                          decoration: BoxDecoration(
+                        return InkWell(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          customBorder: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
-                            color: filter == label
-                                ? Theme.of(context).primaryColor
-                                : Theme.of(context).focusColor,
                           ),
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 10),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 3, horizontal: 15),
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                switch (label) {
-                                  case "All":
-                                    events = widget.events;
-                                    break;
-                                  case "Open":
-                                    events = widget.events.where((event) {
-                                      bool isClosed = event.isClosed ||
-                                          DateFormatter.string2DateTime(
-                                                  event.deadline)
-                                              .isBefore(DateTime.now());
-                                      return !isClosed;
-                                    }).toList();
-                                    break;
-                                  case "Closed":
-                                    events = widget.events.where((event) {
-                                      bool isClosed = event.isClosed ||
-                                          DateFormatter.string2DateTime(
-                                                  event.deadline)
-                                              .isBefore(DateTime.now());
-                                      return isClosed;
-                                    }).toList();
-                                    break;
-                                }
-                                filter = label;
-                              });
-                            },
+                          onTap: () {
+                            setState(() {
+                              switch (label) {
+                                case "All":
+                                  events = widget.events;
+                                  break;
+                                case "Open":
+                                  events = widget.events.where((event) {
+                                    bool isClosed = event.isClosed ||
+                                        DateFormatter.string2DateTime(
+                                                event.deadline)
+                                            .isBefore(DateTime.now());
+                                    return !isClosed;
+                                  }).toList();
+                                  break;
+                                case "Closed":
+                                  events = widget.events.where((event) {
+                                    bool isClosed = event.isClosed ||
+                                        DateFormatter.string2DateTime(
+                                                event.deadline)
+                                            .isBefore(DateTime.now());
+                                    return isClosed;
+                                  }).toList();
+                                  break;
+                              }
+                              filter = label;
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: filter == label
+                                  ? Theme.of(context).primaryColor
+                                  : Theme.of(context).focusColor,
+                            ),
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 3, horizontal: 15),
                             child: Text(
                               label,
                               style: Theme.of(context)
@@ -180,139 +232,117 @@ class _PollEventListBodyState extends State<PollEventListBody> {
           ),
         ),
         Container(
-          margin: const EdgeInsets.only(top: 50),
-          child: Scrollbar(
-            child: ListView.builder(
-              itemCount: events.length + 1,
-              itemBuilder: (BuildContext context, int index) {
-                if (index == events.length) {
-                  return Container(height: LayoutConstants.kPaddingFromCreate);
-                }
-                PollEventModel event = events[index];
-                bool isClosed = event.isClosed ||
-                    DateFormatter.string2DateTime(event.deadline)
-                        .isBefore(DateTime.now());
-                return PollEventTile(
-                  pollEvent: event,
-                  bgColor:
-                      isClosed ? Theme.of(context).primaryColorLight : null,
-                  locationBanner: event.locations[0].icon,
-                  descTop: isClosed
-                      ? "Closed poll"
-                      : "Poll closes the ${DateFormat(Preferences.getBool('is24Hour') ? "dd/MM/yyyy, 'at' HH:mm" : "dd/MM/yyyy, 'at' hh:mm a").format(
-                          DateFormatter.string2DateTime(event.deadline),
-                        )}",
-                  descMiddle: event.pollEventName,
-                  onTap: () async {
-                    // ignore: use_build_context_synchronously
-                    String pollEventId =
-                        "${event.pollEventName}_${event.organizerUid}";
-                    Widget newScreen =
-                        PollEventScreen(pollEventId: pollEventId);
-                    // ignore: use_build_context_synchronously
-                    var ris =
-                        await Navigator.of(context, rootNavigator: false).push(
-                      ScreenTransition(
-                        builder: (context) => newScreen,
-                      ),
-                    );
-                    if (ris == "delete_poll_$curUid") {
-                      // ignore: use_build_context_synchronously
-                      LoadingOverlay.show(context);
-                      // ignore: use_build_context_synchronously
-                      await Provider.of<FirebasePollEvent>(context,
-                              listen: false)
-                          .deletePollEvent(
-                        context: context,
-                        pollId: pollEventId,
-                      );
-                      // ignore: use_build_context_synchronously
-                      LoadingOverlay.hide(context);
-                    }
-                    if (ris == "exit_poll") {
-                      // ignore: use_build_context_synchronously
-                      LoadingOverlay.show(context);
-                      // ignore: use_build_context_synchronously
-                      await Provider.of<FirebasePollEventInvite>(context,
-                              listen: false)
-                          .deletePollEventInvite(
-                        context: context,
-                        inviteeId: curUid,
-                        pollEventId: pollEventId,
-                      );
-                      // ignore: use_build_context_synchronously
-                      LoadingOverlay.hide(context);
-                    }
-                  },
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      MyIconButton(
-                        icon: const Icon(Icons.more_vert),
-                        onTap: () async {
-                          String pollEventId =
-                              "${event.pollEventName}_${event.organizerUid}";
-                          var ris = await MyModal.show(
-                            context: context,
-                            child: PollEventOptions(
-                              pollData: event,
+          margin: const EdgeInsets.only(top: 115),
+          child: Builder(builder: (context) {
+            List<PollEventModel> eventsToShow = events
+                .where((event) => event.pollEventName
+                    .toLowerCase()
+                    .contains(_controller.text.toLowerCase()))
+                .toList();
+            return Scrollbar(
+              child: eventsToShow.isEmpty
+                  ? ListView(
+                      controller: ScrollController(),
+                      children: const [
+                        EmptyList(emptyMsg: "No polls or events found"),
+                      ],
+                    )
+                  : ListView.builder(
+                      itemCount: eventsToShow.length + 1,
+                      itemBuilder: (BuildContext context, int index) {
+                        if (index == eventsToShow.length) {
+                          return Container(
+                              height: LayoutConstants.kPaddingFromCreate);
+                        }
+                        PollEventModel event = eventsToShow[index];
+                        bool isClosed = event.isClosed ||
+                            DateFormatter.string2DateTime(event.deadline)
+                                .isBefore(DateTime.now());
+                        String pollEventId =
+                            "${event.pollEventName}_${event.organizerUid}";
+                        if (isClosed && !event.isClosed) {
+                          // close the event on db
+                          print("Should close ${pollEventId}");
+                          Provider.of<FirebasePollEvent>(context, listen: false)
+                              .closePoll(pollId: pollEventId);
+                        }
+                        String curUid =
+                            Provider.of<FirebaseUser>(context, listen: false)
+                                .user!
+                                .uid;
+                        return PollEventTile(
+                          pollEvent: event,
+                          bgColor: isClosed
+                              ? Theme.of(context).primaryColorLight
+                              : null,
+                          locationBanner: event.locations[0].icon,
+                          descTop: isClosed
+                              ? "Closed poll"
+                              : "Poll closes the ${DateFormat(Provider.of<ClockManager>(context).clockMode ? "dd/MM/yyyy, 'at' HH:mm" : "dd/MM/yyyy, 'at' hh:mm a").format(
+                                  DateFormatter.string2DateTime(event.deadline),
+                                )}",
+                          descMiddle: event.pollEventName,
+                          onTap: () async {
+                            Widget newScreen =
+                                PollEventScreen(pollEventId: pollEventId);
+                            // ignore: use_build_context_synchronously
+                            var ris = await Navigator.of(context,
+                                    rootNavigator: false)
+                                .push(
+                              ScreenTransition(
+                                builder: (context) => newScreen,
+                              ),
+                            );
+
+                            // ignore: use_build_context_synchronously
+                            await PollEventUserMethods.optionsRisManager(
+                              context: context,
                               pollEventId: pollEventId,
-                              invites: [],
-                              refreshPollDetail: () {},
-                              votesLocations: [],
-                              votesDates: [],
-                            ),
-                            heightFactor: 0.3,
-                            doneCancelMode: false,
-                            onDone: () {},
-                            title: "",
-                          );
-                          if (ris == "create_event_$curUid") {
-                            // ignore: use_build_context_synchronously
-                            LoadingOverlay.show(context);
-                            // ignore: use_build_context_synchronously
-                            await Provider.of<FirebasePollEvent>(context,
-                                    listen: false)
-                                .closePoll(
-                              context: context,
-                              pollId: pollEventId,
+                              ris: ris,
                             );
-                            // ignore: use_build_context_synchronously
-                            LoadingOverlay.hide(context);
-                          } else if (ris == "delete_poll_$curUid") {
-                            // ignore: use_build_context_synchronously
-                            LoadingOverlay.show(context);
-                            // ignore: use_build_context_synchronously
-                            await Provider.of<FirebasePollEvent>(context,
-                                    listen: false)
-                                .deletePollEvent(
-                              context: context,
-                              pollId: pollEventId,
-                            );
-                            // ignore: use_build_context_synchronously
-                            LoadingOverlay.hide(context);
-                          } else if (ris == "exit_poll") {
-                            // ignore: use_build_context_synchronously
-                            LoadingOverlay.show(context);
-                            // ignore: use_build_context_synchronously
-                            await Provider.of<FirebasePollEventInvite>(context,
-                                    listen: false)
-                                .deletePollEventInvite(
-                              context: context,
-                              inviteeId: curUid,
-                              pollEventId: pollEventId,
-                            );
-                            // ignore: use_build_context_synchronously
-                            LoadingOverlay.hide(context);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
+                          },
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              MyIconButton(
+                                icon: const Icon(Icons.more_vert),
+                                onTap: () async {
+                                  String pollEventId =
+                                      "${event.pollEventName}_${event.organizerUid}";
+
+                                  var ris = await MyModal.show(
+                                    context: context,
+                                    child: PollEventOptions(
+                                      pollData: event,
+                                      pollEventId: pollEventId,
+                                      invites: [],
+                                      refreshPollDetail: () {},
+                                      votesLocations: [],
+                                      votesDates: [],
+                                      isClosed: true,
+                                    ),
+                                    heightFactor: curUid == event.organizerUid
+                                        ? 0.25
+                                        : 0.16,
+                                    doneCancelMode: false,
+                                    onDone: () {},
+                                    title: "",
+                                  );
+                                  // ignore: use_build_context_synchronously
+                                  await PollEventUserMethods.optionsRisManager(
+                                    context: context,
+                                    pollEventId: pollEventId,
+                                    ris: ris,
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            );
+          }),
         ),
       ],
     );

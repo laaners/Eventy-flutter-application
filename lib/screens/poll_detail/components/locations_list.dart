@@ -6,6 +6,7 @@ import 'package:dima_app/models/vote_location_model.dart';
 import 'package:dima_app/screens/poll_detail/components/availability_legend.dart';
 import 'package:dima_app/screens/poll_detail/components/location_tile.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/widgets/empty_list.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -170,18 +171,17 @@ class _LocationsListState extends State<LocationsList>
         ),
         Container(
           margin: const EdgeInsets.only(top: 50),
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
+          child: votesLocations.isEmpty
+              ? const EmptyList(emptyMsg: "No results found")
+              : ListView.builder(
                   itemCount: votesLocations.length,
+                  physics: const ClampingScrollPhysics(),
+                  shrinkWrap: true,
                   itemBuilder: (BuildContext context, int index) {
                     VoteLocationModel voteLocation = votesLocations[index];
                     Location location = widget.locations.firstWhere(
                       (element) => element.name == voteLocation.locationName,
                     );
-                    int curVote = voteLocation.votes[widget.votingUid] ??
-                        Availability.empty;
                     return LocationTile(
                       location: location,
                       voteLocation: voteLocation,
@@ -191,6 +191,7 @@ class _LocationsListState extends State<LocationsList>
                       pollId: widget.pollId,
                       invites: widget.invites,
                       modifyVote: (int newAvailability) {
+                        if (widget.isClosed) return;
                         if (widget.votingUid == curUid) {
                           setState(() {
                             votesLocations[votesLocations.indexWhere(
@@ -203,9 +204,6 @@ class _LocationsListState extends State<LocationsList>
                     );
                   },
                 ),
-              ),
-            ],
-          ),
         ),
       ],
     );

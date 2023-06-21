@@ -3,6 +3,7 @@ import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/change_password/change_password.dart';
 import 'package:dima_app/screens/edit_profile/edit_profile.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/theme_manager.dart';
 import 'package:dima_app/widgets/container_shadow.dart';
@@ -53,9 +54,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       "24-hour clock",
                     ),
                     value: Preferences.getBool('is24Hour'),
-                    onChanged: (bool value) {
+                    onChanged: (bool newValue) {
                       setState(() {
-                        Preferences.setBool('is24Hour', value);
+                        Provider.of<ClockManager>(context, listen: false)
+                            .toggleClock(newValue);
+                        // Preferences.setBool('is24Hour', value);
                       });
                     },
                     secondary: const Icon(Icons.access_time),

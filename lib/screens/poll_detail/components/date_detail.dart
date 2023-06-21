@@ -5,6 +5,7 @@ import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/screens/poll_detail/components/my_poll.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/firebase_vote.dart';
@@ -31,82 +32,33 @@ class DateDetail extends StatelessWidget {
     required this.isClosed,
   });
 
-  List<MyPollOption> getOptions(VoteDateModel? voteDateModel) {
+  List<MyPollOption> getOptions(VoteDateModel? voteDate) {
     return [
-      MyPollOption(
-        id: Availability.yes,
+      Availability.yes,
+      Availability.iff,
+      Availability.not,
+      Availability.empty
+    ].map((availability) {
+      Map<String, dynamic> votesKind = VoteDateModel.getVotesKind(
+        voteDate: voteDate,
+        kind: availability,
+        invites: invites,
+        organizerUid: organizerUid,
+      );
+      return MyPollOption(
+        id: availability,
         title: Row(
           children: [
-            Icon(Availability.icons[Availability.yes]),
-            const Text(" Present", style: TextStyle(fontSize: 20)),
+            Icon(Availability.icons[availability]),
+            Text(
+              " ${votesKind.length} ${Availability.description(availability)}",
+              style: const TextStyle(fontSize: 20),
+            ),
           ],
         ),
-        votes: voteDateModel != null
-            ? 1 +
-                (voteDateModel
-                    .getVotesKind(
-                      Availability.yes,
-                      invites,
-                      organizerUid,
-                    )
-                    .length)
-            : 1,
-      ),
-      MyPollOption(
-        id: Availability.iff,
-        title: Row(
-          children: [
-            Icon(Availability.icons[Availability.iff]),
-            const Text(" If need be", style: TextStyle(fontSize: 20)),
-          ],
-        ),
-        votes: voteDateModel != null
-            ? voteDateModel
-                .getVotesKind(
-                  Availability.iff,
-                  invites,
-                  organizerUid,
-                )
-                .length
-            : 0,
-      ),
-      MyPollOption(
-        id: Availability.not,
-        title: Row(
-          children: [
-            Icon(Availability.icons[Availability.not]),
-            const Text(" Not present", style: TextStyle(fontSize: 20)),
-          ],
-        ),
-        votes: voteDateModel != null
-            ? voteDateModel
-                .getVotesKind(
-                  Availability.not,
-                  invites,
-                  organizerUid,
-                )
-                .length
-            : 0,
-      ),
-      MyPollOption(
-        id: Availability.empty,
-        title: Row(
-          children: [
-            Icon(Availability.icons[Availability.empty]),
-            const Text(" Pending", style: TextStyle(fontSize: 20)),
-          ],
-        ),
-        votes: voteDateModel != null
-            ? voteDateModel
-                .getVotesKind(
-                  Availability.empty,
-                  invites,
-                  organizerUid,
-                )
-                .length
-            : invites.length - 1,
-      ),
-    ];
+        votes: votesKind.length,
+      );
+    }).toList();
   }
 
   @override
@@ -115,7 +67,7 @@ class DateDetail extends StatelessWidget {
         DateFormatter.string2DateTime("${voteDate.date} 00:00:00");
     var start = voteDate.start;
     var end = voteDate.end;
-    if (!Preferences.getBool('is24Hour')) {
+    if (!Provider.of<ClockManager>(context).clockMode) {
       start = DateFormat("hh:mm a")
           .format(DateFormatter.string2DateTime("2000-01-01 $start:00"));
       end = DateFormat("hh:mm a")
@@ -213,19 +165,14 @@ class DateDetail extends StatelessWidget {
               pollTitle: Container(),
               pollOptions: getOptions(voteDateModel),
               metaWidget: Row(
-                children: const [
-                  Text(
-                    '•',
-                    style: TextStyle(
-                      fontSize: 20,
+                children: [
+                  Flexible(
+                    child: Text(
+                      'Your vote: ${Availability.description(userVotedOptionId).toLowerCase()} ',
+                      style: const TextStyle(fontSize: 20),
                     ),
                   ),
-                  Text(
-                    '2 weeks left',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
+                  Icon(Availability.icons[userVotedOptionId])
                 ],
               ),
             );

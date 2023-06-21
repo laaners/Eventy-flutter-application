@@ -37,7 +37,7 @@ class _GroupsScreenState extends State<GroupsScreen>
             icon: Icon(Icons.group_add,
                 color: Theme.of(context).primaryColorLight),
             onTap: () async {
-              MyModal.show(
+              await MyModal.show(
                 context: context,
                 child: const CreateGroup(),
                 heightFactor: 0.85,

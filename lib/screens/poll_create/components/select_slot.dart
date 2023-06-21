@@ -1,8 +1,10 @@
 import 'package:dima_app/constants/preferences.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class SelectSlot extends StatefulWidget {
   final String dayString;
@@ -62,7 +64,7 @@ class _SelectSlotState extends State<SelectSlot> {
                     mode: CupertinoDatePickerMode.time,
                     initialDateTime: _startDate,
                     minuteInterval: 5,
-                    use24hFormat: Preferences.getBool("is24Hour"),
+                    use24hFormat: Provider.of<ClockManager>(context).clockMode,
                     onDateTimeChanged: (pickedDate) {
                       setState(() {
                         _startDate = pickedDate;
@@ -88,7 +90,7 @@ class _SelectSlotState extends State<SelectSlot> {
                     mode: CupertinoDatePickerMode.time,
                     initialDateTime: _endDate,
                     minuteInterval: 5,
-                    use24hFormat: Preferences.getBool("is24Hour"),
+                    use24hFormat: Provider.of<ClockManager>(context).clockMode,
                     onDateTimeChanged: (pickedDate) {
                       setState(() {
                         _endDate = pickedDate;

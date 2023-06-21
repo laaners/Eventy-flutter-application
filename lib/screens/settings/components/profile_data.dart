@@ -1,13 +1,9 @@
 import 'package:dima_app/constants/layout_constants.dart';
-import 'package:dima_app/debug.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/login/login.dart';
 import 'package:dima_app/services/firebase_user.dart';
-import 'package:dima_app/widgets/container_shadow.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
-import 'package:dima_app/widgets/profile_info.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
-import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -38,7 +34,22 @@ class ProfileData extends StatelessWidget {
               radius: LayoutConstants.kProfilePicRadius,
             ),
             const SizedBox(height: LayoutConstants.kHeight),
-            ProfileInfo(userData: userData),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  userData.username,
+                  style: Theme.of(context).textTheme.titleLarge,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  "${userData.name} ${userData.surname}",
+                  style: Theme.of(context).textTheme.titleMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ],
         );
       },

@@ -51,24 +51,43 @@ class VoteDateModel {
   }
 
   /// This method gets the votes of a specific kind, e.g. Availability.yes or Availability.no .
-  Map<String, dynamic> getVotesKind(
-    int kind,
-    List<PollEventInviteModel> invites,
-    String organizerUid,
-  ) {
+  static Map<String, dynamic> getVotesKind({
+    required VoteDateModel? voteDate,
+    required int kind,
+    required List<PollEventInviteModel> invites,
+    required String organizerUid,
+  }) {
     Map<String, dynamic> votesKind = {};
-    votes.forEach((key, value) {
+    if (voteDate == null) {
+      switch (kind) {
+        case Availability.yes:
+          return {organizerUid: Availability.yes};
+        case Availability.empty:
+          for (var invite in invites) {
+            if (invite.inviteeId != organizerUid) {
+              votesKind[invite.inviteeId] = Availability.empty;
+            }
+          }
+          return votesKind;
+        default:
+          return {};
+      }
+    }
+    voteDate.votes.forEach((key, value) {
       if (value == kind) {
         votesKind[key] = value;
       }
     });
     if (kind == Availability.empty) {
       for (var invite in invites) {
-        if (!votes.containsKey(invite.inviteeId) &&
+        if (!voteDate.votes.containsKey(invite.inviteeId) &&
             invite.inviteeId != organizerUid) {
           votesKind[invite.inviteeId] = Availability.empty;
         }
       }
+    }
+    if (kind == Availability.yes) {
+      votesKind[organizerUid] = Availability.yes;
     }
     return votesKind;
   }

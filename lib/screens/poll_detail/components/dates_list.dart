@@ -13,12 +13,12 @@ import 'dates_view_calendar.dart';
 class DatesList extends StatefulWidget {
   final bool isClosed;
   final String organizerUid;
+  final String votingUid;
   final String pollId;
   final String deadline;
   final Map<String, dynamic> dates;
   final List<PollEventInviteModel> invites;
   final List<VoteDateModel> votesDates;
-
   const DatesList({
     super.key,
     required this.dates,
@@ -28,6 +28,7 @@ class DatesList extends StatefulWidget {
     required this.votesDates,
     required this.deadline,
     required this.isClosed,
+    required this.votingUid,
   });
 
   @override
@@ -78,7 +79,7 @@ class _DatesListState extends State<DatesList>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+    final curUid = Provider.of<FirebaseUser>(listen: false, context).user!.uid;
     return Stack(
       children: [
         Container(
@@ -98,14 +99,14 @@ class _DatesListState extends State<DatesList>
                       votesDates = List.from(widget.votesDates);
                       votesDates = votesDates
                           .where((voteLocation) =>
-                              voteLocation.votes[curUid] == null ||
-                              voteLocation.votes[curUid] == value)
+                              voteLocation.votes[widget.votingUid] == null ||
+                              voteLocation.votes[widget.votingUid] == value)
                           .toList();
                     } else {
                       votesDates = List.from(widget.votesDates);
                       votesDates = votesDates
                           .where((voteLocation) =>
-                              voteLocation.votes[curUid] == value)
+                              voteLocation.votes[widget.votingUid] == value)
                           .toList();
                     }
                     chronoAsc
@@ -173,14 +174,51 @@ class _DatesListState extends State<DatesList>
         ),
         Container(
           margin: const EdgeInsets.only(top: 50),
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView(
+          // calendar overflow problem: column when in modal (viewing other people votes), listview when not modal (viewing current user votes)
+          child: curUid == widget.votingUid
+              ? ListView(
+                  physics: const BouncingScrollPhysics(),
                   children: [
                     DatesViewHorizontal(
                       isClosed: widget.isClosed,
                       organizerUid: widget.organizerUid,
+                      votingUid: widget.votingUid,
+                      pollId: widget.pollId,
+                      deadline: widget.deadline,
+                      dates: widget.dates,
+                      invites: widget.invites,
+                      votesDates: votesDates.where(filter).toList(),
+                      updateFilterAfterVote: updateFilterAfterVote,
+                    ),
+                    DatesViewCalendar(
+                      organizerUid: widget.organizerUid,
+                      pollId: widget.pollId,
+                      deadline: widget.deadline,
+                      dates: widget.dates,
+                      invites: widget.invites,
+                      votesDates: widget.votesDates,
+                      filterDates: (selectedDateString) {
+                        setState(() {
+                          if (selectedDateString == "all") {
+                            filter = (VoteDateModel voteDate) {
+                              return true;
+                            };
+                          } else {
+                            filter = (VoteDateModel voteDate) {
+                              return voteDate.date == selectedDateString;
+                            };
+                          }
+                        });
+                      },
+                    ),
+                  ],
+                )
+              : Column(
+                  children: [
+                    DatesViewHorizontal(
+                      isClosed: widget.isClosed,
+                      organizerUid: widget.organizerUid,
+                      votingUid: widget.votingUid,
                       pollId: widget.pollId,
                       deadline: widget.deadline,
                       dates: widget.dates,
@@ -211,9 +249,6 @@ class _DatesListState extends State<DatesList>
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
         ),
       ],
     );

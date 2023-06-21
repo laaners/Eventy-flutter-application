@@ -84,23 +84,39 @@ void main() {
     });
 
     test('getVotesKind should correctly return votes of specific kind', () {
-      final positiveVotes =
-          testVote.getVotesKind(Availability.yes, testInvites, 'user1');
+      final positiveVotes = VoteDateModel.getVotesKind(
+        voteDate: testVote,
+        kind: Availability.yes,
+        invites: testInvites,
+        organizerUid: 'user1',
+      );
 
       expect(positiveVotes, {'user2': 2});
 
-      final emptyVotes =
-          testVote.getVotesKind(Availability.empty, testInvites, 'user1');
+      final emptyVotes = VoteDateModel.getVotesKind(
+        voteDate: testVote,
+        kind: Availability.empty,
+        invites: testInvites,
+        organizerUid: 'user1',
+      );
 
       expect(emptyVotes, {'user4': -1});
 
-      final notVotes =
-          testVote.getVotesKind(Availability.not, testInvites, 'user1');
+      final notVotes = VoteDateModel.getVotesKind(
+        voteDate: testVote,
+        kind: Availability.not,
+        invites: testInvites,
+        organizerUid: 'user1',
+      );
 
       expect(notVotes, {'user3': 0});
 
-      final iffVotes =
-          testVote.getVotesKind(Availability.iff, testInvites, 'user1');
+      final iffVotes = VoteDateModel.getVotesKind(
+        voteDate: testVote,
+        kind: Availability.iff,
+        invites: testInvites,
+        organizerUid: 'user1',
+      );
 
       expect(iffVotes, {'user1': 1});
     });

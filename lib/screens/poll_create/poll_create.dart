@@ -8,6 +8,7 @@ import 'package:dima_app/screens/poll_create/components/step_basics.dart';
 import 'package:dima_app/screens/poll_create/components/step_dates.dart';
 import 'package:dima_app/screens/poll_create/components/step_invite.dart';
 import 'package:dima_app/screens/poll_create/components/step_places.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
@@ -59,7 +60,7 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
   void initState() {
     super.initState();
     DateTime now = DateTime.now();
-    if (Preferences.getBool("is24Hour")) {
+    if (Provider.of<ClockManager>(context).clockMode) {
       deadlineController.text = DateFormat("yyyy-MM-dd HH:00:00").format(
         DateTime(now.year, now.month, now.day + 1),
       );

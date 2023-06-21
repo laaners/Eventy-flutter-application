@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/models/availability.dart';
 import 'package:dima_app/models/location.dart';
-import 'package:dima_app/models/location_icons.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/vote_location_model.dart';
 import 'package:dima_app/screens/error/error.dart';
@@ -33,82 +32,33 @@ class LocationDetail extends StatelessWidget {
     required this.isClosed,
   });
 
-  List<MyPollOption> getOptions(VoteLocationModel? locationModel) {
+  List<MyPollOption> getOptions(VoteLocationModel? voteLocation) {
     return [
-      MyPollOption(
-        id: Availability.yes,
+      Availability.yes,
+      Availability.iff,
+      Availability.not,
+      Availability.empty
+    ].map((availability) {
+      Map<String, dynamic> votesKind = VoteLocationModel.getVotesKind(
+        voteLocation: voteLocation,
+        kind: availability,
+        invites: invites,
+        organizerUid: organizerUid,
+      );
+      return MyPollOption(
+        id: availability,
         title: Row(
           children: [
-            Icon(Availability.icons[Availability.yes]),
-            const Text(" Present", style: TextStyle(fontSize: 20)),
+            Icon(Availability.icons[availability]),
+            Text(
+              " ${votesKind.length} ${Availability.description(availability)}",
+              style: const TextStyle(fontSize: 20),
+            ),
           ],
         ),
-        votes: locationModel != null
-            ? 1 +
-                (locationModel
-                    .getVotesKind(
-                      Availability.yes,
-                      invites,
-                      organizerUid,
-                    )
-                    .length)
-            : 1,
-      ),
-      MyPollOption(
-        id: Availability.iff,
-        title: Row(
-          children: [
-            Icon(Availability.icons[Availability.iff]),
-            const Text(" If need be", style: TextStyle(fontSize: 20)),
-          ],
-        ),
-        votes: locationModel != null
-            ? locationModel
-                .getVotesKind(
-                  Availability.iff,
-                  invites,
-                  organizerUid,
-                )
-                .length
-            : 0,
-      ),
-      MyPollOption(
-        id: Availability.not,
-        title: Row(
-          children: [
-            Icon(Availability.icons[Availability.not]),
-            const Text(" Not present", style: TextStyle(fontSize: 20)),
-          ],
-        ),
-        votes: locationModel != null
-            ? locationModel
-                .getVotesKind(
-                  Availability.not,
-                  invites,
-                  organizerUid,
-                )
-                .length
-            : 0,
-      ),
-      MyPollOption(
-        id: Availability.empty,
-        title: Row(
-          children: [
-            Icon(Availability.icons[Availability.empty]),
-            const Text(" Pending", style: TextStyle(fontSize: 20)),
-          ],
-        ),
-        votes: locationModel != null
-            ? locationModel
-                .getVotesKind(
-                  Availability.empty,
-                  invites,
-                  organizerUid,
-                )
-                .length
-            : invites.length - 1,
-      ),
-    ];
+        votes: votesKind.length,
+      );
+    }).toList();
   }
 
   @override
@@ -187,25 +137,18 @@ class LocationDetail extends StatelessWidget {
               pollOptionsSplashColor: Colors.white,
               votedProgressColor: Colors.grey.withOpacity(0.3),
               votedBackgroundColor: Colors.grey.withOpacity(0.2),
-              votedCheckmark: const Icon(
-                Icons.check,
-              ),
+              votedCheckmark: const Icon(Icons.check),
               pollTitle: Container(),
               pollOptions: getOptions(locationModel),
               metaWidget: Row(
-                children: const [
-                  Text(
-                    '•',
-                    style: TextStyle(
-                      fontSize: 20,
+                children: [
+                  Flexible(
+                    child: Text(
+                      'Your vote: ${Availability.description(userVotedOptionId).toLowerCase()} ',
+                      style: const TextStyle(fontSize: 20),
                     ),
                   ),
-                  Text(
-                    '2 weeks left',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
+                  Icon(Availability.icons[userVotedOptionId])
                 ],
               ),
             );

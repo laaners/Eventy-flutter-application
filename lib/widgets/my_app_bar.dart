@@ -3,9 +3,11 @@ import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/screens/poll_create/poll_create.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/services/poll_event_methods.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
+import 'package:dima_app/widgets/search_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'loading_logo.dart';
@@ -42,16 +44,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
         margin: const EdgeInsets.only(
             right: LayoutConstants.kModalHorizontalPadding),
         onTap: () async {
-          // the result from pop is the poll id
-          final pollId = await Navigator.of(context, rootNavigator: true).push(
-            ScreenTransition(
-              builder: (context) => const PollCreateScreen(),
-            ),
-          );
-          if (pollId != null) {
-            // ignore: use_build_context_synchronously
-            showSnackBar(context, "Successfully created event!");
-          }
+          await PollEventUserMethods.createNewPoll(context: context);
         },
         icon:
             Icon(Icons.add_circle, color: Theme.of(context).primaryColorLight),
@@ -79,7 +72,6 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
         overflow: TextOverflow.fade,
         style: Theme.of(context).textTheme.headlineSmall,
       ),
-      // backgroundColor: Colors.transparent,
       actions: upRightActions,
       scrolledUnderElevation: 0,
     );

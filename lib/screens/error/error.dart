@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ErrorScreen extends StatelessWidget {
-  final String errorMsg;
-  const ErrorScreen({super.key, this.errorMsg = ""});
+  final String? errorMsg;
+  const ErrorScreen({super.key, this.errorMsg});
 
   @override
   Widget build(BuildContext context) {
@@ -22,32 +22,41 @@ class ErrorScreen extends StatelessWidget {
                 controller: ScrollController(),
                 shrinkWrap: true,
                 children: [
-                  const SizedBox(height: 180, child: EventyLogo(extWidth: 180)),
-                  Container(padding: const EdgeInsets.only(top: 30)),
                   Text(
                     "AN ERROR HAS OCCURRED",
-                    style: Theme.of(context).textTheme.displaySmall,
+                    style: Theme.of(context).textTheme.headlineMedium,
                     textAlign: TextAlign.center,
                   ),
-                  Container(padding: const EdgeInsets.only(top: 10)),
-                  Center(
-                    child: Text(errorMsg),
+                  const SizedBox(height: 20),
+                  const SizedBox(height: 100, child: EventyLogo(extWidth: 100)),
+                  const SizedBox(height: 20),
+                  FractionallySizedBox(
+                    alignment: Alignment.topCenter,
+                    widthFactor: 0.8,
+                    child: Text(
+                      // errorMsg ?? "Check your connection and try again!",
+                      "Check your connection and try again!",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
                   ),
-                  Container(padding: const EdgeInsets.only(top: 10)),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  MyButton(
-                    text: "GO BACK!",
-                    onPressed: () async {
-                      if (Navigator.of(context).canPop()) {
-                        Navigator.of(context).pop();
-                        // Navigator.of(context).popUntil((route) => route.isFirst);
-                      } else {
-                        await Provider.of<FirebaseUser>(context, listen: false)
-                            .signOut();
-                      }
-                    },
+                  const SizedBox(height: 20),
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: LayoutConstants.kHorizontalPadding),
+                    child: MyButton(
+                      text: "GO BACK!",
+                      onPressed: () async {
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.of(context).pop();
+                          // Navigator.of(context).popUntil((route) => route.isFirst);
+                        } else {
+                          await Provider.of<FirebaseUser>(context,
+                                  listen: false)
+                              .signOut();
+                        }
+                      },
+                    ),
                   ),
                   Container(height: LayoutConstants.kPaddingFromCreate),
                 ],

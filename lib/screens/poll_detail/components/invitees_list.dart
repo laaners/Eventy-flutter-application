@@ -13,14 +13,18 @@ import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_button.dart';
-import 'package:dima_app/widgets/profile_pic.dart';
+import 'package:dima_app/widgets/my_icon_button.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:dima_app/widgets/show_user_dialog.dart';
+import 'package:dima_app/widgets/user_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dima_app/widgets/tabbar_switcher.dart';
+
+import 'invitee_votes_view.dart';
 
 class InviteesList extends StatefulWidget {
   final PollEventModel pollData;
@@ -28,6 +32,7 @@ class InviteesList extends StatefulWidget {
   final List<PollEventInviteModel> invites;
   final List<VoteLocationModel> votesLocations;
   final List<VoteDateModel> votesDates;
+  final bool isClosed;
   final VoidCallback refreshPollDetail;
   const InviteesList({
     super.key,
@@ -37,6 +42,7 @@ class InviteesList extends StatefulWidget {
     required this.votesLocations,
     required this.votesDates,
     required this.refreshPollDetail,
+    required this.isClosed,
   });
 
   @override
@@ -130,6 +136,7 @@ class _InviteesListState extends State<InviteesList> {
         }
         List<UserModel> usersData = snapshot.data!;
         return InviteesListIntermediate(
+          isClosed: widget.isClosed,
           pollEventId: widget.pollEventId,
           pollData: widget.pollData,
           users: users,
@@ -155,6 +162,8 @@ class InviteesListIntermediate extends StatefulWidget {
   final VoidCallback refreshPollDetail;
   final List<VoteLocationModel> votesLocations;
   final List<VoteDateModel> votesDates;
+  final bool isClosed;
+
   const InviteesListIntermediate({
     super.key,
     required this.pollEventId,
@@ -166,6 +175,7 @@ class InviteesListIntermediate extends StatefulWidget {
     required this.votesLocations,
     required this.votesDates,
     required this.invites,
+    required this.isClosed,
   });
 
   @override
@@ -196,10 +206,8 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    Widget userListOrEmpty = usersData.isNotEmpty
+  Widget userListOrEmpty() {
+    return usersData.isNotEmpty
         ? Scrollbar(
             child: ListView.builder(
               controller: ScrollController(),
@@ -208,21 +216,54 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
                 if (index == usersData.length) {
                   return Container(height: LayoutConstants.kPaddingFromCreate);
                 }
-                UserModel user = usersData[index];
-                return InviteeTile(
-                  pollData: widget.pollData,
-                  userData: user,
-                  refreshPollDetail: widget.refreshPollDetail,
-                  votesLocations: widget.votesLocations,
-                  votesDates: widget.votesDates,
-                  invites: widget.invites,
-                  pollEventId: widget.pollEventId,
+                UserModel userData = usersData[index];
+                return UserTileFromData(
+                  userData: userData,
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: LayoutConstants.kHorizontalPadding),
+                  trailing: MyIconButton(
+                    icon: const Icon(Icons.event_note),
+                    onTap: () async {
+                      var curUid =
+                          Provider.of<FirebaseUser>(context, listen: false)
+                              .user!
+                              .uid;
+                      if (curUid == userData.uid) {
+                        showUserDialog(context: context, user: userData);
+                      } else {
+                        MyModal.show(
+                          context: context,
+                          shrinkWrap: false,
+                          title: "${userData.username}'s preferences",
+                          child: InviteeVotesView(
+                            isClosed: widget.isClosed,
+                            pollData: widget.pollData,
+                            userData: userData,
+                            refreshPollDetail: widget.refreshPollDetail,
+                            votesLocations: widget.votesLocations,
+                            votesDates: widget.votesDates,
+                            invites: widget.invites,
+                            pollEventId: widget.pollEventId,
+                          ),
+                          heightFactor: 0.85,
+                          doneCancelMode: false,
+                          onDone: () {},
+                        );
+                      }
+                    },
+                  ),
                 );
               },
             ),
           )
         : const EmptyList(emptyMsg: "No other partecipants");
-    return widget.pollData.organizerUid == curUid || widget.pollData.canInvite
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+    return widget.pollData.organizerUid ==
+            curUid // || widget.pollData.canInvite
         ? TabbarSwitcher(
             appBarTitle: widget.pollData.pollEventName,
             upRightActions: [
@@ -237,7 +278,7 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
             listSticky: null,
             labels: const ["Partecipants", "Invite"],
             tabbars: [
-              userListOrEmpty,
+              userListOrEmpty(),
               ListView(
                 controller: ScrollController(),
                 children: [
@@ -265,161 +306,8 @@ class _InviteesListIntermediateState extends State<InviteesListIntermediate> {
             ],
           )
         : Scaffold(
-            appBar: MyAppBar(
-              title: widget.pollData.pollEventName,
-              upRightActions: [],
-            ),
-            body: ResponsiveWrapper(child: userListOrEmpty),
+            appBar: MyAppBar(title: widget.pollData.pollEventName),
+            body: ResponsiveWrapper(child: userListOrEmpty()),
           );
-  }
-}
-
-class InviteeTile extends StatefulWidget {
-  final PollEventModel pollData;
-  final UserModel userData;
-  final VoidCallback refreshPollDetail;
-  final List<VoteLocationModel> votesLocations;
-  final List<VoteDateModel> votesDates;
-  final String pollEventId;
-  final List<PollEventInviteModel> invites;
-  const InviteeTile({
-    super.key,
-    required this.userData,
-    required this.pollData,
-    required this.refreshPollDetail,
-    required this.votesLocations,
-    required this.votesDates,
-    required this.pollEventId,
-    required this.invites,
-  });
-
-  @override
-  State<InviteeTile> createState() => _InviteeTileState();
-}
-
-class _InviteeTileState extends State<InviteeTile> {
-  bool _refresh = false;
-  int _count = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80,
-      child: ListTile(
-        leading: ProfilePic(
-          loading: false,
-          userData: widget.userData,
-          radius: 25,
-        ),
-        title: Text("${widget.userData.name} ${widget.userData.surname}"),
-        subtitle: Text(widget.userData.username),
-        trailing: const Icon(Icons.arrow_forward_ios_rounded),
-        onTap: () async {
-          var curUid =
-              Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-          if (curUid == widget.userData.uid) {
-            showUserDialog(context: context, user: widget.userData);
-          } else {
-            Widget newScreen = InviteeVotesScreen(
-              pollData: widget.pollData,
-              userData: widget.userData,
-              refreshPollDetail: widget.refreshPollDetail,
-              votesLocations: widget.votesLocations,
-              votesDates: widget.votesDates,
-              invites: widget.invites,
-              pollEventId: widget.pollEventId,
-            );
-            Navigator.push(
-              context,
-              ScreenTransition(
-                builder: (context) => newScreen,
-              ),
-            );
-          }
-        },
-      ),
-    );
-  }
-}
-
-class InviteeVotesScreen extends StatefulWidget {
-  final PollEventModel pollData;
-  final UserModel userData;
-  final VoidCallback refreshPollDetail;
-  final List<VoteLocationModel> votesLocations;
-  final List<VoteDateModel> votesDates;
-  final String pollEventId;
-  final List<PollEventInviteModel> invites;
-  const InviteeVotesScreen({
-    super.key,
-    required this.pollData,
-    required this.userData,
-    required this.refreshPollDetail,
-    required this.votesLocations,
-    required this.votesDates,
-    required this.pollEventId,
-    required this.invites,
-  });
-
-  @override
-  State<InviteeVotesScreen> createState() => _InviteeVotesScreenState();
-}
-
-class _InviteeVotesScreenState extends State<InviteeVotesScreen> {
-  bool _refresh = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return TabbarSwitcher(
-      listSticky: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(_refresh.toString()),
-          ],
-        ),
-      ),
-      stickyHeight: 50,
-      labels: const ["Locations", "Dates"],
-      appBarTitle: "${widget.userData.username} votes",
-      upRightActions: [
-        Container(
-          margin: const EdgeInsets.only(
-            right: LayoutConstants.kHorizontalPadding,
-          ),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            child: Ink(
-              decoration: const BoxDecoration(shape: BoxShape.circle),
-              child: const Icon(
-                Icons.refresh,
-              ),
-            ),
-            onTap: () async {
-              widget.refreshPollDetail();
-              setState(() {
-                print("should refresh");
-                _refresh = !_refresh;
-              });
-            },
-          ),
-        ),
-      ],
-      tabbars: [
-        /*
-        LocationsList(
-          votingUid: widget.userData.uid,
-          organizerUid: widget.pollData.organizerUid,
-          pollId: widget.pollEventId,
-          locations: widget.pollData.locations,
-          invites: widget.invites,
-          votesLocations: widget.votesLocations,
-        ),
-        */
-        Text(_refresh.toString()),
-        Text(_refresh.toString())
-      ],
-    );
   }
 }

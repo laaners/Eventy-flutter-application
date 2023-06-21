@@ -403,11 +403,11 @@ class MyPolls extends HookWidget {
               }
             },
           ),
-        // CUSTOM: do not show subtitle containing #votes
-        /*
         const SizedBox(height: 4),
         Row(
           children: [
+            // CUSTOM: do not show subtitle containing #votes
+            /*
             Text(
               '${totalVotes.value} $votesText',
               style: votesTextStyle ??
@@ -416,12 +416,12 @@ class MyPolls extends HookWidget {
                     fontWeight: FontWeight.w500,
                   ),
             ),
+            */
             Expanded(
               child: metaWidget ?? Container(),
             ),
           ],
         ),
-        */
       ],
     );
   }

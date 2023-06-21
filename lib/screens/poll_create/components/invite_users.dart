@@ -123,7 +123,14 @@ class _InviteUsersState extends State<InviteUsers> {
                   )
                 : (_controller.text.isEmpty
                     ? Container()
-                    : const EmptyList(emptyMsg: "No users found")),
+                    : ListView(
+                        controller: ScrollController(),
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        children: const [
+                          EmptyList(emptyMsg: "No groups found")
+                        ],
+                      )),
           ),
         ],
       ),

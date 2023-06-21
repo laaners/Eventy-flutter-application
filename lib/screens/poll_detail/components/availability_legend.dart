@@ -27,41 +27,27 @@ class AvailabilityLegend extends StatelessWidget {
               Availability.not,
               Availability.empty
             ].map((availability) {
-              String legendText = "";
-              switch (availability) {
-                case Availability.yes:
-                  legendText = "Attending";
-                  break;
-                case Availability.iff:
-                  legendText = "If need be";
-                  break;
-                case Availability.not:
-                  legendText = "Not attending";
-                  break;
-                case Availability.empty:
-                  legendText = "Pending";
-                  break;
-                default:
-                  legendText = "All";
-                  break;
-              }
-              return Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: availability == filterAvailability
-                      ? Theme.of(context).primaryColor
-                      : Theme.of(context).focusColor,
-                ),
-                margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                padding: EdgeInsets.only(
-                    top: 3,
-                    bottom: 3,
-                    left: 8,
-                    right: availability == -2 ? 8 : 3),
-                child: InkWell(
-                  onTap: () {
-                    changeFilterAvailability(availability);
-                  },
+              String legendText = Availability.description(availability);
+              return InkWell(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                onTap: () {
+                  changeFilterAvailability(availability);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: availability == filterAvailability
+                        ? Theme.of(context).primaryColor
+                        : Theme.of(context).focusColor,
+                  ),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                  padding: EdgeInsets.only(
+                      top: 3,
+                      bottom: 3,
+                      left: 8,
+                      right: availability == -2 ? 8 : 3),
                   child: availability == -2
                       ? Text(
                           legendText,

@@ -1,10 +1,12 @@
 import 'package:dima_app/constants/preferences.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class StepBasics extends StatefulWidget {
   final TextEditingController eventTitleController;
@@ -99,7 +101,7 @@ class _StepBasicsState extends State<StepBasics> {
                 border: InputBorder.none,
               ),
               controller: TextEditingController(
-                text: DateFormat(Preferences.getBool("is24Hour")
+                text: DateFormat(Provider.of<ClockManager>(context).clockMode
                         ? "EEEE MMMM dd yyyy 'at' HH:mm"
                         : "EEEE MMMM dd yyyy 'at' hh:mm a")
                     .format(

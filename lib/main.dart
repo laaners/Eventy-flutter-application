@@ -1,23 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/debug.dart';
-import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/groups/groups.dart';
 import 'package:dima_app/screens/home/home.dart';
 import 'package:dima_app/screens/login/login.dart';
-import 'package:dima_app/screens/map/map.dart';
-import 'package:dima_app/screens/poll_create/poll_create.dart';
 import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/screens/settings/settings.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/dynamic_links_handler.dart';
 import 'package:dima_app/services/firebase_event_location.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_vote.dart';
+import 'package:dima_app/services/poll_event_methods.dart';
 import 'package:dima_app/services/theme_manager.dart';
-import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
-import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -50,6 +47,10 @@ Future<void> main() async {
         // DARK/LIGHT THEME
         ChangeNotifierProvider<ThemeManager>(
             create: (context) => ThemeManager()),
+
+        // CLOCK MODE, 24h/AM-PM
+        ChangeNotifierProvider<ClockManager>(
+            create: (context) => ClockManager()),
 
         // GLOBAL TAB CONTROLLER
         ChangeNotifierProvider<CupertinoTabController>(
@@ -259,7 +260,8 @@ class _MainScreen extends State<MainScreen> {
                 case 3:
                   return CupertinoTabView(
                     navigatorKey: fourthTabNavKey,
-                    builder: (context) => DebugScreen(), //const SearchScreen(),
+                    builder: (context) =>
+                        const DebugScreen(), //const SearchScreen(),
                   );
                 case 4:
                   return CupertinoTabView(
@@ -292,17 +294,7 @@ class CreatePollEventButton extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 18),
             child: MaterialButton(
               onPressed: () async {
-                // the result from pop is the poll id
-                final pollId =
-                    await Navigator.of(context, rootNavigator: true).push(
-                  ScreenTransition(
-                    builder: (context) => const PollCreateScreen(),
-                  ),
-                );
-                if (pollId != null) {
-                  // ignore: use_build_context_synchronously
-                  showSnackBar(context, "Successfully created event!");
-                }
+                await PollEventUserMethods.createNewPoll(context: context);
               },
               color: Theme.of(context).primaryColor,
               textColor: Theme.of(context).secondaryHeaderColor,

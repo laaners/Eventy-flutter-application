@@ -8,6 +8,7 @@ import 'package:dima_app/screens/poll_detail/components/poll_event_options.dart'
 import 'package:dima_app/screens/poll_detail/components/locations_list.dart';
 import 'package:dima_app/screens/poll_detail/components/most_voted_date_tile.dart';
 import 'package:dima_app/screens/poll_detail/components/most_voted_location_tile.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_user.dart';
@@ -97,6 +98,7 @@ class PollDetailScreen extends StatelessWidget {
                 votesLocations: votesLocations,
                 votesDates: votesDates,
                 refreshPollDetail: refreshPollDetail,
+                isClosed: isClosed,
               ),
             ),
             const SizedBox(height: 10),
@@ -133,7 +135,7 @@ class PollDetailScreen extends StatelessWidget {
                   )
                 : Flexible(
                     child: Text(
-                      DateFormat(Preferences.getBool('is24Hour')
+                      DateFormat(Provider.of<ClockManager>(context).clockMode
                               ? "MMMM dd yyyy, EEEE 'at' HH:mm"
                               : "MMMM dd yyyy, EEEE 'at' hh:mm a")
                           .format(
@@ -177,8 +179,9 @@ class PollDetailScreen extends StatelessWidget {
                 refreshPollDetail: refreshPollDetail,
                 votesLocations: votesLocations,
                 votesDates: votesDates,
+                isClosed: isClosed,
               ),
-              heightFactor: 0.4,
+              heightFactor: 0.32,
               doneCancelMode: false,
               onDone: () {},
               title: "",
@@ -188,10 +191,7 @@ class PollDetailScreen extends StatelessWidget {
               LoadingOverlay.show(context);
               // ignore: use_build_context_synchronously
               await Provider.of<FirebasePollEvent>(context, listen: false)
-                  .closePoll(
-                context: context,
-                pollId: pollId,
-              );
+                  .closePoll(pollId: pollId);
               // ignore: use_build_context_synchronously
               LoadingOverlay.hide(context);
             } else if (ris == "delete_poll_$curUid") {
@@ -232,6 +232,7 @@ class PollDetailScreen extends StatelessWidget {
             organizerUid: pollData.organizerUid,
             pollId: pollId,
             deadline: pollData.deadline,
+            votingUid: curUid,
             dates: pollData.dates,
             invites: pollInvites,
             votesDates: votesDates,
