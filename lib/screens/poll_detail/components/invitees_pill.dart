@@ -16,6 +16,7 @@ class InviteesPill extends StatelessWidget {
   final List<VoteLocationModel> votesLocations;
   final List<VoteDateModel> votesDates;
   final VoidCallback refreshPollDetail;
+  final bool isClosed;
   const InviteesPill({
     super.key,
     required this.pollEventId,
@@ -24,6 +25,7 @@ class InviteesPill extends StatelessWidget {
     required this.pollData,
     required this.votesLocations,
     required this.votesDates,
+    required this.isClosed,
   });
 
   @override
@@ -55,6 +57,7 @@ class InviteesPill extends StatelessWidget {
                       context,
                       ScreenTransition(
                         builder: (context) => InviteesList(
+                          isClosed: isClosed,
                           pollEventId: pollEventId,
                           pollData: pollData,
                           invites: invites

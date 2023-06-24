@@ -1,3 +1,4 @@
+import 'package:dima_app/constants/layout_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:dima_app/models/availability.dart';
 import 'package:dima_app/models/location.dart';
@@ -40,9 +41,12 @@ class LocationTile extends StatelessWidget {
     int curVote = voteLocation.votes[votingUid] ?? Availability.empty;
     return MyListTile(
       horizontalTitleGap: 25,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+      contentPadding: const EdgeInsets.symmetric(
+          horizontal: LayoutConstants.kHorizontalPadding),
       title: location.name,
-      subtitle: location.site,
+      subtitle: location.site.isEmpty
+          ? "The organizer did not provide any link"
+          : location.site,
       leading: SizedBox(
         height: double.infinity,
         child: Column(
@@ -101,6 +105,7 @@ class LocationTile extends StatelessWidget {
       onTap: () async {
         await MyModal.show(
           context: context,
+          shrinkWrap: false,
           child: LocationDetail(
             isClosed: isClosed,
             pollId: pollId,

@@ -1,6 +1,7 @@
 import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/screens/poll_create/components/select_day_slots.dart';
 import 'package:dima_app/screens/poll_create/components/select_slot.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/widgets/container_shadow.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
@@ -10,6 +11,7 @@ import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/pill_box.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class StepDates extends StatefulWidget {
@@ -193,7 +195,7 @@ class _StepDatesState extends State<StepDates> {
 
               String slotString = "$start - $end";
 
-              if (!Preferences.getBool('is24Hour')) {
+              if (!Provider.of<ClockManager>(context).clockMode) {
                 slotString = DateFormat("hh:mm a").format(
                     DateFormatter.string2DateTime("2000-01-01 $start:00"));
                 slotString += " - ";
@@ -267,12 +269,10 @@ class _StepDatesState extends State<StepDates> {
           margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           padding: EdgeInsets.only(bottom: _fixedTimeSlots ? 0 : 0),
           child: TableCalendar(
-            headerStyle: const HeaderStyle(
+            availableGestures: AvailableGestures.horizontalSwipe,
+            headerStyle: HeaderStyle(
               titleCentered: true,
-              titleTextStyle: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              ),
+              titleTextStyle: Theme.of(context).textTheme.headlineSmall!,
             ),
             calendarBuilders: CalendarBuilders(
               prioritizedBuilder: (context, day, focusedDay) {
@@ -409,8 +409,8 @@ class _StepDatesState extends State<StepDates> {
             },
             availableCalendarFormats: const {CalendarFormat.month: 'month'},
             calendarFormat: CalendarFormat.month,
-            onDayLongPressed: (selectedDay, focusedDay) {
-              MyModal.show(
+            onDayLongPressed: (selectedDay, focusedDay) async {
+              await MyModal.show(
                 context: context,
                 heightFactor: 0.85,
                 doneCancelMode: false,
@@ -425,6 +425,7 @@ class _StepDatesState extends State<StepDates> {
                   setSlot: setSlot,
                 ),
               );
+              _focusedDay = selectedDay;
             },
             eventLoader: (DateTime day) {
               String dayString = DateFormatter.dateTime2String(day);

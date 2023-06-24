@@ -1,6 +1,7 @@
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/widgets/my_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,32 +12,40 @@ import 'show_user_dialog.dart';
 
 class UserTileFromData extends StatelessWidget {
   final UserModel userData;
-  const UserTileFromData({super.key, required this.userData});
+  final Widget? trailing;
+  final EdgeInsetsGeometry? contentPadding;
+  const UserTileFromData({
+    super.key,
+    required this.userData,
+    this.trailing,
+    this.contentPadding,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80,
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(0),
-        leading: ProfilePic(
-          loading: false,
-          userData: userData,
-          radius: 30,
-        ),
-        title: Text("${userData.name} ${userData.surname}"),
-        subtitle: Text(userData.username),
-        onTap: () {
-          showUserDialog(context: context, user: userData);
-        },
-      ),
+    return MyListTile(
+      title: userData.username,
+      subtitle: "${userData.name} ${userData.surname}",
+      contentPadding: contentPadding,
+      leading: ProfilePicFromData(userData: userData),
+      trailing: trailing,
+      onTap: () {
+        showUserDialog(context: context, user: userData);
+      },
     );
   }
 }
 
 class UserTileFromUid extends StatefulWidget {
   final String userUid;
-  const UserTileFromUid({super.key, required this.userUid});
+  final Widget? trailing;
+  final EdgeInsetsGeometry? contentPadding;
+  const UserTileFromUid({
+    super.key,
+    required this.userUid,
+    this.trailing,
+    this.contentPadding,
+  });
 
   @override
   State<UserTileFromUid> createState() => _UserTileFromUidState();
@@ -56,14 +65,11 @@ class _UserTileFromUidState extends State<UserTileFromUid> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _future,
-      builder: (
-        context,
-        snapshot,
-      ) {
+      builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const LoadingLogo();
         }
-        if (snapshot.hasError) {
+        if (snapshot.hasError || !snapshot.hasData) {
           Future.microtask(() {
             Navigator.pushReplacement(
               context,
@@ -76,11 +82,12 @@ class _UserTileFromUidState extends State<UserTileFromUid> {
           });
           return Container();
         }
-        if (!snapshot.hasData) {
-          return Container();
-        }
         UserModel userData = snapshot.data!;
-        return UserTileFromData(userData: userData);
+        return UserTileFromData(
+          userData: userData,
+          trailing: widget.trailing,
+          contentPadding: widget.contentPadding,
+        );
       },
     );
   }

@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/services/poll_event_methods.dart';
 import 'package:dima_app/widgets/empty_list.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
+import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,10 +53,28 @@ class _PollEventListByYouState extends State<PollEventListByYou>
           return Container();
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Expanded(
+          return Container(
+            margin: const EdgeInsets.all(LayoutConstants.kHorizontalPadding),
             child: ListView(
               controller: ScrollController(),
-              children: const [EmptyList(emptyMsg: "No polls or events")],
+              children: [
+                EmptyList(
+                  title: "Create your first poll",
+                  emptyMsg:
+                      "A fast way to find the right time and place for a meeting without having access to people's calendars",
+                  button: Container(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: LayoutConstants.kHorizontalPadding),
+                    child: MyButton(
+                      text: "Create a poll",
+                      onPressed: () async {
+                        await PollEventUserMethods.createNewPoll(
+                            context: context);
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         }

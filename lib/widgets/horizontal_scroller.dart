@@ -17,6 +17,7 @@ class HorizontalScroller extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
         child: Row(
           mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.center,
           crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.center,

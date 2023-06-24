@@ -1,4 +1,3 @@
-import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/models/group_model.dart';
 import 'package:dima_app/screens/groups/components/view_group.dart';
 import 'package:dima_app/services/firebase_groups.dart';
@@ -50,8 +49,8 @@ class InviteGroupTile extends StatelessWidget {
         child: Stack(
           children: [
             Positioned(
-              right: -5,
-              top: -5,
+              right: -7,
+              top: -7,
               child: icon,
             ),
             Column(

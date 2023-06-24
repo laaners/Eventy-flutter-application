@@ -5,16 +5,22 @@ import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/screens/poll_detail/components/my_poll.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/firebase_vote.dart';
+import 'package:dima_app/widgets/empty_list.dart';
+import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
+import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class DateDetail extends StatelessWidget {
+import 'availability_legend.dart';
+
+class DateDetail extends StatefulWidget {
   final String pollId;
   final String organizerUid;
   final bool isClosed;
@@ -31,91 +37,49 @@ class DateDetail extends StatelessWidget {
     required this.isClosed,
   });
 
-  List<MyPollOption> getOptions(VoteDateModel? voteDateModel) {
+  @override
+  State<DateDetail> createState() => _DateDetailState();
+}
+
+class _DateDetailState extends State<DateDetail> {
+  int filterAvailability = -2;
+
+  List<MyPollOption> getOptions(VoteDateModel? voteDate) {
     return [
-      MyPollOption(
-        id: Availability.yes,
+      Availability.yes,
+      Availability.iff,
+      Availability.not,
+      Availability.empty
+    ].map((availability) {
+      Map<String, dynamic> votesKind = VoteDateModel.getVotesKind(
+        voteDate: voteDate,
+        kind: availability,
+        invites: widget.invites,
+        organizerUid: widget.organizerUid,
+      );
+      return MyPollOption(
+        id: availability,
         title: Row(
           children: [
-            Icon(Availability.icons[Availability.yes]),
-            const Text(" Present", style: TextStyle(fontSize: 20)),
+            Icon(Availability.icons[availability]),
+            Text(
+              " ${votesKind.length} ${Availability.description(availability)}",
+              style: const TextStyle(fontSize: 20),
+            ),
           ],
         ),
-        votes: voteDateModel != null
-            ? 1 +
-                (voteDateModel
-                    .getVotesKind(
-                      Availability.yes,
-                      invites,
-                      organizerUid,
-                    )
-                    .length)
-            : 1,
-      ),
-      MyPollOption(
-        id: Availability.iff,
-        title: Row(
-          children: [
-            Icon(Availability.icons[Availability.iff]),
-            const Text(" If need be", style: TextStyle(fontSize: 20)),
-          ],
-        ),
-        votes: voteDateModel != null
-            ? voteDateModel
-                .getVotesKind(
-                  Availability.iff,
-                  invites,
-                  organizerUid,
-                )
-                .length
-            : 0,
-      ),
-      MyPollOption(
-        id: Availability.not,
-        title: Row(
-          children: [
-            Icon(Availability.icons[Availability.not]),
-            const Text(" Not present", style: TextStyle(fontSize: 20)),
-          ],
-        ),
-        votes: voteDateModel != null
-            ? voteDateModel
-                .getVotesKind(
-                  Availability.not,
-                  invites,
-                  organizerUid,
-                )
-                .length
-            : 0,
-      ),
-      MyPollOption(
-        id: Availability.empty,
-        title: Row(
-          children: [
-            Icon(Availability.icons[Availability.empty]),
-            const Text(" Pending", style: TextStyle(fontSize: 20)),
-          ],
-        ),
-        votes: voteDateModel != null
-            ? voteDateModel
-                .getVotesKind(
-                  Availability.empty,
-                  invites,
-                  organizerUid,
-                )
-                .length
-            : invites.length - 1,
-      ),
-    ];
+        votes: votesKind.length,
+      );
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     DateTime dateTime =
-        DateFormatter.string2DateTime("${voteDate.date} 00:00:00");
-    var start = voteDate.start;
-    var end = voteDate.end;
-    if (!Preferences.getBool('is24Hour')) {
+        DateFormatter.string2DateTime("${widget.voteDate.date} 00:00:00");
+    var start = widget.voteDate.start;
+    var end = widget.voteDate.end;
+    if (!Provider.of<ClockManager>(context).clockMode) {
       start = DateFormat("hh:mm a")
           .format(DateFormatter.string2DateTime("2000-01-01 $start:00"));
       end = DateFormat("hh:mm a")
@@ -132,27 +96,38 @@ class DateDetail extends StatelessWidget {
           ),
         ),
         Container(
-          margin: const EdgeInsets.only(bottom: 8, top: 8),
+          margin: const EdgeInsets.only(top: 8),
           alignment: Alignment.topLeft,
           child: Text(
             "From $start to $end",
             style: Theme.of(context).textTheme.headlineSmall,
           ),
         ),
-        const Padding(padding: EdgeInsets.only(top: 8)),
+        Row(
+          children: [
+            AvailabilityLegend(
+              filterAvailability: filterAvailability,
+              changeFilterAvailability: (int value) {
+                setState(() {
+                  filterAvailability = value;
+                });
+              },
+            ),
+          ],
+        ),
         StreamBuilder(
           stream: Provider.of<FirebaseVote>(context, listen: false)
               .getVoteDateSnapshot(
-                  pollId: pollId,
-                  date: voteDate.date,
-                  start: voteDate.start,
-                  end: voteDate.end),
+                  pollId: widget.pollId,
+                  date: widget.voteDate.date,
+                  start: widget.voteDate.start,
+                  end: widget.voteDate.end),
           builder: (
             BuildContext context,
             AsyncSnapshot<DocumentSnapshot<Object?>> snapshot,
           ) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const LoadingLogo();
+              return const SizedBox(height: 104);
             }
             if (snapshot.hasError) {
               Future.microtask(() {
@@ -167,23 +142,45 @@ class DateDetail extends StatelessWidget {
               });
               return Container();
             }
-            VoteDateModel? voteDateModel;
+            VoteDateModel? voteDate;
             var curUid =
                 Provider.of<FirebaseUser>(context, listen: false).user!.uid;
             int userVotedOptionId = Availability.empty;
             if (snapshot.data!.exists) {
-              voteDateModel = VoteDateModel.fromMap(
+              voteDate = VoteDateModel.fromMap(
                 (snapshot.data!.data()) as Map<String, dynamic>,
               );
-              userVotedOptionId =
-                  voteDateModel.votes[curUid] ?? Availability.empty;
+              userVotedOptionId = voteDate.votes[curUid] ?? Availability.empty;
             }
-            userVotedOptionId =
-                organizerUid == curUid ? Availability.yes : userVotedOptionId;
+            userVotedOptionId = widget.organizerUid == curUid
+                ? Availability.yes
+                : userVotedOptionId;
+            if (filterAvailability != -2) {
+              List<String> votesKindUids = VoteDateModel.getVotesKind(
+                voteDate: voteDate,
+                kind: filterAvailability,
+                invites: widget.invites,
+                organizerUid: widget.organizerUid,
+              ).keys.toList();
+              if (votesKindUids.contains(curUid)) {
+                votesKindUids.remove(curUid);
+                votesKindUids.insert(0, curUid);
+              }
+              return votesKindUids.isEmpty
+                  ? const EmptyList(emptyMsg: "Nothing here")
+                  : HorizontalScroller(
+                      children: votesKindUids
+                          .map((uid) => ProfilePicFromUid(
+                                userUid: uid,
+                                showUserName: true,
+                                radius: 35,
+                              ))
+                          .toList());
+            }
             return MyPolls(
-              isClosed: isClosed,
+              isClosed: widget.isClosed,
               curUid: curUid,
-              organizerUid: organizerUid,
+              organizerUid: widget.organizerUid,
               votedAnimationDuration: 0,
               votesText: "",
               hasVoted: true,
@@ -191,17 +188,17 @@ class DateDetail extends StatelessWidget {
               heightBetweenTitleAndOptions: 0,
               pollId: '1',
               onVoted: (MyPollOption pollOption, int newTotalVotes) async {
-                if (isClosed) return true;
+                if (widget.isClosed) return true;
                 int newAvailability = pollOption.id!;
                 await Provider.of<FirebaseVote>(context, listen: false)
                     .userVoteDate(
-                        pollId: pollId,
-                        date: voteDate.date,
-                        start: voteDate.start,
-                        end: voteDate.end,
+                        pollId: widget.pollId,
+                        date: widget.voteDate.date,
+                        start: widget.voteDate.start,
+                        end: widget.voteDate.end,
                         uid: curUid,
                         availability: newAvailability);
-                modifyVote(newAvailability);
+                widget.modifyVote(newAvailability);
                 return true;
               },
               pollOptionsSplashColor: Colors.white,
@@ -211,21 +208,16 @@ class DateDetail extends StatelessWidget {
                 Icons.check,
               ),
               pollTitle: Container(),
-              pollOptions: getOptions(voteDateModel),
+              pollOptions: getOptions(voteDate),
               metaWidget: Row(
-                children: const [
-                  Text(
-                    '•',
-                    style: TextStyle(
-                      fontSize: 20,
+                children: [
+                  Flexible(
+                    child: Text(
+                      'Your vote: ${Availability.description(userVotedOptionId).toLowerCase()} ',
+                      style: const TextStyle(fontSize: 20),
                     ),
                   ),
-                  Text(
-                    '2 weeks left',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
+                  Icon(Availability.icons[userVotedOptionId])
                 ],
               ),
             );

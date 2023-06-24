@@ -3,9 +3,12 @@ import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/change_password/change_password.dart';
 import 'package:dima_app/screens/edit_profile/edit_profile.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/services/theme_manager.dart';
 import 'package:dima_app/widgets/container_shadow.dart';
+import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
@@ -53,12 +56,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       "24-hour clock",
                     ),
                     value: Preferences.getBool('is24Hour'),
-                    onChanged: (bool value) {
+                    onChanged: (bool newValue) {
                       setState(() {
-                        Preferences.setBool('is24Hour', value);
+                        Provider.of<ClockManager>(context, listen: false)
+                            .toggleClock(newValue);
+                        // Preferences.setBool('is24Hour', value);
                       });
                     },
                     secondary: const Icon(Icons.access_time),
+                  ),
+                  SwitchListTile(
+                    title: const Text(
+                      "Push notifications",
+                    ),
+                    value:
+                        Provider.of<FirebaseNotification>(context, listen: true)
+                            .isPush,
+                    onChanged: (bool newValue) async {
+                      LoadingOverlay.show(context);
+                      if (newValue) {
+                        String curUid =
+                            Provider.of<FirebaseUser>(context, listen: false)
+                                .user!
+                                .uid;
+                        await Provider.of<FirebaseNotification>(context,
+                                listen: false)
+                            .subscribeToTopic(curUid);
+                      } else {
+                        await Provider.of<FirebaseNotification>(context,
+                                listen: false)
+                            .deleteToken();
+                      }
+                      // ignore: use_build_context_synchronously
+                      LoadingOverlay.hide(context);
+                      setState(() {});
+                    },
+                    secondary: const Icon(Icons.notifications),
                   ),
                   ListTile(
                     leading: const Icon(Icons.edit),

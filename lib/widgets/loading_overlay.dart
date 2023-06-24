@@ -58,7 +58,7 @@ class FullScreenLoader extends StatelessWidget {
         child: Container(
           margin: const EdgeInsets.only(top: 8),
           child: SizedBox(
-            height: 120,
+            height: 170,
             width: 100,
             child: ListView(
               children: [

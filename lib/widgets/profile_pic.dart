@@ -1,15 +1,21 @@
+import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/models/user_model.dart';
+import 'package:dima_app/screens/error/error.dart';
+import 'package:dima_app/services/firebase_user.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'screen_transition.dart';
+import 'show_user_dialog.dart';
 
-class ProfilePic extends StatelessWidget {
+class ProfilePicFromData extends StatelessWidget {
   final UserModel userData;
-  final bool loading;
-  final double radius;
-  const ProfilePic({
+  final double? radius;
+  final bool? showUserName;
+  const ProfilePicFromData({
     super.key,
+    this.radius,
     required this.userData,
-    required this.loading,
-    required this.radius,
+    this.showUserName,
   });
 
   Widget capitalNameSurnameAvatar(context) {
@@ -26,42 +32,156 @@ class ProfilePic extends StatelessWidget {
     );
   }
 
+  Widget profilePicBody(context) {
+    double radiusVar = radius ?? LayoutConstants.kProfilePicRadiusSmall;
+    return InkWell(
+      onTap: () {
+        showUserDialog(context: context, user: userData);
+      },
+      child: CircleAvatar(
+        radius: radiusVar,
+        backgroundColor: Theme.of(context).primaryColor,
+        child: userData.profilePic != "default"
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(radiusVar),
+                child: Image.network(
+                  userData.profilePic,
+                  width: radiusVar * 2,
+                  height: radiusVar * 2,
+                  fit: BoxFit.fill,
+                  errorBuilder: (context, error, stackTrace) {
+                    return capitalNameSurnameAvatar(context);
+                  },
+                  loadingBuilder: (BuildContext context, Widget child,
+                      ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress != null) {
+                      return capitalNameSurnameAvatar(context);
+                    } else {
+                      return child;
+                    }
+                  },
+                ),
+              )
+            : capitalNameSurnameAvatar(context),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: radius,
-      backgroundColor: Theme.of(context).primaryColor,
-      child: userData.profilePic != "default"
-          ? (loading
-              ? capitalNameSurnameAvatar(context)
-              : ClipRRect(
-                  borderRadius: BorderRadius.circular(radius),
-                  child: Image.network(
-                    userData.profilePic,
-                    width: radius * 2,
-                    height: radius * 2,
-                    fit: BoxFit.fill,
-                    loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress != null) {
-                        return capitalNameSurnameAvatar(context);
-                      } else {
-                        return child;
-                      }
-                      /*
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
+    double radiusVar = radius ?? LayoutConstants.kProfilePicRadiusSmall;
+    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+    return showUserName != null && showUserName!
+        ? Container(
+            margin: const EdgeInsets.all(5),
+            width: radiusVar * 2 + 5,
+            child: Column(
+              children: [
+                profilePicBody(context),
+                const SizedBox(height: 4),
+                Text(
+                  curUid == userData.uid ? "You" : userData.username,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          )
+        : profilePicBody(context);
+  }
+}
+
+class ProfilePicFromUid extends StatefulWidget {
+  final String userUid;
+  final double? radius;
+  final bool? maintainState;
+  final bool? showUserName;
+  const ProfilePicFromUid({
+    super.key,
+    required this.userUid,
+    this.radius,
+    this.maintainState,
+    this.showUserName,
+  });
+
+  @override
+  State<ProfilePicFromUid> createState() => _UserTileFromUidState();
+}
+
+class _UserTileFromUidState extends State<ProfilePicFromUid> {
+  Future<UserModel?>? _future;
+
+  @override
+  initState() {
+    super.initState();
+    _future = Provider.of<FirebaseUser>(context, listen: false)
+        .getUserData(uid: widget.userUid);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double radiusVar = widget.radius ?? LayoutConstants.kProfilePicRadiusSmall;
+    return FutureBuilder(
+      future: widget.maintainState != null && widget.maintainState!
+          ? _future
+          : Provider.of<FirebaseUser>(context, listen: false)
+              .getUserData(uid: widget.userUid),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return widget.showUserName != null && widget.showUserName!
+              ? Container(
+                  margin: const EdgeInsets.all(5),
+                  width: 75,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: radiusVar * 2,
+                        width: radiusVar * 2,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            shape: BoxShape.circle,
+                          ),
                         ),
-                      );
-                      */
-                    },
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        "...",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                ))
-          : capitalNameSurnameAvatar(context),
+                )
+              : SizedBox(
+                  height: radiusVar * 2,
+                  width: radiusVar * 2,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                );
+        }
+        if (snapshot.hasError || !snapshot.hasData) {
+          Future.microtask(() {
+            Navigator.pushReplacement(
+              context,
+              ScreenTransition(
+                builder: (context) => ErrorScreen(
+                  errorMsg: snapshot.error.toString(),
+                ),
+              ),
+            );
+          });
+          return Container();
+        }
+        UserModel userData = snapshot.data!;
+        return ProfilePicFromData(
+          userData: userData,
+          radius: widget.radius,
+          showUserName: widget.showUserName,
+        );
+      },
     );
   }
 }

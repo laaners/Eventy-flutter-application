@@ -6,11 +6,13 @@ import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/models/vote_location_model.dart';
 import 'package:dima_app/screens/poll_detail/components/date_detail.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/widgets/my_list_tile.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class MostVotedDateTile extends StatelessWidget {
   final PollEventModel pollData;
@@ -35,7 +37,7 @@ class MostVotedDateTile extends StatelessWidget {
         DateFormatter.string2DateTime("${voteDate.date} 00:00:00");
     var start = voteDate.start;
     var end = voteDate.end;
-    if (!Preferences.getBool('is24Hour')) {
+    if (!Provider.of<ClockManager>(context).clockMode) {
       start = DateFormat("hh:mm a")
           .format(DateFormatter.string2DateTime("2000-01-01 $start:00"));
       end = DateFormat("hh:mm a")
@@ -73,6 +75,7 @@ class MostVotedDateTile extends StatelessWidget {
       onTap: () {
         MyModal.show(
           context: context,
+          shrinkWrap: false,
           child: DateDetail(
             pollId: pollId,
             organizerUid: pollData.organizerUid,

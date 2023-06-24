@@ -64,7 +64,20 @@ class _LogInFormState extends State<LogInForm> {
               );
               LoadingOverlay.hide(context);
             },
-            child: const Text("Firebase login"),
+            child: const Text("Firebase login17"),
+          ),
+          TextButton(
+            onPressed: () async {
+              LoadingOverlay.show(context);
+              await Provider.of<FirebaseUser>(context, listen: false)
+                  .logInWithUsername(
+                context: context,
+                username: "UsernameId14",
+                password: "password",
+              );
+              LoadingOverlay.hide(context);
+            },
+            child: const Text("Firebase login14"),
           ),
           const SizedBox(height: 50),
           const EventyLogo(extWidth: 180),

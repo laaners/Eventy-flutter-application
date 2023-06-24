@@ -2,7 +2,6 @@ import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/screens/groups/components/create_group.dart';
 import 'package:dima_app/screens/groups/components/groups_list.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
-import 'package:dima_app/widgets/my_list_tile.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/search_tile.dart';
@@ -37,7 +36,7 @@ class _GroupsScreenState extends State<GroupsScreen>
             icon: Icon(Icons.group_add,
                 color: Theme.of(context).primaryColorLight),
             onTap: () async {
-              MyModal.show(
+              await MyModal.show(
                 context: context,
                 child: const CreateGroup(),
                 heightFactor: 0.85,

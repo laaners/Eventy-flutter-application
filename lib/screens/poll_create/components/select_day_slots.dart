@@ -1,11 +1,13 @@
 import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/screens/poll_create/components/select_slot.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/widgets/empty_list.dart';
 import 'package:dima_app/widgets/my_list_tile.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class SelectDaySlots extends StatefulWidget {
   final DateTime day;
@@ -67,7 +69,7 @@ class _SelectDaySlotsState extends State<SelectDaySlots> {
                     var k = widget.dates[dayString].keys.toList()[index];
                     var start = k.split("-")[0];
                     var end = k.split("-")[1];
-                    if (!Preferences.getBool('is24Hour')) {
+                    if (!Provider.of<ClockManager>(context).clockMode) {
                       start =
                           "${DateFormat("hh:mm a").format(DateFormatter.string2DateTime("2000-01-01 $start:00"))} ";
                       end =

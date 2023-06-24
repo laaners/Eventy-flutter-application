@@ -1,6 +1,7 @@
 import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
+import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/container_shadow.dart';
@@ -13,6 +14,7 @@ import 'date_tile.dart';
 class DatesViewHorizontal extends StatefulWidget {
   final bool isClosed;
   final String organizerUid;
+  final String votingUid;
   final String pollId;
   final String deadline;
   final Map<String, dynamic> dates;
@@ -29,6 +31,7 @@ class DatesViewHorizontal extends StatefulWidget {
     required this.votesDates,
     required this.isClosed,
     required this.updateFilterAfterVote,
+    required this.votingUid,
   });
 
   @override
@@ -70,7 +73,7 @@ class _DatesViewHorizontalState extends State<DatesViewHorizontal> {
                     ),
               ),
               Text(
-                "at${Preferences.getBool('is24Hour') ? ' ' : '\n'}${DateFormat(Preferences.getBool('is24Hour') ? "HH:mm" : "hh:mm a").format(deadlineDate)}",
+                "at${Provider.of<ClockManager>(context).clockMode ? ' ' : '\n'}${DateFormat(Provider.of<ClockManager>(context).clockMode ? "HH:mm" : "hh:mm a").format(deadlineDate)}",
                 style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onPrimary,
                     ),
@@ -90,18 +93,22 @@ class _DatesViewHorizontalState extends State<DatesViewHorizontal> {
             isClosed: widget.isClosed,
             pollId: widget.pollId,
             organizerUid: widget.organizerUid,
+            votingUid: widget.votingUid,
             invites: widget.invites,
             voteDate: voteDate,
             modifyVote: (int newAvailability) {
-              setState(() {
-                widget
-                    .votesDates[widget.votesDates.indexWhere((e) =>
-                        e.date == voteDate.date &&
-                        e.start == voteDate.start &&
-                        e.end == voteDate.end)]
-                    .votes[curUid] = newAvailability;
-              });
-              widget.updateFilterAfterVote();
+              if (widget.isClosed) return;
+              if (widget.votingUid == curUid) {
+                setState(() {
+                  widget
+                      .votesDates[widget.votesDates.indexWhere((e) =>
+                          e.date == voteDate.date &&
+                          e.start == voteDate.start &&
+                          e.end == voteDate.end)]
+                      .votes[curUid] = newAvailability;
+                });
+                widget.updateFilterAfterVote();
+              }
             },
           );
         }).toList()

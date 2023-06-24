@@ -6,7 +6,6 @@ import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
-import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

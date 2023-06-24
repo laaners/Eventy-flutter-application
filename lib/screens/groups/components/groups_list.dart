@@ -1,5 +1,6 @@
 import 'package:dima_app/screens/groups/components/edit_group.dart';
 import 'package:dima_app/screens/groups/components/group_tile.dart';
+import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,8 @@ import 'package:dima_app/widgets/empty_list.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:provider/provider.dart';
+
+import 'create_group.dart';
 
 class GroupsList extends StatelessWidget {
   final TextEditingController searchController;
@@ -48,7 +51,31 @@ class GroupsList extends StatelessWidget {
             child: ListView(
               controller: ScrollController(),
               shrinkWrap: true,
-              children: const [EmptyList(emptyMsg: "No groups")],
+              children: [
+                EmptyList(
+                  title: "Create a group of users",
+                  emptyMsg:
+                      "A simple way to manage who to invite to your polls and events",
+                  button: Container(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: LayoutConstants.kHorizontalPadding),
+                    child: MyButton(
+                      text: "Create a group",
+                      onPressed: () async {
+                        await MyModal.show(
+                          context: context,
+                          child: const CreateGroup(),
+                          heightFactor: 0.85,
+                          doneCancelMode: true,
+                          onDone: () {},
+                          title: "New Group",
+                          shrinkWrap: false,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         }
@@ -69,7 +96,7 @@ class GroupsList extends StatelessWidget {
                 child: ListView(
                   controller: ScrollController(),
                   shrinkWrap: true,
-                  children: const [EmptyList(emptyMsg: "No groups")],
+                  children: const [EmptyList(emptyMsg: "No groups found")],
                 ),
               )
             : Expanded(
