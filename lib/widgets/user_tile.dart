@@ -27,11 +27,7 @@ class UserTileFromData extends StatelessWidget {
       title: userData.username,
       subtitle: "${userData.name} ${userData.surname}",
       contentPadding: contentPadding,
-      leading: ProfilePic(
-        loading: false,
-        userData: userData,
-        radius: 30,
-      ),
+      leading: ProfilePicFromData(userData: userData),
       trailing: trailing,
       onTap: () {
         showUserDialog(context: context, user: userData);
@@ -69,14 +65,11 @@ class _UserTileFromUidState extends State<UserTileFromUid> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _future,
-      builder: (
-        context,
-        snapshot,
-      ) {
+      builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const LoadingLogo();
         }
-        if (snapshot.hasError) {
+        if (snapshot.hasError || !snapshot.hasData) {
           Future.microtask(() {
             Navigator.pushReplacement(
               context,
@@ -87,9 +80,6 @@ class _UserTileFromUidState extends State<UserTileFromUid> {
               ),
             );
           });
-          return Container();
-        }
-        if (!snapshot.hasData) {
           return Container();
         }
         UserModel userData = snapshot.data!;

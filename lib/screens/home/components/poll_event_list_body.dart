@@ -264,7 +264,7 @@ class _PollEventListBodyState extends State<PollEventListBody> {
                           // close the event on db
                           print("Should close ${pollEventId}");
                           Provider.of<FirebasePollEvent>(context, listen: false)
-                              .closePoll(pollId: pollEventId);
+                              .closePoll(pollId: pollEventId, context: context);
                         }
                         String curUid =
                             Provider.of<FirebaseUser>(context, listen: false)
@@ -319,7 +319,7 @@ class _PollEventListBodyState extends State<PollEventListBody> {
                                       refreshPollDetail: () {},
                                       votesLocations: [],
                                       votesDates: [],
-                                      isClosed: true,
+                                      isClosed: isClosed,
                                     ),
                                     heightFactor: curUid == event.organizerUid
                                         ? 0.25

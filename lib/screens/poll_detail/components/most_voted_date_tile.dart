@@ -75,6 +75,7 @@ class MostVotedDateTile extends StatelessWidget {
       onTap: () {
         MyModal.show(
           context: context,
+          shrinkWrap: false,
           child: DateDetail(
             pollId: pollId,
             organizerUid: pollData.organizerUid,

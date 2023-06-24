@@ -28,9 +28,8 @@ class ProfileData extends StatelessWidget {
         UserModel userData = snapshot.data!;
         return Column(
           children: [
-            ProfilePic(
+            ProfilePicFromData(
               userData: userData,
-              loading: false,
               radius: LayoutConstants.kProfilePicRadius,
             ),
             const SizedBox(height: LayoutConstants.kHeight),

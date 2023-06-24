@@ -14,6 +14,9 @@ class LayoutConstants {
   static const double kVerticalPadding = 30.0;
 
   /// Profile Picture radius
+  static const double kProfilePicRadiusSmall = 30.0;
+
+  /// Profile Picture radius
   static const double kProfilePicRadius = 70.0;
 
   /// Profile Picture radius

@@ -125,11 +125,7 @@ class PollEventTile extends StatelessWidget {
               contentPadding: const EdgeInsets.all(0),
               minLeadingWidth: 0,
               horizontalTitleGap: 15,
-              leading: ProfilePic(
-                userData: userData,
-                loading: false,
-                radius: 30,
-              ),
+              leading: ProfilePicFromData(userData: userData),
               trailing: trailing,
               title: Text(
                 descTop,

@@ -12,7 +12,7 @@ void showUserDialog({
       title: Text(user.username),
       content: Row(
         children: [
-          ProfilePic(userData: user, loading: false, radius: 45),
+          ProfilePicFromData(userData: user, radius: 45),
           const SizedBox(width: 20),
           Expanded(
             child: Text(

@@ -8,6 +8,7 @@ class MyListTile extends StatelessWidget {
   final VoidCallback? onTap;
   final double? horizontalTitleGap;
   final EdgeInsetsGeometry? contentPadding;
+  final int? subtitleMaxLines;
   const MyListTile({
     super.key,
     required this.title,
@@ -17,6 +18,7 @@ class MyListTile extends StatelessWidget {
     this.onTap,
     this.horizontalTitleGap,
     this.contentPadding,
+    this.subtitleMaxLines,
   });
 
   static Widget leadingIcon({
@@ -54,6 +56,7 @@ class MyListTile extends StatelessWidget {
             ? Text(
                 subtitle!,
                 overflow: TextOverflow.ellipsis,
+                maxLines: subtitleMaxLines ?? 1,
                 style: Theme.of(context).textTheme.titleSmall!.copyWith(
                       color: Theme.of(context).primaryColor,
                       fontStyle: FontStyle.italic,

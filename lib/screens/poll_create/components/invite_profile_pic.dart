@@ -3,7 +3,6 @@ import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
-import 'package:dima_app/widgets/show_user_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -79,35 +78,12 @@ class InviteProfilePic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
-    return InkWell(
-      child: Stack(
-        children: [
-          Container(
-            margin: const EdgeInsets.all(5),
-            width: 75,
-            child: Column(
-              children: [
-                ProfilePic(
-                  userData: user,
-                  loading: false,
-                  radius: 35,
-                ),
-                Container(padding: const EdgeInsets.symmetric(vertical: 2)),
-                Text(
-                  curUid == user.uid ? "You" : user.username,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          // show nothing if in cancelmode and organizer != curUid and user is in original invitees
-          getTopIcon(context) ?? Container()
-        ],
-      ),
-      onTap: () {
-        showUserDialog(context: context, user: user);
-      },
+    return Stack(
+      children: [
+        ProfilePicFromData(userData: user, showUserName: true, radius: 35),
+        // show nothing if in cancelmode and organizer != curUid and user is in original invitees
+        getTopIcon(context) ?? Container()
+      ],
     );
   }
 }

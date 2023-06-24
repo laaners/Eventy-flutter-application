@@ -143,7 +143,7 @@ class _PollEventScreenState extends State<PollEventScreen>
                 // close the event on db
                 print("Should close ${widget.pollEventId}");
                 Provider.of<FirebasePollEvent>(context, listen: false)
-                    .closePoll(pollId: widget.pollEventId);
+                    .closePoll(pollId: widget.pollEventId, context: context);
               }
 
               return FutureBuilder<Map<String, dynamic>?>(

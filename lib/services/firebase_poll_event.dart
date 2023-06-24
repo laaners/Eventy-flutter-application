@@ -3,14 +3,12 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dima_app/models/event_location_preview.dart';
 import 'package:dima_app/models/location.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/models/vote_location_model.dart';
 import 'package:dima_app/services/date_methods.dart';
-import 'package:dima_app/services/firebase_event_location.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_vote.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
@@ -18,10 +16,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:async/async.dart';
-
 import '../models/availability.dart';
 import 'firebase_crud.dart';
+import 'firebase_notification.dart';
 
 class FirebasePollEvent {
   final FirebaseFirestore _firestore;
@@ -119,7 +116,7 @@ class FirebasePollEvent {
 
       if (!pollData.isClosed && localDate.compareTo(nowDate) <= 0) {
         await Provider.of<FirebasePollEvent>(context, listen: false)
-            .closePoll(pollId: pollEventId);
+            .closePoll(pollId: pollEventId, context: context);
       }
 
       List<PollEventInviteModel> pollInvites =
@@ -191,10 +188,27 @@ class FirebasePollEvent {
 
   Future<void> closePoll({
     required String pollId,
+    required BuildContext context,
   }) async {
     try {
       var document = await FirebaseCrud.readDoc(pollEventCollection, pollId);
       if (document!.exists) {
+        PollEventModel poll = PollEventModel.firebaseDocToObj(
+            document.data() as Map<String, dynamic>);
+
+        List<PollEventInviteModel> pollInvites =
+            await Provider.of<FirebasePollEventInvite>(context, listen: false)
+                .getInvitesFromPollEventId(pollEventId: pollId);
+        await Future.wait(pollInvites
+            .map((invite) => FirebaseNotification.sendNotification(
+                  pollEventId: pollId,
+                  organizerUid: poll.organizerUid,
+                  topic: invite.inviteeId,
+                  title: "The poll ${poll.pollEventName} has been closed!",
+                  body:
+                      "The poll ${poll.pollEventName} has been closed, see the meeting details!",
+                ))
+            .toList());
         await FirebaseCrud.updateDoc(
             pollEventCollection, pollId, "isClosed", true);
       }

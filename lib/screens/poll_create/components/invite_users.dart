@@ -127,9 +127,7 @@ class _InviteUsersState extends State<InviteUsers> {
                         controller: ScrollController(),
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        children: const [
-                          EmptyList(emptyMsg: "No groups found")
-                        ],
+                        children: const [EmptyList(emptyMsg: "No users found")],
                       )),
           ),
         ],

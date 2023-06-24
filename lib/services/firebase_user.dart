@@ -78,6 +78,7 @@ class FirebaseUser extends ChangeNotifier {
     try {
       await _auth.signOut();
       notifyListeners();
+      print(_auth.currentUser);
     } on FirebaseAuthException catch (e) {
       print(e.message!);
     }

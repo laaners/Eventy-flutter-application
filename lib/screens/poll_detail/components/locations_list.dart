@@ -172,7 +172,13 @@ class _LocationsListState extends State<LocationsList>
         Container(
           margin: const EdgeInsets.only(top: 50),
           child: votesLocations.isEmpty
-              ? const EmptyList(emptyMsg: "No results found")
+              ? ListView(
+                  shrinkWrap: true,
+                  controller: ScrollController(),
+                  children: const [
+                    EmptyList(emptyMsg: "No polls or events found"),
+                  ],
+                )
               : ListView.builder(
                   itemCount: votesLocations.length,
                   physics: const ClampingScrollPhysics(),

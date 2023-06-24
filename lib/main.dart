@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dima_app/debug.dart';
+import 'package:dima_app/models/poll_event_notification.dart';
 import 'package:dima_app/screens/groups/groups.dart';
 import 'package:dima_app/screens/home/home.dart';
 import 'package:dima_app/screens/login/login.dart';
@@ -7,24 +7,28 @@ import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/screens/settings/settings.dart';
 import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/dynamic_links_handler.dart';
-import 'package:dima_app/services/firebase_event_location.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_vote.dart';
+import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/services/poll_event_methods.dart';
 import 'package:dima_app/services/theme_manager.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'constants/preferences.dart';
 import 'constants/theme_constants.dart';
 import 'firebase_options.dart';
+import 'models/notification_model.dart';
+import 'screens/notifications/notifications.dart';
 import 'services/firebase_groups.dart';
 
 Future<void> main() async {
@@ -40,6 +44,16 @@ Future<void> main() async {
   final PendingDynamicLinkData? initialLink =
       await FirebaseDynamicLinks.instance.getInitialLink();
   dynamicLinksHandler.setLink(initialLink);
+
+  FirebaseNotification messaging =
+      FirebaseNotification(FirebaseMessaging.instance, firestore);
+  await messaging.requestPermission();
+  await messaging.initHandlers();
+  if (auth.currentUser != null && Preferences.getBool('isPush')) {
+    await messaging.subscribeToTopic(auth.currentUser!.uid);
+  } else {
+    await messaging.deleteToken();
+  }
 
   runApp(
     MultiProvider(
@@ -65,8 +79,21 @@ Future<void> main() async {
         Provider(create: (context) => FirebasePollEvent(firestore)),
         Provider(create: (context) => FirebaseVote(firestore)),
         Provider(create: (context) => FirebasePollEventInvite(firestore)),
-        Provider(create: (context) => FirebaseEventLocation(firestore)),
         Provider(create: (context) => FirebaseGroups(firestore)),
+
+        // MESSAGING
+        ChangeNotifierProxyProvider<FirebaseUser, FirebaseNotification>(
+          create: (context) => messaging,
+          update:
+              (BuildContext context, value, FirebaseNotification? previous) {
+            if (value.user != null) {
+              previous!.subscribeToTopic(value.user!.uid);
+            } else {
+              previous!.deleteToken();
+            }
+            return previous;
+          },
+        ),
       ],
       child: const MyApp(),
     ),
@@ -100,6 +127,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return MaterialApp(
       title: 'Eventy',
       theme: lightTheme,
@@ -135,6 +166,7 @@ class _MainScreen extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
     return Scaffold(
       // to avoid sticky keyboard when editing text
       resizeToAvoidBottomInset: false,
@@ -174,25 +206,63 @@ class _MainScreen extends State<MainScreen> {
                   currentIndex = index;
                 });
               },
-              items: const [
-                BottomNavigationBarItem(
+              items: [
+                const BottomNavigationBarItem(
                   icon: Icon(Icons.home),
                   label: 'Home',
                 ),
-                BottomNavigationBarItem(
+                const BottomNavigationBarItem(
                   icon: Icon(Icons.group),
                   label: 'Groups',
                 ),
                 // add a center docker notch floating action button to the tab bar here
-                BottomNavigationBarItem(
+                const BottomNavigationBarItem(
                   icon: Icon(Icons.add_circle_outline),
                   label: 'Create',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.search),
-                  label: 'Search',
+                  icon: StreamBuilder(
+                      stream: Provider.of<FirebaseNotification>(context,
+                              listen: false)
+                          .getUserNotificationsSnapshot(uid: curUid),
+                      builder: (
+                        BuildContext context,
+                        AsyncSnapshot<DocumentSnapshot<Object?>> snapshot,
+                      ) {
+                        if (snapshot.connectionState ==
+                                ConnectionState.waiting ||
+                            snapshot.hasError ||
+                            !snapshot.hasData ||
+                            !snapshot.data!.exists) {
+                          return const Icon(Icons.notifications);
+                        }
+                        NotificationModel notificationModel =
+                            NotificationModel.fromMap(
+                                snapshot.data!.data() as Map<String, dynamic>);
+                        List<PollEventNotification> notifications =
+                            notificationModel.notifications;
+                        bool anyNotRead = notifications
+                            .any((notification) => !notification.isRead);
+                        return Stack(
+                          children: [
+                            if (anyNotRead)
+                              Positioned(
+                                right: 0.0,
+                                child: Container(
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
+                              ),
+                            const Icon(Icons.notifications),
+                          ],
+                        );
+                      }),
+                  label: 'Notifications',
                 ),
-                BottomNavigationBarItem(
+                const BottomNavigationBarItem(
                   icon: Icon(Icons.settings),
                   label: 'Settings',
                 ),
@@ -214,7 +284,7 @@ class _MainScreen extends State<MainScreen> {
                 Widget newScreen = PollEventScreen(pollEventId: pollEventId);
                 Provider.of<CupertinoTabController>(context, listen: false)
                     .index = 0;
-                Future.delayed(Duration.zero, () async {
+                Future.delayed(const Duration(milliseconds: 100), () async {
                   setState(() {
                     currentIndex = 0;
                   });
@@ -261,7 +331,7 @@ class _MainScreen extends State<MainScreen> {
                   return CupertinoTabView(
                     navigatorKey: fourthTabNavKey,
                     builder: (context) =>
-                        const DebugScreen(), //const SearchScreen(),
+                        const NotificationsScreen(), //const SearchScreen(),
                   );
                 case 4:
                   return CupertinoTabView(

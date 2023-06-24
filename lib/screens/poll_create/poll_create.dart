@@ -60,7 +60,7 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
   void initState() {
     super.initState();
     DateTime now = DateTime.now();
-    if (Provider.of<ClockManager>(context).clockMode) {
+    if (Provider.of<ClockManager>(context, listen: false).clockMode) {
       deadlineController.text = DateFormat("yyyy-MM-dd HH:00:00").format(
         DateTime(now.year, now.month, now.day + 1),
       );

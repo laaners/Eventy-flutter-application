@@ -145,7 +145,9 @@ class _StepBasicsState extends State<StepBasics> {
                       minimumDate:
                           DateTime.now().add(const Duration(minutes: 30)),
                       minuteInterval: 5,
-                      use24hFormat: true,
+                      use24hFormat:
+                          Provider.of<ClockManager>(context, listen: false)
+                              .clockMode,
                       onDateTimeChanged: (pickedDate) {
                         _pickedDate = pickedDate;
                       },

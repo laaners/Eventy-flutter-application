@@ -69,6 +69,7 @@ class MostVotedLocationTile extends StatelessWidget {
       onTap: () {
         MyModal.show(
           context: context,
+          shrinkWrap: false,
           child: LocationDetail(
             isClosed: true,
             pollId: pollId,
@@ -80,7 +81,30 @@ class MostVotedLocationTile extends StatelessWidget {
           heightFactor: 0.85,
           doneCancelMode: false,
           onDone: () {},
-          title: "",
+          titleWidget: Container(
+            alignment: Alignment.topLeft,
+            child: RichText(
+              text: TextSpan(
+                style: Theme.of(context).textTheme.headlineMedium,
+                children: [
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 5.0),
+                      child: Icon(
+                        LocationIcons.icons[mostVotedLocation.icon],
+                        size:
+                            Theme.of(context).textTheme.headlineLarge!.fontSize,
+                        color:
+                            Theme.of(context).textTheme.headlineMedium!.color,
+                      ),
+                    ),
+                  ),
+                  TextSpan(text: mostVotedLocation.name),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );

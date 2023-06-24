@@ -6,6 +6,7 @@ import 'package:dima_app/services/firebase_vote.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'firebase_notification.dart';
 import 'firebase_poll_event.dart';
 
 class FirebasePollEventInvite {
@@ -25,18 +26,28 @@ class FirebasePollEventInvite {
         pollEventId: pollEventId,
         inviteeId: inviteeId,
       );
-      String pollEventInviteId = "${pollEventId}_$inviteeId";
-      /*
-      var pollEventInviteExistence = await FirebaseCrud.readDoc(
-          pollEventInviteCollection, pollEventInviteId);
-      if (pollEventInviteExistence!.exists) {
-        // ignore: use_build_context_synchronously
-        // showSnackBar(context, "An invite with this name already exists");
+      CollectionReference pollEventCollection =
+          _firestore.collection(PollEventModel.collectionName);
+      var document =
+          await FirebaseCrud.readDoc(pollEventCollection, pollEventId);
+      if (document!.exists) {
+        String pollEventInviteId = "${pollEventId}_$inviteeId";
+        await pollEventInviteCollection
+            .doc(pollEventInviteId)
+            .set(pollEventInvite.toMap());
+        PollEventModel pollEvent = PollEventModel.firebaseDocToObj(
+            document.data() as Map<String, dynamic>);
+        if (pollEvent.organizerUid != inviteeId) {
+          await FirebaseNotification.sendNotification(
+            pollEventId: pollEventId,
+            organizerUid: pollEvent.organizerUid,
+            topic: inviteeId,
+            title: "Invitation to ${pollEvent.pollEventName}!",
+            body:
+                "You have been invited to partecipate to ${pollEvent.pollEventName}, see the meeting details!",
+          );
+        }
       }
-      */
-      await pollEventInviteCollection
-          .doc(pollEventInviteId)
-          .set(pollEventInvite.toMap());
     } on FirebaseException catch (e) {
       // showSnackBar(context, e.message!);
       print(e.message!);

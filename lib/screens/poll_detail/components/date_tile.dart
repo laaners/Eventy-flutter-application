@@ -55,6 +55,7 @@ class DateTile extends StatelessWidget {
       onTap: () {
         MyModal.show(
           context: context,
+          shrinkWrap: false,
           child: DateDetail(
             isClosed: isClosed,
             pollId: pollId,

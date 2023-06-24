@@ -14,9 +14,10 @@ import 'firebase_user.dart';
 class PollEventUserMethods {
   static createNewPoll({required BuildContext context}) async {
     // the result from pop is the poll id
+    const Widget newScreen = PollCreateScreen();
     final pollId = await Navigator.of(context, rootNavigator: true).push(
       ScreenTransition(
-        builder: (context) => const PollCreateScreen(),
+        builder: (context) => newScreen,
       ),
     );
     if (pollId != null) {
@@ -33,7 +34,7 @@ class PollEventUserMethods {
     if (ris == "create_event_$curUid") {
       LoadingOverlay.show(context);
       await Provider.of<FirebasePollEvent>(context, listen: false)
-          .closePoll(pollId: pollEventId);
+          .closePoll(pollId: pollEventId, context: context);
       LoadingOverlay.hide(context);
     } else if (ris == "delete_poll_$curUid") {
       LoadingOverlay.show(context);

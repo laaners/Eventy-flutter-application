@@ -166,9 +166,8 @@ class PollDetailScreen extends StatelessWidget {
       appBarTitle: pollData.pollEventName,
       upRightActions: [
         MyIconButton(
-          icon: const Icon(
-            Icons.more_vert,
-          ),
+          icon:
+              Icon(Icons.more_vert, color: Theme.of(context).primaryColorLight),
           onTap: () async {
             var ris = await MyModal.show(
               context: context,
@@ -191,7 +190,7 @@ class PollDetailScreen extends StatelessWidget {
               LoadingOverlay.show(context);
               // ignore: use_build_context_synchronously
               await Provider.of<FirebasePollEvent>(context, listen: false)
-                  .closePoll(pollId: pollId);
+                  .closePoll(pollId: pollId, context: context);
               // ignore: use_build_context_synchronously
               LoadingOverlay.hide(context);
             } else if (ris == "delete_poll_$curUid") {
@@ -212,7 +211,7 @@ class PollDetailScreen extends StatelessWidget {
         MyIconButton(
           margin: const EdgeInsets.only(
               right: LayoutConstants.kModalHorizontalPadding),
-          icon: const Icon(Icons.refresh),
+          icon: Icon(Icons.refresh, color: Theme.of(context).primaryColorLight),
           onTap: refreshPollDetail,
         ),
       ],
