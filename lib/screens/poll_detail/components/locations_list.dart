@@ -176,7 +176,7 @@ class _LocationsListState extends State<LocationsList>
                   shrinkWrap: true,
                   controller: ScrollController(),
                   children: const [
-                    EmptyList(emptyMsg: "No polls or events found"),
+                    EmptyList(emptyMsg: "Nothing here"),
                   ],
                 )
               : ListView.builder(

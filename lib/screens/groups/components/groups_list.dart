@@ -115,6 +115,7 @@ class GroupsList extends StatelessWidget {
                         margin: const EdgeInsets.symmetric(horizontal: 8),
                         child: GroupTile(
                           group: group,
+                          maintainState: true,
                           trailing: MyIconButton(
                             icon: const Icon(Icons.edit),
                             onTap: () async {

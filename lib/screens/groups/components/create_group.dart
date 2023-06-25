@@ -87,7 +87,6 @@ class _CreateGroupState extends State<CreateGroup> {
             addInvitee: (UserModel user) {
               setState(() {
                 if (!members.map((_) => _.uid).toList().contains(user.uid)) {
-                  // inviteeIds.add(uid);
                   members.insert(0, user);
                 }
               });

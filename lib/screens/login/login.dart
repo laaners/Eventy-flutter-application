@@ -1,4 +1,4 @@
-import 'package:dima_app/firebase_cruds_testing.dart';
+import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/password_reset/password_reset.dart';
 import 'package:dima_app/screens/signup/signup.dart';
 import 'package:dima_app/services/firebase_user.dart';
@@ -36,7 +36,7 @@ class _LogInFormState extends State<LogInForm> {
 
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _passwordVisible = false;
+  bool _passwordInvisible = true;
 
   @override
   void dispose() {
@@ -52,6 +52,7 @@ class _LogInFormState extends State<LogInForm> {
         controller: ScrollController(),
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
+          /*
           TextButton(
             key: GlobalKey(debugLabel: 'test1'),
             onPressed: () async {
@@ -62,6 +63,7 @@ class _LogInFormState extends State<LogInForm> {
                 username: "usernameId17",
                 password: "password",
               );
+              // ignore: use_build_context_synchronously
               LoadingOverlay.hide(context);
             },
             child: const Text("Firebase login17"),
@@ -75,20 +77,21 @@ class _LogInFormState extends State<LogInForm> {
                 username: "UsernameId14",
                 password: "password",
               );
+              // ignore: use_build_context_synchronously
               LoadingOverlay.hide(context);
             },
             child: const Text("Firebase login14"),
           ),
+           */
           const SizedBox(height: 50),
           const EventyLogo(extWidth: 180),
+          const SizedBox(height: 20),
           Text(
             "Eventy",
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.displayLarge,
           ),
-          const SizedBox(
-            height: 50,
-          ),
+          const SizedBox(height: 20),
           Text(
             "Log In",
             style: Theme.of(context).textTheme.headlineLarge,
@@ -121,7 +124,7 @@ class _LogInFormState extends State<LogInForm> {
                 ),
                 TextFormField(
                   controller: _passwordController,
-                  obscureText: _passwordVisible,
+                  obscureText: _passwordInvisible,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.lock_open),
                     hintText: 'Password',
@@ -131,11 +134,11 @@ class _LogInFormState extends State<LogInForm> {
                     suffixIcon: IconButton(
                       onPressed: () {
                         setState(() {
-                          _passwordVisible = !_passwordVisible;
+                          _passwordInvisible = !_passwordInvisible;
                         });
                       },
                       icon: Icon(
-                        _passwordVisible
+                        _passwordInvisible
                             ? Icons.visibility_off
                             : Icons.visibility,
                       ),
@@ -176,12 +179,15 @@ class _LogInFormState extends State<LogInForm> {
                     if (_formKey.currentState!.validate()) {
                       // If the form is valid, display a snackbar. In the real world,
                       // you'd often call a server or save the information in a database.
+                      LoadingOverlay.show(context);
                       await Provider.of<FirebaseUser>(context, listen: false)
                           .logInWithUsername(
                         context: context,
                         username: _usernameController.text,
                         password: _passwordController.text,
                       );
+                      // ignore: use_build_context_synchronously
+                      LoadingOverlay.hide(context);
                     }
                   },
                 ),
@@ -198,14 +204,32 @@ class _LogInFormState extends State<LogInForm> {
                       ),
                     ),
                     TextButton(
-                      key: const Key("log-in-to-sign-up-screen"),
-                      onPressed: () {
+                      key: const Key("log_in_to_sign_up_screen"),
+                      onPressed: () async {
                         Widget newScreen = const SignUpScreen();
-                        Navigator.of(context, rootNavigator: false).push(
+                        final ris =
+                            await Navigator.of(context, rootNavigator: false)
+                                .push(
                           ScreenTransition(
                             builder: (context) => newScreen,
                           ),
                         );
+                        if (ris != null) {
+                          Map<String, dynamic> user =
+                              ris as Map<String, dynamic>;
+                          // ignore: use_build_context_synchronously
+                          LoadingOverlay.show(context);
+                          // ignore: use_build_context_synchronously
+                          await Provider.of<FirebaseUser>(context,
+                                  listen: false)
+                              .logInWithUsername(
+                            context: context,
+                            username: user["username"],
+                            password: user["password"],
+                          );
+                          // ignore: use_build_context_synchronously
+                          LoadingOverlay.hide(context);
+                        }
                       },
                       child: const Text(
                         "Sign up",

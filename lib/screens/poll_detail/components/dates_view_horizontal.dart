@@ -1,4 +1,3 @@
-import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/services/clock_manager.dart';

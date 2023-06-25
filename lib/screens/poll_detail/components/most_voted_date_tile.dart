@@ -1,10 +1,6 @@
-import 'package:dima_app/constants/preferences.dart';
-import 'package:dima_app/models/location.dart';
-import 'package:dima_app/models/location_icons.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
-import 'package:dima_app/models/vote_location_model.dart';
 import 'package:dima_app/screens/poll_detail/components/date_detail.dart';
 import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';

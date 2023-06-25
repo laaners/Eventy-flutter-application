@@ -7,7 +7,6 @@ import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/poll_event_methods.dart';
-import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/my_list_tile.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/screen_transition.dart';

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collection/collection.dart';
 import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/firebase_options.dart';
 import 'package:dima_app/models/notification_model.dart';

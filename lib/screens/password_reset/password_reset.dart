@@ -1,4 +1,3 @@
-import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_button.dart';
@@ -26,7 +25,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar(title: "Password rest", upRightActions: []),
+      appBar: const MyAppBar(title: "Password rest"),
       body: ResponsiveWrapper(
         child: Form(
           key: _formKey,

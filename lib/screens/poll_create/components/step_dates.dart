@@ -1,4 +1,3 @@
-import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/screens/poll_create/components/select_day_slots.dart';
 import 'package:dima_app/screens/poll_create/components/select_slot.dart';
 import 'package:dima_app/services/clock_manager.dart';

@@ -4,8 +4,6 @@ import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:provider/provider.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -22,7 +20,6 @@ class _ChangeProfileScreenState extends State<ChangePasswordScreen> {
 
   bool _passwordInvisibleOld = true;
   bool _passwordInvisibleNew = true;
-  bool _modified = false;
 
   @override
   void dispose() {
@@ -34,10 +31,7 @@ class _ChangeProfileScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar(
-        title: "Change password",
-        upRightActions: [],
-      ),
+      appBar: const MyAppBar(title: "Change password"),
       body: ResponsiveWrapper(
         child: Form(
           key: _formkey,
