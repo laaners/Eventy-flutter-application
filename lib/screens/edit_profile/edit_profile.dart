@@ -97,7 +97,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             .usernameAlreadyExists(username: username);
                         setState(() {
                           _usernameAlreadyExist = tmp;
-                          print(_usernameAlreadyExist);
                         });
                       },
                       validator: (value) {

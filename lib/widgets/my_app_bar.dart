@@ -1,17 +1,14 @@
 import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/error/error.dart';
-import 'package:dima_app/screens/poll_create/poll_create.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/poll_event_methods.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
-import 'package:dima_app/widgets/search_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'loading_logo.dart';
-import 'show_snack_bar.dart';
 import 'user_tile.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {

@@ -61,6 +61,7 @@ class _StepBasicsState extends State<StepBasics> {
             ),
           ),
           MyTextField(
+            key: const Key("poll_event_title"),
             maxLength: 40,
             maxLines: 2,
             hintText: "What's the occasion?",
@@ -75,6 +76,7 @@ class _StepBasicsState extends State<StepBasics> {
             ),
           ),
           MyTextField(
+            key: const Key("poll_event_desc"),
             maxLength: 200,
             maxLines: 7,
             hintText: "Describe what this event is about",

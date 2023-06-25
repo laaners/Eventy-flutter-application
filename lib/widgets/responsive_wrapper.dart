@@ -1,6 +1,4 @@
-import 'package:collection/collection.dart';
 import 'package:dima_app/widgets/delay_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ResponsiveWrapper extends StatelessWidget {

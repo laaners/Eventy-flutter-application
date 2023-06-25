@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/models/vote_date_model.dart';
 import 'package:dima_app/models/vote_location_model.dart';
-import 'package:flutter/material.dart';
 
 import 'firebase_crud.dart';
 

@@ -1,19 +1,11 @@
-import 'dart:convert';
-
 import 'package:dima_app/constants/layout_constants.dart';
-import 'package:dima_app/firebase_cruds_testing.dart';
 import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_user.dart';
-import 'package:dima_app/widgets/loading_overlay.dart';
-import 'package:dima_app/widgets/logo.dart';
-import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dima_app/widgets/my_app_bar.dart';
@@ -71,7 +63,7 @@ class _DebugScreenState extends State<DebugScreen>
               child: const Text("TO POLL DETAIL (WITH TABBAR)"),
             ),
             Text(
-              _locationAddrController.text + "ok",
+              "${_locationAddrController.text}ok",
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const Text("ok"),
@@ -356,11 +348,9 @@ class _DebugScreenState extends State<DebugScreen>
                     const SizedBox(
                       height: 100,
                     ),
-                    Container(
-                      child: Image.asset('images/logo.png'),
-                    ),
+                    Image.asset('images/logo.png'),
                     // Generate samples to display of all Theme.of(context).textTheme fonts available
-                    Text("Normal text"),
+                    const Text("Normal text"),
                     Text('textTheme.bodyLarge text',
                         style: Theme.of(context).textTheme.bodyLarge),
                     Text('textTheme.bodyMedium text',

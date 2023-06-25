@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-import 'container_shadow.dart';
-
 class MapFromCoor extends StatefulWidget {
   final String address;
   final double lat;

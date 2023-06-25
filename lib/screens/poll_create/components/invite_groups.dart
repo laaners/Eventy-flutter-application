@@ -34,7 +34,7 @@ class InviteGroups extends StatefulWidget {
 class _InviteGroupsState extends State<InviteGroups> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focus = FocusNode();
-  late var _stream;
+  late Stream<QuerySnapshot<Object?>>? _stream;
 
   @override
   void initState() {

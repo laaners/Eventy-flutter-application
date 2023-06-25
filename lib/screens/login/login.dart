@@ -1,4 +1,3 @@
-import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/password_reset/password_reset.dart';
 import 'package:dima_app/screens/signup/signup.dart';
 import 'package:dima_app/services/firebase_user.dart';

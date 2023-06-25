@@ -107,7 +107,7 @@ class _InviteUsersState extends State<InviteUsers> {
                         .map(
                           (e) => InviteProfilePic(
                             invitees: widget.invitees,
-                            originalInvitees: [],
+                            originalInvitees: const [],
                             organizerUid: "",
                             user: e,
                             addInvitee: widget.addInvitee,
