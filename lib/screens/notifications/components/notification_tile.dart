@@ -79,6 +79,8 @@ class _NotificationTileState extends State<NotificationTile> {
           difference =
               difference < 1 ? differenceDuration.inSeconds : difference;
 
+          difference = difference < 0 ? -difference : difference;
+
           return Container(
             decoration: BoxDecoration(
               color: widget.notification.isRead

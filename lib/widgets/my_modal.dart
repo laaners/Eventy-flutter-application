@@ -98,14 +98,20 @@ class MyModal extends StatelessWidget {
                                     const BorderRadius.all(Radius.circular(20)),
                               ),
                             ),
-                      if (titleWidget != null) titleWidget,
+                      if (titleWidget != null)
+                        ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 600),
+                            child: titleWidget),
                       if (title != null && title.isNotEmpty)
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 0, top: 8),
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            title,
-                            style: Theme.of(context).textTheme.headlineMedium,
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 600),
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 0, top: 8),
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              title,
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
                           ),
                         ),
                     ],

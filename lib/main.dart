@@ -127,11 +127,13 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    /*
     // Disable orientation change
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    */
     return MaterialApp(
       title: 'Eventy',
       theme: lightTheme,

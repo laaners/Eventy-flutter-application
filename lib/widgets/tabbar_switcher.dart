@@ -81,61 +81,63 @@ class _TabbarSwitcher extends State<TabbarSwitcher>
               ),
       ),
       body: SafeArea(
-        child: NestedScrollView(
-          controller: _scrollController,
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              // https://github.com/flutter/flutter/issues/37152
-              // to remove some space below tabbar
-              SliverOverlapAbsorber(
-                handle:
-                    NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                sliver: SliverPadding(
-                  // space between sticky elements and app bar
-                  padding: const EdgeInsets.only(top: 0),
-                  sliver: SliverAppBar(
-                    scrolledUnderElevation: 0,
-                    elevation: 1,
-                    pinned: true,
-                    expandedHeight: widget.stickyHeight,
-                    automaticallyImplyLeading: false,
-                    centerTitle: true,
-                    backgroundColor: _isShrink || widget.stickyHeight == 0
-                        ? Theme.of(context).appBarTheme.backgroundColor
-                        : Theme.of(context).scaffoldBackgroundColor,
-                    bottom: PreferredSize(
-                      // height between app bar and tabbar
-                      preferredSize: const Size.fromHeight(0),
-                      child: TabBar(
-                        tabs: widget.labels.map((e) => Tab(text: e)).toList(),
-                        controller: _tabController,
-                        indicatorSize: TabBarIndicatorSize.tab,
+        child: ResponsiveWrapper(
+          child: NestedScrollView(
+            controller: _scrollController,
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return [
+                // https://github.com/flutter/flutter/issues/37152
+                // to remove some space below tabbar
+                SliverOverlapAbsorber(
+                  handle:
+                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                  sliver: SliverPadding(
+                    // space between sticky elements and app bar
+                    padding: const EdgeInsets.only(top: 0),
+                    sliver: SliverAppBar(
+                      scrolledUnderElevation: 0,
+                      elevation: 1,
+                      pinned: true,
+                      expandedHeight: widget.stickyHeight,
+                      automaticallyImplyLeading: false,
+                      centerTitle: true,
+                      backgroundColor: _isShrink || widget.stickyHeight == 0
+                          ? Theme.of(context).appBarTheme.backgroundColor
+                          : Theme.of(context).scaffoldBackgroundColor,
+                      bottom: PreferredSize(
+                        // height between app bar and tabbar
+                        preferredSize: const Size.fromHeight(0),
+                        child: TabBar(
+                          tabs: widget.labels.map((e) => Tab(text: e)).toList(),
+                          controller: _tabController,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                        ),
                       ),
+                      flexibleSpace:
+                          widget.stickyHeight != 0 && widget.listSticky != null
+                              ? FlexibleSpaceBar(
+                                  collapseMode: CollapseMode.pin,
+                                  background: widget.listSticky,
+                                )
+                              : null,
                     ),
-                    flexibleSpace:
-                        widget.stickyHeight != 0 && widget.listSticky != null
-                            ? FlexibleSpaceBar(
-                                collapseMode: CollapseMode.pin,
-                                background: widget.listSticky,
-                              )
-                            : null,
                   ),
                 ),
+              ];
+            },
+            body: ResponsiveWrapper(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: TabBarView(
+                      // for best performance, add to the stateful widgets
+                      // with AutomaticKeepAliveClientMixin
+                      controller: _tabController,
+                      children: widget.tabbars,
+                    ),
+                  ),
+                ],
               ),
-            ];
-          },
-          body: ResponsiveWrapper(
-            child: Column(
-              children: [
-                Expanded(
-                  child: TabBarView(
-                    // for best performance, add to the stateful widgets
-                    // with AutomaticKeepAliveClientMixin
-                    controller: _tabController,
-                    children: widget.tabbars,
-                  ),
-                ),
-              ],
             ),
           ),
         ),

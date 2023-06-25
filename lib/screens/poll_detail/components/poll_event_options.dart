@@ -35,162 +35,160 @@ class PollEventOptions extends StatelessWidget {
   Widget build(BuildContext context) {
     String curUid = Provider.of<FirebaseUser>(listen: false, context).user!.uid;
     String pollOrEvent = isClosed ? "event" : "poll";
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (curUid == pollData.organizerUid)
-          ListTile(
-            contentPadding: const EdgeInsets.all(0),
-            title: Text(
-              "Share the $pollOrEvent",
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            leading: Container(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
+    return SafeArea(
+      child: Wrap(
+        children: [
+          if (curUid == pollData.organizerUid)
+            ListTile(
+              title: Text(
+                "Share the $pollOrEvent",
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              child: const Icon(
-                Icons.share_outlined,
-              ),
-            ),
-            onTap: () async {
-              await DynamicLinksHandler.pollEventLinkSharing(
-                context: context,
-                pollData: pollData,
-              );
-            },
-          ),
-        if (invites.isNotEmpty)
-          ListTile(
-            contentPadding: const EdgeInsets.all(0),
-            title: Text(
-              "${curUid == pollData.organizerUid ? "Manage" : "See"} invited users",
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            leading: Container(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: Icon(
-                curUid == pollData.organizerUid
-                    ? Icons.person_add
-                    : Icons.person_search,
-              ),
-            ),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                ScreenTransition(
-                  builder: (context) => InviteesList(
-                    isClosed: isClosed,
-                    pollEventId: pollEventId,
-                    pollData: pollData,
-                    invites: invites
-                        .where((e) => e.inviteeId != pollData.organizerUid)
-                        .toList(),
-                    refreshPollDetail: refreshPollDetail,
-                    votesDates: votesDates,
-                    votesLocations: votesLocations,
-                  ),
+              leading: Container(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
                 ),
-              );
-            },
-          ),
-        if (curUid == pollData.organizerUid && !isClosed)
-          ListTile(
-            contentPadding: const EdgeInsets.all(0),
-            title: Text(
-              "Close the poll",
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            leading: Container(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
+                child: const Icon(
+                  Icons.share_outlined,
+                ),
               ),
-              child: const Icon(
-                Icons.event_available,
-              ),
+              onTap: () async {
+                await DynamicLinksHandler.pollEventLinkSharing(
+                  context: context,
+                  pollData: pollData,
+                );
+              },
             ),
-            onTap: () async {
-              bool ris = await MyAlertDialog.showAlertConfirmCancel(
-                context: context,
-                title: "Closing the poll",
-                content:
-                    "Do you want to close the poll early and create the event?",
-                trueButtonText: "Confirm",
-              );
-              if (ris) {
-                Navigator.pop(context, "create_event_${pollData.organizerUid}");
-              }
-            },
-          ),
-        if (curUid == pollData.organizerUid)
-          ListTile(
-            contentPadding: const EdgeInsets.all(0),
-            title: Text(
-              "Delete the $pollOrEvent",
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            leading: Container(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
+          if (invites.isNotEmpty)
+            ListTile(
+              title: Text(
+                "${curUid == pollData.organizerUid ? "Manage" : "See"} invited users",
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              child: const Icon(
-                Icons.delete,
+              leading: Container(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Icon(
+                  curUid == pollData.organizerUid
+                      ? Icons.person_add
+                      : Icons.person_search,
+                ),
               ),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  ScreenTransition(
+                    builder: (context) => InviteesList(
+                      isClosed: isClosed,
+                      pollEventId: pollEventId,
+                      pollData: pollData,
+                      invites: invites
+                          .where((e) => e.inviteeId != pollData.organizerUid)
+                          .toList(),
+                      refreshPollDetail: refreshPollDetail,
+                      votesDates: votesDates,
+                      votesLocations: votesLocations,
+                    ),
+                  ),
+                );
+              },
             ),
-            onTap: () async {
-              bool ris = await MyAlertDialog.showAlertConfirmCancel(
-                context: context,
-                title: "Deleting the poll",
-                content:
-                    "This action will delete the poll without creating the event, continue?",
-                trueButtonText: "Confirm",
-              );
-              if (ris) {
-                Navigator.pop(context, "delete_poll_${pollData.organizerUid}");
-              }
-            },
-          ),
-        if (curUid != pollData.organizerUid)
-          ListTile(
-            contentPadding: const EdgeInsets.all(0),
-            title: Text(
-              "Exit the $pollOrEvent",
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            leading: Container(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
+          if (curUid == pollData.organizerUid && !isClosed)
+            ListTile(
+              title: Text(
+                "Close the poll",
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              child: const Icon(
-                Icons.logout,
+              leading: Container(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: const Icon(
+                  Icons.event_available,
+                ),
               ),
+              onTap: () async {
+                bool ris = await MyAlertDialog.showAlertConfirmCancel(
+                  context: context,
+                  title: "Closing the poll",
+                  content:
+                      "Do you want to close the poll early and create the event?",
+                  trueButtonText: "Confirm",
+                );
+                if (ris) {
+                  Navigator.pop(
+                      context, "create_event_${pollData.organizerUid}");
+                }
+              },
             ),
-            onTap: () async {
-              bool ris = await MyAlertDialog.showAlertConfirmCancel(
-                context: context,
-                title: "Exiting the poll",
-                content:
-                    "By confirming this action you will no longer be able to partecipate in this poll, continue?",
-                trueButtonText: "Confirm",
-              );
-              if (ris) {
-                Navigator.pop(context, "exit_poll");
-              }
-            },
-          ),
-      ],
+          if (curUid == pollData.organizerUid)
+            ListTile(
+              title: Text(
+                "Delete the $pollOrEvent",
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              leading: Container(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: const Icon(
+                  Icons.delete,
+                ),
+              ),
+              onTap: () async {
+                bool ris = await MyAlertDialog.showAlertConfirmCancel(
+                  context: context,
+                  title: "Deleting the poll",
+                  content:
+                      "This action will delete the poll without creating the event, continue?",
+                  trueButtonText: "Confirm",
+                );
+                if (ris) {
+                  Navigator.pop(
+                      context, "delete_poll_${pollData.organizerUid}");
+                }
+              },
+            ),
+          if (curUid != pollData.organizerUid)
+            ListTile(
+              title: Text(
+                "Exit the $pollOrEvent",
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              leading: Container(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: const Icon(
+                  Icons.logout,
+                ),
+              ),
+              onTap: () async {
+                bool ris = await MyAlertDialog.showAlertConfirmCancel(
+                  context: context,
+                  title: "Exiting the poll",
+                  content:
+                      "By confirming this action you will no longer be able to partecipate in this poll, continue?",
+                  trueButtonText: "Confirm",
+                );
+                if (ris) {
+                  Navigator.pop(context, "exit_poll");
+                }
+              },
+            ),
+        ],
+      ),
     );
   }
 }

@@ -92,7 +92,7 @@ class FirebaseUser extends ChangeNotifier {
   }
 
   // signup
-  Future<UserModel?> signUpWithEmail({
+  Future<bool> signUpWithEmail({
     required String email,
     required String password,
     required String username,
@@ -106,12 +106,12 @@ class FirebaseUser extends ChangeNotifier {
       tmp = await usernameAlreadyExists(username: username);
       if (tmp) {
         showSnackBar(context, "Choose another username!");
-        return null;
+        return false;
       }
       tmp = await emailAlreadyExists(email: email);
       if (tmp) {
         showSnackBar(context, "Choose another email!");
-        return null;
+        return false;
       }
 
       UserCredential userCredential =
@@ -131,11 +131,11 @@ class FirebaseUser extends ChangeNotifier {
       Map<String, dynamic> userMap = userEntity.toMap();
       userMap["username_lower"] = username.toLowerCase();
       await userCollection.doc(userCredential.user!.uid).set(userMap);
-      return userEntity;
+      return true;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
-    return null;
+    return false;
   }
 
   Future<bool> usernameAlreadyExists({required String username}) async {

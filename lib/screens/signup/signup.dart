@@ -91,8 +91,6 @@ class _SignUpFormState extends State<SignUpForm> {
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Username cannot be empty';
-                } else if (_usernameAlreadyExist) {
-                  return 'Username already exists';
                 }
                 return null;
               },
@@ -221,8 +219,9 @@ class _SignUpFormState extends State<SignUpForm> {
                 if (_formKey.currentState!.validate()) {
                   LoadingOverlay.show(context);
                   // ignore: use_build_context_synchronously
-                  await Provider.of<FirebaseUser>(context, listen: false)
-                      .signUpWithEmail(
+                  var isNewUser =
+                      await Provider.of<FirebaseUser>(context, listen: false)
+                          .signUpWithEmail(
                     email: _emailController.text,
                     password: _passwordController.text,
                     username: _usernameController.text,
@@ -233,6 +232,7 @@ class _SignUpFormState extends State<SignUpForm> {
                   );
                   // ignore: use_build_context_synchronously
                   LoadingOverlay.hide(context);
+                  if (!isNewUser) return;
                   // ignore: use_build_context_synchronously
                   Navigator.pop(context, {
                     "username": _usernameController.text,

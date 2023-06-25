@@ -70,9 +70,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 BuildContext context,
                 AsyncSnapshot<DocumentSnapshot<Object?>> snapshot,
               ) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const LoadingLogo();
-                }
                 if (snapshot.hasError) {
                   Future.microtask(() {
                     Navigator.of(context, rootNavigator: false).pushReplacement(
@@ -85,14 +82,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   });
                   return Container();
                 }
-                if (!snapshot.data!.exists) {
-                  return ListView(
-                    controller: ScrollController(),
-                    shrinkWrap: true,
-                    children: const [
-                      SizedBox(height: 30),
-                      EmptyList(
-                        emptyMsg: "No notifications",
+                /*
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const LoadingLogo();
+                }
+                */
+                if (snapshot.connectionState == ConnectionState.waiting ||
+                    !snapshot.data!.exists) {
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: ListView(
+                          controller: ScrollController(),
+                          shrinkWrap: true,
+                          children: const [
+                            SizedBox(height: 30),
+                            EmptyList(
+                              emptyMsg: "No notifications",
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   );
@@ -103,33 +112,38 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     notificationModel.notifications;
                 notifications
                     .sort((a, b) => b.timestamp.compareTo(a.timestamp));
-                return notifications.isEmpty
-                    ? ListView(
-                        controller: ScrollController(),
-                        shrinkWrap: true,
-                        children: const [
-                          SizedBox(height: 30),
-                          EmptyList(
-                            emptyMsg: "No notifications",
-                          ),
-                        ],
-                      )
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        controller: ScrollController(),
-                        itemCount: notifications.length + 1,
-                        itemBuilder: (BuildContext context, int index) {
-                          if (index == notifications.length) {
-                            return Container(
-                                height: LayoutConstants.kPaddingFromCreate);
-                          }
-                          PollEventNotification notification =
-                              notifications[index];
-                          return NotificationTile(
-                            notification: notification,
-                          );
-                        },
-                      );
+                return Column(
+                  children: [
+                    Expanded(
+                      child: notifications.isEmpty
+                          ? ListView(
+                              controller: ScrollController(),
+                              shrinkWrap: true,
+                              children: const [
+                                SizedBox(height: 30),
+                                EmptyList(emptyMsg: "No notifications"),
+                              ],
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              controller: ScrollController(),
+                              itemCount: notifications.length + 1,
+                              itemBuilder: (BuildContext context, int index) {
+                                if (index == notifications.length) {
+                                  return Container(
+                                      height:
+                                          LayoutConstants.kPaddingFromCreate);
+                                }
+                                PollEventNotification notification =
+                                    notifications[index];
+                                return NotificationTile(
+                                  notification: notification,
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                );
               }),
         ),
       ),

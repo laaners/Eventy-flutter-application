@@ -148,8 +148,10 @@ class _ChangeImageState extends State<ChangeImage> {
             children: [
               ListTile(
                   leading: const Icon(Icons.photo_library),
-                  title: const Text(
-                    'Gallery',
+                  title: Text(
+                    "Gallery",
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   onTap: () {
                     imgFromGallery(context);
@@ -157,8 +159,10 @@ class _ChangeImageState extends State<ChangeImage> {
                   }),
               ListTile(
                 leading: const Icon(Icons.photo_camera),
-                title: const Text(
-                  'Camera',
+                title: Text(
+                  "Camera",
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
                 onTap: () {
                   imgFromCamera(context);

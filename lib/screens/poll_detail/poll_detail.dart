@@ -168,21 +168,20 @@ class PollDetailScreen extends StatelessWidget {
           icon:
               Icon(Icons.more_vert, color: Theme.of(context).primaryColorLight),
           onTap: () async {
-            var ris = await MyModal.show(
+            var ris = await showModalBottomSheet(
               context: context,
-              child: PollEventOptions(
-                pollData: pollData,
-                pollEventId: pollId,
-                invites: pollInvites,
-                refreshPollDetail: refreshPollDetail,
-                votesLocations: votesLocations,
-                votesDates: votesDates,
-                isClosed: isClosed,
-              ),
-              heightFactor: 0.32,
-              doneCancelMode: false,
-              onDone: () {},
-              title: "",
+              useRootNavigator: true,
+              builder: (BuildContext context) {
+                return PollEventOptions(
+                  pollData: pollData,
+                  pollEventId: pollId,
+                  invites: pollInvites,
+                  refreshPollDetail: refreshPollDetail,
+                  votesLocations: votesLocations,
+                  votesDates: votesDates,
+                  isClosed: isClosed,
+                );
+              },
             );
             if (ris == "create_event_$curUid") {
               // ignore: use_build_context_synchronously

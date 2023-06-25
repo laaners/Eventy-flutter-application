@@ -58,7 +58,6 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
         margin: EdgeInsets.all(5),
         child: Image.asset('images/logo.png'),
       ),
-      */
       shape: shape ??
           Border(
             bottom: BorderSide(
@@ -66,6 +65,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
               color: Theme.of(context).dividerColor,
             ),
           ),
+      */
       centerTitle: true,
       title: Text(
         title,
