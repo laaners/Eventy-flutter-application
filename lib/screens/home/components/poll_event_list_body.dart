@@ -305,24 +305,20 @@ class _PollEventListBodyState extends State<PollEventListBody> {
                                 onTap: () async {
                                   String pollEventId =
                                       "${event.pollEventName}_${event.organizerUid}";
-
-                                  var ris = await MyModal.show(
+                                  var ris = await showModalBottomSheet(
                                     context: context,
-                                    child: PollEventOptions(
-                                      pollData: event,
-                                      pollEventId: pollEventId,
-                                      invites: [],
-                                      refreshPollDetail: () {},
-                                      votesLocations: [],
-                                      votesDates: [],
-                                      isClosed: isClosed,
-                                    ),
-                                    heightFactor: curUid == event.organizerUid
-                                        ? 0.25
-                                        : 0.16,
-                                    doneCancelMode: false,
-                                    onDone: () {},
-                                    title: "",
+                                    useRootNavigator: true,
+                                    builder: (BuildContext context) {
+                                      return PollEventOptions(
+                                        pollData: event,
+                                        pollEventId: pollEventId,
+                                        invites: [],
+                                        refreshPollDetail: () {},
+                                        votesLocations: [],
+                                        votesDates: [],
+                                        isClosed: isClosed,
+                                      );
+                                    },
                                   );
                                   // ignore: use_build_context_synchronously
                                   await PollEventUserMethods.optionsRisManager(

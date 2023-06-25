@@ -92,9 +92,15 @@ class ResponsiveWrapper extends StatelessWidget {
                   )
                 : Container(
                     alignment: Alignment.topCenter,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).appBarTheme.backgroundColor,
+                    ),
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 600),
                       child: Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                        ),
                         child: child,
                       ),
                     ),

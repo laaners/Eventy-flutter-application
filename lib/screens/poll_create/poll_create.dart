@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/models/location.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/poll_create/components/my_stepper.dart';
@@ -321,34 +320,39 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
           )
         ],
       ),
-      body: MyStepper(
-        elevation: 1,
-        currentStep: _activeStepIndex,
-        steps: stepList(),
-        onStepTapped: (int index) {
-          setState(() {
-            _activeStepIndex = index;
-          });
-        },
-        // override continue cancel of stepper
-        controlsBuilder: (context, controls) {
-          return Container();
-        },
+      body: ResponsiveWrapper(
+        child: MyStepper(
+          elevation: 1,
+          currentStep: _activeStepIndex,
+          steps: stepList(),
+          onStepTapped: (int index) {
+            setState(() {
+              _activeStepIndex = index;
+            });
+          },
+          // override continue cancel of stepper
+          controlsBuilder: (context, controls) {
+            return Container();
+          },
+        ),
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.only(
-          bottom: 10,
-          top: 10,
-          left: 10,
-          right: 10,
+        padding: EdgeInsets.symmetric(
+          vertical: 10,
+          horizontal: MediaQuery.of(context).size.width >= 600
+              ? MediaQuery.of(context).size.width / 2 - 300 + 10
+              : 10,
         ),
         decoration: BoxDecoration(
+          color: Theme.of(context).appBarTheme.backgroundColor,
+          /*
           border: Border(
             top: BorderSide(
               width: 1.0,
               color: Theme.of(context).dividerColor,
             ),
           ),
+           */
         ),
         child: Row(
           children: [

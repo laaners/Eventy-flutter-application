@@ -10,6 +10,7 @@ import 'package:dima_app/services/theme_manager.dart';
 import 'package:dima_app/widgets/container_shadow.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
+import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MyAppBar(title: "Settings", upRightActions: []),
+      appBar: MyAppBar(
+        title: "Settings",
+        upRightActions: [
+          MyIconButton(
+            margin: const EdgeInsets.only(
+                right: LayoutConstants.kModalHorizontalPadding),
+            icon:
+                Icon(Icons.logout, color: Theme.of(context).primaryColorLight),
+            onTap: () async {
+              await Provider.of<FirebaseUser>(context, listen: false).signOut();
+            },
+          ),
+        ],
+      ),
       body: ResponsiveWrapper(
         child: ListView(
           controller: ScrollController(),
@@ -130,7 +144,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ListTile(
                     leading: const Icon(Icons.logout),
                     title: const Text("Sign Out"),
-                    trailing: const Icon(Icons.navigate_next),
                     onTap: () async {
                       await Provider.of<FirebaseUser>(context, listen: false)
                           .signOut();

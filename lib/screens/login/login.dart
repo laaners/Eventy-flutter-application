@@ -52,22 +52,21 @@ class _LogInFormState extends State<LogInForm> {
         controller: ScrollController(),
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
-          /*
           TextButton(
             key: GlobalKey(debugLabel: 'test1'),
             onPressed: () async {
               LoadingOverlay.show(context);
               await Provider.of<FirebaseUser>(context, listen: false)
                   .logInWithUsername(
-                context: context,
-                username: "usernameId17",
-                password: "password",
-              );
+                      context: context,
+                      username: "usernameId17",
+                      password: "password");
               // ignore: use_build_context_synchronously
               LoadingOverlay.hide(context);
             },
             child: const Text("Firebase login17"),
           ),
+          /*
           TextButton(
             onPressed: () async {
               LoadingOverlay.show(context);
@@ -104,6 +103,7 @@ class _LogInFormState extends State<LogInForm> {
                   height: 25,
                 ),
                 TextFormField(
+                  key: const Key("username_field"),
                   controller: _usernameController,
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.face),
@@ -123,6 +123,7 @@ class _LogInFormState extends State<LogInForm> {
                   height: 25,
                 ),
                 TextFormField(
+                  key: const Key("password_field"),
                   controller: _passwordController,
                   obscureText: _passwordInvisible,
                   decoration: InputDecoration(
@@ -174,6 +175,7 @@ class _LogInFormState extends State<LogInForm> {
                   height: 25,
                 ),
                 MyButton(
+                  key: const Key("login_button"),
                   text: "LOG IN",
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
