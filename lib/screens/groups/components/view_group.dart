@@ -2,7 +2,6 @@ import 'package:dima_app/models/group_model.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/services/firebase_user.dart';
-import 'package:dima_app/widgets/container_shadow.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/screen_transition.dart';

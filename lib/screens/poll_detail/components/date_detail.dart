@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/models/availability.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';
@@ -11,7 +10,6 @@ import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/firebase_vote.dart';
 import 'package:dima_app/widgets/empty_list.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
-import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';

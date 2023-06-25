@@ -11,7 +11,6 @@ import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
-import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -210,7 +209,6 @@ class _EditGroupBodyState extends State<EditGroupBody> {
             addInvitee: (UserModel user) {
               setState(() {
                 if (!members.map((_) => _.uid).toList().contains(user.uid)) {
-                  // inviteeIds.add(uid);
                   members.insert(0, user);
                 }
               });

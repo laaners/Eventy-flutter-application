@@ -2,7 +2,6 @@ import 'package:dima_app/models/location.dart';
 import 'package:dima_app/models/location_icons.dart';
 import 'package:dima_app/screens/poll_create/components/select_location_address.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
-import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
 import 'package:flutter/material.dart';

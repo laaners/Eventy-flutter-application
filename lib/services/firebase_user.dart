@@ -40,18 +40,23 @@ class FirebaseUser extends ChangeNotifier {
       if (usernameValidation.docs.isNotEmpty) {
         String email = (usernameValidation.docs[0].data()
             as Map<String, dynamic>)['email'];
-        await loginWithEmail(
-            email: email, password: password, context: context);
-        notifyListeners();
+        bool loggedIn = await loginWithEmail(
+          email: email,
+          password: password,
+          context: context,
+        );
+        if (loggedIn) {
+          showSnackBar(context, "Welcome, $username!");
+        }
       } else {
-        showSnackBar(context, "Username does not exists");
+        showSnackBar(context, "Username does not exist");
       }
     } on FirebaseException catch (e) {
       print(e.message);
     }
   }
 
-  Future<void> loginWithEmail({
+  Future<bool> loginWithEmail({
     required String email,
     required String password,
     required BuildContext context,
@@ -69,9 +74,11 @@ class FirebaseUser extends ChangeNotifier {
       */
       await FirebaseCrud.readDoc(userCollection, _auth.currentUser!.uid);
       notifyListeners();
+      return true;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
+    return false;
   }
 
   Future<void> signOut() async {
@@ -85,7 +92,7 @@ class FirebaseUser extends ChangeNotifier {
   }
 
   // signup
-  Future<bool> signUpWithEmail({
+  Future<UserModel?> signUpWithEmail({
     required String email,
     required String password,
     required String username,
@@ -95,13 +102,16 @@ class FirebaseUser extends ChangeNotifier {
     required BuildContext context,
   }) async {
     try {
-      var usernameValidation =
-          await userCollection.where('username', isEqualTo: username).get();
-
-      if (usernameValidation.docs.isNotEmpty) {
-        // ignore: use_build_context_synchronously
+      bool tmp;
+      tmp = await usernameAlreadyExists(username: username);
+      if (tmp) {
         showSnackBar(context, "Choose another username!");
-        return false;
+        return null;
+      }
+      tmp = await emailAlreadyExists(email: email);
+      if (tmp) {
+        showSnackBar(context, "Choose another email!");
+        return null;
       }
 
       UserCredential userCredential =
@@ -109,7 +119,6 @@ class FirebaseUser extends ChangeNotifier {
         email: email,
         password: password,
       );
-      // ignore: use_build_context_synchronously
       // await sendEmailVerification(context);
       UserModel userEntity = UserModel(
         uid: userCredential.user!.uid,
@@ -122,11 +131,11 @@ class FirebaseUser extends ChangeNotifier {
       Map<String, dynamic> userMap = userEntity.toMap();
       userMap["username_lower"] = username.toLowerCase();
       await userCollection.doc(userCredential.user!.uid).set(userMap);
-      return true;
+      return userEntity;
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
     }
-    return false;
+    return null;
   }
 
   Future<bool> usernameAlreadyExists({required String username}) async {
@@ -134,6 +143,17 @@ class FirebaseUser extends ChangeNotifier {
       var usernameValidation =
           await userCollection.where('username', isEqualTo: username).get();
       return usernameValidation.docs.isNotEmpty;
+    } on FirebaseException catch (e) {
+      print(e.message);
+      return true;
+    }
+  }
+
+  Future<bool> emailAlreadyExists({required String email}) async {
+    try {
+      var emailValidation =
+          await userCollection.where('email', isEqualTo: email).get();
+      return emailValidation.docs.isNotEmpty;
     } on FirebaseException catch (e) {
       print(e.message);
       return true;

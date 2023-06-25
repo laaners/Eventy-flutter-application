@@ -1,7 +1,6 @@
 import 'package:dima_app/models/location.dart';
 import 'package:dima_app/models/location_icons.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
-import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

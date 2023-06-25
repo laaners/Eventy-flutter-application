@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/constants/layout_constants.dart';
-import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/models/notification_model.dart';
 import 'package:dima_app/models/poll_event_notification.dart';
 import 'package:dima_app/screens/error/error.dart';
@@ -8,17 +7,11 @@ import 'package:dima_app/screens/notifications/components/notification_tile.dart
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/widgets/loading_logo.dart';
-import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
-import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
-import 'package:dima_app/widgets/my_list_tile.dart';
-import 'package:dima_app/widgets/my_modal.dart';
-import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

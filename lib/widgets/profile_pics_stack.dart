@@ -1,14 +1,10 @@
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/login/login.dart';
 import 'package:dima_app/services/firebase_user.dart';
-import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
-import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
-
-import '../screens/error/error.dart';
 
 class ProfilePicsStack extends StatefulWidget {
   final double radius;
@@ -45,7 +41,11 @@ class _ProfilePicsStackState extends State<ProfilePicsStack> {
               right: widget.rl != null
                   ? (widget.radius * 2 - widget.offset) * index
                   : null,
-              child: ProfilePicFromUid(userUid: user, radius: widget.radius),
+              child: ProfilePicFromUid(
+                userUid: user,
+                radius: widget.radius,
+                maintainState: widget.maintainState,
+              ),
             );
           }).toList(),
           if (widget.uids.isEmpty)

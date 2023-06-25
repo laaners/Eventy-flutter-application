@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -45,7 +47,6 @@ class DynamicLinksHandler extends ChangeNotifier {
     // print(finalUrl);
     // print(dynamicLongLink);
     await Share.share(finalUrl.toString());
-    // ignore: use_build_context_synchronously
     await Clipboard.setData(ClipboardData(text: finalUrl.toString()));
     LoadingOverlay.hide(context);
   }

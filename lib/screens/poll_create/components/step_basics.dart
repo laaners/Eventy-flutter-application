@@ -1,4 +1,3 @@
-import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/widgets/my_modal.dart';

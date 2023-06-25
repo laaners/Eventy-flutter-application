@@ -1,5 +1,4 @@
 import 'package:dima_app/constants/layout_constants.dart';
-import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/models/vote_date_model.dart';

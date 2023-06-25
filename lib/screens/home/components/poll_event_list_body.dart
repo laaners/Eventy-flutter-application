@@ -1,16 +1,13 @@
 import 'package:dima_app/constants/layout_constants.dart';
-import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/models/poll_event_model.dart';
 import 'package:dima_app/screens/poll_detail/components/poll_event_options.dart';
 import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
-import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/poll_event_methods.dart';
 import 'package:dima_app/widgets/empty_list.dart';
-import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/poll_event_tile.dart';
@@ -262,7 +259,6 @@ class _PollEventListBodyState extends State<PollEventListBody> {
                             "${event.pollEventName}_${event.organizerUid}";
                         if (isClosed && !event.isClosed) {
                           // close the event on db
-                          print("Should close ${pollEventId}");
                           Provider.of<FirebasePollEvent>(context, listen: false)
                               .closePoll(pollId: pollEventId, context: context);
                         }

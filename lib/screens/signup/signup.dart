@@ -1,4 +1,6 @@
+import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
@@ -69,6 +71,7 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
             */
             TextFormField(
+              key: const Key("username_field"),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _usernameController,
               decoration: const InputDecoration(
@@ -83,7 +86,6 @@ class _SignUpFormState extends State<SignUpForm> {
                         .usernameAlreadyExists(username: username);
                 setState(() {
                   _usernameAlreadyExist = tmp;
-                  print(_usernameAlreadyExist);
                 });
               },
               validator: (value) {
@@ -95,10 +97,9 @@ class _SignUpFormState extends State<SignUpForm> {
                 return null;
               },
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             TextFormField(
+              key: const Key("name_field"),
               controller: _nameController,
               decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.perm_identity),
@@ -113,10 +114,9 @@ class _SignUpFormState extends State<SignUpForm> {
                 return null;
               },
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             TextFormField(
+              key: const Key("surname_field"),
               controller: _surnameController,
               decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.perm_identity),
@@ -131,10 +131,9 @@ class _SignUpFormState extends State<SignUpForm> {
                 return null;
               },
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             TextFormField(
+              key: const Key("email_field"),
               controller: _emailController,
               decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.mail),
@@ -153,10 +152,9 @@ class _SignUpFormState extends State<SignUpForm> {
                 return null;
               },
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             TextFormField(
+              key: const Key("password_field"),
               controller: _passwordController,
               obscureText: _passwordInvisible,
               decoration: InputDecoration(
@@ -185,10 +183,9 @@ class _SignUpFormState extends State<SignUpForm> {
                 return null;
               },
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             TextFormField(
+              key: const Key("password_confirm_field"),
               obscureText: _passwordInvisible,
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.lock_open),
@@ -218,11 +215,13 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
             const SizedBox(height: 30),
             MyButton(
+              key: const Key("signup_button"),
               text: "SIGN UP",
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
+                  LoadingOverlay.show(context);
                   // ignore: use_build_context_synchronously
-                  if (await Provider.of<FirebaseUser>(context, listen: false)
+                  await Provider.of<FirebaseUser>(context, listen: false)
                       .signUpWithEmail(
                     email: _emailController.text,
                     password: _passwordController.text,
@@ -231,17 +230,14 @@ class _SignUpFormState extends State<SignUpForm> {
                     surname: _surnameController.text,
                     profilePic: "default",
                     context: context,
-                  )) {
-                    // ignore: use_build_context_synchronously
-                    Navigator.pop(context);
-                  }
-
-                  // ignore: use_build_context_synchronously
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Welcome, ${_usernameController.text}!"),
-                    ),
                   );
+                  // ignore: use_build_context_synchronously
+                  LoadingOverlay.hide(context);
+                  // ignore: use_build_context_synchronously
+                  Navigator.pop(context, {
+                    "username": _usernameController.text,
+                    "password": _passwordController.text,
+                  });
                 }
               },
             ),
