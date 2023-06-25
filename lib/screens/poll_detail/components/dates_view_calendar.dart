@@ -211,9 +211,6 @@ class _DatesViewCalendarState extends State<DatesViewCalendar> {
         },
         availableCalendarFormats: const {CalendarFormat.month: 'month'},
         calendarFormat: CalendarFormat.month,
-        onDayLongPressed: (selectedDay, focusedDay) {
-          print("do something on long press");
-        },
         eventLoader: (DateTime day) {
           String dayString = DateFormatter.dateTime2String(day).split(" ")[0];
           if (widget.dates.containsKey(dayString)) {

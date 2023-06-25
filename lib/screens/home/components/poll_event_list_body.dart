@@ -5,11 +5,9 @@ import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
-import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/poll_event_methods.dart';
 import 'package:dima_app/widgets/empty_list.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
-import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/poll_event_tile.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:dima_app/widgets/search_tile.dart';
@@ -262,10 +260,6 @@ class _PollEventListBodyState extends State<PollEventListBody> {
                           Provider.of<FirebasePollEvent>(context, listen: false)
                               .closePoll(pollId: pollEventId, context: context);
                         }
-                        String curUid =
-                            Provider.of<FirebaseUser>(context, listen: false)
-                                .user!
-                                .uid;
                         return PollEventTile(
                           pollEvent: event,
                           bgColor: isClosed
@@ -312,10 +306,10 @@ class _PollEventListBodyState extends State<PollEventListBody> {
                                       return PollEventOptions(
                                         pollData: event,
                                         pollEventId: pollEventId,
-                                        invites: [],
+                                        invites: const [],
                                         refreshPollDetail: () {},
-                                        votesLocations: [],
-                                        votesDates: [],
+                                        votesLocations: const [],
+                                        votesDates: const [],
                                         isClosed: isClosed,
                                       );
                                     },

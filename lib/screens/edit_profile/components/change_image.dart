@@ -27,7 +27,7 @@ class ChangeImage extends StatefulWidget {
 class _ChangeImageState extends State<ChangeImage> {
   bool loading = false;
   final ImagePicker _picker = ImagePicker();
-  late final _stream;
+  late Stream<UserModel> _stream;
 
   @override
   void initState() {
@@ -42,9 +42,6 @@ class _ChangeImageState extends State<ChangeImage> {
       if (pickedFile != null) {
         widget.changePhoto(File(pickedFile.path));
         widget.changeInitialRemoved(true);
-        // uploadFile(context);
-      } else {
-        print('No image selected.');
       }
     });
   }
@@ -59,9 +56,6 @@ class _ChangeImageState extends State<ChangeImage> {
       if (pickedFile != null) {
         widget.changePhoto(File(pickedFile.path));
         widget.changeInitialRemoved(true);
-        // uploadFile(context);
-      } else {
-        print('No image selected.');
       }
     });
   }

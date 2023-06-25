@@ -49,6 +49,7 @@ class MyModal extends StatelessWidget {
                                 Align(
                                   alignment: const Alignment(-1, 0),
                                   child: TextButton(
+                                    key: const Key("modal_cancel"),
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
@@ -80,6 +81,7 @@ class MyModal extends StatelessWidget {
                                 Align(
                                   alignment: const Alignment(1, 0),
                                   child: TextButton(
+                                    key: const Key("modal_confirm"),
                                     onPressed: onDone,
                                     child: const Text("Confirm"),
                                   ),

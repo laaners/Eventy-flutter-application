@@ -21,7 +21,6 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'constants/preferences.dart';
@@ -366,6 +365,7 @@ class CreatePollEventButton extends StatelessWidget {
           Container(
             margin: const EdgeInsets.only(bottom: 18),
             child: MaterialButton(
+              key: const Key("create_poll_event"),
               onPressed: () async {
                 await PollEventUserMethods.createNewPoll(context: context);
               },

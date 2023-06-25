@@ -30,30 +30,13 @@ class PollEventScreen extends StatefulWidget {
 
 class _PollEventScreenState extends State<PollEventScreen>
     with AutomaticKeepAliveClientMixin {
-  Future<Map<String, dynamic>?>? _future;
   bool _refresh = true;
 
   @override
   bool get wantKeepAlive => true;
 
-  @override
-  initState() {
-    super.initState();
-    _future = Provider.of<FirebasePollEvent>(context, listen: false)
-        .getPollDataAndInvites(
-      context: context,
-      pollEventId: widget.pollEventId,
-    );
-  }
-
   void refreshPollDetail() {
     setState(() {
-      _future = null;
-      _future = Provider.of<FirebasePollEvent>(context, listen: false)
-          .getPollDataAndInvites(
-        context: context,
-        pollEventId: widget.pollEventId,
-      );
       _refresh = !_refresh;
     });
   }

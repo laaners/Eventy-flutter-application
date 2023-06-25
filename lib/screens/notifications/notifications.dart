@@ -6,7 +6,6 @@ import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/screens/notifications/components/notification_tile.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/services/firebase_notification.dart';
-import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';

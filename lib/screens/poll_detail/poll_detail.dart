@@ -14,7 +14,6 @@ import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/delay_widget.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
-import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:dima_app/widgets/user_tile.dart';
 import 'package:flutter/material.dart';

@@ -1,4 +1,3 @@
-import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
