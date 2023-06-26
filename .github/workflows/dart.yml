@@ -12,26 +12,14 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  test:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v1
-        with:
-          channel: 'stable'
-      - name: Install Dependencies
-        run: flutter pub get
-#      - name: Flutter Analyze
-#        run: flutter analyze
-      - name: Check Flutter Formatting
-        run: dart format
-      - name: Run Flutter Tests
-        run: flutter test
-      - name: Run Flutter Integration Tests
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: x86_64
-          profile: Nexus 6
-          script: flutter test integration_test
+          api-level: 29
+          script: flutter test; flutter test integration_test
