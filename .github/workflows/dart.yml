@@ -28,3 +28,5 @@ jobs:
         run: dart format
       - name: Run Flutter Tests
         run: flutter test
+      - name: Run Flutter Integration Tests
+        run: flutter test integration_test
