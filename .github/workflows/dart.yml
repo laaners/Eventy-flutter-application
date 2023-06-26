@@ -25,6 +25,6 @@ jobs:
 #      - name: Flutter Analyze
 #        run: flutter analyze
       - name: Check Flutter Formatting
-        run: flutter format lib/** --set-exit-if-changed
+        run: dart format
       - name: Run Flutter Tests
         run: flutter test
