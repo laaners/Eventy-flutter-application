@@ -88,16 +88,16 @@ void main() {
         voteDate: testVote,
         kind: Availability.yes,
         invites: testInvites,
-        organizerUid: 'user1',
+        organizerUid: 'organizer',
       );
 
-      expect(positiveVotes, {'user2': 2});
+      expect(positiveVotes, {'organizer': 2, 'user2': 2});
 
       final emptyVotes = VoteDateModel.getVotesKind(
         voteDate: testVote,
         kind: Availability.empty,
         invites: testInvites,
-        organizerUid: 'user1',
+        organizerUid: 'organizer',
       );
 
       expect(emptyVotes, {'user4': -1});
@@ -106,7 +106,7 @@ void main() {
         voteDate: testVote,
         kind: Availability.not,
         invites: testInvites,
-        organizerUid: 'user1',
+        organizerUid: 'organizer',
       );
 
       expect(notVotes, {'user3': 0});
@@ -115,7 +115,7 @@ void main() {
         voteDate: testVote,
         kind: Availability.iff,
         invites: testInvites,
-        organizerUid: 'user1',
+        organizerUid: 'organizer',
       );
 
       expect(iffVotes, {'user1': 1});
