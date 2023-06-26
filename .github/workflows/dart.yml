@@ -17,17 +17,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      # Note: This workflow uses the latest stable version of the Dart SDK.
-      # You can specify other versions if desired, see documentation here:
-      # https://github.com/dart-lang/setup-dart/blob/main/README.md
-      # - uses: dart-lang/setup-dart@v1
-      - uses: dart-lang/setup-dart@9a04e6d73cca37bd455e0608d7e5092f881fd603
-      
-      - name: Install Flutter
-        run: git clone https://github.com/flutter/flutter.git --depth 1 -b $FLUTTER_VERSION flutter
-      - name: Add Flutter to Path
-        run: echo "$GITHUB_WORKSPACE/flutter/bin" >> $GITHUB_PATH
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable'
       - name: Install Dependencies
         run: flutter pub get
       - name: Flutter Analyze
