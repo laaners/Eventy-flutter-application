@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:dima_app/main.dart' as app;
 
+import '00_utils.dart';
 import '02_login_test.dart';
 
 void main() {
@@ -13,40 +14,59 @@ void main() {
       await app.main();
       await tester.pumpAndSettle();
 
-      await loginTest(tester: tester, username: "Ale", password: "password");
+      var usernameField = find.byKey(const Key('username_field'));
+      if (usernameField.evaluate().isNotEmpty) {
+        await loginTest(tester: tester, username: "Ale", password: "password");
+      }
 
       // Go to poll create screen
-      final createIcon = find.byKey(const Key("create_poll_event"));
+      var createIcon = find.byKey(const Key("create_poll_event"));
       expect(createIcon, findsOneWidget);
       await tester.tap(createIcon);
       await tester.pumpAndSettle();
       expect(find.text("Basics"), findsOneWidget);
 
       // Fill basics
-      final pollEventTitle = find.byKey(const Key('poll_event_title'));
-      expect(pollEventTitle, findsOneWidget);
-      await tester.enterText(pollEventTitle, "An event name");
-      await tester.testTextInput
-          .receiveAction(TextInputAction.done); // close keyboard
-
-      final pollEventDesc = find.byKey(const Key('poll_event_desc'));
-      expect(pollEventDesc, findsOneWidget);
-      await tester.enterText(pollEventDesc,
-          "An event description, this is the event 'An event name'");
-      await tester.testTextInput
-          .receiveAction(TextInputAction.done); // close keyboard
-
-      final pollEventDeadline =
+      await fillTextWidget(
+          key: "poll_event_title", text: "An event name", tester: tester);
+      await fillTextWidget(
+          key: "poll_event_desc",
+          text: "An event description, this is the event 'An event name'",
+          tester: tester);
+      var pollEventDeadline =
           find.widgetWithText(ListTile, "Deadline for voting");
       expect(pollEventDeadline, findsOneWidget);
       await tester.tap(pollEventDeadline);
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key("modal_confirm")));
-      await tester.pumpAndSettle();
+      await tapOnWidget(key: "modal_confirm", tester: tester);
 
       // Fill places
       await tester.tap(find.widgetWithText(SizedBox, "Places").first);
       await tester.pumpAndSettle();
+      // Add virtual
+      var virtualMeetingSwitch =
+          find.byKey(const Key("virtual_meeting_switch"));
+      expect(virtualMeetingSwitch, findsOneWidget);
+      Switch virtualMeetingSwitchWidget = tester.widget(virtualMeetingSwitch);
+      expect(virtualMeetingSwitchWidget.value, false);
+      await tester.tap(virtualMeetingSwitch);
+      await tester.pumpAndSettle();
+      await tapOnWidget(key: "modal_confirm", tester: tester);
+      await tapOnWidget(key: "alert_cancel", tester: tester);
+      await fillTextWidget(
+          key: "virtual_link_field",
+          text: "https://meet.google.com/non-existent",
+          tester: tester);
+      await tapOnWidget(key: "modal_confirm", tester: tester);
+      virtualMeetingSwitch = find.byKey(const Key("virtual_meeting_switch"));
+      virtualMeetingSwitchWidget = tester.widget(virtualMeetingSwitch);
+      expect(virtualMeetingSwitchWidget.value, true);
+      // Real place
+      await tapOnWidget(key: "add_location_tile", tester: tester);
+      await fillTextWidget(
+          key: "location_name_field", text: 'Polimi', tester: tester);
+
+      // Fill dates
       await tester.tap(find.widgetWithText(SizedBox, "Dates").first);
       await tester.pumpAndSettle();
       expect(find.text("Same time for all dates"), findsOneWidget);
