@@ -119,6 +119,7 @@ class _SelectVirtualState extends State<SelectVirtual> {
               ),
             ),
             subtitle: TextFormField(
+              key: const Key("virtual_link_field"),
               autofocus: false,
               controller: locationAddrController,
               decoration: InputDecoration(

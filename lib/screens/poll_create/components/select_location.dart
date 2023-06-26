@@ -150,6 +150,7 @@ class _SelectLocationState extends State<SelectLocation> {
             ),
           ),
           MyTextField(
+            key: const Key("location_name_field"),
             maxLength: 40,
             maxLines: 1,
             hintText: "Name of the Location",

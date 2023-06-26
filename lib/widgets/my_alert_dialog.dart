@@ -19,6 +19,7 @@ class MyAlertDialog {
           ),
           actions: [
             TextButton(
+              key: const Key("alert_ok"),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -48,12 +49,14 @@ class MyAlertDialog {
         ),
         actions: [
           TextButton(
+            key: const Key("alert_cancel"),
             onPressed: () {
               Navigator.pop(context);
             },
             child: const Text('Cancel'),
           ),
           TextButton(
+            key: const Key("alert_confirm"),
             style: ButtonStyle(
               backgroundColor:
                   MaterialStatePropertyAll(Theme.of(context).colorScheme.error),

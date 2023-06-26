@@ -48,6 +48,7 @@ class _StepPlacesState extends State<StepPlaces> {
                 child: FittedBox(
                   fit: BoxFit.fill,
                   child: Switch(
+                    key: const Key("virtual_meeting_switch"),
                     value: virtualMeeting,
                     onChanged: (value) {
                       if (value) {
@@ -85,6 +86,7 @@ class _StepPlacesState extends State<StepPlaces> {
         Container(
           margin: const EdgeInsets.only(top: 15.0),
           child: MyListTile(
+            key: const Key("add_location_tile"),
             leading: MyListTile.leadingIcon(
               icon: Icon(
                 Icons.add_location_alt,
