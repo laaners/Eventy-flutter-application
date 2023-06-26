@@ -13,12 +13,7 @@ on:
 
 jobs:
   test:
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        api-level: [23, 29]
-        target: [default]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -34,15 +29,5 @@ jobs:
         run: dart format
       - name: Unit and Widget Tests
         run: flutter test
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - name: Integration Tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: x86_64
-          profile: Nexus 6
-          script: flutter test; flutter test integration_test
+      - name: Unit and Widget Tests
+        run: flutter test integration_test -d linux
