@@ -11,6 +11,7 @@ class ResponsiveWrapper extends StatelessWidget {
       child: DelayWidget(
         child:
             MediaQuery.of(context).orientation == Orientation.landscape && false
+                // ignore: dead_code
                 ? Stack(
                     children: [
                       Container(

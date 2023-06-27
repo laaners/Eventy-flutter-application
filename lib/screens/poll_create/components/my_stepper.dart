@@ -2,12 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
+// ignore_for_file: unnecessary_null_comparison
 
-// TODO(dragostis): Missing functionality:
-//   * mobile horizontal mode with adding/removing steps
-//   * alternative labeling
-//   * stepper feedback in the case of high-latency interactions
+import 'package:flutter/material.dart';
 
 /// The state of a [Step] which is used to control the style of the circle and
 /// text.

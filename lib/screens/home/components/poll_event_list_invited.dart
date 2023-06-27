@@ -70,6 +70,7 @@ class _PollEventListInvitedState extends State<PollEventListInvited>
             String organizerUid = invite.pollEventId.split("_")[1];
             return organizerUid != curUid;
           } on RangeError catch (e) {
+            // ignore: avoid_print
             print(e.toString());
             return false;
           }

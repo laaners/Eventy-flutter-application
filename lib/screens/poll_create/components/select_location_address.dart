@@ -159,6 +159,7 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
                     });
                   }
                 } on Exception catch (e) {
+                  // ignore: avoid_print
                   print("Nominatim error: $e");
                   setState(() {
                     showMap = false;

@@ -37,7 +37,6 @@ class _SignUpFormState extends State<SignUpForm> {
   final _passwordController = TextEditingController();
 
   bool _passwordInvisible = true;
-  bool _usernameAlreadyExist = false;
 
   @override
   void dispose() {
@@ -79,14 +78,6 @@ class _SignUpFormState extends State<SignUpForm> {
                 labelText: 'Username',
                 labelStyle: TextStyle(fontStyle: FontStyle.italic),
               ),
-              onChanged: (username) async {
-                bool tmp =
-                    await Provider.of<FirebaseUser>(context, listen: false)
-                        .usernameAlreadyExists(username: username);
-                setState(() {
-                  _usernameAlreadyExist = tmp;
-                });
-              },
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Username cannot be empty';

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -192,6 +194,7 @@ class FirebaseNotification extends ChangeNotifier {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
+    // ignore: unused_local_variable
     const initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
 

@@ -124,7 +124,6 @@ class _PollEventScreenState extends State<PollEventScreen>
                       .isBefore(DateTime.now());
               if (isClosed && !tmp["isClosed"]) {
                 // close the event on db
-                print("Should close ${widget.pollEventId}");
                 Provider.of<FirebasePollEvent>(context, listen: false)
                     .closePoll(pollId: widget.pollEventId, context: context);
               }
