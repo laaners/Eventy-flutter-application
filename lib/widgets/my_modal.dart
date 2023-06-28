@@ -167,18 +167,20 @@ class MyModal extends StatelessWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       builder: (context) => FractionallySizedBox(
         heightFactor: heightFactor,
-        child: doneCancelMode
-            ? child
-            : modalWidget(
-                context: context,
-                child: child,
-                heightFactor: heightFactor,
-                doneCancelMode: doneCancelMode,
-                onDone: onDone,
-                titleWidget: titleWidget,
-                title: title,
-                shrinkWrap: shrinkWrap,
-              ),
+        child: Scaffold(
+          body: doneCancelMode
+              ? child
+              : modalWidget(
+                  context: context,
+                  child: child,
+                  heightFactor: heightFactor,
+                  doneCancelMode: doneCancelMode,
+                  onDone: onDone,
+                  titleWidget: titleWidget,
+                  title: title,
+                  shrinkWrap: shrinkWrap,
+                ),
+        ),
       ),
     );
     return ris;

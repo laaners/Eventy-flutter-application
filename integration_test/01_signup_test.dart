@@ -3,7 +3,6 @@ import 'package:integration_test/integration_test.dart';
 import 'package:dima_app/main.dart' as app;
 
 import '00_utils.dart';
-import '02_login_test.dart';
 
 void main() {
 /*

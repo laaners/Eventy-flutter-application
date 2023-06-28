@@ -4,9 +4,34 @@ import 'package:integration_test/integration_test.dart';
 import 'package:dima_app/main.dart' as app;
 
 import '00_utils.dart';
-import '02_login_test.dart';
 
 void main() {
+/*
+Paste the following here: https://www.plantuml.com/plantuml/uml/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000
+
+@startuml
+actor User
+participant "Poll Create Screen" as PollCreateScreen
+participant "Stepper Widget" as StepperWidget
+participant "Poll Service" as PollService
+
+User -> PollCreateScreen: Starts creating a new poll
+User -> PollCreateScreen: Enters poll details
+PollCreateScreen -> StepperWidget: Displays stepper widget
+User -> StepperWidget: Proceeds to the next step
+StepperWidget -> PollCreateScreen: Returns entered details for the step
+User -> StepperWidget: Proceeds to the next step
+StepperWidget -> PollCreateScreen: Returns entered details for the step
+User -> StepperWidget: Proceeds to the next step
+StepperWidget -> PollCreateScreen: Returns entered details for the step
+User -> StepperWidget: Proceeds to the next step
+StepperWidget -> PollCreateScreen: Returns entered details for the step
+PollCreateScreen -> PollService: Creates the poll
+PollService --> PollCreateScreen: Poll creation result
+PollCreateScreen -> User: Displays poll creation result
+@enduml
+
+*/
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('create poll', () {

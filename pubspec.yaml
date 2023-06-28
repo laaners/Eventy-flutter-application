@@ -63,12 +63,12 @@ dependencies:
   shared_preferences: ^2.1.0
   flutter_launcher_icons: ^0.12.0
   location: ^4.4.0
-  mockito: ^5.4.0
   rxdart: ^0.27.7
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mockito: ^5.4.0
   integration_test:
     sdk: flutter
 

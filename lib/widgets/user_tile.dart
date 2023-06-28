@@ -1,3 +1,4 @@
+import 'package:dima_app/constants/layout_constants.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/services/firebase_user.dart';
@@ -67,7 +68,21 @@ class _UserTileFromUidState extends State<UserTileFromUid> {
       future: _future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LoadingLogo();
+          return MyListTile(
+            title: "",
+            subtitle: "",
+            contentPadding: widget.contentPadding,
+            leading: SizedBox(
+              height: LayoutConstants.kProfilePicRadiusSmall * 2,
+              width: LayoutConstants.kProfilePicRadiusSmall * 2,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          );
         }
         if (snapshot.hasError || !snapshot.hasData) {
           Future.microtask(() {

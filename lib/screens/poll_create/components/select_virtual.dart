@@ -122,6 +122,7 @@ class _SelectVirtualState extends State<SelectVirtual> {
               key: const Key("virtual_link_field"),
               autofocus: false,
               controller: locationAddrController,
+              maxLines: null,
               decoration: InputDecoration(
                 hintText: "Paste the link here",
                 isDense: true,

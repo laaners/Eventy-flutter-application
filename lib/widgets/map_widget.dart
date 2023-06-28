@@ -34,35 +34,41 @@ class _MapFromCoorState extends State<MapFromCoor> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 350,
-      child: FlutterMap(
-        options: MapOptions(
-          center: LatLng(widget.lat, widget.lon),
-          zoom: 16.4746,
-          maxZoom: 18,
-          interactiveFlags: InteractiveFlag.pinchZoom |
-              InteractiveFlag.doubleTapZoom |
-              InteractiveFlag.drag,
-        ),
+      height: MediaQuery.of(context).size.width > 600
+          ? 600
+          : MediaQuery.of(context).size.width,
+      child: Stack(
         children: [
-          TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'dev.fleaflet.flutter_map.example',
-          ),
-          MarkerLayer(
-            markers: [
-              Marker(
-                width: 80,
-                height: 80,
-                point: LatLng(widget.lat, widget.lon),
-                builder: (ctx) => GestureDetector(
-                  onTap: () {},
-                  child: const Icon(
-                    Icons.place,
-                    size: 35,
+          FlutterMap(
+            options: MapOptions(
+              center: LatLng(widget.lat, widget.lon),
+              zoom: 16.4746,
+              maxZoom: 18,
+              interactiveFlags: InteractiveFlag.pinchZoom |
+                  InteractiveFlag.doubleTapZoom |
+                  InteractiveFlag.drag,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'dev.fleaflet.flutter_map.example',
+              ),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    width: 80,
+                    height: 80,
+                    point: LatLng(widget.lat, widget.lon),
+                    builder: (ctx) => GestureDetector(
+                      onTap: () {},
+                      child: const Icon(
+                        Icons.place,
+                        size: 35,
+                      ),
+                    ),
+                    anchorPos: anchorPos,
                   ),
-                ),
-                anchorPos: anchorPos,
+                ],
               ),
             ],
           ),

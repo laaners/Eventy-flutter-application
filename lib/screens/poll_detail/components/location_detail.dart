@@ -10,8 +10,11 @@ import 'package:dima_app/services/firebase_vote.dart';
 import 'package:dima_app/widgets/empty_list.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/map_widget.dart';
+import 'package:dima_app/widgets/my_alert_dialog.dart';
+import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
+import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -197,77 +200,55 @@ class _LocationDetailState extends State<LocationDetail> {
             );
           },
         ),
-        widget.location.name == "Virtual meeting"
-            ? ListTile(
-                contentPadding: const EdgeInsets.all(0),
-                minLeadingWidth: 0,
-                horizontalTitleGap: 0,
-                title: Container(
-                  padding: const EdgeInsets.only(top: 8, bottom: 8),
+        Column(
+          children: [
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
                   child: Text(
-                    "Virtual room link",
+                    widget.location.name == "Virtual meeting"
+                        ? "Virtual room link"
+                        : "Address",
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ),
-                subtitle: TextFormField(
-                  initialValue: widget.location.site.isEmpty
-                      ? "The organizer did not provide any link"
-                      : widget.location.site,
-                  autofocus: false,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    suffixIcon: IconButton(
-                      iconSize: 25,
-                      onPressed: () async {
-                        await Clipboard.setData(
-                          ClipboardData(text: widget.location.site),
-                        );
-                      },
-                      icon: const Icon(Icons.copy),
-                    ),
-                    border: InputBorder.none,
-                  ),
+                MyIconButton(
+                  icon: const Icon(Icons.copy),
+                  onTap: () async {
+                    if (widget.location.site.isEmpty) return;
+                    await Clipboard.setData(
+                        ClipboardData(text: widget.location.site));
+                    showSnackBar(context,
+                        "${widget.location.name == "Virtual meeting" ? "Link" : "Address"} copied!");
+                  },
                 ),
-              )
-            : Column(
-                children: [
-                  ListTile(
-                    contentPadding: const EdgeInsets.all(0),
-                    minLeadingWidth: 0,
-                    horizontalTitleGap: 0,
-                    title: Container(
-                      padding: const EdgeInsets.only(top: 8, bottom: 8),
-                      child: Text(
-                        "Address",
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                    ),
-                    subtitle: TextFormField(
-                      autofocus: false,
-                      initialValue: widget.location.site,
-                      // enabled: false,
-                      decoration: InputDecoration(
-                        isDense: true,
-                        suffixIcon: IconButton(
-                          iconSize: 25,
-                          onPressed: () async {
-                            await Clipboard.setData(
-                                ClipboardData(text: widget.location.site));
-                          },
-                          icon: const Icon(Icons.copy),
-                        ),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                  const Padding(padding: EdgeInsets.only(top: 15)),
-                  MapFromCoor(
-                    lat: widget.location.lat,
-                    lon: widget.location.lon,
-                    address: widget.location.site,
-                  ),
-                ],
+              ],
+            ),
+            const SizedBox(height: 8),
+            TextFormField(
+              maxLines: null,
+              autofocus: false,
+              initialValue: widget.location.site.isEmpty
+                  ? "The organizer did not provide any link"
+                  : widget.location.site,
+              enabled: false,
+              decoration: InputDecoration(
+                isDense: true,
+                border: InputBorder.none,
               ),
+            ),
+            const SizedBox(height: 15),
+            if (widget.location.name != "Virtual meeting")
+              MapFromCoor(
+                lat: widget.location.lat,
+                lon: widget.location.lon,
+                address: widget.location.site,
+              ),
+          ],
+        ),
       ],
     );
   }
