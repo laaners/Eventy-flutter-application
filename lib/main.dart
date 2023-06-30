@@ -7,7 +7,6 @@ import 'package:dima_app/screens/home/home.dart';
 import 'package:dima_app/screens/login/login.dart';
 import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/screens/settings/settings.dart';
-import 'package:dima_app/screens/signup/signup.dart';
 import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/dynamic_links_handler.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';

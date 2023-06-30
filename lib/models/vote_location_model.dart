@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:flutter/foundation.dart';
 import 'availability.dart';
@@ -112,7 +113,8 @@ class VoteLocationModel {
 
     return other.pollId == pollId &&
         other.locationName == locationName &&
-        mapEquals(other.votes, votes);
+        (mapEquals(other.votes, votes) ||
+            DeepCollectionEquality().equals(other.votes, votes));
   }
 
   /// This method creates a hash code for a VoteLocationModel object.

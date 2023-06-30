@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'package:collection/collection.dart';
 import 'package:dima_app/models/location.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:flutter/foundation.dart';
@@ -184,7 +185,8 @@ class PollEventModel {
         other.deadline == deadline &&
         other.public == public &&
         other.canInvite == canInvite &&
-        mapEquals(other.dates, dates) &&
+        (mapEquals(other.dates, dates) ||
+            DeepCollectionEquality().equals(other.dates, dates)) &&
         listEquals(other.locations, locations) &&
         other.isClosed == isClosed;
   }
