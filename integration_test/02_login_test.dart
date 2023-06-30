@@ -33,7 +33,6 @@ end
     testWidgets('login and logout', (tester) async {
       await app.main();
       await tester.pumpAndSettle();
-
       await loginTest(tester: tester, username: "Ale", password: "password");
       await logoutTest(tester: tester);
     });
@@ -50,7 +49,7 @@ end
           key: "password_field", text: "random password", tester: tester);
 
       // Tap the signup button.
-      await tapOnWidget(key: "login_button", tester: tester);
+      await tapOnWidgetByKey(key: "login_button", tester: tester);
 
       // Wait for the Snackbar to appear
       final successSnackbar = find.text('Username does not exist');

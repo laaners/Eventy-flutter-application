@@ -10,7 +10,6 @@ import 'package:dima_app/services/firebase_vote.dart';
 import 'package:dima_app/widgets/empty_list.dart';
 import 'package:dima_app/widgets/horizontal_scroller.dart';
 import 'package:dima_app/widgets/map_widget.dart';
-import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/profile_pic.dart';
 import 'package:dima_app/widgets/screen_transition.dart';

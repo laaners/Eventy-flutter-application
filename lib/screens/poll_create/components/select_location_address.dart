@@ -68,6 +68,7 @@ class _SelectLocationAddressState extends State<SelectLocationAddress> {
           ),
         ),
         SearchTile(
+          key: const Key("location_addr_field"),
           controller: widget.controller,
           focusNode: widget.focusNode,
           hintText: "Search here",
