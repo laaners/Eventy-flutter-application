@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:flutter/foundation.dart';
@@ -157,7 +158,8 @@ class VoteDateModel {
         other.date == date &&
         other.start == start &&
         other.end == end &&
-        mapEquals(other.votes, votes);
+        (mapEquals(other.votes, votes) ||
+            DeepCollectionEquality().equals(other.votes, votes));
   }
 
   /// VoteDateModel hashCode method for hashing the object
