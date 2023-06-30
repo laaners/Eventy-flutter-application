@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dima_app/models/poll_event_notification.dart';
+import 'package:dima_app/screens/error/error.dart';
 import 'package:dima_app/screens/groups/groups.dart';
 import 'package:dima_app/screens/home/home.dart';
 import 'package:dima_app/screens/login/login.dart';
 import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/screens/settings/settings.dart';
+import 'package:dima_app/screens/signup/signup.dart';
 import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/dynamic_links_handler.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';
@@ -109,10 +112,28 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Connectivity connectivity = Connectivity();
+
+  String connectivityCheck(ConnectivityResult? result) {
+    if (result == ConnectivityResult.wifi) {
+      return "You are now connected to wifi";
+    } else if (result == ConnectivityResult.mobile) {
+      return "You are now connected to mobile data";
+    } else if (result == ConnectivityResult.ethernet) {
+      return "You are now connected to ethernet";
+    } else if (result == ConnectivityResult.bluetooth) {
+      return "You are now connected to bluetooth";
+    } else if (result == ConnectivityResult.none) {
+      return "No connection available";
+    } else {
+      return "No Connection!!";
+    }
+  }
+
   @override
   void initState() {
-    initLink();
     super.initState();
+    initLink();
   }
 
   void initLink() async {
@@ -139,10 +160,27 @@ class _MyAppState extends State<MyApp> {
       darkTheme: darkTheme,
       themeMode: Provider.of<ThemeManager>(context).themeMode,
       initialRoute: '/',
-      home: Consumer<FirebaseUser>(
-        builder: (context, value, child) {
-          if (value.user != null) return const MainScreen();
-          return const LogInScreen();
+      home: StreamBuilder<ConnectivityResult>(
+        initialData: ConnectivityResult.mobile,
+        stream: Connectivity().onConnectivityChanged,
+        builder: (context, snapshot) {
+          connectivityCheck(snapshot.data);
+          if (!snapshot.hasData ||
+              snapshot.connectionState == ConnectionState.waiting) {
+            return const ErrorScreen(noButton: true);
+          }
+          final connectivityResult = snapshot.data;
+          if (connectivityResult == ConnectivityResult.none ||
+              connectivityResult == null) {
+            return ErrorScreen(noButton: true);
+          }
+          print(snapshot.data);
+          return Consumer<FirebaseUser>(
+            builder: (context, value, child) {
+              if (value.user != null) return const MainScreen();
+              return const LogInScreen();
+            },
+          );
         },
       ),
     );

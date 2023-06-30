@@ -88,6 +88,7 @@ class _StepDatesState extends State<StepDates> {
                 child: FittedBox(
                   fit: BoxFit.fill,
                   child: Switch(
+                    key: const Key("same_slots_switch"),
                     value: _fixedTimeSlots,
                     onChanged: (value) async {
                       if (value) {

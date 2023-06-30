@@ -36,7 +36,7 @@ end
     testWidgets('sign up new user and sign out', (tester) async {
       await app.main();
       await tester.pumpAndSettle();
-      await tapOnWidget(key: "log_in_to_sign_up_screen", tester: tester);
+      await tapOnWidgetByKey(key: "log_in_to_sign_up_screen", tester: tester);
 
       // We are in signup
       String username = "Ale";
@@ -52,7 +52,7 @@ end
           key: 'password_confirm_field', text: 'password', tester: tester);
 
       // Tap the signup button
-      await tapOnWidget(key: 'signup_button', tester: tester);
+      await tapOnWidgetByKey(key: 'signup_button', tester: tester);
 
       // We are in home, verify that the signup process was successful.
       // Wait for the Snackbar to appear
@@ -68,7 +68,7 @@ end
     testWidgets('sign up old user', (tester) async {
       await app.main();
       await tester.pumpAndSettle();
-      await tapOnWidget(key: "log_in_to_sign_up_screen", tester: tester);
+      await tapOnWidgetByKey(key: "log_in_to_sign_up_screen", tester: tester);
 
       // We are in signup
       String username = "Ale";
@@ -84,7 +84,7 @@ end
           key: 'password_confirm_field', text: 'password', tester: tester);
 
       // Duplicate username
-      await tapOnWidget(key: 'signup_button', tester: tester);
+      await tapOnWidgetByKey(key: 'signup_button', tester: tester);
       var successDuplicateWarning = find
           .text('Choose another username!'); // Wait for the Snackbar to appear
       await tester.pump(const Duration(seconds: 3));
@@ -94,7 +94,7 @@ end
       // Change username
       await tester.pumpAndSettle(const Duration(seconds: 2));
       await fillTextWidget(key: 'username_field', text: 'Ale2', tester: tester);
-      await tapOnWidget(key: 'signup_button', tester: tester);
+      await tapOnWidgetByKey(key: 'signup_button', tester: tester);
       successDuplicateWarning =
           find.text('Choose another email!'); // Wait for the Snackbar to appear
       await tester.pump(const Duration(seconds: 3));

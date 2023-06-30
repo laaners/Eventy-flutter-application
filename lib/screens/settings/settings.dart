@@ -9,6 +9,7 @@ import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/services/theme_manager.dart';
 import 'package:dima_app/widgets/container_shadow.dart';
 import 'package:dima_app/widgets/loading_overlay.dart';
+import 'package:dima_app/widgets/my_alert_dialog.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_icon_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
@@ -38,7 +39,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             icon:
                 Icon(Icons.logout, color: Theme.of(context).primaryColorLight),
             onTap: () async {
-              await Provider.of<FirebaseUser>(context, listen: false).signOut();
+              bool ris = await MyAlertDialog.showAlertConfirmCancel(
+                context: context,
+                title: "Signing out",
+                content: "Are you sure?",
+                trueButtonText: "Sign out",
+              );
+              if (ris) {
+                await Provider.of<FirebaseUser>(context, listen: false)
+                    .signOut();
+              }
             },
           ),
         ],
@@ -145,8 +155,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     leading: const Icon(Icons.logout),
                     title: const Text("Sign Out"),
                     onTap: () async {
-                      await Provider.of<FirebaseUser>(context, listen: false)
-                          .signOut();
+                      bool ris = await MyAlertDialog.showAlertConfirmCancel(
+                        context: context,
+                        title: "Signing out",
+                        content: "Are you sure?",
+                        trueButtonText: "Sign out",
+                      );
+                      if (ris) {
+                        await Provider.of<FirebaseUser>(context, listen: false)
+                            .signOut();
+                      }
                     },
                   ),
                   // Delete account not implemented yet

@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Future tapOnWidget({
+Future tapOnWidgetByKey({
   required String key,
   required WidgetTester tester,
 }) async {
-  final widget = find.byKey(Key(key));
+  final widget = await find.byKey(Key(key));
+  expect(widget, findsOneWidget);
+  await tester.tap(widget);
+  await tester.pumpAndSettle();
+}
+
+Future tapOnWidgetByFinder({
+  required Finder widget,
+  required WidgetTester tester,
+}) async {
   expect(widget, findsOneWidget);
   await tester.tap(widget);
   await tester.pumpAndSettle();
@@ -16,7 +25,7 @@ Future fillTextWidget({
   required String text,
   required WidgetTester tester,
 }) async {
-  final widget = find.byKey(Key(key));
+  final widget = await find.byKey(Key(key));
   expect(widget, findsOneWidget);
   await tester.enterText(widget, text);
   await tester.testTextInput.receiveAction(TextInputAction.done);
@@ -76,5 +85,6 @@ Future logoutTest({required WidgetTester tester}) async {
   expect(logoutIcon, findsOneWidget);
   await tester.tap(logoutIcon);
   await tester.pumpAndSettle();
+  await tapOnWidgetByKey(key: "alert_confirm", tester: tester);
   expect(find.byKey(const Key("log_in_to_sign_up_screen")), findsOneWidget);
 }

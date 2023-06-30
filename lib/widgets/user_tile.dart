@@ -5,8 +5,6 @@ import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/my_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'loading_logo.dart';
 import 'profile_pic.dart';
 import 'screen_transition.dart';
 import 'show_user_dialog.dart';
