@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dima_app/models/location.dart';
 import 'package:dima_app/models/poll_event_model.dart';
+import 'package:dima_app/services/date_methods.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 
@@ -101,7 +102,10 @@ void main() {
     "organizerUid": "test organizer uid",
     "pollEventDesc": "test poll event description",
     "deadline": Timestamp.fromDate(
-        DateFormat("yyyy-MM-dd HH:mm:ss").parse("2023-05-15 17:30:00")),
+      DateFormat("yyyy-MM-dd HH:mm:ss").parse(
+        DateFormatter.toUtcString("2023-05-15 19:30:00"),
+      ),
+    ),
     "public": false,
     "canInvite": false,
     "dates": utcDates,

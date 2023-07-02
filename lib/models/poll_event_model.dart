@@ -87,7 +87,8 @@ class PollEventModel {
   }
 
   /// This method converts a firestore document to a PollEventModel object
-  static PollEventModel firebaseDocToObj(Map<String, dynamic> doc) {
+  static PollEventModel firebaseDocToObj(Map<String, dynamic> firebaseDoc) {
+    Map<String, dynamic> doc = new Map.from(firebaseDoc);
     doc["locations"] = (doc["locations"] as List).map((e) {
       e["lat"] = e["lat"].toDouble();
       e["lon"] = e["lon"].toDouble();
