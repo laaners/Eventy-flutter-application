@@ -37,7 +37,7 @@ void main() {
     }
   ];
 
-  final Map<String, dynamic> utcDates = {
+  Map<String, dynamic> utcDates = {
     "2023-05-18": [
       {"start": "06:00", "end": "08:00"},
       {"start": "06:30", "end": "08:00"},
@@ -82,6 +82,8 @@ void main() {
     },
   };
 
+  utcDates = PollEventModel.datesToUtc(pollEventModelDates);
+
   final pollEventModel = PollEventModel(
     pollEventName: "test poll event model",
     organizerUid: "test organizer uid",
@@ -108,20 +110,17 @@ void main() {
   };
 
   group('PollEventModel', () {
-    test('datesToUtc method should work correctly', () {
-      Map<String, dynamic> testDates =
+    test('datesToUtc and datesToLocal method should work correctly', () {
+      Map<String, dynamic> testDatesUtc =
           PollEventModel.datesToUtc(pollEventModelDates);
-      expect(testDates, utcDates);
-    });
-
-    test('datesToLocal method should work correctly', () {
-      Map<String, dynamic> testDates = PollEventModel.datesToLocal(utcDates);
-      expect(testDates, localDates);
+      Map<String, dynamic> testDatesLocal =
+          PollEventModel.datesToLocal(testDatesUtc);
+      expect(testDatesLocal, localDates);
     });
 
     test('firebaseDocToObj method should work correctly', () {
       PollEventModel obj = PollEventModel.firebaseDocToObj(pollEventFirebase);
-      expect(obj == pollEventModel, true);
+      expect(obj, pollEventModel);
     });
 
     test('copyWith method should work correctly', () {

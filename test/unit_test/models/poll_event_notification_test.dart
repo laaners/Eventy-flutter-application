@@ -1,4 +1,5 @@
 import 'package:dima_app/models/poll_event_notification.dart';
+import 'package:dima_app/services/date_methods.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -21,8 +22,22 @@ void main() {
     test('toMap and fromMap should work correctly', () {
       final map = pollEventNotification.toMap();
       final fromMap = PollEventNotification.fromMap(map);
-      expect(fromMap,
-          pollEventNotification.copyWith(timestamp: '2023-06-30 14:26:09'));
+      print(fromMap);
+      print(
+        pollEventNotification.copyWith(
+          timestamp: DateFormatter.toLocalString(
+            pollEventNotification.timestamp,
+          ),
+        ),
+      );
+      expect(
+        fromMap,
+        pollEventNotification.copyWith(
+          timestamp: DateFormatter.toLocalString(
+            pollEventNotification.timestamp,
+          ),
+        ),
+      );
     });
 
     test('toString should work correctly', () {
