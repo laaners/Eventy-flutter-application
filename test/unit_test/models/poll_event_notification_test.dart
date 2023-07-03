@@ -22,14 +22,6 @@ void main() {
     test('toMap and fromMap should work correctly', () {
       final map = pollEventNotification.toMap();
       final fromMap = PollEventNotification.fromMap(map);
-      print(fromMap);
-      print(
-        pollEventNotification.copyWith(
-          timestamp: DateFormatter.toLocalString(
-            pollEventNotification.timestamp,
-          ),
-        ),
-      );
       expect(
         fromMap,
         pollEventNotification.copyWith(

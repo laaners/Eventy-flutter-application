@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class PollEventTile extends StatelessWidget {
-  final String locationBanner;
   final String descTop;
   final String descMiddle;
   final String? descBottom;
@@ -18,7 +17,6 @@ class PollEventTile extends StatelessWidget {
   final PollEventModel pollEvent;
   const PollEventTile({
     super.key,
-    required this.locationBanner,
     required this.onTap,
     required this.pollEvent,
     required this.descTop,
@@ -64,6 +62,7 @@ class PollEventTile extends StatelessWidget {
             context,
             snapshot,
           ) {
+            print(snapshot);
             if (snapshot.connectionState == ConnectionState.waiting) {
               return ListTile(
                 contentPadding: const EdgeInsets.all(0),

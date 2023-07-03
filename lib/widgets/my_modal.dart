@@ -65,6 +65,7 @@ class MyModal extends StatelessWidget {
                                 Align(
                                   alignment: const Alignment(0, 0),
                                   child: Container(
+                                    key: const Key("modal_drag_bar"),
                                     margin: const EdgeInsets.only(
                                         bottom: 10, top: 10),
                                     alignment: Alignment.center,
@@ -89,6 +90,7 @@ class MyModal extends StatelessWidget {
                               ],
                             )
                           : Container(
+                              key: const Key("modal_drag_bar"),
                               margin:
                                   const EdgeInsets.only(bottom: 10, top: 10),
                               alignment: Alignment.center,

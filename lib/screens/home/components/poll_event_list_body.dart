@@ -265,7 +265,6 @@ class _PollEventListBodyState extends State<PollEventListBody> {
                           bgColor: isClosed
                               ? Theme.of(context).primaryColorLight
                               : null,
-                          locationBanner: event.locations[0].icon,
                           descTop: isClosed
                               ? "Closed poll"
                               : "Poll closes the ${DateFormat(Provider.of<ClockManager>(context).clockMode ? "dd/MM/yyyy, 'at' HH:mm" : "dd/MM/yyyy, 'at' hh:mm a").format(
