@@ -142,30 +142,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         return null;
                       },
                     ),
-                    /*
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      initialValue: widget.userData.email,
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.mail),
-                        border: const OutlineInputBorder(),
-                        hintText: widget.userData.email,
-                        labelStyle: const TextStyle(fontStyle: FontStyle.italic),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter an e-mail address';
-                        }
-                        final emailRegex =
-                            RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                        if (!emailRegex.hasMatch(value)) {
-                          return 'Please enter a valid e-mail address';
-                        }
-                        return null;
-                      },
-                    ),
-                    */
                     const SizedBox(height: 50),
                     MyButton(
                       text: "SAVE",

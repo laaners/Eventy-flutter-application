@@ -42,7 +42,7 @@ class ErrorScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  if (noButton != null && noButton == false)
+                  if (noButton == null || noButton == false)
                     Container(
                       margin: const EdgeInsets.symmetric(
                           horizontal: LayoutConstants.kHorizontalPadding),

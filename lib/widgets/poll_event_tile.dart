@@ -62,7 +62,6 @@ class PollEventTile extends StatelessWidget {
             context,
             snapshot,
           ) {
-            print(snapshot);
             if (snapshot.connectionState == ConnectionState.waiting) {
               return ListTile(
                 contentPadding: const EdgeInsets.all(0),

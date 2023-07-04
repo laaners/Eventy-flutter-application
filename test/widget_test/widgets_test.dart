@@ -1,3 +1,5 @@
+import 'package:dima_app/models/poll_event_model.dart';
+import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/container_shadow.dart';
 import 'package:dima_app/widgets/delay_widget.dart';
 import 'package:dima_app/widgets/empty_list.dart';
@@ -14,13 +16,20 @@ import 'package:dima_app/widgets/my_list_tile.dart';
 import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
 import 'package:dima_app/widgets/pill_box.dart';
+import 'package:dima_app/widgets/poll_event_tile.dart';
+import 'package:dima_app/widgets/profile_pic.dart';
+import 'package:dima_app/widgets/profile_pics_stack.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/search_tile.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:dima_app/widgets/tabbar_switcher.dart';
+import 'package:dima_app/widgets/user_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
+
+import '../mocks/mock_firebase_user.dart';
 
 class CustomBindings extends AutomatedTestWidgetsFlutterBinding {
   @override
@@ -186,7 +195,7 @@ void main() async {
       );
     });
 
-    testWidgets('Logo works correctly', (tester) async {
+    testWidgets('Logo renders correctly', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -239,7 +248,7 @@ void main() async {
           findsNothing);
     });
 
-    testWidgets('MyAlertDialog works correctly', (tester) async {
+    testWidgets('MyAlertDialog renders correctly', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -369,7 +378,7 @@ void main() async {
       expect(find.text('MyAlertDialog title'), findsOneWidget);
     });
 
-    testWidgets('MyListTile works correctly', (tester) async {
+    testWidgets('MyListTile renders correctly', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -448,7 +457,7 @@ void main() async {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('MyModal works correctly', (tester) async {
+    testWidgets('MyModal renders correctly', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -520,7 +529,7 @@ void main() async {
       expect(find.text('Modal text'), findsNothing);
     });
 
-    testWidgets('MyTextField works correctly', (tester) async {
+    testWidgets('MyTextField renders correctly', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -562,6 +571,151 @@ void main() async {
       expect(find.text('Hello'), findsOneWidget);
     });
 
+    testWidgets('PollEventTile renders correctly', (tester) async {
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<FirebaseUser>(
+                create: (context) => MockFirebaseUser()),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: SafeArea(
+                child: Builder(builder: (context) {
+                  return PollEventTile(
+                    pollEvent: PollEventModel(
+                      pollEventName: "test poll event model",
+                      organizerUid: "test organizer uid",
+                      pollEventDesc: "test poll event description",
+                      deadline: "2024-05-15 19:30:00",
+                      public: true,
+                      canInvite: true,
+                      dates: {},
+                      locations: [],
+                      isClosed: false,
+                    ),
+                    descTop: "PollEventTile desc top",
+                    descMiddle: "PollEventTile desc middle",
+                    onTap: () async {
+                      await MyAlertDialog.showAlertIfCondition(
+                        context: context,
+                        condition: true,
+                        title: "On tap title",
+                        content: "MyAlertDialog content",
+                      );
+                    },
+                    trailing: MyIconButton(
+                      icon: Icon(Icons.abc_outlined),
+                      onTap: () async {
+                        await MyAlertDialog.showAlertIfCondition(
+                          context: context,
+                          condition: true,
+                          title: "Trailing title",
+                          content: "MyAlertDialog content",
+                        );
+                      },
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text("PollEventTile desc top"), findsOneWidget);
+      expect(find.text("PollEventTile desc middle"), findsOneWidget);
+
+      expect(find.byWidgetPredicate((widget) => widget is PollEventTile),
+          findsOneWidget);
+      await tester
+          .tap(find.byWidgetPredicate((widget) => widget is PollEventTile));
+      await tester.pumpAndSettle();
+      expect(find.text('On tap title'), findsOneWidget);
+      await tester.tap(find.byKey(Key("alert_ok")));
+      await tester.pumpAndSettle();
+
+      expect(
+          find.byWidgetPredicate(
+              (widget) => widget is Icon && widget.icon == Icons.abc_outlined),
+          findsOneWidget);
+      await tester.tap(find.byWidgetPredicate(
+          (widget) => widget is Icon && widget.icon == Icons.abc_outlined));
+      await tester.pumpAndSettle();
+      expect(find.text('Trailing title'), findsOneWidget);
+      await tester.tap(find.byKey(Key("alert_ok")));
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('ProfilePic renders correctly', (tester) async {
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<FirebaseUser>(
+                create: (context) => MockFirebaseUser()),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: SafeArea(
+                child: Builder(builder: (context) {
+                  return Column(
+                    children: [
+                      ProfilePicFromUid(userUid: "userUid"),
+                      ProfilePicFromData(
+                        userData: MockFirebaseUser.testUserModel,
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byWidgetPredicate((widget) => widget is CircleAvatar),
+          findsNWidgets(2));
+
+      await tester.tap(find
+          .byWidgetPredicate((widget) => widget is ProfilePicFromData)
+          .first);
+      await tester.pumpAndSettle();
+      expect(find.text('test name\ntest surname'), findsOneWidget);
+      await tester.tap(find.text("OK"));
+      await tester.pumpAndSettle();
+      expect(find.text('test name\ntest surname'), findsNothing);
+    });
+
+    testWidgets('ProfilePicsStack renders correctly', (tester) async {
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<FirebaseUser>(
+                create: (context) => MockFirebaseUser()),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: SafeArea(
+                child: Builder(builder: (context) {
+                  return ProfilePicsStack(
+                    radius: 40,
+                    offset: 30,
+                    uids: ["1", "2", "3"],
+                  );
+                }),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byWidgetPredicate((widget) => widget is CircleAvatar),
+          findsNWidgets(3));
+    });
+
     testWidgets('ResponsiveWrapper has a text', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -576,7 +730,7 @@ void main() async {
       expect(find.text('Hello'), findsOneWidget);
     });
 
-    testWidgets('SearchTile works correctly', (tester) async {
+    testWidgets('SearchTile renders correctly', (tester) async {
       TextEditingController controller = TextEditingController();
       controller.text = "";
       await tester.pumpWidget(
@@ -607,7 +761,7 @@ void main() async {
       expect(find.text('Hello, World!'), findsNothing);
     });
 
-    testWidgets('showSnackBar works correctly', (tester) async {
+    testWidgets('showSnackBar renders correctly', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -630,7 +784,7 @@ void main() async {
       expect(find.text('This is a snackbar'), findsOneWidget);
     });
 
-    testWidgets('TabbarSwitcher works correctly', (tester) async {
+    testWidgets('TabbarSwitcher renders correctly', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: TabbarSwitcher(
@@ -655,6 +809,80 @@ void main() async {
       await tester.tap(find.text("tab2"));
       await tester.pumpAndSettle();
       expect(find.text('tab2 body'), findsOneWidget);
+    });
+
+    testWidgets('UserTile renders correctly', (tester) async {
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<FirebaseUser>(
+                create: (context) => MockFirebaseUser()),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: SafeArea(
+                child: Builder(builder: (context) {
+                  return Column(
+                    children: [
+                      UserTileFromUid(
+                        userUid: "userUid",
+                        trailing: MyIconButton(
+                          icon: Icon(Icons.abc_outlined),
+                          onTap: () async {
+                            await MyAlertDialog.showAlertIfCondition(
+                              context: context,
+                              condition: true,
+                              title: "Trailing title",
+                              content: "MyAlertDialog content",
+                            );
+                          },
+                        ),
+                      ),
+                      UserTileFromData(
+                        userData: MockFirebaseUser.testUserModel,
+                        trailing: MyIconButton(
+                          icon: Icon(Icons.abc_outlined),
+                          onTap: () async {
+                            await MyAlertDialog.showAlertIfCondition(
+                              context: context,
+                              condition: true,
+                              title: "Trailing title",
+                              content: "MyAlertDialog content",
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byWidgetPredicate((widget) => widget is MyListTile),
+          findsNWidgets(2));
+      await tester
+          .tap(find.byWidgetPredicate((widget) => widget is MyListTile).first);
+      await tester.pumpAndSettle();
+      expect(find.text('test name\ntest surname'), findsOneWidget);
+      await tester.tap(find.text("OK"));
+      await tester.pumpAndSettle();
+
+      expect(
+          find.byWidgetPredicate(
+              (widget) => widget is Icon && widget.icon == Icons.abc_outlined),
+          findsNWidgets(2));
+      await tester.tap(find
+          .byWidgetPredicate(
+              (widget) => widget is Icon && widget.icon == Icons.abc_outlined)
+          .first);
+      await tester.pumpAndSettle();
+      expect(find.text('Trailing title'), findsOneWidget);
+      await tester.tap(find.byKey(Key("alert_ok")));
+      await tester.pumpAndSettle();
     });
   });
 }
