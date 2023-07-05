@@ -11,11 +11,13 @@ class ProfilePicFromData extends StatelessWidget {
   final UserModel userData;
   final double? radius;
   final bool? showUserName;
+  final bool? notShowDialog;
   const ProfilePicFromData({
     super.key,
     this.radius,
     required this.userData,
     this.showUserName,
+    this.notShowDialog,
   });
 
   Widget capitalNameSurnameAvatar(context) {
@@ -35,9 +37,11 @@ class ProfilePicFromData extends StatelessWidget {
   Widget profilePicBody(context) {
     double radiusVar = radius ?? LayoutConstants.kProfilePicRadiusSmall;
     return InkWell(
-      onTap: () {
-        showUserDialog(context: context, user: userData);
-      },
+      onTap: notShowDialog != null && notShowDialog == true
+          ? null
+          : () {
+              showUserDialog(context: context, user: userData);
+            },
       child: CircleAvatar(
         radius: radiusVar,
         backgroundColor: Theme.of(context).primaryColor,
@@ -95,12 +99,14 @@ class ProfilePicFromUid extends StatefulWidget {
   final double? radius;
   final bool? maintainState;
   final bool? showUserName;
+  final bool? notShowDialog;
   const ProfilePicFromUid({
     super.key,
     required this.userUid,
     this.radius,
     this.maintainState,
     this.showUserName,
+    this.notShowDialog,
   });
 
   @override
@@ -180,6 +186,7 @@ class _UserTileFromUidState extends State<ProfilePicFromUid> {
           userData: userData,
           radius: widget.radius,
           showUserName: widget.showUserName,
+          notShowDialog: widget.notShowDialog,
         );
       },
     );

@@ -45,6 +45,7 @@ class _ProfilePicsStackState extends State<ProfilePicsStack> {
                 userUid: user,
                 radius: widget.radius,
                 maintainState: widget.maintainState,
+                notShowDialog: true,
               ),
             );
           }).toList(),
@@ -78,6 +79,7 @@ class _ProfilePicsStackState extends State<ProfilePicsStack> {
                   child: ProfilePicFromData(
                     userData: userData,
                     radius: widget.radius,
+                    notShowDialog: true,
                   ),
                 );
               },

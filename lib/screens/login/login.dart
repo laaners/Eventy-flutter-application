@@ -118,9 +118,7 @@ class _LogInFormState extends State<LogInForm> {
                     return null;
                   },
                 ),
-                const SizedBox(
-                  height: 25,
-                ),
+                const SizedBox(height: 25),
                 TextFormField(
                   key: const Key("password_field"),
                   controller: _passwordController,
@@ -170,9 +168,7 @@ class _LogInFormState extends State<LogInForm> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 25,
-                ),
+                const SizedBox(height: 25),
                 MyButton(
                   key: const Key("login_button"),
                   text: "LOG IN",
