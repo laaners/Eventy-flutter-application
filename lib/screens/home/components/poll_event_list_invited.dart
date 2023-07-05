@@ -65,6 +65,7 @@ class _PollEventListInvitedState extends State<PollEventListInvited>
             .toList();
         // filter out invites where curUid is not organizer:
         // a pollEventId is name_organizerUid, so:
+        /*
         invites = invites.where((invite) {
           try {
             String organizerUid = invite.pollEventId.split("_")[1];
@@ -75,6 +76,7 @@ class _PollEventListInvitedState extends State<PollEventListInvited>
             return false;
           }
         }).toList();
+        */
         return StreamBuilder(
           stream: Provider.of<FirebasePollEvent>(context, listen: false)
               .getUserInvitedPollsEventsSnapshot(
@@ -107,9 +109,11 @@ class _PollEventListInvitedState extends State<PollEventListInvited>
                 ),
               );
             }
+            // keep only events where curUid is not organizer:
             List<PollEventModel> events = snapshot.data!
                 .map((e) => PollEventModel.firebaseDocToObj(
                     e.data() as Map<String, dynamic>))
+                .where((pollEvent) => pollEvent.organizerUid != curUid)
                 .toList();
             return PollEventListBody(events: events);
           },

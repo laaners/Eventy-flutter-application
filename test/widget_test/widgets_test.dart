@@ -664,6 +664,7 @@ void main() async {
                       ProfilePicFromUid(userUid: "userUid"),
                       ProfilePicFromData(
                         userData: MockFirebaseUser.testUserModel,
+                        notShowDialog: true,
                       ),
                     ],
                   );
@@ -684,6 +685,12 @@ void main() async {
       await tester.pumpAndSettle();
       expect(find.text('test name\ntest surname'), findsOneWidget);
       await tester.tap(find.text("OK"));
+      await tester.pumpAndSettle();
+      expect(find.text('test name\ntest surname'), findsNothing);
+
+      await tester.tap(find
+          .byWidgetPredicate((widget) => widget is ProfilePicFromData)
+          .last);
       await tester.pumpAndSettle();
       expect(find.text('test name\ntest surname'), findsNothing);
     });

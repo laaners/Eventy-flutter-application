@@ -24,7 +24,7 @@ class CustomBindings extends AutomatedTestWidgetsFlutterBinding {
 void main() async {
   CustomBindings();
 
-  group('Edit profile screen test', () {
+  group('Groups screen test', () {
     testWidgets('CreateGroup component renders correctly', (tester) async {
       await tester.pumpWidget(
         MultiProvider(

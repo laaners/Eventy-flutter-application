@@ -41,4 +41,18 @@ class MockFirebaseUser extends Mock implements FirebaseUser {
   }) async {
     return [testUserModel];
   }
+
+  @override
+  Future<List<UserModel>> getUsersData({required String pattern}) async {
+    return [
+      UserModel(
+        uid: 'test uid2',
+        email: 'test email',
+        username: 'test username',
+        name: 'test name',
+        surname: 'test surname',
+        profilePic: 'default',
+      )
+    ];
+  }
 }
