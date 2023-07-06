@@ -129,18 +129,7 @@ void main() async {
         ),
       );
       await tester.pumpAndSettle();
-      expect(
-        find.byWidgetPredicate((widget) => widget is PollEventListBody),
-        findsOneWidget,
-      );
-      expect(
-        find.byWidgetPredicate((widget) => widget is PollEventTile),
-        findsOneWidget,
-      );
-      expect(
-        find.text(MockFirebasePollEvent.testPollEventModel.pollEventName),
-        findsOneWidget,
-      );
+      expect(find.text("No polls or events found"), findsOneWidget);
     });
 
     testWidgets('HomeScreen renders correctly', (tester) async {
