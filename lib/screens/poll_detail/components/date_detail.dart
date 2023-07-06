@@ -47,7 +47,7 @@ class _DateDetailState extends State<DateDetail> {
       Availability.yes,
       Availability.iff,
       Availability.not,
-      Availability.empty
+      Availability.empty,
     ].map((availability) {
       Map<String, dynamic> votesKind = VoteDateModel.getVotesKind(
         voteDate: voteDate,
