@@ -10,7 +10,7 @@ class MockFirebasePollEventInvite extends Mock
     implements FirebasePollEventInvite {
   static PollEventInviteModel testPollEventInviteModel = PollEventInviteModel(
     pollEventId: "test poll event model",
-    inviteeId: 'test uid',
+    inviteeId: 'test organizer uid',
   );
 
   @override
@@ -34,7 +34,7 @@ class MockFirebasePollEventInvite extends Mock
   Stream<QuerySnapshot<Object?>>? getAllPollEventInviteSnapshot({
     required String uid,
   }) {
-    String pollEventInviteId = "test poll event model_test uid";
+    String pollEventInviteId = "test poll event model_test organizer uid";
     final firestore = FakeFirebaseFirestore();
     firestore
         .collection(PollEventInviteModel.collectionName)
@@ -62,7 +62,8 @@ class MockFirebasePollEventInvite extends Mock
   @override
   Stream<DocumentSnapshot<Object?>>? getPollEventInviteSnapshot(
       {required String pollId, required String uid}) {
-    String pollEventInviteId = "test poll event model_test uid";
+    String pollEventInviteId =
+        "test poll event model_test organizer uid_test uid";
     final firestore = FakeFirebaseFirestore();
     firestore
         .collection(PollEventInviteModel.collectionName)

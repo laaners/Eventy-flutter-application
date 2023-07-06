@@ -6,13 +6,13 @@ import 'package:mockito/mockito.dart';
 class MockUser extends Mock implements User {
   @override
   String get uid {
-    return "test uid";
+    return "test organizer uid";
   }
 }
 
 class MockFirebaseUser extends Mock implements FirebaseUser {
   static UserModel testUserModel = UserModel(
-    uid: 'test uid',
+    uid: 'test organizer uid',
     email: 'test email',
     username: 'test username',
     name: 'test name',

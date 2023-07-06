@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dima_app/models/availability.dart';
 import 'package:dima_app/models/location.dart';
+import 'package:dima_app/models/poll_event_invite_model.dart';
 import 'package:dima_app/models/poll_event_model.dart';
+import 'package:dima_app/models/vote_date_model.dart';
+import 'package:dima_app/models/vote_location_model.dart';
 import 'package:dima_app/services/date_methods.dart';
 import 'package:dima_app/services/firebase_crud.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
@@ -10,6 +14,7 @@ import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MockFirebasePollEvent extends Mock implements FirebasePollEvent {
+  static String testPollId = "test poll event model_test organizer uid";
   static PollEventModel testPollEventModel = PollEventModel(
     pollEventName: "test poll event model",
     organizerUid: "test organizer uid",
@@ -20,15 +25,9 @@ class MockFirebasePollEvent extends Mock implements FirebasePollEvent {
     dates: {
       "2023-05-18": [
         {"start": "08:00", "end": "10:00"},
-        {"start": "08:30", "end": "10:00"},
-        {"start": "18:00", "end": "19:00"},
       ],
       "2023-05-20": [
-        {"start": "08:00", "end": "10:00"},
         {"start": "18:00", "end": "19:00"},
-      ],
-      "2023-05-22": [
-        {"start": "08:00", "end": "10:00"},
       ],
     },
     locations: [
@@ -46,24 +45,65 @@ class MockFirebasePollEvent extends Mock implements FirebasePollEvent {
         "site":
             "Ponte di Legno, Comunità montana della valle Camonica, Brescia, Lombardia, 25056, Italia",
         "icon": "location_on_outlined",
-      },
-      {
-        "lat": 45.4926642,
-        "lon": 9.1928945,
-        "name": "casa",
-        "site": "Viale Zara",
-        "icon": "home_outlined",
-      },
-      {
-        "lat": 45.4789256,
-        "lon": 9.2257514,
-        "name": "polimi",
-        "site": "Piazza Leonardo Da Vinci - Politecnico",
-        "icon": "school_outlined",
       }
     ].map((e) => Location.fromMap(e)).toList(),
-    isClosed: false,
+    isClosed: true,
   );
+
+  static List<PollEventInviteModel> testInvites = [
+    PollEventInviteModel(
+        pollEventId: testPollId, inviteeId: "test organizer uid"),
+    PollEventInviteModel(pollEventId: testPollId, inviteeId: "user1"),
+    PollEventInviteModel(pollEventId: testPollId, inviteeId: "user2"),
+    PollEventInviteModel(pollEventId: testPollId, inviteeId: "user3"),
+    PollEventInviteModel(pollEventId: testPollId, inviteeId: "user4"),
+  ];
+
+  static List<VoteLocationModel> testVotesLocations = [
+    VoteLocationModel(
+      pollId: testPollId,
+      locationName: "Curma",
+      votes: {
+        'test organizer uid': Availability.yes,
+        'user1': 1,
+        'user2': 2,
+        'user3': 0,
+        'user4': -1,
+      },
+    ),
+    VoteLocationModel(
+      locationName: "ponte di legno",
+      pollId: testPollId,
+      votes: {
+        'test organizer uid': Availability.yes,
+      },
+    ),
+  ];
+
+  static List<VoteDateModel> testVotesDates = [
+    VoteDateModel(
+      pollId: MockFirebasePollEvent.testPollId,
+      date: '2023-05-18',
+      start: '08:00',
+      end: '10:00',
+      votes: {
+        'test organizer uid': Availability.yes,
+        'user1': 1,
+        'user2': 2,
+        'user3': 0,
+        'user4': -1,
+      },
+    ),
+    VoteDateModel(
+      pollId: MockFirebasePollEvent.testPollId,
+      date: '2023-05-20',
+      start: '18:00',
+      end: '19:00',
+      votes: {
+        'test organizer uid': Availability.yes,
+      },
+    ),
+  ];
 
   @override
   Future<void> closePoll({
@@ -103,9 +143,9 @@ class MockFirebasePollEvent extends Mock implements FirebasePollEvent {
   }) async {
     return {
       "data": testPollEventModel,
-      "invites": [],
-      "locations": [],
-      "dates": [],
+      "invites": testInvites,
+      "locations": testVotesLocations,
+      "dates": testVotesDates,
     };
   }
 

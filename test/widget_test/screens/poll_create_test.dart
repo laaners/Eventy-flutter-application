@@ -2,9 +2,6 @@ import 'package:dima_app/models/location.dart';
 import 'package:dima_app/models/location_icons.dart';
 import 'package:dima_app/models/user_model.dart';
 import 'package:dima_app/screens/groups/components/view_group.dart';
-import 'package:dima_app/screens/home/components/poll_event_list_by_you.dart';
-import 'package:dima_app/screens/home/components/poll_event_list_invited.dart';
-import 'package:dima_app/screens/home/home.dart';
 import 'package:dima_app/screens/poll_create/components/invite_group_tile.dart';
 import 'package:dima_app/screens/poll_create/components/invite_groups.dart';
 import 'package:dima_app/screens/poll_create/components/invite_profile_pic.dart';
@@ -14,21 +11,28 @@ import 'package:dima_app/screens/poll_create/components/select_day_slots.dart';
 import 'package:dima_app/screens/poll_create/components/select_location.dart';
 import 'package:dima_app/screens/poll_create/components/select_location_address.dart';
 import 'package:dima_app/screens/poll_create/components/select_slot.dart';
+import 'package:dima_app/screens/poll_create/components/select_virtual.dart';
+import 'package:dima_app/screens/poll_create/components/step_basics.dart';
+import 'package:dima_app/screens/poll_create/components/step_dates.dart';
+import 'package:dima_app/screens/poll_create/components/step_invite.dart';
+import 'package:dima_app/screens/poll_create/components/step_places.dart';
+import 'package:dima_app/screens/poll_create/poll_create.dart';
 import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/firebase_groups.dart';
-import 'package:dima_app/services/firebase_poll_event.dart';
-import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:dima_app/widgets/my_list_tile.dart';
+import 'package:dima_app/widgets/my_modal.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
+import 'package:dima_app/widgets/pill_box.dart';
 import 'package:dima_app/widgets/search_tile.dart';
-import 'package:dima_app/widgets/tabbar_switcher.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 import '../../mocks/mock_clock_manager.dart';
 import '../../mocks/mock_firebase_groups.dart';
-import '../../mocks/mock_firebase_poll_event.dart';
-import '../../mocks/mock_firebase_poll_event_invite.dart';
 import '../../mocks/mock_firebase_user.dart';
 
 class CustomBindings extends AutomatedTestWidgetsFlutterBinding {
@@ -321,38 +325,342 @@ void main() async {
       );
     });
 
-    testWidgets('HomeScreen renders correctly', (tester) async {
+    testWidgets('SelectSlot component renders correctly', (tester) async {
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ClockManager>(
+              create: (context) => MockClockManager(),
+            ),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: SafeArea(
+                child: SelectSlot(
+                  setSlot: (value) {},
+                  dayString: "2023-06-20",
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byWidgetPredicate((widget) => widget is CupertinoDatePicker),
+          findsNWidgets(2));
+    });
+
+    testWidgets('SelectVirtual component renders correctly', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SafeArea(
+              child: SelectVirtual(
+                defaultOptions: Location("", "", 1, 1, "videocam"),
+                locations: [],
+                addLocation: (value) {},
+                removeLocation: (value) {},
+                setVirtualMeeting: (value) {},
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text("Virtual room link (optional)"), findsOneWidget);
+      expect(
+        find.byWidgetPredicate((widget) => widget is TextFormField),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('StepBasics component renders correctly', (tester) async {
+      TextEditingController deadlineController = TextEditingController();
+      DateTime now = DateTime.now();
+      deadlineController.text = DateFormat("yyyy-MM-dd HH:00:00").format(
+        DateTime(now.year, now.month, now.day + 1),
+      );
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ClockManager>(
+              create: (context) => MockClockManager(),
+            ),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: SafeArea(
+                child: StepBasics(
+                  eventTitleController: TextEditingController(),
+                  eventDescController: TextEditingController(),
+                  deadlineController: deadlineController,
+                  setDeadline: (value) {},
+                  dates: {},
+                  removeDays: (value) {},
+                  visibility: true,
+                  changeVisibility: () {},
+                  canInvite: true,
+                  changeCanInvite: () {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text("Title"), findsOneWidget);
+      expect(find.text("Description (optional)"), findsOneWidget);
+      expect(find.text("Deadline for voting"), findsOneWidget);
+      expect(
+        find.byWidgetPredicate((widget) => widget is MyTextField),
+        findsNWidgets(2),
+      );
+      expect(
+        find.byWidgetPredicate((widget) => widget is ListTile),
+        findsOneWidget,
+      );
+      await tester.tap(find.byWidgetPredicate((widget) => widget is ListTile));
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is MyModal),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('StepDates component renders correctly', (tester) async {
+      TextEditingController deadlineController = TextEditingController();
+      DateTime now = DateTime.now();
+      deadlineController.text = DateFormat("yyyy-MM-dd HH:00:00").format(
+        DateTime(now.year, now.month, now.day + 1),
+      );
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ClockManager>(
+              create: (context) => MockClockManager(),
+            ),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: SafeArea(
+                child: ListView(
+                  children: [
+                    StepDates(
+                      dates: {},
+                      addDate: (value) {},
+                      removeDate: (value) {},
+                      deadlineController: deadlineController,
+                      removeEmpty: (value) {},
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is PillBox),
+        findsOneWidget,
+      );
+      expect(
+        find.text("Tap on a selected day to edit its time slots"),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate((widget) => widget is TableCalendar),
+        findsOneWidget,
+      );
+      await tester.tap(find.byKey(Key("same_slots_switch")));
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is SelectSlot),
+        findsOneWidget,
+      );
+      await tester.tap(find.byKey(Key("modal_confirm")));
+      await tester.pumpAndSettle();
+      expect(
+        find.text("Long tap on a selected day to edit its time slots"),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('StepInvite component renders correctly', (tester) async {
+      TextEditingController deadlineController = TextEditingController();
+      DateTime now = DateTime.now();
+      deadlineController.text = DateFormat("yyyy-MM-dd HH:00:00").format(
+        DateTime(now.year, now.month, now.day + 1),
+      );
       await tester.pumpWidget(
         MultiProvider(
           providers: [
             ChangeNotifierProvider<FirebaseUser>(
               create: (context) => MockFirebaseUser(),
             ),
-            Provider<FirebasePollEvent>(
-              create: (context) => MockFirebasePollEvent(),
+            ChangeNotifierProvider<ClockManager>(
+              create: (context) => MockClockManager(),
             ),
-            Provider<FirebasePollEventInvite>(
-              create: (context) => MockFirebasePollEventInvite(),
+            Provider<FirebaseGroups>(
+              create: (context) => MockFirebaseGroups(),
             ),
           ],
           child: MaterialApp(
-            home: HomeScreen(),
+            home: Scaffold(
+              body: SafeArea(
+                child: ListView(
+                  children: [
+                    StepInvite(
+                      invitees: [],
+                      addInvitee: (value) {},
+                      removeInvitee: (value) {},
+                      organizerUid: "organizerUid",
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       );
       await tester.pumpAndSettle();
       expect(
-        find.byWidgetPredicate((widget) => widget is TabbarSwitcher),
+        find.byWidgetPredicate((widget) => widget is InviteProfilePic),
+        findsAtLeastNWidgets(1),
+      );
+      expect(
+        find.byWidgetPredicate((widget) => widget is TabBar),
         findsOneWidget,
       );
       expect(
-        find.byWidgetPredicate((widget) => widget is PollEventListByYou),
+        find.byWidgetPredicate((widget) => widget is InviteUsers),
         findsOneWidget,
       );
-      await tester.tap(find.text("Invited"));
+      expect(
+        find.byWidgetPredicate((widget) => widget is InviteGroups),
+        findsNothing,
+      );
+
+      await tester.tap(find.byWidgetPredicate(
+          (widget) => widget is Icon && widget.icon == Icons.group_add));
       await tester.pumpAndSettle();
       expect(
-        find.byWidgetPredicate((widget) => widget is PollEventListInvited),
+        find.byWidgetPredicate((widget) => widget is InviteUsers),
+        findsNothing,
+      );
+      expect(
+        find.byWidgetPredicate((widget) => widget is InviteGroups),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('StepPlaces component renders correctly', (tester) async {
+      List<Location> locations = [];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SafeArea(
+              child: ListView(
+                children: [
+                  StepPlaces(
+                    locations: locations,
+                    addLocation: (value) {
+                      locations.add(value);
+                    },
+                    removeLocation: (value) {},
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is PillBox),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate((widget) => widget is MyListTile),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byKey(Key("virtual_meeting_switch")));
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is SelectVirtual),
+        findsOneWidget,
+      );
+      await tester.tap(find.byKey(Key("modal_confirm")));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(Key("alert_confirm")));
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is MyListTile),
+        findsNWidgets(2),
+      );
+
+      await tester.tap(find.byKey(Key("add_location_tile")));
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is SelectLocation),
+        findsOneWidget,
+      );
+      await tester.tap(find.byKey(Key("modal_cancel")));
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is MyListTile),
+        findsNWidgets(2),
+      );
+    });
+
+    testWidgets('PollCreateScreen renders correctly', (tester) async {
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<FirebaseUser>(
+              create: (context) => MockFirebaseUser(),
+            ),
+            ChangeNotifierProvider<ClockManager>(
+              create: (context) => MockClockManager(),
+            ),
+            Provider<FirebaseGroups>(
+              create: (context) => MockFirebaseGroups(),
+            ),
+          ],
+          child: MaterialApp(
+            home: PollCreateScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is MyStepper),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate((widget) => widget is StepBasics),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.widgetWithText(SizedBox, "Places").first);
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is StepPlaces),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.widgetWithText(SizedBox, "Dates").first);
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is StepDates),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.widgetWithText(SizedBox, "Invite").first);
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is StepInvite),
         findsOneWidget,
       );
     });
