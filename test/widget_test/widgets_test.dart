@@ -1,4 +1,5 @@
 import 'package:dima_app/models/poll_event_model.dart';
+import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/container_shadow.dart';
 import 'package:dima_app/widgets/delay_widget.dart';
@@ -23,12 +24,15 @@ import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/search_tile.dart';
 import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:dima_app/widgets/tabbar_switcher.dart';
+import 'package:dima_app/widgets/tablet_navigation_rail.dart';
 import 'package:dima_app/widgets/user_tile.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
+import '../mocks/mock_firebase_notification.dart';
 import '../mocks/mock_firebase_user.dart';
 
 class CustomBindings extends AutomatedTestWidgetsFlutterBinding {
@@ -144,31 +148,44 @@ void main() async {
 
     testWidgets('LoadingOverlay shows loading', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SafeArea(
-              child: Builder(builder: (context) {
-                return Column(
-                  children: [
-                    ElevatedButton(
-                      key: Key("test button1"),
-                      child: Text("Show loading and hide"),
-                      onPressed: () async {
-                        LoadingOverlay.show(context);
-                        await Future.delayed(Duration(seconds: 3));
-                        LoadingOverlay.hide(context);
-                      },
-                    ),
-                    ElevatedButton(
-                      key: Key("test button2"),
-                      child: Text("Show loading and not hide"),
-                      onPressed: () {
-                        LoadingOverlay.show(context);
-                      },
-                    ),
-                  ],
-                );
-              }),
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseUser>(
+              create: (context) => MockFirebaseUser(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: SafeArea(
+                child: Builder(builder: (context) {
+                  return Column(
+                    children: [
+                      ElevatedButton(
+                        key: Key("test button1"),
+                        child: Text("Show loading and hide"),
+                        onPressed: () async {
+                          LoadingOverlay.show(context);
+                          await Future.delayed(Duration(seconds: 3));
+                          LoadingOverlay.hide(context);
+                        },
+                      ),
+                      ElevatedButton(
+                        key: Key("test button2"),
+                        child: Text("Show loading and not hide"),
+                        onPressed: () {
+                          LoadingOverlay.show(context);
+                        },
+                      ),
+                    ],
+                  );
+                }),
+              ),
             ),
           ),
         ),
@@ -725,10 +742,23 @@ void main() async {
 
     testWidgets('ResponsiveWrapper has a text', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ResponsiveWrapper(
-              child: Text("Hello"),
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseUser>(
+              create: (context) => MockFirebaseUser(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: ResponsiveWrapper(
+                child: Text("Hello"),
+              ),
             ),
           ),
         ),
@@ -793,18 +823,31 @@ void main() async {
 
     testWidgets('TabbarSwitcher renders correctly', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: TabbarSwitcher(
-            labels: ["tab1", "tab2"],
-            stickyHeight: 100,
-            alwaysShowTitle: true,
-            appBarTitle: "App bar title",
-            listSticky: Text("Sticky title"),
-            upRightActions: [],
-            tabbars: [
-              Text("tab1 body"),
-              Text("tab2 body"),
-            ],
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseUser>(
+              create: (context) => MockFirebaseUser(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
+          ],
+          child: MaterialApp(
+            home: TabbarSwitcher(
+              labels: ["tab1", "tab2"],
+              stickyHeight: 100,
+              alwaysShowTitle: true,
+              appBarTitle: "App bar title",
+              listSticky: Text("Sticky title"),
+              upRightActions: [],
+              tabbars: [
+                Text("tab1 body"),
+                Text("tab2 body"),
+              ],
+            ),
           ),
         ),
       );
@@ -816,6 +859,32 @@ void main() async {
       await tester.tap(find.text("tab2"));
       await tester.pumpAndSettle();
       expect(find.text('tab2 body'), findsOneWidget);
+    });
+
+    testWidgets('TabletNavigationRail renders correctly', (tester) async {
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseUser>(
+              create: (context) => MockFirebaseUser(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
+          ],
+          child: MaterialApp(
+            home: TabletNavigationRail(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is Icon),
+        findsAtLeastNWidgets(4),
+      );
     });
 
     testWidgets('UserTile renders correctly', (tester) async {

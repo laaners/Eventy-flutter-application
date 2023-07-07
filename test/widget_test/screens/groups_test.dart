@@ -6,14 +6,17 @@ import 'package:dima_app/screens/groups/components/view_group.dart';
 import 'package:dima_app/screens/groups/groups.dart';
 import 'package:dima_app/screens/poll_create/components/step_invite.dart';
 import 'package:dima_app/services/firebase_groups.dart';
+import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/my_text_field.dart';
 import 'package:dima_app/widgets/profile_pics_stack.dart';
 import 'package:dima_app/widgets/user_tile.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import '../../mocks/mock_firebase_groups.dart';
+import '../../mocks/mock_firebase_notification.dart';
 import '../../mocks/mock_firebase_user.dart';
 
 class CustomBindings extends AutomatedTestWidgetsFlutterBinding {
@@ -217,6 +220,12 @@ void main() async {
             ),
             Provider<FirebaseGroups>(
               create: (context) => MockFirebaseGroups(),
+            ),
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
             ),
           ],
           child: MaterialApp(

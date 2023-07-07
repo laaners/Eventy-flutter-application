@@ -16,6 +16,7 @@ import 'package:dima_app/services/firebase_vote.dart';
 import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/services/poll_event_methods.dart';
 import 'package:dima_app/services/theme_manager.dart';
+import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -166,14 +167,27 @@ class _MyAppState extends State<MyApp> {
           connectivityCheck(snapshot.data);
           if (!snapshot.hasData ||
               snapshot.connectionState == ConnectionState.waiting) {
-            return const ErrorScreen(noButton: true);
+            return ErrorScreen(
+              customButton: MyButton(
+                text: "Reload",
+                onPressed: () {
+                  setState(() {});
+                },
+              ),
+            );
           }
           final connectivityResult = snapshot.data;
           if (connectivityResult == ConnectivityResult.none ||
               connectivityResult == null) {
-            return ErrorScreen(noButton: true);
+            return ErrorScreen(
+              customButton: MyButton(
+                text: "Reload",
+                onPressed: () {
+                  setState(() {});
+                },
+              ),
+            );
           }
-          print(snapshot.data);
           return Consumer<FirebaseUser>(
             builder: (context, value, child) {
               if (value.user != null) return const MainScreen();
@@ -203,9 +217,53 @@ class _MainScreen extends State<MainScreen> {
   final GlobalKey<NavigatorState> fourthTabNavKey = GlobalKey<NavigatorState>();
   final GlobalKey<NavigatorState> fifthTabNavKey = GlobalKey<NavigatorState>();
 
+  void changeTab(int index) {
+    if (index == 2) {
+      Provider.of<CupertinoTabController>(context, listen: false).index =
+          currentIndex;
+      return;
+    }
+    // back home only if not switching tab
+    if (currentIndex == index) {
+      switch (index) {
+        case 0:
+          firstTabNavKey.currentState?.popUntil((r) => r.isFirst);
+          break;
+        case 1:
+          secondTabNavKey.currentState?.popUntil((r) => r.isFirst);
+          break;
+        case 2:
+          thirdTabNavKey.currentState?.popUntil((r) => r.isFirst);
+          break;
+        case 3:
+          fourthTabNavKey.currentState?.popUntil((r) => r.isFirst);
+          break;
+        case 4:
+          fifthTabNavKey.currentState?.popUntil((r) => r.isFirst);
+          break;
+      }
+    }
+    setState(() {
+      currentIndex = index;
+      Provider.of<CupertinoTabController>(context, listen: false).index =
+          currentIndex;
+    });
+  }
+
+  final Map<int, Widget> screens = {
+    0: HomeScreen(),
+    1: GroupsScreen(),
+    3: NotificationsScreen(),
+    4: SettingsScreen(),
+  };
+
   @override
   Widget build(BuildContext context) {
     String curUid = Provider.of<FirebaseUser>(context, listen: false).user!.uid;
+    bool isTablet = MediaQueryData.fromWindow(WidgetsBinding.instance.window)
+            .size
+            .shortestSide >=
+        600;
     return Scaffold(
       // to avoid sticky keyboard when editing text
       resizeToAvoidBottomInset: false,
@@ -215,36 +273,8 @@ class _MainScreen extends State<MainScreen> {
             controller:
                 Provider.of<CupertinoTabController>(context, listen: true),
             tabBar: CupertinoTabBar(
-              onTap: (index) {
-                if (index == 2) {
-                  Provider.of<CupertinoTabController>(context, listen: false)
-                      .index = currentIndex;
-                  return;
-                }
-                // back home only if not switching tab
-                if (currentIndex == index) {
-                  switch (index) {
-                    case 0:
-                      firstTabNavKey.currentState?.popUntil((r) => r.isFirst);
-                      break;
-                    case 1:
-                      secondTabNavKey.currentState?.popUntil((r) => r.isFirst);
-                      break;
-                    case 2:
-                      thirdTabNavKey.currentState?.popUntil((r) => r.isFirst);
-                      break;
-                    case 3:
-                      fourthTabNavKey.currentState?.popUntil((r) => r.isFirst);
-                      break;
-                    case 4:
-                      fifthTabNavKey.currentState?.popUntil((r) => r.isFirst);
-                      break;
-                  }
-                }
-                setState(() {
-                  currentIndex = index;
-                });
-              },
+              height: isTablet ? 0 : 50,
+              onTap: changeTab,
               items: [
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.home),
@@ -326,6 +356,8 @@ class _MainScreen extends State<MainScreen> {
                 Future.delayed(const Duration(milliseconds: 100), () async {
                   setState(() {
                     currentIndex = 0;
+                    Provider.of<CupertinoTabController>(context, listen: false)
+                        .index = currentIndex;
                   });
 
                   // create invite
@@ -364,13 +396,12 @@ class _MainScreen extends State<MainScreen> {
                 case 1:
                   return CupertinoTabView(
                     navigatorKey: secondTabNavKey,
-                    builder: (context) => const GroupsScreen(), // MapScreen(),
+                    builder: (context) => const GroupsScreen(),
                   );
                 case 3:
                   return CupertinoTabView(
                     navigatorKey: fourthTabNavKey,
-                    builder: (context) =>
-                        const NotificationsScreen(), //const SearchScreen(),
+                    builder: (context) => const NotificationsScreen(),
                   );
                 case 4:
                   return CupertinoTabView(
@@ -382,7 +413,7 @@ class _MainScreen extends State<MainScreen> {
               }
             },
           ),
-          const CreatePollEventButton(),
+          if (!isTablet) const CreatePollEventButton(),
         ],
       ),
     );

@@ -1,11 +1,14 @@
 import 'dart:io';
 import 'package:dima_app/screens/edit_profile/components/change_image.dart';
 import 'package:dima_app/screens/edit_profile/edit_profile.dart';
+import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/services/firebase_user.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
+import '../../mocks/mock_firebase_notification.dart';
 import '../../mocks/mock_firebase_user.dart';
 
 class CustomBindings extends AutomatedTestWidgetsFlutterBinding {
@@ -57,6 +60,12 @@ void main() async {
           providers: [
             ChangeNotifierProvider<FirebaseUser>(
                 create: (context) => MockFirebaseUser()),
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
           ],
           child: MaterialApp(
             home: EditProfileScreen(

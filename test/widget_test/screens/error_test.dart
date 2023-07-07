@@ -1,8 +1,15 @@
 import 'package:dima_app/screens/error/error.dart';
+import 'package:dima_app/services/firebase_notification.dart';
+import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/logo.dart';
 import 'package:dima_app/widgets/my_button.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
+
+import '../../mocks/mock_firebase_notification.dart';
+import '../../mocks/mock_firebase_user.dart';
 
 class CustomBindings extends AutomatedTestWidgetsFlutterBinding {
   @override
@@ -15,8 +22,21 @@ void main() async {
   group('Error screen test', () {
     testWidgets('ErrorScreen renders correctly with button', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ErrorScreen(),
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseUser>(
+              create: (context) => MockFirebaseUser(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
+          ],
+          child: MaterialApp(
+            home: ErrorScreen(),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -28,24 +48,6 @@ void main() async {
       expect(
         find.byWidgetPredicate((widget) => widget is MyButton),
         findsOneWidget,
-      );
-    });
-
-    testWidgets('ErrorScreen renders correctly without button', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: ErrorScreen(noButton: true),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text("AN ERROR HAS OCCURRED"), findsOneWidget);
-      expect(
-        find.byWidgetPredicate((widget) => widget is EventyLogo),
-        findsOneWidget,
-      );
-      expect(
-        find.byWidgetPredicate((widget) => widget is MyButton),
-        findsNothing,
       );
     });
   });

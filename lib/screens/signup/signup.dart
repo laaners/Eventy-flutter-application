@@ -14,6 +14,7 @@ class SignUpScreen extends StatelessWidget {
     return const Scaffold(
       // todo: remove appBar
       body: ResponsiveWrapper(
+        hideNavigation: true,
         child: SignUpForm(),
       ),
       appBar: MyAppBar(title: "Sign Up", upRightActions: []),

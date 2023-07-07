@@ -76,6 +76,7 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
           title: const Text(""),
           label: const Text("Basics"),
           content: ResponsiveWrapper(
+            hideNavigation: true,
             child: StepBasics(
               eventTitleController: eventTitleController,
               eventDescController: eventDescController,
@@ -117,6 +118,7 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
           title: const Text(""),
           label: const Text("Places"),
           content: ResponsiveWrapper(
+            hideNavigation: true,
             child: StepPlaces(
               locations: locations,
               addLocation: (location) {
@@ -138,6 +140,7 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
           title: const Text(""),
           label: const Text("Dates"),
           content: ResponsiveWrapper(
+            hideNavigation: true,
             child: StepDates(
               dates: dates,
               addDate: (value) {
@@ -187,6 +190,7 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
           title: const Text(""),
           label: const Text("Invite"),
           content: ResponsiveWrapper(
+            hideNavigation: true,
             child: Container(
               margin: const EdgeInsets.all(15),
               child: StepInvite(
@@ -320,21 +324,19 @@ class _PollCreateScreenState extends State<PollCreateScreen> {
           )
         ],
       ),
-      body: ResponsiveWrapper(
-        child: MyStepper(
-          elevation: 1,
-          currentStep: _activeStepIndex,
-          steps: stepList(),
-          onStepTapped: (int index) {
-            setState(() {
-              _activeStepIndex = index;
-            });
-          },
-          // override continue cancel of stepper
-          controlsBuilder: (context, controls) {
-            return Container();
-          },
-        ),
+      body: MyStepper(
+        elevation: 1,
+        currentStep: _activeStepIndex,
+        steps: stepList(),
+        onStepTapped: (int index) {
+          setState(() {
+            _activeStepIndex = index;
+          });
+        },
+        // override continue cancel of stepper
+        controlsBuilder: (context, controls) {
+          return Container();
+        },
       ),
       bottomNavigationBar: Container(
         padding: EdgeInsets.symmetric(
