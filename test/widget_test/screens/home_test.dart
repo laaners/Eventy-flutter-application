@@ -3,15 +3,18 @@ import 'package:dima_app/screens/home/components/poll_event_list_by_you.dart';
 import 'package:dima_app/screens/home/components/poll_event_list_invited.dart';
 import 'package:dima_app/screens/home/home.dart';
 import 'package:dima_app/screens/poll_detail/components/poll_event_options.dart';
+import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/empty_list.dart';
 import 'package:dima_app/widgets/poll_event_tile.dart';
 import 'package:dima_app/widgets/tabbar_switcher.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import '../../mocks/mock_firebase_notification.dart';
 import '../../mocks/mock_firebase_poll_event.dart';
 import '../../mocks/mock_firebase_poll_event_invite.dart';
 import '../../mocks/mock_firebase_user.dart';
@@ -136,6 +139,12 @@ void main() async {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
             ChangeNotifierProvider<FirebaseUser>(
               create: (context) => MockFirebaseUser(),
             ),

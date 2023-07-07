@@ -125,19 +125,17 @@ class _TabbarSwitcher extends State<TabbarSwitcher>
                 ),
               ];
             },
-            body: ResponsiveWrapper(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: TabBarView(
-                      // for best performance, add to the stateful widgets
-                      // with AutomaticKeepAliveClientMixin
-                      controller: _tabController,
-                      children: widget.tabbars,
-                    ),
+            body: Column(
+              children: [
+                Expanded(
+                  child: TabBarView(
+                    // for best performance, add to the stateful widgets
+                    // with AutomaticKeepAliveClientMixin
+                    controller: _tabController,
+                    children: widget.tabbars,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

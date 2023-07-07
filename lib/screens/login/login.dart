@@ -17,6 +17,7 @@ class LogInScreen extends StatelessWidget {
     return const Scaffold(
       // todo: remove appBar
       body: ResponsiveWrapper(
+        hideNavigation: true,
         child: LogInForm(),
       ),
     );

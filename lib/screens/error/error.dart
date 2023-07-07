@@ -8,8 +8,12 @@ import 'package:provider/provider.dart';
 
 class ErrorScreen extends StatelessWidget {
   final String? errorMsg;
-  final bool? noButton;
-  const ErrorScreen({super.key, this.errorMsg, this.noButton});
+  final Widget? customButton;
+  const ErrorScreen({
+    super.key,
+    this.errorMsg,
+    this.customButton,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,24 +46,24 @@ class ErrorScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  if (noButton == null || noButton == false)
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: LayoutConstants.kHorizontalPadding),
-                      child: MyButton(
-                        text: "GO BACK!",
-                        onPressed: () async {
-                          if (Navigator.of(context).canPop()) {
-                            Navigator.of(context).pop();
-                            // Navigator.of(context).popUntil((route) => route.isFirst);
-                          } else {
-                            await Provider.of<FirebaseUser>(context,
-                                    listen: false)
-                                .signOut();
-                          }
-                        },
-                      ),
-                    ),
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: LayoutConstants.kHorizontalPadding),
+                    child: customButton ??
+                        MyButton(
+                          text: "GO BACK!",
+                          onPressed: () async {
+                            if (Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                              // Navigator.of(context).popUntil((route) => route.isFirst);
+                            } else {
+                              await Provider.of<FirebaseUser>(context,
+                                      listen: false)
+                                  .signOut();
+                            }
+                          },
+                        ),
+                  ),
                   Container(height: LayoutConstants.kPaddingFromCreate),
                 ],
               ),

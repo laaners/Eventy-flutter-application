@@ -19,6 +19,7 @@ import 'package:dima_app/screens/poll_create/components/step_places.dart';
 import 'package:dima_app/screens/poll_create/poll_create.dart';
 import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/firebase_groups.dart';
+import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/my_list_tile.dart';
 import 'package:dima_app/widgets/my_modal.dart';
@@ -33,6 +34,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../mocks/mock_clock_manager.dart';
 import '../../mocks/mock_firebase_groups.dart';
+import '../../mocks/mock_firebase_notification.dart';
 import '../../mocks/mock_firebase_user.dart';
 
 class CustomBindings extends AutomatedTestWidgetsFlutterBinding {
@@ -618,6 +620,12 @@ void main() async {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
             ChangeNotifierProvider<FirebaseUser>(
               create: (context) => MockFirebaseUser(),
             ),

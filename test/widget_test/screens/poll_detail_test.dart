@@ -24,6 +24,7 @@ import 'package:dima_app/screens/poll_detail/poll_detail.dart';
 import 'package:dima_app/screens/poll_event/poll_event.dart';
 import 'package:dima_app/services/clock_manager.dart';
 import 'package:dima_app/services/firebase_groups.dart';
+import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/services/firebase_poll_event.dart';
 import 'package:dima_app/services/firebase_poll_event_invite.dart';
 import 'package:dima_app/services/firebase_user.dart';
@@ -33,12 +34,14 @@ import 'package:dima_app/widgets/my_list_tile.dart';
 import 'package:dima_app/widgets/profile_pics_stack.dart';
 import 'package:dima_app/widgets/tabbar_switcher.dart';
 import 'package:dima_app/widgets/user_tile.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../mocks/mock_clock_manager.dart';
 import '../../mocks/mock_firebase_groups.dart';
+import '../../mocks/mock_firebase_notification.dart';
 import '../../mocks/mock_firebase_poll_event.dart';
 import '../../mocks/mock_firebase_poll_event_invite.dart';
 import '../../mocks/mock_firebase_user.dart';
@@ -401,6 +404,12 @@ void main() async {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
             ChangeNotifierProvider<FirebaseUser>(
               create: (context) => MockFirebaseUser(),
             ),
@@ -785,6 +794,12 @@ void main() async {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
             ChangeNotifierProvider<FirebaseUser>(
               create: (context) => MockFirebaseUser(),
             ),
@@ -857,6 +872,12 @@ void main() async {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
             ChangeNotifierProvider<FirebaseUser>(
               create: (context) => MockFirebaseUser(),
             ),

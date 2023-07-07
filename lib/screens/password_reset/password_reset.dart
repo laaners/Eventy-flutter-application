@@ -27,6 +27,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
     return Scaffold(
       appBar: const MyAppBar(title: "Password rest"),
       body: ResponsiveWrapper(
+        hideNavigation: true,
         child: Form(
           key: _formKey,
           child: ListView(
