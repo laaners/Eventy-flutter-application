@@ -189,6 +189,7 @@ class _EditGroupBodyState extends State<EditGroupBody> {
             ),
           ),
           MyTextField(
+            key: const Key("group_name"),
             maxLength: 40,
             maxLines: 1,
             hintText: widget.groupName,

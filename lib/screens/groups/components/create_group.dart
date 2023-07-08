@@ -67,6 +67,7 @@ class _CreateGroupState extends State<CreateGroup> {
             ),
           ),
           MyTextField(
+            key: const Key("group_name"),
             maxLength: 40,
             maxLines: 1,
             hintText: "Group Name",
