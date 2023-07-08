@@ -40,15 +40,17 @@ end
 
       // We are in signup
       String username = "Ale";
-      await fillTextWidget(
+      await fillTextWidgetByKey(
           key: 'username_field', text: username, tester: tester);
-      await fillTextWidget(key: 'name_field', text: 'Alessio', tester: tester);
-      await fillTextWidget(key: 'surname_field', text: 'Hu', tester: tester);
-      await fillTextWidget(
+      await fillTextWidgetByKey(
+          key: 'name_field', text: 'Alessio', tester: tester);
+      await fillTextWidgetByKey(
+          key: 'surname_field', text: 'Hu', tester: tester);
+      await fillTextWidgetByKey(
           key: 'email_field', text: 'aletest@example.com', tester: tester);
-      await fillTextWidget(
+      await fillTextWidgetByKey(
           key: 'password_field', text: 'password', tester: tester);
-      await fillTextWidget(
+      await fillTextWidgetByKey(
           key: 'password_confirm_field', text: 'password', tester: tester);
 
       // Tap the signup button
@@ -65,6 +67,7 @@ end
 
       await logoutTest(tester: tester);
     });
+
     testWidgets('sign up old user', (tester) async {
       await app.main();
       await tester.pumpAndSettle();
@@ -72,15 +75,17 @@ end
 
       // We are in signup
       String username = "Ale";
-      await fillTextWidget(
+      await fillTextWidgetByKey(
           key: 'username_field', text: username, tester: tester);
-      await fillTextWidget(key: 'name_field', text: 'Alessio', tester: tester);
-      await fillTextWidget(key: 'surname_field', text: 'Hu', tester: tester);
-      await fillTextWidget(
+      await fillTextWidgetByKey(
+          key: 'name_field', text: 'Alessio', tester: tester);
+      await fillTextWidgetByKey(
+          key: 'surname_field', text: 'Hu', tester: tester);
+      await fillTextWidgetByKey(
           key: 'email_field', text: 'aletest@example.com', tester: tester);
-      await fillTextWidget(
+      await fillTextWidgetByKey(
           key: 'password_field', text: 'password', tester: tester);
-      await fillTextWidget(
+      await fillTextWidgetByKey(
           key: 'password_confirm_field', text: 'password', tester: tester);
 
       // Duplicate username
@@ -93,7 +98,8 @@ end
 
       // Change username
       await tester.pumpAndSettle(const Duration(seconds: 2));
-      await fillTextWidget(key: 'username_field', text: 'Ale2', tester: tester);
+      await fillTextWidgetByKey(
+          key: 'username_field', text: 'Ale2', tester: tester);
       await tapOnWidgetByKey(key: 'signup_button', tester: tester);
       successDuplicateWarning =
           find.text('Choose another email!'); // Wait for the Snackbar to appear

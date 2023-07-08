@@ -58,6 +58,7 @@ class _DateDetailState extends State<DateDetail> {
       return MyPollOption(
         id: availability,
         title: Row(
+          key: Key(Availability.description(availability)),
           children: [
             Icon(Availability.icons[availability]),
             Text(

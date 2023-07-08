@@ -60,6 +60,7 @@ class _LocationDetailState extends State<LocationDetail> {
       return MyPollOption(
         id: availability,
         title: Row(
+          key: Key(Availability.description(availability)),
           children: [
             Icon(Availability.icons[availability]),
             Text(

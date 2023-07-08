@@ -36,16 +36,17 @@ end
       await loginTest(tester: tester, username: "Ale", password: "password");
       await logoutTest(tester: tester);
     });
+
     testWidgets('login fail', (tester) async {
       await app.main();
       await tester.pumpAndSettle();
 
       // Enter data
-      await fillTextWidget(
+      await fillTextWidgetByKey(
           key: "username_field",
           text: "This username does not exist",
           tester: tester);
-      await fillTextWidget(
+      await fillTextWidgetByKey(
           key: "password_field", text: "random password", tester: tester);
 
       // Tap the signup button.

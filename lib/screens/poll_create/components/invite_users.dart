@@ -41,6 +41,7 @@ class _InviteUsersState extends State<InviteUsers> {
       child: Column(
         children: [
           SearchTile(
+            key: const Key("search_for_username"),
             controller: _controller,
             focusNode: _focus,
             hintText: "Search for username",

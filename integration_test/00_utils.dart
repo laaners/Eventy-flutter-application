@@ -20,12 +20,23 @@ Future tapOnWidgetByFinder({
   await tester.pumpAndSettle();
 }
 
-Future fillTextWidget({
+Future fillTextWidgetByKey({
   required String key,
   required String text,
   required WidgetTester tester,
 }) async {
   final widget = await find.byKey(Key(key));
+  expect(widget, findsOneWidget);
+  await tester.enterText(widget, text);
+  await tester.testTextInput.receiveAction(TextInputAction.done);
+  await tester.pumpAndSettle();
+}
+
+Future fillTextWidgetByFinder({
+  required Finder widget,
+  required String text,
+  required WidgetTester tester,
+}) async {
   expect(widget, findsOneWidget);
   await tester.enterText(widget, text);
   await tester.testTextInput.receiveAction(TextInputAction.done);
@@ -87,4 +98,14 @@ Future logoutTest({required WidgetTester tester}) async {
   await tester.pumpAndSettle();
   await tapOnWidgetByKey(key: "alert_confirm", tester: tester);
   expect(find.byKey(const Key("log_in_to_sign_up_screen")), findsOneWidget);
+}
+
+Future closeModal({required WidgetTester tester}) async {
+  await tester.fling(
+    find.byKey(Key("modal_drag_bar")),
+    Offset(0, 210),
+    1000,
+    warnIfMissed: false,
+  );
+  await tester.pumpAndSettle();
 }
