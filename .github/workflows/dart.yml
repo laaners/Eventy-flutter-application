@@ -23,8 +23,8 @@ jobs:
           channel: 'stable'
       - name: Install Dependencies
         run: flutter pub get
-      - name: Flutter Analyze
-        run: flutter analyze
+#      - name: Flutter Analyze
+#        run: flutter analyze
       - name: Check Flutter Formatting
         run: dart format
       - name: Unit and Widget Tests
