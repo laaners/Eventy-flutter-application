@@ -37,13 +37,6 @@ class LoadingOverlay {
     overlay?.remove();
     overlay = null;
   }
-
-  static Future<T> during<T>(BuildContext context, Future<T> future) {
-    show(context);
-    return future.whenComplete(() => hide(context));
-  }
-
-  static void remove(BuildContext context) {}
 }
 
 class FullScreenLoader extends StatelessWidget {

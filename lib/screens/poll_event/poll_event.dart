@@ -13,7 +13,6 @@ import 'package:dima_app/widgets/loading_logo.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
 import 'package:dima_app/widgets/screen_transition.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui' as ui;
 import 'package:provider/provider.dart';
 
 class PollEventScreen extends StatefulWidget {
@@ -39,15 +38,6 @@ class _PollEventScreenState extends State<PollEventScreen>
     setState(() {
       _refresh = !_refresh;
     });
-  }
-
-  Size textSize(String text, TextStyle style) {
-    final TextPainter textPainter = TextPainter(
-        text: TextSpan(text: text, style: style),
-        maxLines: 1,
-        textDirection: ui.TextDirection.ltr)
-      ..layout(minWidth: 0, maxWidth: double.infinity);
-    return textPainter.size;
   }
 
   @override

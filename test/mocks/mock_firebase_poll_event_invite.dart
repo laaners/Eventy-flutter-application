@@ -54,12 +54,6 @@ class MockFirebasePollEventInvite extends Mock
   }
 
   @override
-  Future<List<PollEventInviteModel>> getInvitesFromUserId(
-      {required String userId}) async {
-    return [testPollEventInviteModel];
-  }
-
-  @override
   Stream<DocumentSnapshot<Object?>>? getPollEventInviteSnapshot(
       {required String pollId, required String uid}) {
     String pollEventInviteId =

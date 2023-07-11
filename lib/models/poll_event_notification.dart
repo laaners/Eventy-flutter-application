@@ -1,6 +1,4 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
 import 'package:dima_app/services/date_methods.dart';
 
 class PollEventNotification {
@@ -61,12 +59,6 @@ class PollEventNotification {
       timestamp: map['timestamp'] as String,
     );
   }
-
-  String toJson() => json.encode(toMap());
-
-  factory PollEventNotification.fromJson(String source) =>
-      PollEventNotification.fromMap(
-          json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {

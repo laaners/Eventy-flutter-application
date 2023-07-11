@@ -198,52 +198,7 @@ class FirebaseNotification extends ChangeNotifier {
     const initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
 
-    /*
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      firebaseMessagingForegroundHandler(
-        message: message,
-        flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
-        channel: channel,
-      );
-    });
-    */
-
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  }
-
-  firebaseMessagingForegroundHandler({
-    required RemoteMessage message,
-    required FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
-    required AndroidNotificationChannel channel,
-  }) {
-    print('Got a message whilst in the foreground!');
-    print('Message data: ${message.notification}');
-    print("FOREsE");
-
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android;
-
-    // If `onMessage` is triggered with a notification, construct our own
-    // local notification to show to users using the created channel.
-    if (notification != null && android != null) {
-      flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            channelDescription: channel.description,
-            priority: Priority.max,
-            importance: Importance.max,
-            icon: 'app_icon',
-            // other properties...
-          ),
-        ),
-      );
-      notifyListeners();
-    }
   }
 
   static Future<void> sendNotification({

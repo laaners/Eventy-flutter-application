@@ -20,7 +20,8 @@ void main() async {
   CustomBindings();
 
   group('Edit profile screen test', () {
-    testWidgets('ChangeImage component renders correctly', (tester) async {
+    testWidgets('ChangeImage component renders correctly (camera)',
+        (tester) async {
       bool _initialRemoved = false;
       File? _photo;
       await tester.pumpWidget(
@@ -52,6 +53,59 @@ void main() async {
         find.byWidgetPredicate((widget) => widget is CircleAvatar),
         findsOneWidget,
       );
+      await tester.tap(find.byWidgetPredicate(
+          (widget) => widget is Icon && widget.icon == Icons.close));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byWidgetPredicate(
+          (widget) => widget is Icon && widget.icon == Icons.photo_camera));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text("Camera"));
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('ChangeImage component renders correctly (gallery)',
+        (tester) async {
+      bool _initialRemoved = false;
+      File? _photo;
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<FirebaseUser>(
+                create: (context) => MockFirebaseUser()),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: SafeArea(
+                child: ChangeImage(
+                  photo: _photo,
+                  changeInitialRemoved: (bool value) {
+                    _initialRemoved = value;
+                  },
+                  changePhoto: (File? newPhoto) {
+                    _photo = newPhoto;
+                  },
+                  initialRemoved: _initialRemoved,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate((widget) => widget is CircleAvatar),
+        findsOneWidget,
+      );
+      await tester.tap(find.byWidgetPredicate(
+          (widget) => widget is Icon && widget.icon == Icons.close));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byWidgetPredicate(
+          (widget) => widget is Icon && widget.icon == Icons.photo_camera));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text("Gallery"));
+      await tester.pumpAndSettle();
     });
 
     testWidgets('EditProfileScreen renders correctly', (tester) async {

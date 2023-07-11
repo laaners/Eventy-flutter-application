@@ -282,48 +282,13 @@ class FirebasePollEvent {
         await Future.wait(promisesVotesDates);
 
         // delete poll
+        // showSnackBar(context, "Successfully deleted poll/event");
         await FirebaseCrud.deleteDoc(pollEventCollection, pollId);
-        showSnackBar(context, "Successfully deleted poll/event");
       }
     } on FirebaseException catch (e) {
       print(e.message);
       showSnackBar(context, "Error in poll/event deletion");
     }
-  }
-
-  Future<List<PollEventModel>> searchEventsByName({
-    required String pattern,
-  }) async {
-    try {
-      var events = await pollEventCollection
-          .orderBy('name_lower')
-          .where('name_lower', isGreaterThanOrEqualTo: pattern.toLowerCase())
-          .where('name_lower', isLessThan: '${pattern.toLowerCase()}z')
-          .limit(10)
-          .get();
-      if (events.docs.isNotEmpty) {
-        List<PollEventModel> eventsData = events.docs.map((doc) {
-          var tmp = doc.data() as Map<String, dynamic>;
-          tmp["locations"] = (tmp["locations"] as List).map((e) {
-            e["lat"] = e["lat"].toDouble();
-            e["lon"] = e["lon"].toDouble();
-            return e as Map<String, dynamic>;
-          }).toList();
-          tmp["deadline"] =
-              DateFormatter.dateTime2String(tmp["deadline"].toDate());
-          tmp["deadline"] = DateFormatter.toLocalString(tmp["deadline"]);
-          tmp["dates"] =
-              PollEventModel.datesToLocal(tmp["dates"] as Map<String, dynamic>);
-          var pollDetails = PollEventModel.fromMap(tmp);
-          return pollDetails;
-        }).toList();
-        return eventsData;
-      }
-    } on FirebaseException catch (e) {
-      //showSnackBar(context, e.message!);
-      print(e.message!);
-    }
-    return [];
   }
 
   Stream<QuerySnapshot<Object?>>? getUserOrganizedPollsEventsSnapshot({
@@ -344,60 +309,4 @@ class FirebasePollEvent {
         Rx.combineLatestList(streamList);
     return mergedStream;
   }
-
-  /*
-  Future<List<PollEventModel>> getUserInvitedPollsEvents({
-      required List<String> pollEventIds,
-    }) async {
-      try {
-        /*
-        var documents = await pollEventCollection
-            .where(FieldPath.documentId, whereIn: pollEventIds)
-            .get();
-        if (documents.docs.isNotEmpty) {
-          final List<PollEventModel> events = documents.docs.map((doc) {
-            return PollEventModel.firebaseDocToObj(
-                doc.data() as Map<String, dynamic>);
-          }).toList();
-          return events;
-          // return events.where((event) => event.isClosed).toList();
-        }
-        */
-        List<PollEventModel?> tmp = await Future.wait(
-          pollEventIds.map((e) => getPollEventData(id: e)).toList(),
-        );
-        List<PollEventModel> pollEvents = [];
-        for (var event in tmp) {
-          if (event != null) {
-            pollEvents.add(event);
-          }
-        }
-        return pollEvents;
-      } on FirebaseException catch (e) {
-        print(e.message!);
-      }
-      return [];
-    }
-
-  Future<List<PollEventModel>> getUserOrganizedPollsEvents({
-    required String uid,
-  }) async {
-    try {
-      var documents =
-          await pollEventCollection.where("organizerUid", isEqualTo: uid).get();
-      if (documents.docs.isNotEmpty) {
-        final List<PollEventModel> events = documents.docs.map((doc) {
-          return PollEventModel.firebaseDocToObj(
-              doc.data() as Map<String, dynamic>);
-        }).toList();
-        return events;
-        // return events.where((event) => event.isClosed).toList();
-      }
-      return [];
-    } on FirebaseException catch (e) {
-      print(e.message!);
-    }
-    return [];
-  }
-  */
 }

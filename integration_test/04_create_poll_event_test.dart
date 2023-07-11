@@ -238,6 +238,13 @@ HomeScreen -> HomeScreen: Shows creation success
             .first,
         tester: tester,
       );
+      await tapOnWidgetByFinder(
+        widget: find
+            .byWidgetPredicate(
+                (widget) => widget is Icon && widget.icon == Icons.cancel)
+            .first,
+        tester: tester,
+      );
 
       // Create poll-------------------------------------------------------
       await tapOnWidgetByFinder(
@@ -253,6 +260,30 @@ HomeScreen -> HomeScreen: Shows creation success
       await tester.tap(homeIcon);
       await tester.pumpAndSettle();
       expect(find.text("An event name"), findsOneWidget);
+
+      // Close poll-------------------------------------------------------
+      await tapOnWidgetByFinder(
+          widget: find
+              .byWidgetPredicate(
+                  (widget) => widget is Icon && widget.icon == Icons.more_vert)
+              .first,
+          tester: tester);
+      await tapOnWidgetByFinder(
+          widget: find.text("Close the poll").first, tester: tester);
+      await tapOnWidgetByKey(key: "alert_confirm", tester: tester);
+      expect(find.text("An event name"), findsOneWidget);
+
+      // Delete event-------------------------------------------------------
+      await tapOnWidgetByFinder(
+          widget: find
+              .byWidgetPredicate(
+                  (widget) => widget is Icon && widget.icon == Icons.more_vert)
+              .first,
+          tester: tester);
+      await tapOnWidgetByFinder(
+          widget: find.text("Delete the event").first, tester: tester);
+      await tapOnWidgetByKey(key: "alert_confirm", tester: tester);
+      expect(find.text("An event name"), findsNothing);
     });
   });
 }

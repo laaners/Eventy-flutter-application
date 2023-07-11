@@ -1,5 +1,4 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:dima_app/models/location.dart';
 import 'package:dima_app/services/date_methods.dart';
@@ -161,13 +160,6 @@ class PollEventModel {
       isClosed: map['isClosed'] as bool,
     );
   }
-
-  /// This method converts a PollEventModel object to a json string
-  String toJson() => json.encode(toMap());
-
-  /// This method converts a json string to a PollEventModel object
-  factory PollEventModel.fromJson(String source) =>
-      PollEventModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   /// This method prints a PollEventModel object
   @override

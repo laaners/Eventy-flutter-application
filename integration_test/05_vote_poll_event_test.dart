@@ -1,5 +1,6 @@
 import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/screens/poll_detail/components/date_tile.dart';
+import 'package:dima_app/screens/poll_detail/components/invitee_votes_view.dart';
 import 'package:dima_app/screens/poll_detail/components/location_tile.dart';
 import 'package:dima_app/widgets/poll_event_tile.dart';
 import 'package:flutter/material.dart';
@@ -77,9 +78,37 @@ DateDetail -> PollDetailScreen: Close modal
 
       // Go to poll_detail
       await tapOnWidgetByFinder(
+        widget: find.text("Closed"),
+        tester: tester,
+      );
+      await tapOnWidgetByFinder(
+        widget: find.text("Open"),
+        tester: tester,
+      );
+      await tapOnWidgetByFinder(
+        widget: find.text("All"),
+        tester: tester,
+      );
+      await tapOnWidgetByFinder(
+        widget: find.byWidgetPredicate((widget) =>
+            widget is Icon && widget.icon == Icons.sort_by_alpha_outlined),
+        tester: tester,
+      );
+      await tapOnWidgetByFinder(
+        widget: find.byWidgetPredicate((widget) =>
+            widget is Icon && widget.icon == Icons.access_time_outlined),
+        tester: tester,
+      );
+      await tapOnWidgetByFinder(
         widget: find.byWidgetPredicate((widget) => widget is PollEventTile),
         tester: tester,
       );
+      await tapOnWidgetByFinder(
+        widget: find.byWidgetPredicate(
+            (widget) => widget is Icon && widget.icon == Icons.refresh),
+        tester: tester,
+      );
+
       await tester.fling(
         find.text("Dates"),
         Offset(0, -150),
@@ -89,6 +118,16 @@ DateDetail -> PollDetailScreen: Close modal
       await tester.pumpAndSettle();
 
       // Vote a location
+      await tapOnWidgetByFinder(
+        widget: find.byWidgetPredicate(
+            (widget) => widget is Icon && widget.icon == Icons.sort_by_alpha),
+        tester: tester,
+      );
+      await tapOnWidgetByFinder(
+        widget: find.byWidgetPredicate(
+            (widget) => widget is Icon && widget.icon == Icons.sort),
+        tester: tester,
+      );
       await tapOnWidgetByFinder(
         widget:
             find.byWidgetPredicate((widget) => widget is LocationTile).first,
@@ -117,6 +156,16 @@ DateDetail -> PollDetailScreen: Close modal
       // Vote a date
       await tapOnWidgetByFinder(widget: find.text("Dates"), tester: tester);
       await tapOnWidgetByFinder(
+        widget: find.byWidgetPredicate((widget) =>
+            widget is Icon && widget.icon == Icons.access_time_outlined),
+        tester: tester,
+      );
+      await tapOnWidgetByFinder(
+        widget: find.byWidgetPredicate(
+            (widget) => widget is Icon && widget.icon == Icons.sort),
+        tester: tester,
+      );
+      await tapOnWidgetByFinder(
         widget: find.byWidgetPredicate((widget) => widget is DateTile).first,
         tester: tester,
       );
@@ -139,6 +188,29 @@ DateDetail -> PollDetailScreen: Close modal
             (widget) => widget is Icon && widget.icon == Icons.help),
         findsAtLeastNWidgets(2),
       );
+
+      // see some details
+      await tester.fling(
+        find.text("Dates"),
+        Offset(0, 150),
+        1000,
+        warnIfMissed: false,
+      );
+      await tester.pumpAndSettle();
+      await tapOnWidgetByFinder(
+          widget: find.textContaining(" invited"), tester: tester);
+      await tapOnWidgetByFinder(
+        widget: find
+            .byWidgetPredicate(
+                (widget) => widget is Icon && widget.icon == Icons.event_note)
+            .first,
+        tester: tester,
+      );
+      expect(
+        find.byWidgetPredicate((widget) => widget is InviteeVotesView),
+        findsOneWidget,
+      );
+      await tapOnWidgetByFinder(widget: find.text("Dates"), tester: tester);
     });
   });
 }

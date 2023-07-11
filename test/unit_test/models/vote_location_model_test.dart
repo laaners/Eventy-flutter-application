@@ -109,12 +109,63 @@ void main() {
       );
 
       expect(iffVotes, {'user1': 1});
+
+      // null voteDate
+      final nullPositiveVotes = VoteLocationModel.getVotesKind(
+        voteLocation: null,
+        kind: Availability.yes,
+        invites: testInvites,
+        organizerUid: 'organizer',
+      );
+
+      expect(nullPositiveVotes, {'organizer': 2});
+
+      final nullEmptyVotes = VoteLocationModel.getVotesKind(
+        voteLocation: null,
+        kind: Availability.empty,
+        invites: testInvites,
+        organizerUid: 'organizer',
+      );
+
+      expect(nullEmptyVotes, {
+        'user1': -1,
+        'user2': -1,
+        'user3': -1,
+        'user4': -1,
+      });
+
+      // corner case
+      final cornerCase = VoteLocationModel.getVotesKind(
+        voteLocation: testVote,
+        kind: Availability.empty,
+        invites: [
+          PollEventInviteModel(
+              pollEventId: "pollEventId0", inviteeId: "user_corner")
+        ],
+        organizerUid: 'organizer',
+      );
+
+      expect(cornerCase, {
+        'user4': -1,
+        'user_corner': -1,
+      });
     });
 
     test('getPositiveVotes should correctly return positive votes', () {
       final positiveVotes = testVote.getPositiveVotes();
-
       expect(positiveVotes, {'user1': 1, 'user2': 2});
+    });
+
+    test('toString should work correctly', () {
+      expect(testVote.toString(),
+          'VoteLocationCollection(pollId: poll1, locationName: test location name, votes: {user1: 1, user2: 2, user3: 0, user4: -1})');
+    });
+
+    test('Equality and hashCode should work correctly', () {
+      final copy = testVote.copyWith();
+      expect(copy, testVote);
+      expect(copy.copyWith(votes: {}) == testVote, false);
+      expect(copy.hashCode, testVote.hashCode);
     });
   });
 }

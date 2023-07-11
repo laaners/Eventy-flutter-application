@@ -36,6 +36,7 @@ end
     testWidgets('sign up new user and sign out', (tester) async {
       await app.main();
       await tester.pumpAndSettle();
+      await logoutTest(tester: tester);
       await tapOnWidgetByKey(key: "log_in_to_sign_up_screen", tester: tester);
 
       // We are in signup

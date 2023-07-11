@@ -52,6 +52,7 @@ class _LogInFormState extends State<LogInForm> {
         controller: ScrollController(),
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
+          /*
           TextButton(
             key: GlobalKey(debugLabel: 'test1'),
             onPressed: () async {
@@ -66,23 +67,21 @@ class _LogInFormState extends State<LogInForm> {
             },
             child: const Text("Firebase login17"),
           ),
-          /*
           TextButton(
+            key: GlobalKey(debugLabel: 'test1'),
             onPressed: () async {
               LoadingOverlay.show(context);
               await Provider.of<FirebaseUser>(context, listen: false)
                   .logInWithUsername(
-                context: context,
-                username: "UsernameId14",
-                password: "password",
-              );
+                      context: context, username: "Ale", password: "password");
               // ignore: use_build_context_synchronously
               LoadingOverlay.hide(context);
             },
-            child: const Text("Firebase login14"),
+            child: const Text("Firebase login Ale"),
           ),
-           */
-          const SizedBox(height: 50),
+          */
+
+          const SizedBox(height: 60),
           const EventyLogo(extWidth: 180),
           const SizedBox(height: 20),
           Text(
