@@ -22,10 +22,20 @@ jobs:
         with:
           channel: 'stable'
       - name: Install Dependencies
-        run: flutter pub get
+        run: |
+          flutter pub get
+          sudo apt-get update -qq -y
+          sudo apt-get install lcov -y
 #      - name: Flutter Analyze
 #        run: flutter analyze
       - name: Check Flutter Formatting
         run: dart format
       - name: Unit and Widget Tests
-        run: flutter test
+        run: |
+          flutter test --coverage
+          genhtml coverage/lcov.info -o coverage/html
+      - name: HTML Preview
+        id: html_preview
+        uses: pavi2410/html-preview-action@v2
+        with:
+          html_file: 'coverage/html'
