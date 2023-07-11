@@ -1,3 +1,5 @@
+import 'package:dima_app/screens/password_reset/password_reset.dart';
+import 'package:dima_app/widgets/my_button.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:dima_app/main.dart' as app;
@@ -54,6 +56,36 @@ end
 
       // Wait for the Snackbar to appear
       final successSnackbar = find.text('Username does not exist');
+      await tester.pump(const Duration(seconds: 3));
+      expect(successSnackbar, findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('password reset', (tester) async {
+      await app.main();
+      await tester.pumpAndSettle();
+
+      // Enter data
+      await tapOnWidgetByFinder(
+          widget: find.text("Forgot Password?"), tester: tester);
+      expect(
+        find.byWidgetPredicate((widget) => widget is PasswordResetScreen),
+        findsOneWidget,
+      );
+
+      await fillTextWidgetByKey(
+        key: "password_reset_email_field",
+        text: "dummyemail@test.com",
+        tester: tester,
+      );
+      // Tap the signup button.
+      await tapOnWidgetByFinder(
+        widget: find.byWidgetPredicate((widget) => widget is MyButton),
+        tester: tester,
+      );
+
+      // Wait for the Snackbar to appear
+      final successSnackbar =
+          find.text('Check the e-mail to change the password');
       await tester.pump(const Duration(seconds: 3));
       expect(successSnackbar, findsAtLeastNWidgets(1));
     });

@@ -1,4 +1,8 @@
 import 'package:dima_app/models/poll_event_model.dart';
+import 'package:dima_app/models/user_model.dart';
+import 'package:dima_app/screens/poll_create/poll_create.dart';
+import 'package:dima_app/services/clock_manager.dart';
+import 'package:dima_app/services/firebase_groups.dart';
 import 'package:dima_app/services/firebase_notification.dart';
 import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/container_shadow.dart';
@@ -32,6 +36,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
+import '../mocks/mock_clock_manager.dart';
+import '../mocks/mock_firebase_groups.dart';
 import '../mocks/mock_firebase_notification.dart';
 import '../mocks/mock_firebase_user.dart';
 
@@ -323,14 +329,45 @@ void main() async {
 
     testWidgets('MyAppBar has a title', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            appBar: MyAppBar(title: "AppBar title"),
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
+            ChangeNotifierProvider<FirebaseUser>(
+              create: (context) => MockFirebaseUser(),
+            ),
+            ChangeNotifierProvider<ClockManager>(
+              create: (context) => MockClockManager(),
+            ),
+            Provider<FirebaseGroups>(
+              create: (context) => MockFirebaseGroups(),
+            ),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              appBar: MyAppBar(
+                title: "AppBar title",
+                upRightActions: [
+                  Builder(builder: (context) {
+                    return MyAppBar.createEvent(context);
+                  })
+                ],
+              ),
+            ),
           ),
         ),
       );
       await tester.pumpAndSettle();
       expect(find.text('AppBar title'), findsOneWidget);
+      await tester
+          .tap(find.byWidgetPredicate((widget) => widget is MyIconButton));
+      await tester.pumpAndSettle();
+      expect(find.byWidgetPredicate((widget) => widget is PollCreateScreen),
+          findsOneWidget);
     });
 
     testWidgets('MyButton has a text', (tester) async {
@@ -680,7 +717,16 @@ void main() async {
                     children: [
                       ProfilePicFromUid(userUid: "userUid"),
                       ProfilePicFromData(
-                        userData: MockFirebaseUser.testUserModel,
+                        userData: UserModel(
+                          uid: 'test organizer uid',
+                          email: 'test email',
+                          username: 'test username',
+                          name: 'test name',
+                          surname: 'test surname',
+                          profilePic:
+                              'https://images.ygoprodeck.com/images/cards_cropped/83152482.jpg',
+                        ),
+                        showUserName: true,
                         notShowDialog: true,
                       ),
                     ],
@@ -722,13 +768,20 @@ void main() async {
           child: MaterialApp(
             home: Scaffold(
               body: SafeArea(
-                child: Builder(builder: (context) {
-                  return ProfilePicsStack(
-                    radius: 40,
-                    offset: 30,
-                    uids: ["1", "2", "3"],
-                  );
-                }),
+                child: Column(
+                  children: [
+                    ProfilePicsStack(
+                      radius: 40,
+                      offset: 30,
+                      uids: ["1", "2", "3"],
+                    ),
+                    ProfilePicsStack(
+                      radius: 40,
+                      offset: 30,
+                      uids: [],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -737,7 +790,7 @@ void main() async {
       await tester.pumpAndSettle();
 
       expect(find.byWidgetPredicate((widget) => widget is CircleAvatar),
-          findsNWidgets(3));
+          findsNWidgets(4));
     });
 
     testWidgets('ResponsiveWrapper has a text', (tester) async {
@@ -854,6 +907,45 @@ void main() async {
       await tester.pumpAndSettle();
       expect(find.text('App bar title'), findsOneWidget);
       expect(find.text('Sticky title'), findsOneWidget);
+      expect(find.text('tab1 body'), findsOneWidget);
+
+      await tester.tap(find.text("tab2"));
+      await tester.pumpAndSettle();
+      expect(find.text('tab2 body'), findsOneWidget);
+    });
+
+    testWidgets('TabbarSwitcher no sticky renders correctly', (tester) async {
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<CupertinoTabController>(
+              create: (context) => CupertinoTabController(),
+            ),
+            ChangeNotifierProvider<FirebaseUser>(
+              create: (context) => MockFirebaseUser(),
+            ),
+            ChangeNotifierProvider<FirebaseNotification>(
+              create: (context) => MockFirebaseNotification(),
+            ),
+          ],
+          child: MaterialApp(
+            home: TabbarSwitcher(
+              labels: ["tab1", "tab2"],
+              stickyHeight: 0,
+              alwaysShowTitle: true,
+              appBarTitle: "App bar title",
+              upRightActions: [],
+              tabbars: [
+                Text("tab1 body"),
+                Text("tab2 body"),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('App bar title'), findsOneWidget);
+      expect(find.text('Sticky title'), findsNothing);
       expect(find.text('tab1 body'), findsOneWidget);
 
       await tester.tap(find.text("tab2"));

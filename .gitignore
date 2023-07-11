@@ -60,3 +60,6 @@ node_modules
 serviceAccountKey.json
 messaging_server
 lib_copy
+genhtml.perl
+coverage/*
+make_coverage.bat

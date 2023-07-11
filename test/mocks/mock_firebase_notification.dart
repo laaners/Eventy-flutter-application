@@ -18,6 +18,9 @@ class MockFirebaseNotification extends Mock implements FirebaseNotification {
   );
 
   @override
+  bool get isPush => true;
+
+  @override
   Stream<DocumentSnapshot<Object?>>? getUserNotificationsSnapshot(
       {required String uid}) {
     var tmp = {

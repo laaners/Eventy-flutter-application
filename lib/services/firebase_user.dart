@@ -20,8 +20,6 @@ class FirebaseUser extends ChangeNotifier {
   CollectionReference get userCollection =>
       _firestore.collection(UserModel.collectionName);
 
-  FirebaseUser.instance(this._auth, this._firestore) {}
-
   Stream<UserModel> getCurrentUserStream() {
     return userCollection
         .doc(user!.uid)

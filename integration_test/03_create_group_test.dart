@@ -1,5 +1,6 @@
 import 'package:dima_app/constants/preferences.dart';
 import 'package:dima_app/screens/groups/components/group_tile.dart';
+import 'package:dima_app/screens/groups/components/view_group.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -94,6 +95,13 @@ GroupsScreen -> GroupsScreen: Shows groups
       expect(find.byWidgetPredicate((widget) => widget is GroupTile),
           findsOneWidget);
       expect(find.text("A group name"), findsOneWidget);
+
+      await tapOnWidgetByFinder(
+        widget: find.byWidgetPredicate((widget) => widget is GroupTile),
+        tester: tester,
+      );
+      expect(find.byWidgetPredicate((widget) => widget is ViewGroup),
+          findsOneWidget);
     });
 
     testWidgets('edit existing group', (tester) async {
@@ -157,6 +165,84 @@ GroupsScreen -> GroupsScreen: Shows groups
       expect(find.byWidgetPredicate((widget) => widget is GroupTile),
           findsOneWidget);
       expect(find.text("A group name edited"), findsOneWidget);
+    });
+
+    testWidgets('delete existing group', (tester) async {
+      await app.main();
+      await tester.pumpAndSettle();
+
+      var usernameField = find.byKey(const Key('username_field'));
+      if (usernameField.evaluate().isNotEmpty) {
+        await loginTest(tester: tester, username: "Ale", password: "password");
+      }
+
+      // Go to groups screen
+      await tapOnWidgetByFinder(
+        widget: find
+            .byWidgetPredicate(
+                (widget) => widget is Icon && widget.icon == Icons.group)
+            .first,
+        tester: tester,
+      );
+      await tapOnWidgetByFinder(
+        widget: find
+            .byWidgetPredicate(
+                (widget) => widget is Icon && widget.icon == Icons.edit)
+            .first,
+        tester: tester,
+      );
+      expect(
+        find.text(
+          "Editing \"A group name edited\"",
+        ),
+        findsOneWidget,
+      );
+      await tapOnWidgetByFinder(
+        widget: find
+            .byWidgetPredicate(
+                (widget) => widget is Icon && widget.icon == Icons.delete)
+            .first,
+        tester: tester,
+      );
+      await tapOnWidgetByKey(key: "alert_confirm", tester: tester);
+      expect(find.text("A group name edited"), findsNothing);
+
+      // recreate it for later use
+      await tapOnWidgetByFinder(
+        widget: find
+            .byWidgetPredicate(
+                (widget) => widget is Icon && widget.icon == Icons.group_add)
+            .first,
+        tester: tester,
+      );
+      await fillTextWidgetByKey(
+        key: "group_name",
+        text: "A group name",
+        tester: tester,
+      );
+      await fillTextWidgetByKey(
+        key: "search_for_username",
+        text: "username",
+        tester: tester,
+      );
+      await tester.pumpAndSettle();
+      await tapOnWidgetByFinder(
+        widget: find
+            .byWidgetPredicate(
+                (widget) => widget is Icon && widget.icon == Icons.add_circle)
+            .first,
+        tester: tester,
+      );
+
+      await tapOnWidgetByFinder(
+        widget: find
+            .byWidgetPredicate(
+                (widget) => widget is Icon && widget.icon == Icons.add_circle)
+            .at(2),
+        tester: tester,
+      );
+
+      await tapOnWidgetByKey(key: "modal_confirm", tester: tester);
     });
   });
 }

@@ -59,12 +59,9 @@ class _MapFromCoorState extends State<MapFromCoor> {
                     width: 80,
                     height: 80,
                     point: LatLng(widget.lat, widget.lon),
-                    builder: (ctx) => GestureDetector(
-                      onTap: () {},
-                      child: const Icon(
-                        Icons.place,
-                        size: 35,
-                      ),
+                    builder: (ctx) => const Icon(
+                      Icons.place,
+                      size: 35,
                     ),
                     anchorPos: anchorPos,
                   ),

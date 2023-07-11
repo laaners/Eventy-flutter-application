@@ -114,7 +114,7 @@ void main() {
   };
 
   group('PollEventModel', () {
-    test('datesToUtc and datesToLocal method should work correctly', () {
+    test('datesToUtc and datesToLocal methods should work correctly', () {
       Map<String, dynamic> testDatesUtc =
           PollEventModel.datesToUtc(pollEventModelDates);
       Map<String, dynamic> testDatesLocal =

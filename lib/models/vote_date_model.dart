@@ -62,17 +62,17 @@ class VoteDateModel {
     if (voteDate == null) {
       switch (kind) {
         case Availability.yes:
-          return {organizerUid: Availability.yes};
+          votesKind = {organizerUid: Availability.yes};
+          break;
         case Availability.empty:
           for (var invite in invites) {
             if (invite.inviteeId != organizerUid) {
               votesKind[invite.inviteeId] = Availability.empty;
             }
           }
-          return votesKind;
-        default:
-          return {};
+          break;
       }
+      return votesKind;
     }
     voteDate.votes.forEach((key, value) {
       if (value == kind) {

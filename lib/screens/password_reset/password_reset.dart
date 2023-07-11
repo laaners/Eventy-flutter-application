@@ -2,6 +2,7 @@ import 'package:dima_app/services/firebase_user.dart';
 import 'package:dima_app/widgets/my_app_bar.dart';
 import 'package:dima_app/widgets/my_button.dart';
 import 'package:dima_app/widgets/responsive_wrapper.dart';
+import 'package:dima_app/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -35,6 +36,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
             children: [
               const SizedBox(height: 20),
               TextFormField(
+                key: const Key("password_reset_email_field"),
                 controller: _emailController,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.mail),
@@ -60,8 +62,10 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     // If the form is valid, display a snackbar and call a server or save the information in the database.
-                    Provider.of<FirebaseUser>(context, listen: false)
+                    await Provider.of<FirebaseUser>(context, listen: false)
                         .sendPasswordResetEmail(email: _emailController.text);
+                    showSnackBar(
+                        context, "Check the e-mail to change the password");
                   }
                 },
               ),

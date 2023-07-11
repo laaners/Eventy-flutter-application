@@ -33,21 +33,6 @@ class MockFirebaseGroups extends Mock implements FirebaseGroups {
   }
 
   @override
-  Future<void> editGroup(
-      {required String uid,
-      required String groupName,
-      required List<String> membersUids}) async {
-    return;
-  }
-
-  @override
-  Future<List<GroupModel>> getUserCreatedGroups({
-    required String uid,
-  }) async {
-    return [testGroupModel];
-  }
-
-  @override
   Stream<QuerySnapshot<Object?>>? getUserCreatedGroupsSnapshot({
     required String uid,
   }) {

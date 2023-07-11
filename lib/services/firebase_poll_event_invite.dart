@@ -63,12 +63,6 @@ class FirebasePollEventInvite {
   }) async {
     try {
       String pollEventInviteId = "${pollEventId}_$inviteeId";
-      /*
-      await FirebaseCrud.deleteDoc(
-        pollEventInviteCollection,
-        pollEventInviteId,
-      );
-      */
 
       // remove invitee votes on locations and dates
       PollEventModel? pollData =
@@ -121,29 +115,6 @@ class FirebasePollEventInvite {
     try {
       var documents = await pollEventInviteCollection
           .where("pollEventId", isEqualTo: pollEventId)
-          .get();
-      if (documents.docs.isNotEmpty) {
-        final List<PollEventInviteModel> pollEventInvites =
-            documents.docs.map((doc) {
-          var tmp = doc.data() as Map<String, dynamic>;
-          var pollEventInvite = PollEventInviteModel.fromMap(tmp);
-          return pollEventInvite;
-        }).toList();
-        return pollEventInvites;
-      }
-      return [];
-    } on FirebaseException catch (e) {
-      print(e.message!);
-    }
-    return [];
-  }
-
-  Future<List<PollEventInviteModel>> getInvitesFromUserId({
-    required String userId,
-  }) async {
-    try {
-      var documents = await pollEventInviteCollection
-          .where("inviteeId", isEqualTo: userId)
           .get();
       if (documents.docs.isNotEmpty) {
         final List<PollEventInviteModel> pollEventInvites =

@@ -22,7 +22,7 @@ class CustomBindings extends AutomatedTestWidgetsFlutterBinding {
 void main() async {
   CustomBindings();
 
-  group('Notifcations screen test', () {
+  group('Notifications screen test', () {
     testWidgets('NotificationTile component renders correctly', (tester) async {
       await tester.pumpWidget(
         MultiProvider(
