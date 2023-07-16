@@ -212,7 +212,7 @@ class ProfilePicTemporary extends StatelessWidget {
                 imageFile!,
                 width: radius * 2,
                 height: radius * 2,
-                fit: BoxFit.fill,
+                fit: BoxFit.cover,
               ),
             )
           : userData.profilePic != "default" && !initialRemoved
@@ -224,7 +224,7 @@ class ProfilePicTemporary extends StatelessWidget {
                         userData.profilePic,
                         width: radius * 2,
                         height: radius * 2,
-                        fit: BoxFit.fill,
+                        fit: BoxFit.cover,
                         loadingBuilder: (BuildContext context, Widget child,
                             ImageChunkEvent? loadingProgress) {
                           if (loadingProgress != null) {

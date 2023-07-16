@@ -52,7 +52,7 @@ class ProfilePicFromData extends StatelessWidget {
                   userData.profilePic,
                   width: radiusVar * 2,
                   height: radiusVar * 2,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return capitalNameSurnameAvatar(context);
                   },
