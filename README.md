@@ -364,19 +364,9 @@ This is the first screen that the user sees when they open the
 application. It displays a list of the upcoming events, which are
 filtered in two tabs, one for the event created by the user and one for the events the user is invited to. The user can tap on an event to view its details.
 
-<div style="display: flex" align="center">
-  <div align="center">
-    <img src="images/eventy/home/home-by-you.png"/>
-    
-    Events created by the user
-  </div>
-  &ensp;
-  <div align="center">
-    <img src="images/eventy/home/home-invited.png" />
-    
-    Events the user is invited to
-  </div>
-</div>
+|![](images/eventy/home/home-by-you.png)|![](images/eventy/home/home-invited.png)|
+|:-:|:-:|
+|Events created by the user|Events the user is invited to|
 
 <div align="center">
     <img src="images/eventy/home/tablet-home-invited.png" width="50%"/>
@@ -384,27 +374,13 @@ filtered in two tabs, one for the event created by the user and one for the even
     Tablet home in light mode
 </div>
 
+#### Groups
 
-#### Groups {#groups .unnumbered}
+This screen displays a list of the user's groups. The user can tap on a group to view its members.
 
-This screen displays a list of the user's groups. The user can tap on a
-group to view its members.
-
-<figure id="fig:groups">
-<figure>
-<img src="images/eventy/groups/groups.png" />
-<figcaption>Groups screen</figcaption>
-</figure>
-<figure>
-<img src="images/eventy/groups/group-detail.png" />
-<figcaption>Group details</figcaption>
-</figure>
-<figure>
-<img src="images/eventy/groups/new-group.png" />
-<figcaption>Create new group</figcaption>
-</figure>
-<figcaption>Create new group</figcaption>
-</figure>
+|![](images/eventy/groups/groups.png)|![](images/eventy/groups/group-detail.png)|![](images/eventy/groups/new-group.png)|
+|:-:|:-:|:-:|
+|Groups screen|Group detail|Create new group|
 
 #### Create Poll
 
@@ -413,77 +389,35 @@ title and add options for the poll. The user can also add a description
 and set a deadline for the poll. The user can then share the poll with
 other users or groups by inviting them to the poll.
 
-<figure id="fig:create-event">
-<figure>
-<img src="images/eventy/create/1-basics.png" />
-<figcaption>Set title - create screen</figcaption>
-</figure>
-<figure>
-<img src="images/eventy/create/2-locations.png" />
-<figcaption>Locations or virtual event</figcaption>
-</figure>
-<figure>
-<img src="images/eventy/create/2-add-location.png" />
-<figcaption>Add locations</figcaption>
-</figure>
-<figure>
-<img src="images/eventy/create/3-add-dates.png" />
-<figcaption>Add dates</figcaption>
-</figure>
-<figure>
-<img src="images/eventy/create/4-invite-group.png" />
-<figcaption>Invite group members</figcaption>
-</figure>
-<figure>
-<img src="images/eventy/create/4-invite-user.png" />
-<figcaption>Invite user</figcaption>
-</figure>
-<figcaption>Invite user</figcaption>
-</figure>
+|![](images/eventy/create/1-basics.png)|![](images/eventy/create/2-locations.png)|![](images/eventy/create/2-add-location.png)|
+|:-:|:-:|:-:|
+|Set title - create screen|Locations or virtual event|Add locations|
 
-#### Notifications {#notifications .unnumbered}
+|![](images/eventy/create/3-add-dates.png)|![](images/eventy/create/4-invite-group.png)|![](images/eventy/create/4-invite-user.png)|
+|:-:|:-:|:-:|
+|Add dates|Invite group members|Invite user|
 
-This screen displays a list of the user's notifications. The user can
-tap on a notification to view its details. Notifications about events,
-if cliked, will redirect the user to the event details screen.
+#### Notifications
 
-<figure id="fig:notifications">
-<figure>
-<img src="images/eventy/notifications/notifications.png" />
-<figcaption>Notifications</figcaption>
-</figure>
-<figure>
-<img src="images/eventy/notifications/event-detail.png" />
-<figcaption>Event details</figcaption>
-</figure>
-<figcaption>Event details</figcaption>
-</figure>
+This screen displays a list of the user's notifications. The user can tap on a notification to view its details. Notifications about events, if cliked, will redirect the user to the event details screen.
 
-![Tablet event detail in light
-mode](images/eventy/notifications/tablet-event-detail.png){#fig:tablet-event-detail
-width="0.9\\linewidth"}
+|![](images/eventy/notifications/notifications.png)|![](images/eventy/notifications/event-detail.png)|
+|:-:|:-:|
+|Notifications|Event details|
 
-#### Settings {#settings .unnumbered}
+<div align="center">
+    <img src="images/eventy/notifications/tablet-event-detail.png" width="50%"/>
 
-This screen displays the application settings. The user can edit their
-profile information and password. The user can also decide to log out
-from the application.
+    Tablet event detail in light mode
+</div>
 
-<figure id="fig:settings">
-<figure>
-<img src="images/eventy/settings/settings.png" />
-<figcaption>Settings</figcaption>
-</figure>
-<figure>
-<img src="images/eventy/settings/edit-profile.png" />
-<figcaption>Edit profile</figcaption>
-</figure>
-<figure>
-<img src="images/eventy/settings/change-password.png" />
-<figcaption>Change password</figcaption>
-</figure>
-<figcaption>Change password</figcaption>
-</figure>
+#### Settings
+
+This screen displays the application settings. The user can edit their profile information and password. The user can also decide to log out from the application.
+
+|![](images/eventy/settings/settings.png)|![](images/eventy/settings/edit-profile.png)|![](images/eventy/settings/change-password.png)|
+|:-:|:-:|:-:|
+|Settings|Edit profile|Change password|
 
 ## Visual design elements
 
@@ -493,19 +427,11 @@ application uses a consistent color scheme throughout, with a light and
 a dark theme. The color and basic shapes are Material Design 3
 compliant, thanks to the use of the FlexColorScheme package[^2].
 
-<figure id="fig:themes">
-<figure>
-<img src="images/theme/dark.png" />
-<figcaption>Dark theme</figcaption>
-</figure>
-<figure>
-<img src="images/theme/light.png" />
-<figcaption>Light theme</figcaption>
-</figure>
-<figcaption>Light theme</figcaption>
-</figure>
+|![](images/theme/dark.png)|![](images/theme/light.png)|
+|:-:|:-:|
+|Dark theme|Light theme|
 
-# Features and Functionality {#sec:features}
+# Features and Functionality
 
 ## Feature List
 
@@ -599,42 +525,36 @@ most significant tests with the corresponding sequence diagrams
 -   **Sign Up** This test case verifies that the user can sign up to the
     application.
 
-    <img src="images/test/integration-sign-up.png" width="50%"/>
+    <img src="images/test/integration-sign-up.png" width="100%" align="center"/>
 
 -   **Log In** This test case verifies that the user can log in to the
     application using the correct credentials.
 
-    ::: center
-    <img src="images/test/integration-log-in.png" width="1\\linewidth"}
-    :::
-
+    <img src="images/test/integration-log-in.png" width="100%" align="center"/>
 -   **Create Poll** This test case verifies that the user can create a
     poll.
 
-    ::: center
-    <img src="images/test/integration-create-poll.png" width="1\\linewidth"}
-    :::
+    <img src="images/test/integration-create-poll.png"  width="100%" align="center"/>
 
 -   **Vote Poll** This test case verifies that the user can vote a poll.
 
-    ::: center
-    <img src="images/test/integration-vote-poll.png" width="1\\linewidth"}
-    :::
+    <img src="images/test/integration-vote-poll.png"  width="100%" align="center"/>
 
--   **Create Group** This test case verifies that the user can create a
-    group.
+-   **Create Group** This test case verifies that the user can create a group.
 
-    ::: center
-    <img src="images/test/integration-create-group.png" width="1\\linewidth"}
-    :::
+    <img src="images/test/integration-create-group.png"  width="100%" align="center"/>
 
 Through the flutter coverage library, we managed to achieve a test
 coverage of 80%. The untested lines were manually tested and consist of
 mostly fallback widgets and methods in case of server errors (e.g.
 Firebase excpetions) or internet connection errors.
 
-![Testing coverage](images/test/coverage_all.png){#fig:testing-coverage
-width="1\\linewidth"}
+<div align="center">
+    <img src="images/test/coverage_all.png" width="100%"/>
+
+    Testing coverage
+</div>
+
 
 ### Automation testing
 
